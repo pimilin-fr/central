@@ -1,0 +1,50 @@
+{# ===== LOGIQUE DATES ROBUSTE ===== #}
+{% set nowTs = "now"|date("U") %}
+{% set beginTs = projet.beginAt ? projet.beginAt|date("U") : null %}
+{% set endTs = projet.endAt ? projet.endAt|date("U") : null %}
+{% set threeMonthsTs = "now"|date_modify("+3 months")|date("U") %}
+
+{% set isEnded = endTs and endTs < nowTs %}
+{% set isFuture = beginTs and beginTs > nowTs %}
+{% set isEndingSoon = endTs and endTs > nowTs and endTs <= threeMonthsTs %}
+{% set isActive = beginTs and beginTs <= nowTs and (not endTs or endTs >= nowTs) %}
+
+{# ===== PRIORITÉ LOGIQUE ===== #}
+{% if isEnded %}
+    {% set badgeClass = "bg-red-100 text-red-600" %}
+    {% set badgeLabel = "Terminé" %}
+    {% set icon = 'mdi:close-circle-outline' %}
+    {% set iconColor = 'text-red-500' %}
+{% elseif isFuture %}
+    {% set badgeClass = "bg-yellow-100 text-yellow-700" %}
+    {% set badgeLabel = "À venir" %}
+    {% set icon = 'mdi:clock-outline' %}
+    {% set iconColor = 'text-yellow-500' %}
+{% elseif isEndingSoon %}
+    {% set badgeClass = "bg-orange-100 text-orange-600" %}
+    {% set badgeLabel = "Fin proche" %}
+    {% set icon = 'mdi:alert-circle-outline' %}
+    {% set iconColor = 'text-orange-500' %}
+{% elseif isActive %}
+    {% set badgeClass = "bg-green-100 text-green-600" %}
+    {% set badgeLabel = "En cours" %}
+    {% set icon = 'pajamas:status-active' %}
+    {% set iconColor = 'text-green-500' %}
+{% else %}
+    {% set badgeClass = "bg-gray-100 text-gray-600" %}
+    {% set badgeLabel = "Indéfini" %}
+    {% set icon = 'mdi:help-circle-outline' %}
+    {% set iconColor = 'text-gray-500' %}
+{% endif %}
+{# ===== STATUT (ALIGNÉ HORIZONTAL) ===== #}
+<div class="flex items-center gap-2">
+    <span class="{{ iconColor }}">
+        {{ ux_icon(icon, { class: 'w-4 h-4' }) }}
+    </span>
+    <span class="px-2 py-1 text-xs font-semibold rounded {{ badgeClass }}">
+        {{ badgeLabel }}
+    </span>
+
+
+
+</div>

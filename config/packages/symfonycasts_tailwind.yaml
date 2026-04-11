@@ -1,0 +1,5 @@
+symfonycasts_tailwind:
+    # Specify the EXACT version of Tailwind CSS you want to use
+    binary_version: 'v4.1.11'
+    input_css: assets/styles/app.css
+    #output_css: public/build/tailwind.css

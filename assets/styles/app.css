@@ -1,0 +1,86 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --sidebar-width: 260px;
+    --bg: #f6f7fb;
+    --sidebar-bg: #1f2937;
+    --accent: #3b82f6;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    color: white;
+    padding-top: 1rem;
+    transition: transform .3s;
+}
+
+.sidebar nav a {
+    display: flex;              /* 👈 au lieu de block */
+    align-items: center;        /* 👈 centrage vertical */
+    gap: 0.75rem;               /* espace icône / texte */
+    color: white;
+    border:none;
+    text-decoration: none;
+    padding: .75rem;
+    /*border-radius: .5rem;*/
+}
+.sidebar nav a svg{
+    width: 1.5em;
+    height: 1.5em;
+}
+.sidebar nav a:hover {
+    background: rgba(255,255,255,.05);
+
+    /*    outline: 2px solid rgba(255,255,255,.25);
+        outline-offset: -2px;*/
+}
+.sidebar nav a:hover,  .sidebar nav a.nav_active{
+    border-left: 4px solid #e67505;
+}
+
+.sidebar-toggle {
+    display: none;
+}
+
+/* Mobile / tablette */
+@media (max-width: 1024px) {
+    .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        z-index: 1000;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-toggle {
+        display: block;
+        margin-bottom: 1rem;
+    }
+}
+
+.main {
+    flex: 1;
+    padding: 1.5rem;
+}
+
+/** Coloring & Sizing Txt */
+.sidebar nav a.nav_tiers svg{
+    color: #e67505;
+}

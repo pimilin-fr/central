@@ -1,0 +1,61 @@
+<div class="p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6">
+        {% for adresse in adresses %}
+            {% set bgColor = adresse.adresseType.couleur ?? '#F97316' %}
+            {% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
+
+            <a href="{{ path('app_adresse_show', {id: adresse.id}) }}"
+               class="block bg-white rounded-xl shadow hover:shadow-lg transition relative
+               p-6 pr-10 border">
+                {# --- Cercle année / mois --- #}
+                <div class="absolute -top-3 -left-3
+                     w-16 h-16
+                     rounded-full bg-orange-500
+                     flex flex-col items-center justify-center
+                     text-white font-bold text-xs shadow"
+                     style="background-color: {{ bgColor }}; color: {{ textColor }};
+                     ">
+
+                    <span class="leading-none">{{ adresse.adresseType.name|slice(0, 5) }}</span>
+                </div>
+
+                {# --- LISERAI DROIT --- #}
+                <div class="absolute top-0 right-0 h-full w-8
+                     bg-orange-500
+                     flex items-center justify-center
+                     rounded-r-xl text-white" style="background-color: {{ bgColor }}; color: {{ textColor }};"
+                     ">
+
+                    <span class=" text-xs font-bold tracking-wider
+                          rotate-90 whitespace-nowrap" >
+                        {{ adresse.villeCourte}}
+                    </span>
+                </div>
+
+                {# --- CONTENU --- #}
+                <div class="flex flex-col h-full">
+
+                    {# Ligne titre (remontée) #}
+                    <div class="flex items-center mb-2 pl-14 -mt-2">
+                        <h3 class="text-lg font-semibold text-gray-900 truncate">
+                            {{ adresse.name }}
+                        </h3>
+                    </div>
+
+                    <hr class="mb-2 mt-2"/>
+
+                    {# Type #}
+                    <p class="text-sm text-gray-500 mb-4">
+                        {{ adresse.adresse  }}
+                    </p>
+
+                </div>
+            </a>
+        {% else %}
+            <div class="col-span-full text-center text-gray-500 py-12">
+                Aucune adresse trouvée
+            </div>
+        {% endfor %}
+    </div>
+
+</div>

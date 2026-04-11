@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Portefeuilles{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        {# =========================
+            HEADER : Titre + actions (modernisé)
+            ========================= #}
+        {% 
+            set btns = [
+                {
+                    label: "Ajouter",
+                    path: path('app_tiers_new'),
+                    color: 'green',
+                    icon: 'ic:round-add',
+
+                }
+            ]
+        
+        %}
+        {% include 'partials/header.html.twig' with {
+            btns: btns,
+            title: "Portefeuilles - Liste",
+            item: null
+        } %}
+        
+        {# Table #}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {% include 'portefeuille/_table.html.twig' %}
+        </div>
+    </div>
+
+{% endblock %}

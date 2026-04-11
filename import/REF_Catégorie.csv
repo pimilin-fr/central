@@ -1,0 +1,90 @@
+Categorie,Nature,NatureID,CategorieN0,CategorieN1,CategorieN2,CodeDuo,Index,CategorieID
+Finance / Banque / Épargne,Dépense,N.DEP,Finance,Banque,Épargne,Fin.Ba,01,C.D-FIN.BA.01
+Finance / Banque / Frais bancaires,Dépense,N.DEP,Finance,Banque,Frais bancaires,Fin.Ba,02,C.D-FIN.BA.02
+Finance / Banque / Intérêts bancaires,Revenu,N.REV,Finance,Banque,Intérêts bancaires,Fin.Ba,03,C.R-FIN.BA.03
+Finance / Banque / PCC,Dépense,N.DEP,Finance,Banque,PCC,Fin.Ba,04,C.D-FIN.BA.04
+Finance / Banque / Retrait,Dépense,N.DEP,Finance,Banque,Retrait,Fin.Ba,05,C.D-FIN.BA.05
+Finance / Crédits / Intérêts crédits,Dépense,N.DEP,Finance,Crédits,Intérêts crédits,Fin.Cr,01,C.D-FIN.CR.01
+Finance / Crédits / Prêt auto,Revenu,N.REV,Finance,Crédits,Prêt auto,Fin.Cr,02,C.R-FIN.CR.02
+Finance / Crédits / Prêt Immo,Revenu,N.REV,Finance,Crédits,Prêt Immo,Fin.Cr,03,C.R-FIN.CR.03
+Finance / Crédits / Prêt Perso,Revenu,N.REV,Finance,Crédits,Prêt Perso,Fin.Cr,04,C.R-FIN.CR.04
+Finance / Crédits / Remboursement Prêts Perso,Dépense,N.DEP,Finance,Crédits,Remboursement Prêts Perso,Fin.Cr,05,C.D-FIN.CR.05
+Finance / Logement / Revenu Locatifs,Revenu,N.REV,Finance,Logement,Revenu Locatifs,Fin.Lo,01,C.R-FIN.LO.01
+Finance / Obligations / Frais réglementaires,Dépense,N.DEP,Finance,Obligations,Frais réglementaires,Fin.Ob,01,C.D-FIN.OB.01
+Finance / Obligations / Impôts,Dépense,N.DEP,Finance,Obligations,Impôts,Fin.Ob,02,C.D-FIN.OB.02
+Finance / Professionnel /  Indemnité,Revenu,N.REV,Finance,Professionnel,Indemnité,Fin.Pr,01,C.R-FIN.PR.01
+Finance / Professionnel /  Intéressement,Revenu,N.REV,Finance,Professionnel,Intéressement,Fin.Pr,02,C.R-FIN.PR.02
+Finance / Social / Chaumage,Revenu,N.REV,Finance,Social,Chaumage,Fin.So,01,C.R-FIN.SO.01
+Finance / Social / Trop Perçu (Chaumage),Dépense,N.DEP,Finance,Social,Trop Perçu (Chaumage),Fin.So,02,C.D-FIN.SO.02
+Finance / Professionnel /  Prime,Revenu,N.REV,Finance,Professionnel,Prime,Fin.Pr,03,C.R-FIN.PR.03
+Finance / Professionnel /  Salaire,Revenu,N.REV,Finance,Professionnel,Salaire,Fin.Pr,04,C.R-FIN.PR.04
+Finance / Exceptionnel / Revenus Divers,Revenu,N.REV,Finance,Exceptionnel,Revenus Divers,Fin.Ex,01,C.R-FIN.EX.01
+Finance / Exceptionnel / Héritage,Revenu,N.REV,Finance,Exceptionnel,Héritage,Fin.Ex,02,C.R-FIN.EX.02
+Finance / Exceptionnel / Pertes & Profits,Revenu,N.REV,Finance,Exceptionnel,Pertes & Profits,Fin.Ex,03,C.R-FIN.EX.03
+Finance / Social / CAF,Revenu,N.REV,Finance,Social,CAF,Fin.So,03,C.R-FIN.SO.03
+Logement / Ameublement / Accessoires,Dépense,N.DEP,Logement,Ameublement,Accessoires,Log.Am,01,C.D-LOG.AM.01
+Logement / Annexe / Stockage,Dépense,N.DEP,Logement,Annexe,Stockage,Log.An,01,C.D-LOG.AN.01
+Logement / Charges / Assurance,Dépense,N.DEP,Logement,Charges,Assurance,Log.Ch,01,C.D-LOG.CH.01
+Logement / Charges / Autres Charges,Dépense,N.DEP,Logement,Charges,Autres Charges,Log.Ch,02,C.D-LOG.CH.02
+Logement / Charges / Crédit Immo,Dépense,N.DEP,Logement,Charges,Crédit Immo,Log.Ch,03,C.D-LOG.CH.03
+Logement / Charges / Déménagement,Dépense,N.DEP,Logement,Charges,Déménagement,Log.Ch,04,C.D-LOG.CH.04
+Logement / Charges / Énergie (Élec & Gaz),Dépense,N.DEP,Logement,Charges,Énergie (Élec & Gaz),Log.Ch,05,C.D-LOG.CH.05
+Logement / Charges / Loyer,Dépense,N.DEP,Logement,Charges,Loyer,Log.Ch,06,C.D-LOG.CH.06
+Logement / Ameublement & Entretien / Bricolage,Dépense,N.DEP,Logement,Ameublement & Entretien,Bricolage,Log.Am,02,C.D-LOG.AM.02
+Logement / Ameublement & Entretien / Décoration,Dépense,N.DEP,Logement,Ameublement & Entretien,Décoration,Log.Am,03,C.D-LOG.AM.03
+Logement / Ameublement & Entretien / Mobilier,Dépense,N.DEP,Logement,Ameublement & Entretien,Mobilier,Log.Am,04,C.D-LOG.AM.04
+Logement /Ameublement & Entretien / Serrurier,Dépense,N.DEP,Logement,Ameublement & Entretien,Serrurier,Log.Am,05,C.D-LOG.AM.05
+Logement /Ameublement & Entretien / Ménage (services),Dépense,N.DEP,Logement,Ameublement & Entretien,Ménage (services),Log.Am,06,C.D-LOG.AM.06
+Quotidien /  Mode / Accessoire Beauté,Dépense,N.DEP,Quotidien,Mode,Accessoire Beauté,Quo.Mo,01,C.D-QUO.MO.01
+"Quotidien /  Mode / Sac, Ceintures",Dépense,N.DEP,Quotidien,Mode,"Sac, Ceintures",Quo.Mo,02,C.D-QUO.MO.02
+Quotidien / Abonnement / Internet & Mobile,Dépense,N.DEP,Quotidien,Abonnement,Internet & Mobile,Quo.Ab,01,C.D-QUO.AB.01
+Quotidien / Abonnement / Loisirs (annuel),Dépense,N.DEP,Quotidien,Abonnement,Loisirs (annuel),Quo.Ab,02,C.D-QUO.AB.02
+Quotidien / Abonnement / Streaming,Dépense,N.DEP,Quotidien,Abonnement,Streaming,Quo.Ab,03,C.D-QUO.AB.03
+Quotidien / Abonnement / Loisirs (mensuel),Dépense,N.DEP,Quotidien,Abonnement,Loisirs (mensuel),Quo.Ab,04,C.D-QUO.AB.04
+Quotidien / Abonnement / Sécurité (annuel),Dépense,N.DEP,Quotidien,Abonnement,Sécurité (annuel),Quo.Ab,05,C.D-QUO.AB.05
+Quotidien / Cadeaux / Autres Cadeaux,Dépense,N.DEP,Quotidien,Cadeaux,Autres Cadeaux,Quo.Ca,01,C.D-QUO.CA.01
+Quotidien / Cadeaux / Cadeaux Amis,Dépense,N.DEP,Quotidien,Cadeaux,Cadeaux Amis,Quo.Ca,02,C.D-QUO.CA.02
+Quotidien / Cadeaux / Cadeaux Famille,Dépense,N.DEP,Quotidien,Cadeaux,Cadeaux Famille,Quo.Ca,03,C.D-QUO.CA.03
+Quotidien / Consommation / Annimaux,Dépense,N.DEP,Quotidien,Consommation,Annimaux,Quo.Co,01,C.D-QUO.CO.01
+Quotidien / Consommation / Autres Matériels,Dépense,N.DEP,Quotidien,Consommation,Autres Matériels,Quo.Co,02,C.D-QUO.CO.02
+Quotidien / Consommation / Courses,Dépense,N.DEP,Quotidien,Consommation,Courses,Quo.Co,03,C.D-QUO.CO.03
+Quotidien / Consommation / Électroménager,Dépense,N.DEP,Quotidien,Consommation,Électroménager,Quo.Co,04,C.D-QUO.CO.04
+Quotidien / Consommation / High-Tech,Dépense,N.DEP,Quotidien,Consommation,High-Tech,Quo.Co,05,C.D-QUO.CO.05
+"Quotidien / Consommation / Multimédia (CD, DVD)",Dépense,N.DEP,Quotidien,Consommation,"Multimédia (CD, DVD)",Quo.Co,06,C.D-QUO.CO.06
+Quotidien / Consommation / Papeterie & Bureautique,Dépense,N.DEP,Quotidien,Consommation,Papeterie & Bureautique,Quo.Co,07,C.D-QUO.CO.07
+Quotidien / Correspondance / Documents,Dépense,N.DEP,Quotidien,Correspondance,Documents,Quo.Co,08,C.D-QUO.CO.08
+Quotidien / Correspondance / Affranchissement,Dépense,N.DEP,Quotidien,Correspondance,Affranchissement,Quo.Co,09,C.D-QUO.CO.09
+Quotidien / Correspondance / Colis,Dépense,N.DEP,Quotidien,Correspondance,Colis,Quo.Co,10,C.D-QUO.CO.10
+Quotidien / Correspondance / Recommandé,Dépense,N.DEP,Quotidien,Correspondance,Recommandé,Quo.Co,11,C.D-QUO.CO.11
+Quotidien / Famille / Sport,Dépense,N.DEP,Quotidien,Famille,Sport,Quo.Fa,01,C.D-QUO.FA.01
+Quotidien / Famille / Activités familiales,Dépense,N.DEP,Quotidien,Famille,Activités familiales,Quo.Fa,02,C.D-QUO.FA.02
+Quotidien / Famille / Enfant,Dépense,N.DEP,Quotidien,Famille,Enfant,Quo.Fa,03,C.D-QUO.FA.03
+Quotidien / Famille / Voyage,Dépense,N.DEP,Quotidien,Famille,Voyage,Quo.Fa,04,C.D-QUO.FA.04
+Quotidien / Loisir récréatif / Cinéma (solo),Dépense,N.DEP,Quotidien,Loisir récréatif,Cinéma (solo),Quo.Lo,01,C.D-QUO.LO.01
+Quotidien / Loisir récréatif / Gaming - Jeux vidéo,Dépense,N.DEP,Quotidien,Loisir récréatif,Gaming - Jeux vidéo,Quo.Lo,02,C.D-QUO.LO.02
+Quotidien / Mode / Chaussures & autres,Dépense,N.DEP,Quotidien,Mode,Chaussures & autres,Quo.Mo,03,C.D-QUO.MO.03
+Quotidien / Mode / Vêtements ,Dépense,N.DEP,Quotidien,Mode,Vêtements,Quo.Mo,04,C.D-QUO.MO.04
+Quotidien / Mode / Vêtements & accessoires à theme,Dépense,N.DEP,Quotidien,Mode,Vêtements & accessoires à theme,Quo.Mo,05,C.D-QUO.MO.05
+Quotidien / Mode/ Sous-vêtements,Dépense,N.DEP,Quotidien,Mode,Sous-vêtements,Quo.Mo,06,C.D-QUO.MO.06
+Quotidien / Transport / Assurance Auto,Dépense,N.DEP,Quotidien,Transport,Assurance Auto,Quo.Tr,01,C.D-QUO.TR.01
+Quotidien / Transport / Carburant (Essence / Élec),Dépense,N.DEP,Quotidien,Transport,Carburant (Essence / Élec),Quo.Tr,02,C.D-QUO.TR.02
+Quotidien / Transport / Amandes & PV,Dépense,N.DEP,Quotidien,Transport,Amandes & PV,Quo.Tr,03,C.D-QUO.TR.03
+Quotidien / Transport / Entretien Auto,Dépense,N.DEP,Quotidien,Transport,Entretien Auto,Quo.Tr,04,C.D-QUO.TR.04
+Quotidien / Transport / Crédit Auto,Dépense,N.DEP,Quotidien,Transport,Crédit Auto,Quo.Tr,05,C.D-QUO.TR.05
+Quotidien / Transport / Péages & Parkings,Dépense,N.DEP,Quotidien,Transport,Péages & Parkings,Quo.Tr,06,C.D-QUO.TR.06
+Quotidien / Transport / Transport en commun,Dépense,N.DEP,Quotidien,Transport,Transport en commun,Quo.Tr,07,C.D-QUO.TR.07
+Quotidien / Transport / Vélo libre service,Dépense,N.DEP,Quotidien,Transport,Vélo libre service,Quo.Tr,08,C.D-QUO.TR.08
+Santé & Bien-être / Loisirs Social / Adhésion association,Dépense,N.DEP,Santé & Bien-être,Loisirs Social,Adhésion association,San.Lo,01,C.D-SAN.LO.01
+Santé & Bien-être / Loisirs Social / Cinéma (partagé),Dépense,N.DEP,Santé & Bien-être,Loisirs Social,Cinéma (partagé),San.Lo,02,C.D-SAN.LO.02
+Santé & Bien-être / Loisirs Social / Dons association,Dépense,N.DEP,Santé & Bien-être,Loisirs Social,Dons association,San.Lo,03,C.D-SAN.LO.03
+Santé & Bien-être / Loisirs Social / Jeux de Société,Dépense,N.DEP,Santé & Bien-être,Loisirs Social,Jeux de Société,San.Lo,04,C.D-SAN.LO.04
+Santé & Bien-être / Loisirs Social / Attractions,Dépense,N.DEP,Santé & Bien-être,Loisirs Social,Attractions,San.Lo,05,C.D-SAN.LO.05
+Santé & Bien-être / Loisirs Social / Autre Loisirs,Dépense,N.DEP,Santé & Bien-être,Loisirs Social,Autre Loisirs,San.Lo,06,C.D-SAN.LO.06
+Santé & Bien-être / Loisirs Social / Sorties & Repas Perso,Dépense,N.DEP,Santé & Bien-être,Loisirs Social,Sorties & Repas Perso,San.Lo,07,C.D-SAN.LO.07
+Quotidien / Repas / Repas Midi,Dépense,N.DEP,Quotidien,Repas,Repas Midi,Quo.Re,01,C.D-QUO.RE.01
+Quotidien / Repas / Repas Resto partagés,Dépense,N.DEP,Quotidien,Repas,Repas Resto partagés,Quo.Re,02,C.D-QUO.RE.02
+Santé & Bien-être / Santé / Adhésion mutuelle,Dépense,N.DEP,Santé & Bien-être,Santé,Adhésion mutuelle,San.Sa,01,C.D-SAN.SA.01
+Santé & Bien-être / Santé / Analyses,Dépense,N.DEP,Santé & Bien-être,Santé,Analyses,San.Sa,02,C.D-SAN.SA.02
+Santé & Bien-être / Santé / Médicaments,Dépense,N.DEP,Santé & Bien-être,Santé,Médicaments,San.Sa,03,C.D-SAN.SA.03
+Santé & Bien-être / Santé / Remboursement mutuelle,Revenu,N.REV,Santé & Bien-être,Santé,Remboursement mutuelle,San.Sa,04,C.R-SAN.SA.04
+Santé & Bien-être / Santé / Soins,Dépense,N.DEP,Santé & Bien-être,Santé,Soins,San.Sa,05,C.D-SAN.SA.05

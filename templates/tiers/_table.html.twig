@@ -1,0 +1,99 @@
+<div class="p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6">
+        {% for tiers in tiers %}
+            {% set bgColor = tiers.tiersType.couleur ?? '#F97316' %}
+            {% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
+
+
+            {% set isDeleted = tiers.deletedAt is not null %}
+
+            <a href="{{ path('app_tiers_show', {id: tiers.id}) }}"
+               class="block bg-white rounded-xl shadow hover:shadow-lg transition relative
+               p-6 pr-10 border
+               {{ isDeleted ? 'opacity-40' : '' }}">
+
+                {# --- Cercle année / mois --- #}
+                {% if tiers.createdAt %}
+                    {% set year = tiers.createdAt|date('y') %}
+                    {% set month = tiers.createdAt|date('F')|lower %}
+                    {% set month_fr = {
+                        'january':'jan.', 'february':'fév.', 'march':'mars', 'april':'avril',
+                        'may':'mai', 'june':'juin', 'july':'juil.', 'august':'août',
+                        'september':'sept.', 'october':'oct.', 'november':'nov.', 'december':'déc.'
+                    }[month] %}
+                {% else %}
+                    {% set year = '—' %}
+                    {% set month_fr = '—' %}
+                {% endif %}
+
+                <div class="absolute -top-3 -left-3
+                     w-16 h-16
+                     rounded-full bg-orange-500
+                     flex flex-col items-center justify-center
+                     text-white font-bold text-xs shadow"
+                     style="background-color: {{ bgColor }}; color: {{ textColor }};">
+                    
+                    <span class="leading-none">{{ month_fr }}</span>
+                    <span class="w-8 border-t border-white my-1"></span>
+                    <span class="text-lg leading-none">{{ year }}</span>
+                </div>
+
+                {# --- LISERAI DROIT --- #}
+                <div class="absolute top-0 right-0 h-full w-8
+                     bg-orange-500
+                     flex items-center justify-center
+                     rounded-r-xl" 
+                     style="background-color: {{ bgColor }}; color: {{ textColor }};">
+                    
+                    <span class=" text-xs font-bold tracking-wider
+                          rotate-90 whitespace-nowrap">
+                        {{ tiers.tiersType.libelleLiserai|upper}}
+                    </span>
+                </div>
+
+                {# --- CONTENU --- #}
+                <div class="flex flex-col h-full">
+
+                    {# Ligne titre (remontée) #}
+                    <div class="flex items-center mb-2 pl-14 -mt-2">
+                        <h3 class="text-lg font-semibold text-gray-900 truncate">
+                            {{ tiers.name }}
+                        </h3>
+                    </div>
+
+                    <hr class="mb-2 mt-2"/>
+
+                    {# Type #}
+                    <p class="text-sm text-gray-500 mb-4">
+                        {{ tiers.tiersType.typeN1 ~ " / " ~ tiers.tiersType.typeN2  }}
+                    </p>
+
+                    {# Bas de carte #}
+                    <div class="mt-auto flex items-center justify-between">
+                        <span class="inline-flex items-center text-xs font-bold text-white bg-gray-800 px-2 py-0.5 rounded">
+                            {% for ta in tiers.tiersAdresses %}
+                                {% if ta.isPrincipale %}
+                                    {{ ux_icon('bxs:map', { class: 'mr-1' }) }} {{ ta.adresse.villeCourte }}
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+
+                        {% if isDeleted %}
+                            <span class="inline-flex items-center text-xs text-red-500 font-bold">
+                                {{ ux_icon('pajamas:status-active', { class: 'w-3 h-3 mr-1' }) }}
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center text-xs text-green-500 font-bold">
+                                {{ ux_icon('pajamas:status-active', { class: 'w-3 h-3 mr-1' }) }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        {% else %}
+            <div class="col-span-full text-center text-gray-500 py-12">
+                Aucun tiers trouvé
+            </div>
+        {% endfor %}
+    </div>
+</div>

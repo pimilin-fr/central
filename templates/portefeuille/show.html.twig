@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Portefeuille{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        {# =========================
+            HEADER : Titre + actions (modernisé)
+            ========================= #}
+        {% set btns = [
+                {   
+                   label: "Opération",
+                   path: "#",
+                   color: "green",
+                   icon: 'ic:round-add',
+                   attr: [{
+                            label: 'onclick', 
+                            value: 'App.modal.open("'~path('app_depenses_new', {portefeuille: portefeuille.id})~'")'
+                        }]
+                },{
+                    label: "Suppr.",
+                    path: path('app_portefeuille_delete', {id:portefeuille.id}),
+                    color: 'red',
+                    icon: 'gridicons:trash'
+                }, {
+                    label: "Retour",
+                    path: path('app_portefeuille_index'),
+                    color: 'gray',
+                    icon: 'mdi:arrow-left',
+            }] %}
+
+
+        {% include 'partials/header.html.twig' with {
+            btns: btns,
+            title: 'Portefeuille : '~portefeuille.name,
+            item: portefeuille
+        } %}
+
+        {# =========================
+        ONGLETS FONCTIONNELS
+        ========================= #}
+        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+
+        {% set tabs = [
+        {
+            id: 'summary',
+            label: 'Résumé',
+            content: include('portefeuille/_activite.html.twig')
+        },{
+            id: 'edit',
+            label: 'Modifier',
+            icon: 'mdi:pencil',
+            content: include('portefeuille/_form.html.twig')
+        }
+    ] %}
+
+        {% include 'partials/tabs.html.twig' with {
+        tabs: tabs,
+        activeTab: activeTab
+    } %}
+    </div>
+
+{% endblock %}

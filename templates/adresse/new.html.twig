@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Adresse{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        {# =========================
+            HEADER : Titre + actions (modernisé)
+            ========================= #}
+        {% set btns = [] %}
+        {% set btns = btns|merge([{
+                label: "Retour",
+                path: path('app_adresse_index'),
+                color: 'gray',
+                icon: 'mdi:arrow-left',
+            }]) %}
+
+
+        {% include 'partials/header.html.twig' with {
+            btns: btns,
+            title: 'Nouvelle adresse',
+            item: null
+        } %}
+
+
+        {# =========================
+          ONGLETS FONCTIONNELS
+          ========================= #}
+        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+
+        {% set tabs = [
+            {
+                id: 'summary', 
+                content: include('adresse/_form.html.twig'),
+                label: 'Ajout',
+                icon: 'ic:round-add'
+            }
+        ] %}
+
+        {% include 'partials/tabs.html.twig' with {
+            tabs: tabs,
+            activeTab: activeTab
+        } %}
+
+    </div>
+{% endblock %}

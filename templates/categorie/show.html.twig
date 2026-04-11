@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Adresse{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        {# =========================
+            HEADER : Titre + actions (modernisé)
+            ========================= #}
+        {% set btns = [] %}
+        {% if categorie.parent %}
+            {% set btns = btns|merge([
+                {
+                    label: "Parent",
+                    path: path('app_categorie_show', { id: categorie.parent.id }),
+                    color: 'green',
+                    icon: 'icon-park-solid:up-c',
+                }
+            ]) %}
+        {% endif %}
+        {% set btns = btns|merge([{
+                label: "Retour",
+                path: path('app_categorie_index'),
+                color: 'gray',
+                icon: 'mdi:arrow-left',
+            }]) %}
+
+
+        {% include 'partials/header.html.twig' with {
+            btns: btns,
+            title: 'Catégorie : '~categorie,
+            item: categorie
+        } %}
+        
+        {# =========================
+           ONGLETS FONCTIONNELS
+           ========================= #}
+        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+
+        {% set tabs = [
+            {
+                id: 'summary',
+                label: 'Résumé',
+                content: include('categorie/_resume.html.twig')
+            },{
+                id: 'childs',
+                label: 'Enfants',
+                badge: categorie.children|length,
+                content: include('categorie/_table.html.twig', { categories: categorie.children})
+            },{
+                id: 'edit',
+                label: 'Modifier',
+                icon: 'mdi:pencil',
+                content: include('categorie/_form.html.twig')
+            }
+        ] %}
+
+        {% include 'partials/tabs.html.twig' with {
+            tabs: tabs,
+            activeTab: activeTab
+        } %}
+
+    </div>
+
+
+
+
+{% endblock %}

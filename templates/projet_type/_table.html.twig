@@ -1,0 +1,9 @@
+<ul class="space-y-1">
+    {% for type in types %}
+        {% include 'projet_type/_node.html.twig' with { node: type, level: 0 } %}
+    {% else %}
+        <li>
+            Pas d'enfant
+        </li>
+    {% endfor %}
+</ul>

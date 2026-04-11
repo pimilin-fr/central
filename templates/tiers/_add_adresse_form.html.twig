@@ -1,0 +1,35 @@
+{{ form_start(addAdresseForm, {'attr': {'class': 'flex items-center gap-4 flex-wrap'}}) }}
+
+{# Adresse : label + input sur la même ligne #}
+<div class="flex items-center gap-2 flex-1 min-w-[250px]">
+    {{ form_label(addAdresseForm.adresse, null, {'label_attr': {'class': 'text-sm font-medium text-gray-700'}}) }}
+    {{ form_widget(addAdresseForm.adresse, {
+            'attr': {
+                'class': addAdresseForm.adresse.vars.attr.class ~ ' flex-1 rounded-md 
+                        border border-gray-300 shadow-sm 
+                        focus:border-green-500 focus:ring-1 focus:ring-green-500'
+            }
+        }) }}
+
+    {#{{ form_widget(addAdresseForm.adresse, {
+        'attr': {
+            'class': 'flex-1 rounded-md border-gray-300 shadow-sm focus:ring-orange-500 focus:border-orange-500'
+        }
+    }) }}#}
+</div>
+
+{# Checkbox "Principale" #}
+<div class="flex items-center gap-1">
+    {{ form_label(addAdresseForm.isPrincipale, 'Principale', {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
+    {{ form_widget(addAdresseForm.isPrincipale, {'attr': {'class': 'rounded text-green-500 accent-green-600'}}) }}
+
+</div>
+
+{# Bouton avec icône #}
+<button type="submit" 
+        class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg shadow-sm transition">
+    {{ ux_icon('fluent-mdl2:add', {'class': 'w-4 h-4 mr-2'}) }}
+    Ajouter
+</button>
+
+{{ form_end(addAdresseForm) }}

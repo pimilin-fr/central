@@ -1,0 +1,41 @@
+<li>
+    <a href="{{ path('app_projet_type_show', {id: node.id}) }}"
+       class="
+            group block rounded-lg
+            transition
+            hover:bg-gray-100
+            focus:outline-none focus:ring-2 focus:ring-blue-500
+       "
+       style="margin-left: {{ level * 24 }}px"
+    >
+        <div class="flex items-center justify-between px-4 py-2">
+
+            <div class="flex items-center gap-3">
+                {% if node.children|length > 0 %}
+                    <span class="text-gray-400 group-hover:text-gray-600">
+                        ▸
+                    </span>
+                {% else %}
+                    <span class="text-gray-300">
+                        •
+                    </span>
+                {% endif %}
+
+                <span class="font-medium text-gray-900">
+                    {{ node.libelle }}
+                </span>
+            </div>
+        </div>
+    </a>
+
+    {% if node.children|length > 0 %}
+        <ul class="mt-1 space-y-1">
+            {% for child in node.children %}
+                {% include 'projet_type/_node.html.twig' with {
+                    node: child,
+                    level: level + 1
+                } %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>

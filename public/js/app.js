@@ -1,0 +1,564 @@
+const App = {
+
+    config: {
+        debug: true,
+        version: "v1.3.25.1",
+        appName: "Central"
+    },
+
+    log(...args) {
+        if (this.config.debug) {
+            console.log("[" + this.config.appName + "-" + this.config.version + "]", ...args);
+        }
+    },
+
+    init() {
+
+        // surcharge config via Twig si dispo
+//        if (window.APP_CONFIG) {
+//            this.config = { ...this.config, ...window.APP_CONFIG };
+//            console.log('CONFIG', this.config);
+//        }
+
+        this.log('🚀 Init app');
+        this.log('config', this.config);
+
+        this.autocomplete.init();
+        this.tabs.init();
+        this.bulk.init();
+        this.loadMore.init();
+        this.releves.init();
+        this.depenses.init();
+        this.selectAll.init();
+        this.modal.init();
+    },
+
+    /* =========================================================
+     AUTOCOMPLETE
+     ========================================================= */
+    autocomplete: {
+        init(scope = document) {
+            App.log('Init autocomplete');
+
+            scope.querySelectorAll('.autocomplete').forEach(input => {
+
+                // 🔴 éviter double init
+                if (input.dataset.initialized)
+                    return;
+                input.dataset.initialized = "1";
+
+                const form = input.closest('form');
+                if (!form)
+                    return;
+
+                const resultsBox = document.createElement('div');
+                resultsBox.className = `
+            absolute left-0 right-0 mt-1
+            bg-white border border-gray-200
+            rounded-md shadow-lg
+            max-h-60 overflow-y-auto
+            z-50 hidden
+        `;
+
+                const wrapper = document.createElement('div');
+                wrapper.classList.add('relative');
+
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+                wrapper.appendChild(resultsBox);
+
+                let debounce;
+
+                function getHiddenField() {
+                    const inputName = input.name;
+
+                    if (inputName.includes('[')) {
+                        const hiddenName = inputName.replace(/\]$/, '_id]');
+                        return form.querySelector(`input[name="${hiddenName}"]`);
+                    }
+
+                    return form.querySelector(`input[name="${inputName}_id"]`);
+                }
+
+                input.addEventListener('input', function () {
+
+                    const query = this.value.trim();
+                    clearTimeout(debounce);
+
+                    const hidden = getHiddenField();
+                    if (hidden)
+                        hidden.value = '';
+
+                    if (query.length < 2) {
+                        resultsBox.classList.add('hidden');
+                        return;
+                    }
+
+                    debounce = setTimeout(async () => {
+
+                        const endpoint = input.dataset.endpoint;
+
+                        try {
+                            const response = await fetch(`${endpoint}?q=${encodeURIComponent(query)}`);
+                            const data = await response.json();
+
+                            resultsBox.innerHTML = '';
+
+                            if (!Array.isArray(data) || data.length === 0) {
+                                resultsBox.innerHTML =
+                                        '<div class="px-3 py-2 text-sm text-gray-400">Aucun résultat</div>';
+                                resultsBox.classList.remove('hidden');
+                                return;
+                            }
+
+                            data.forEach(item => {
+
+                                const option = document.createElement('div');
+                                option.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer';
+
+                                const label = item.label ?? item.name ?? item.text ?? '';
+                                option.textContent = label;
+
+                                option.addEventListener('mousedown', (e) => {
+                                    e.preventDefault();
+
+                                    input.value = label;
+
+                                    const hidden = getHiddenField();
+                                    if (hidden)
+                                        hidden.value = item.id;
+
+                                    resultsBox.classList.add('hidden');
+                                });
+
+                                resultsBox.appendChild(option);
+                            });
+
+                            resultsBox.classList.remove('hidden');
+
+                        } catch (error) {
+                            App.log('Autocomplete error', error);
+                        }
+
+                    }, 250);
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!wrapper.contains(e.target)) {
+                        resultsBox.classList.add('hidden');
+                    }
+                });
+
+            });
+        }
+
+//        init() {
+//            App.log('Init autocomplete');
+//
+//            document.querySelectorAll('.autocomplete').forEach(input => {
+//
+//                const form = input.closest('form');
+//                if (!form)
+//                    return;
+//
+//                const resultsBox = document.createElement('div');
+//                resultsBox.className = `
+//                    absolute left-0 right-0 mt-1
+//                    bg-white border border-gray-200
+//                    rounded-md shadow-lg
+//                    max-h-60 overflow-y-auto
+//                    z-50 hidden
+//                `;
+//
+//                const wrapper = document.createElement('div');
+//                wrapper.classList.add('relative');
+//
+//                input.parentNode.insertBefore(wrapper, input);
+//                wrapper.appendChild(input);
+//                wrapper.appendChild(resultsBox);
+//
+//                let debounce;
+//
+//                function getHiddenField() {
+//
+//                    const form = input.closest('form');
+//                    if (!form)
+//                        return null;
+//
+//                    const inputName = input.name;
+//
+//                    if (inputName.includes('[')) {
+//                        const hiddenName = inputName.replace(/\]$/, '_id]');
+//                        return form.querySelector(`input[name="${hiddenName}"]`);
+//                    }
+//
+//                    return form.querySelector(`input[name="${inputName}_id"]`);
+//                }
+//
+//                input.addEventListener('input', function () {
+//
+//                    const query = this.value.trim();
+//                    clearTimeout(debounce);
+//
+//                    const hidden = getHiddenField();
+//                    if (hidden)
+//                        hidden.value = '';
+//
+//                    if (query.length < 2) {
+//                        resultsBox.classList.add('hidden');
+//                        return;
+//                    }
+//
+//                    debounce = setTimeout(async () => {
+//
+//                        const endpoint = input.dataset.endpoint;
+//
+//                        try {
+//                            const response = await fetch(`${endpoint}?q=${encodeURIComponent(query)}`);
+//                            const data = await response.json();
+//
+//                            resultsBox.innerHTML = '';
+//
+//                            if (!Array.isArray(data) || data.length === 0) {
+//                                resultsBox.innerHTML =
+//                                        '<div class="px-3 py-2 text-sm text-gray-400">Aucun résultat</div>';
+//                                resultsBox.classList.remove('hidden');
+//                                return;
+//                            }
+//
+//                            data.forEach(item => {
+//
+//                                const option = document.createElement('div');
+//                                option.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer';
+//
+//                                const label = item.label ?? item.name ?? item.text ?? '';
+//                                option.textContent = label;
+//
+//                                option.addEventListener('mousedown', (e) => {
+//                                    e.preventDefault();
+//
+//                                    input.value = label;
+//
+//                                    const hidden = getHiddenField();
+//                                    if (hidden)
+//                                        hidden.value = item.id;
+//
+//                                    resultsBox.classList.add('hidden');
+//                                });
+//
+//                                resultsBox.appendChild(option);
+//                            });
+//
+//                            resultsBox.classList.remove('hidden');
+//
+//                        } catch (error) {
+//                            App.log('Autocomplete error', error);
+//                        }
+//
+//                    }, 250);
+//                });
+//
+//                document.addEventListener('click', function (e) {
+//                    if (!wrapper.contains(e.target)) {
+//                        resultsBox.classList.add('hidden');
+//                    }
+//                });
+//
+//            });
+//        }
+    },
+
+    /* =========================================================
+     TABS
+     ========================================================= */
+    tabs: {
+
+        init() {
+            App.log('Init tabs');
+
+            document.querySelectorAll('[data-tabs]').forEach(container => {
+
+                const buttons = container.querySelectorAll('.tab-button');
+                const contents = container.querySelectorAll('.tab-content');
+                const defaultTab = container.dataset.defaultTab || 'summary';
+
+                function activateTab(tab) {
+
+                    contents.forEach(c => c.classList.add('hidden'));
+
+                    buttons.forEach(b => {
+                        b.classList.remove('border-orange-500', 'text-orange-600');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+
+                    const content = container.querySelector('#tab-' + tab);
+                    if (!content)
+                        return;
+
+                    content.classList.remove('hidden');
+
+                    const btn = container.querySelector(`[data-tab="${tab}"]`);
+                    if (btn) {
+                        btn.classList.add('border-orange-500', 'text-orange-600');
+                        btn.classList.remove('border-transparent', 'text-gray-500');
+                    }
+
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', tab);
+                    history.replaceState({}, '', url);
+                }
+
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.preventDefault();
+                        activateTab(btn.dataset.tab);
+                    });
+                });
+
+                activateTab(defaultTab);
+            });
+        }
+    },
+
+    /* =========================================================
+     BULK ACTIONS
+     ========================================================= */
+    bulk: {
+
+        init() {
+            App.log('Init bulk');
+
+            const bulkForm = document.querySelector('[data-bulk-form]');
+            if (!bulkForm)
+                return;
+
+            const actionSelect = bulkForm.querySelector('#bulk-action');
+            if (!actionSelect)
+                return;
+
+            const fieldBlocks = bulkForm.querySelectorAll('[data-field]');
+
+            function hideAllFields() {
+                fieldBlocks.forEach(block => block.classList.add('hidden'));
+            }
+
+            function handleBulkChange() {
+
+                hideAllFields();
+
+                const selectedOption = actionSelect.options[actionSelect.selectedIndex];
+                const fields = selectedOption.dataset.fields;
+
+                if (!fields)
+                    return;
+
+                fields.split(',').forEach(fieldName => {
+                    const block = bulkForm.querySelector(`[data-field="${fieldName.trim()}"]`);
+                    if (block)
+                        block.classList.remove('hidden');
+                });
+            }
+
+            actionSelect.addEventListener('change', handleBulkChange);
+            handleBulkChange();
+        }
+    },
+
+    /* =========================================================
+     LOAD MORE (version lien)
+     ========================================================= */
+    loadMore: {
+
+        init() {
+            App.log('Init load more');
+
+            const link = document.getElementById('load-more');
+            if (!link)
+                return;
+
+            const container = document.getElementById('releves-container');
+            const endMessage = document.getElementById('load-more-end');
+
+            link.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                const offset = parseInt(link.dataset.offset);
+                const limit = parseInt(link.dataset.limit || 12);
+                const url = link.dataset.url;
+
+                link.innerText = 'Chargement...';
+                link.classList.add('pointer-events-none', 'opacity-50');
+
+                try {
+                    const response = await fetch(`${url}?offset=${offset}`);
+                    const html = await response.text();
+
+                    if (!html.trim()) {
+                        link.classList.add('hidden');
+                        if (endMessage)
+                            endMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    container.insertAdjacentHTML('beforeend', html);
+
+                    link.dataset.offset = offset + limit;
+                    link.innerText = 'Voir plus';
+                    link.classList.remove('pointer-events-none', 'opacity-50');
+
+                } catch (e) {
+                    App.log('Load more error', e);
+                    link.innerText = 'Erreur...';
+                }
+            });
+        }
+    },
+
+    /* =========================================================
+     RELEVES (toggle)
+     ========================================================= */
+    releves: {
+
+        init() {
+            App.log('Init relevés');
+
+            window.toggleReleve = function (id) {
+
+                const all = document.querySelectorAll('[id^="releve-"]');
+
+                all.forEach(el => {
+                    if (el.id !== 'releve-' + id) {
+                        el.classList.add('hidden');
+                    }
+                });
+
+                const target = document.getElementById('releve-' + id);
+                if (target)
+                    target.classList.toggle('hidden');
+            };
+        }
+    },
+
+    /* =========================================================
+     DEPENSES (toggle détail)
+     ========================================================= */
+    depenses: {
+
+        init() {
+            App.log('Init depenses');
+
+            document.querySelectorAll('.depense-row').forEach(row => {
+                row.addEventListener('click', () => {
+                    const id = row.dataset.id;
+                    const detail = document.getElementById('detail-' + id);
+                    if (detail)
+                        detail.classList.toggle('hidden');
+                });
+            });
+        }
+    },
+
+    /* =========================================================
+     SELECT ALL
+     ========================================================= */
+    selectAll: {
+
+        init() {
+            App.log('Init select all');
+
+            document.addEventListener('change', function (e) {
+
+                if (!e.target.classList.contains('select-all'))
+                    return;
+
+                const table = e.target.closest('table');
+                const checked = e.target.checked;
+
+                table.querySelectorAll('.row-checkbox').forEach(cb => {
+                    cb.checked = checked;
+                    cb.addEventListener('click', e => e.stopPropagation());
+                });
+
+            });
+        }
+    },
+
+    /* =========================================================
+     Gestion des modales
+     ========================================================= */
+    modal: {
+
+        init() {
+            App.log('Init modal');
+        },
+
+        open(url) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+
+            modal.classList.remove('hidden');
+
+            fetch(url)
+                    .then(res => res.text())
+                    .then(html => {
+                        content.innerHTML = html;
+
+                        App.autocomplete.init(content); // 🔥 Reload Autocomplete
+                        App.modal.bindForm();
+                    });
+        },
+
+        close() {
+            document.getElementById('modal').classList.add('hidden');
+        },
+
+        bindForm() {
+
+            const form = document.querySelector('#modal-content form');
+            if (!form)
+                return;
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const data = new FormData(form);
+
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: data,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        App.log('Saved');
+
+                        if (document.getElementById('keep-open')?.checked) {
+                            form.reset();
+                        } else {
+                            App.modal.close();
+                        }
+                    }
+
+                } else {
+                    // 🔥 cas erreur Symfony → on réinjecte le HTML
+                    const html = await response.text();
+                    document.getElementById('modal-content').innerHTML = html;
+
+                    // ré-init JS
+                    App.autocomplete.init(document.getElementById('modal-content'));
+                    App.modal.bindForm();
+                }
+            });
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => App.init());

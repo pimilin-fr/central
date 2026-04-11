@@ -1,0 +1,91 @@
+
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+
+    {# SOLDE #}
+    <div class="md:col-span-2 bg-gray-100 p-5 rounded-xl border shadow">
+        <div class="text-sm text-gray-800">Solde réel</div>
+
+        {% set solde = portefeuille.balanceActuelle %}
+        
+
+        <div class="text-2xl font-bold
+             {{ solde >= 0 ? 'text-green-600' : 'text-red-500' }}">
+            {{ solde|number_format(2, ',', ' ') }} €
+        </div>
+    </div>
+
+    {# INFOS PORTEFEUILLE #}
+    <div class="md:col-span-3 bg-gray-100 p-5 rounded-xl shadow border relative overflow-hidden">
+
+        {# liserai couleur #}
+        <div class="absolute left-0 top-0 h-full w-5"
+             style="background-color: {{ portefeuille.couleur ?? '#e5e7eb' }}"></div>
+
+        <div class="pl-4 grid grid-cols-2 gap-4 text-sm">
+
+            <div>
+                <p class="text-gray-800">Libellé</p>
+                <p class="font-medium">{{ portefeuille.libelle }}</p>
+            </div>
+
+            <div>
+                <p class="text-gray-800">Origine</p>
+                <p class="font-medium">{{ portefeuille.origine ?? '—' }}</p>
+            </div>
+
+            <div>
+                <p class="text-gray-800">Défaut</p>
+                <p class="font-medium">
+                    <span class="inline-flex items-center">
+                        {% if portefeuille.isDefault %}
+                            {{ ux_icon('mdi:check-circle', { class: 'w-5 h-5 text-green-500' }) }}
+                        {% else %}
+                            {{ ux_icon('mdi:close-circle', { class: 'w-5 h-5 text-gray-400' }) }}
+                        {% endif %}
+                    </span>
+                </p>
+            </div>
+
+            <div>
+                <p class="text-gray-800">Couleur</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded"
+                         style="background-color: {{ portefeuille.couleur }}"></div>
+                    <span>{{ portefeuille.couleur }}</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="mb-6">
+    <form method="post" action="{{ path('app_depenses_bulk_update') }}" class="mb-4"  data-bulk-form>
+        <div class="flex flex-wrap items-end gap-4 bg-gray-100 p-4 rounded-lg border shadow-sm space-y-3 mb-4">
+            {{ include('depenses/_bulk_components.html.twig') }}
+        </div>
+
+        <div id="releves-container">
+            {% include 'portefeuille/_releve.html.twig' %}
+        </div>
+{#
+        <a href="{{ path('app_portefeuille_releves_ajax', {
+            id: portefeuille.id,
+            offset: offset + limit
+        }) }}"  
+           id="load-more"
+           data-offset="{{ offset + limit }}"
+           data-limit="{{ limit }}"
+           data-url="{{ path('app_portefeuille_releves_ajax', {id: portefeuille.id}) }}"
+           class="inline-block px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
+           >
+            Voir plus
+        </a>
+
+        <div id="load-more-end" class="hidden text-sm text-gray-500 mt-3">
+            ✔️ Fin des relevés
+        </div> #}
+    </form>
+</div>
+

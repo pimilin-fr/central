@@ -1,0 +1,117 @@
+<div class="p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6">
+        {% for projet in projets %}
+
+            {% set bgColor = projet.couleur ?? '#F97316' %}
+            {% set textColor = projet.textColor ?? '#FFFFFF' %}
+
+            {# ===== LOGIQUE DATES ROBUSTE ===== #}
+            {% set nowTs = "now"|date("U") %}
+            {% set beginTs = projet.beginAt ? projet.beginAt|date("U") : null %}
+            {% set endTs = projet.endAt ? projet.endAt|date("U") : null %}
+            {% set threeMonthsTs = "now"|date_modify("+3 months")|date("U") %}
+
+            {% set isEnded = endTs and endTs < nowTs %}
+            {% set isFuture = beginTs and beginTs > nowTs %}
+            {% set isEndingSoon = endTs and endTs > nowTs and endTs <= threeMonthsTs %}
+            {% set isActive = beginTs and beginTs <= nowTs and (not endTs or endTs >= nowTs) %}
+
+            {# ===== PRIORITÉ LOGIQUE ===== #}
+            {% if isEnded %}
+                {% set badgeClass = "bg-red-100 text-red-600" %}
+                {% set badgeLabel = "Terminé" %}
+            {% elseif isFuture %}
+                {% set badgeClass = "bg-yellow-100 text-yellow-700" %}
+                {% set badgeLabel = "À venir" %}
+            {% elseif isEndingSoon %}
+                {% set badgeClass = "bg-orange-100 text-orange-600" %}
+                {% set badgeLabel = "Fin proche" %}
+            {% elseif isActive %}
+                {% set badgeClass = "bg-green-100 text-green-600" %}
+                {% set badgeLabel = "En cours" %}
+            {% else %}
+                {% set badgeClass = "bg-gray-100 text-gray-600" %}
+                {% set badgeLabel = "Indéfini" %}
+            {% endif %}
+
+            <a href="{{ path('app_projet_show', {id: projet.id}) }}"
+               class="block bg-white rounded-xl shadow hover:shadow-lg transition relative
+               p-6 pr-10 border
+               {{ isEnded or isFuture ? 'opacity-20' : '' }}
+               ">
+
+                {# ===== MOIS FR SANS INTL ===== #}
+                {% set months = {
+                    '01':'janv.', '02':'févr.', '03':'mars', '04':'avril',
+                    '05':'mai', '06':'juin', '07':'juil.', '08':'août',
+                    '09':'sept.', '10':'oct.', '11':'nov.', '12':'déc.'
+                } %}
+
+                {% if projet.beginAt %}
+                    {% set monthNum = projet.beginAt|date('m') %}
+                    {% set month_fr = months[monthNum] %}
+                    {% set year = projet.beginAt|date('y') %}
+                {% else %}
+                    {% set month_fr = '—' %}
+                    {% set year = '—' %}
+                {% endif %}
+
+                {# ===== CERCLE DATE ===== #}
+                <div class="absolute -top-3 -left-3
+                     w-16 h-16
+                     rounded-full
+                     flex flex-col items-center justify-center
+                     text-white font-bold text-xs shadow"
+                     style="background-color: {{ bgColor }}; color: {{ textColor }};">
+                    
+                    <span class="leading-none">{{ month_fr }}</span>
+                    <span class="w-8 border-t border-white my-1"></span>
+                    <span class="text-lg leading-none">{{ year }}</span>
+                </div>
+
+                {# ===== LISERAI DROIT ===== #}
+                <div class="absolute top-0 right-0 h-full w-8 rounded-r-xl"
+                     style="background-color: {{ bgColor }};">
+                </div>
+
+                {# ===== CONTENU ===== #}
+                <div class="flex flex-col h-full">
+
+                    <div class="flex items-center mb-2 pl-14 -mt-2">
+                        <h3 class="text-lg font-semibold text-gray-900 truncate">
+                            {{ projet.name }}
+                        </h3>
+                    </div>
+
+                    <hr class="mb-3 mt-2"/>
+
+                    <p class="text-sm text-gray-500 mb-4">
+                        {{ projet.type }}
+                    </p>
+
+                    {# ===== PÉRIODE EN FR ===== #}
+                    <div class="text-xs text-gray-500 mb-4">
+                        {% if projet.beginAt %}
+                            {% set m1 = months[projet.beginAt|date('m')] %}
+                            <span>{{ projet.beginAt|date('d') }} {{ m1 }} {{ projet.beginAt|date('Y') }}</span>
+                        {% endif %}
+
+                        {% if projet.endAt %}
+                            {% set m2 = months[projet.endAt|date('m')] %}
+                            <span class="mx-1">→</span>
+                            <span>{{ projet.endAt|date('d') }} {{ m2 }} {{ projet.endAt|date('Y') }}</span>
+                        {% endif %}
+                    </div>
+
+                    {# ===== BAS CARTE ===== #}
+                    {% include 'projet/_status.html.twig'%}
+                </div>
+            </a>
+
+        {% else %}
+            <div class="col-span-full text-center text-gray-500 py-12">
+                Aucun projet trouvé
+            </div>
+        {% endfor %}
+    </div>
+</div>

@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tiers{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        {# =========================
+              HEADER : Titre + actions (modernisé)
+              ========================= #}
+        {% set btns = [] %}
+        {% if tiers.tiersType %}
+            {% set btns = btns|merge([
+                {
+                    label: "Type",
+                    path: path('app_type_tiers_show', { id: tiers.tiersType.id }),
+                    color: 'green',
+                    icon: 'icon-park-solid:up-c',
+                }
+            ]) %}
+        {% endif %}
+        {% if tiers.deletedAt is null %}
+            {% set btns = btns|merge([ {
+                label: "Suppr.",
+                path: path('app_tiers_delete', {id:tiers.id}),
+                color: 'red',
+                icon: 'gridicons:trash'
+            }])%}
+        {% else %}
+            {% set btns = btns|merge([ {
+                label: "Retaure",
+                path: path('app_tiers_restore', {id:tiers.id}),
+                color: 'blue',
+                icon: 'fa-solid:trash-restore-alt'
+            }])%}
+        {% endif %}
+        {% set btns = btns|merge([{
+                label: "Retour",
+                path: path('app_tiers_index'),
+                color: 'gray',
+                icon: 'mdi:arrow-left',
+            }]) %}
+
+
+        {% include 'partials/header.html.twig' with {
+            btns: btns,
+            title: 'Tiers : '~tiers.name,
+            item: tiers,
+            subTitle:{
+                color: tiers.tiersType.couleur ,
+                label: tiers.tiersType.name 
+            }
+        } %}
+
+        {# =========================
+        ONGLETS FONCTIONNELS
+        ========================= #}
+        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+
+        {% set tabs = [
+            {
+                id: 'summary',
+                label: 'Résumé',
+                content: include('tiers/_resume.html.twig')
+            },
+            {
+                id: 'adresses',
+                label: 'Adresses',
+                badge: adresses|length,
+                content: include('tiers/_add_adresse_form.html.twig')
+                    ~ include('tiers/_show_adresses.html.twig')
+            },
+            {
+                id: 'lines',
+                label: 'Opérations',
+                badge: depenses|length,
+                content: include('depenses/_bulk_depense.html.twig')
+            },{
+                id: 'edit',
+                label: 'Modifier',
+                icon: 'mdi:pencil',
+                content: include('tiers/_form.html.twig')
+            }
+            ] %}
+
+        {% include 'partials/tabs.html.twig' with {
+            tabs: tabs,
+            activeTab: activeTab
+            } %}
+
+
+    </div>
+{% endblock %}

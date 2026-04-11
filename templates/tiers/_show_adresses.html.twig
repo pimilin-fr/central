@@ -1,0 +1,53 @@
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+
+    {# LISTE DES ADRESSES #}
+    <div class="space-y-3">
+        {% for ta in adresses %}
+            {% set adresse = ta.adresse %}
+            <div class="
+                 p-4 rounded-lg border 
+                 {% if ta.isPrincipale %}
+                     border-green-500 bg-green-50
+                 {% else %}
+                     border-gray-200 bg-white
+                 {% endif %}
+                 ">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-medium text-sm">
+                            {{ adresse }}
+                        </p>
+
+                        {% if ta.isPrincipale %}
+                            <span class="inline-flex items-center mt-1 text-xs text-green-700 font-semibold">
+                                {{ ux_icon('pajamas:star', {'class': 'w-4 h-4 mr-1'}) }}
+                                Adresse principale
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex gap-2 text-gray-400">
+                        <button class="hover:text-blue-600" title="Voir sur la carte">
+                            {{ ux_icon('mdi:map-marker', {'class': 'w-5 h-5'}) }}
+                        </button>
+                        <button class="hover:text-red-600" title="Délier">
+                            <a href="{{ path('app_tiers_adresse_unlink', {id: ta.id}) }}"
+                               class="text-gray-500 hover:text-gray-800">
+                                {{ ux_icon('mdi:link-off', {'class': 'w-5 h-5'}) }}
+                            </a>
+
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-sm text-gray-500">Aucune adresse liée</p>
+        {% endfor %}
+    </div>
+
+    {# CARTE #}
+    <div class="rounded-lg border bg-gray-100 flex items-center justify-center min-h-[500px]">
+        <div id="map" style="height: 500px;"></div>
+    </div>
+
+</div>

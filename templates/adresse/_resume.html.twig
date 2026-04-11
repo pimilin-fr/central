@@ -1,0 +1,72 @@
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+    {# Résumé principal #}
+    <div class="lg:col-span-3 bg-white rounded-xl shadow-sm p-5">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+            {# Nom interne #}
+            <div>
+                <p class="text-gray-500">Nom</p>
+                <p class="text-gray-800 font-medium">
+                    {{ adresse.name }}
+                </p>
+            </div>
+
+            {# Type d'adresse avec couleur dynamique #}
+            <div>
+                <p class="text-gray-500">Type</p>
+                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full text-white"
+                      style="background-color: {{ adresse.adresseType.color }}">
+                    {{ adresse.adresseType.name }}
+                </span>
+            </div>
+
+            {# Adresse complète formatée #}
+            <div class="md:col-span-2">
+                <p class="text-gray-500">Adresse</p>
+                <p class="text-gray-800 font-medium leading-relaxed">
+                    {{ adresse.prefix }}
+                    {%if adresse.num !=0%}{{ adresse.num }}{% endif %}
+                    {{ adresse.bisTer }}
+                    {{ adresse.typeVoie }}
+                    {{ adresse.nomVoie }}<br>
+                    {{ adresse.codePostal }}
+                    {{ adresse.ville }}
+                    {% if adresse.cedex %} CEDEX {{ adresse.cedex }}{% endif %}<br>
+                    {{ adresse.pays }}
+                </p>
+            </div>
+
+            {# Adresse parent si existe #}
+            {% if adresse.adresseParent %}
+                <div>
+                    <p class="text-gray-500">Adresse parent</p>
+                    <p class="text-gray-800 font-medium">
+                        {{ adresse.adresseParent.name }}
+                    </p>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {# Tuile latérale #}
+    <div class="bg-gray-50 rounded-xl border shadow-sm p-4 text-sm">
+
+        {% if adresse.adresseForcee %}
+            <p class="flex items-center gap-2 text-xs text-orange-600 font-bold">
+                {{ ux_icon('mdi:map-marker-alert', { class: 'w-4 h-4' }) }}
+                <span>Adresse forcée</span>
+            </p>
+        {% endif %}
+
+        {% if adresse.adresseExact %}
+            <p class="mt-2 text-xs text-gray-500 uppercase">Adresse exacte</p>
+            <p class="text-gray-800 text-xs break-words">
+                {{ adresse.adresseExact }}
+            </p>
+        {% endif %}
+
+    </div>
+</div>

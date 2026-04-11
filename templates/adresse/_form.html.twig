@@ -1,0 +1,233 @@
+{{ form_start(form, { attr: { class: 'space-y-6' } }) }}
+
+{# =========================
+   CHAMPS
+   ========================= #}
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    {# Nom #}
+    <div class=" md:col-span-2">
+        {{ form_label(form.name, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.name, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.name) }}
+    </div>
+
+    {# Type #}
+    <div>
+        {{ form_label(form.adresseType, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.adresseType, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.adresseType) }}
+    </div>
+    {# parent #}
+    <div>
+        {{ form_label(form.adresseParent, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.adresseParent, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.adresseParent) }}
+    </div>
+    {# num #}
+    <div>
+        {{ form_label(form.prefix, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.prefix, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.prefix) }}
+    </div>
+    {# num #}
+    <div>
+        {{ form_label(form.num, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.num, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.num) }}
+    </div>
+    {# bis #}
+    <div>
+        {{ form_label(form.bisTer, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.bisTer, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.bisTer) }}
+    </div>
+    {# typeVoie #}
+    <div>
+        {{ form_label(form.typeVoie, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.typeVoie, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.bisTer) }}
+    </div>
+    {# voie #}
+    <div>
+        {{ form_label(form.nomVoie, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.nomVoie, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.nomVoie) }}
+    </div>
+    {# CP #}
+    <div>
+        {{ form_label(form.codePostal, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.codePostal, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.codePostal) }}
+    </div>
+    {# ville #}
+    <div>
+        {{ form_label(form.ville, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.ville, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.ville) }}
+    </div>
+    {# cedex #}
+    <div>
+        {{ form_label(form.cedex, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.cedex, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.cedex) }}
+    </div>
+
+    {# pays #}
+    <div class=" md:col-span-2"></div>
+    <div>
+        {{ form_label(form.pays, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.pays, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.pays) }}
+    </div><div></div>
+
+    {# adresse #}
+    <div>
+        {{ form_label(form.adresse, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.adresse, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.adresse) }}
+    </div><div>
+        {{ form_label(form.adresseForcee, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.adresseForcee, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.adresseForcee) }}
+    </div><div>
+        {{ form_label(form.adresseExact, null, {
+            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+        }) }}
+
+        {{ form_widget(form.adresseExact, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.adresseExact) }}
+    </div>
+</div>
+
+{{ form_widget(form) }}
+{# =========================
+   ACTIONS
+   ========================= #}
+<div class="flex justify-end gap-3 pt-4">
+    <button type="submit"
+            class="inline-flex items-center gap-2 px-4 py-2
+            text-sm font-medium rounded-lg
+            bg-orange-500 hover:bg-orange-600 text-white transition">
+        {{ ux_icon('mdi:content-save-outline', { class: 'w-4 h-4' }) }}
+        Enregistrer
+    </button>
+</div>
+
+{{ form_end(form) }}

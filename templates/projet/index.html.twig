@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projet{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        {# =========================
+            HEADER : Titre + actions (modernisé)
+            ========================= #}
+        {% 
+            set btns = [
+                {
+                    label: "Ajouter",
+                    path: path('app_projet_new'),
+                    color: 'green',
+                    icon: 'ic:round-add',
+                },{
+                    label: "Type projets",
+                    icon: "grommet-icons:cubes",
+                    color: "blue",
+                    path: path('app_projet_type_index')
+                }
+            ]
+        
+        %}
+        {% include 'partials/header.html.twig' with {
+            btns: btns,
+            title: "Projet - Liste",
+            item: null
+        } %}
+        {# Table #}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {% include 'projet/_table.html.twig' %}
+        </div>
+        {# Header #
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-semibold text-gray-800">
+                Tiers
+            </h1>
+
+            <a href="{{ path('app_tiers_new') }}"
+               class="inline-flex items-center gap-2
+               bg-orange-500 hover:bg-orange-600
+               text-white text-sm font-medium
+               px-4 py-2 rounded-lg
+               shadow-sm transition">
+                {{ ux_icon('ic:round-add', { class: 'w-5 h-5' }) }}
+                Nouveau
+            </a>
+            <a href="{{ path('app_type_tiers_index') }}"
+               class="inline-flex items-center gap-2
+               bg-blue-500 hover:bg-blue-600
+               text-white text-sm font-medium
+               px-4 py-2 rounded-lg
+               shadow-sm transition">
+                {{ ux_icon('mage:users-fill', { class: 'w-5 h-5' }) }}
+                Type Tiers
+            </a>
+        </div>
+
+        {# Table #
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {% include 'tiers/_table.html.twig' %}
+        </div>
+        
+    </div>#}
+    {% endblock %}

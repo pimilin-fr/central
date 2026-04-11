@@ -1,0 +1,91 @@
+<div class="p-6 bg-gray-100">
+    {% set grouped = {} %}
+
+    {# --- Grouper les N3 par N1 puis N2 --- #}
+    {% for type in types %}
+        {% set n1 = type.typeN1 %}
+        {% set n2 = type.typeN2 %}
+
+        {% if grouped[n1] is not defined %}
+            {% set grouped = grouped|merge({ (n1): {} }) %}
+        {% endif %}
+
+        {% set currentN1 = grouped[n1] %}
+        {% if currentN1[n2] is not defined %}
+            {% set currentN1 = currentN1|merge({ (n2): [] }) %}
+        {% endif %}
+
+        {% set currentN2 = currentN1[n2]|merge([type]) %}
+        {% set currentN1 = currentN1|merge({ (n2): currentN2 }) %}
+        {% set grouped = grouped|merge({ (n1): currentN1 }) %}
+    {% endfor %}
+
+    {# --- Script toggle inversé --- #}
+    <script>
+        function toggleSection(id, iconId) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(iconId);
+            if(el) el.classList.toggle('hidden'); // cache / montre la section
+            if(icon) icon.classList.toggle('rotate-90'); // rotate-90 = chevron fermé (droite)
+        }
+    </script>
+
+    {# --- Affichage N1 > N2 > N3 avec chevrons corrects --- #}
+    {% for n1, n2s in grouped %}
+        <div class="mb-6">
+            <div class="flex items-center cursor-pointer select-none"
+                 onclick="toggleSection('section-{{ loop.index }}', 'icon-n1-{{ loop.index }}')">
+                {{ ux_icon('heroicons-outline:chevron-down', {
+                    id: 'icon-n1-' ~ loop.index,
+                    class: 'w-5 h-5 mr-2 transition-transform'
+                }) }}
+                <h2 class="text-2xl font-bold text-gray-900">{{ n1 }}</h2>
+            </div>
+
+            <div id="section-{{ loop.index }}">
+                {% for n2, n3s in n2s %}
+                    <div class="mb-4">
+                        <div class="flex items-center ml-4 cursor-pointer select-none"
+                             onclick="toggleSection('subsection-{{ loop.parent.loop.index }}-{{ loop.index }}', 'icon-n2-{{ loop.parent.loop.index }}-{{ loop.index }}')">
+                            {{ ux_icon('heroicons-outline:chevron-down', {
+                                id: 'icon-n2-' ~ loop.parent.loop.index ~ '-' ~ loop.index,
+                                class: 'w-4 h-4 mr-2 transition-transform'
+                            }) }}
+                            <h3 class="text-lg font-semibold text-gray-700">{{ n2 }}</h3>
+                        </div>
+
+                        <div id="subsection-{{ loop.parent.loop.index }}-{{ loop.index }}"
+                             class="ml-8 grid gap-4">
+
+                            {% for n3 in n3s %}
+                                <a href="{{ path('app_type_tiers_show', {id: n3.id}) }}"
+                                   class="relative flex items-center border rounded-xl shadow hover:shadow-lg bg-white transition overflow-hidden">
+
+                                    {# --- Liserai vertical arrondi --- #}
+                                    {% if n3.couleur %}
+                                        <div class="w-3 h-full flex items-center justify-center rounded-l-xl"
+                                             style="background-color: {{ n3.couleur }};">
+                                            {% if n3.libelleLiserai %}
+                                                <span class="text-white text-xs font-bold rotate-90 whitespace-nowrap origin-left">
+                                                    {{ n3.libelleLiserai }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                    {# --- Contenu de la carte N3 --- #}
+                                    <div class="flex-1 p-4">
+                                        <span class="font-semibold text-gray-900">{{ n3.typeN3 }}</span>
+                                    </div>
+
+                                    
+                                </a>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

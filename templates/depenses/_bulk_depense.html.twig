@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_depenses_bulk_update') }}" class="mb-4 space-y-3"  data-bulk-form>
+    <div class="flex flex-wrap items-end gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
+        {{ include('depenses/_bulk_components.html.twig') }}
+    </div>
+    {{ include('depenses/_table.html.twig') }}
+</form>

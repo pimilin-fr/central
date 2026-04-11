@@ -1,0 +1,49 @@
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+    {# =========================
+       BLOC PRINCIPAL
+       ========================= #}
+    <div class="lg:col-span-4 bg-white p-6 rounded-xl border shadow-sm space-y-6">
+
+        {# Types hiérarchiques #}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+                <p class="text-gray-500">Type</p>
+                <p class="text-gray-800 font-medium">{{ portefeuille.type }}</p>
+            </div>
+
+            <div>
+                <p class="text-gray-500">Origine</p>
+                <p class="text-gray-800 font-medium">{{ portefeuille.origine }}</p>
+            </div>
+
+            <div>
+                <p class="text-gray-500">Libelle</p>
+                <p class="text-gray-800 font-medium">{{ portefeuille.Libelle }}</p>
+            </div>
+        </div>
+   
+
+    </div>
+
+    {# =========================
+       TUILE LATERALE LISERAI
+       ========================= #}
+    <div class="lg:col-span-1">
+        <div
+            class="h-full rounded-xl border shadow-sm flex items-center justify-center text-center p-4"
+            style="border-left: 20px solid {{ portefeuille.couleur }};"
+            >
+            <div>
+                <p class="text-xs tracking-wide text-gray-500 mb-1">
+                    Liserai
+                </p>
+
+                <p class="text-sm uppercase font-semibold text-gray-800">
+                    {{ portefeuille.name ?? '—' }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,128 @@
+{% set releveId = depense.releveId ?? 0 %}
+<table class="min-w-full divide-y divide-gray-200 text-sm" data-releve="{{ releveId }}">
+    <thead class="bg-gray-50">
+        <tr>
+            <th><input type="checkbox" class="select-all"/></th>
+            <th class="px-4 py-3 text-left">Date</th>
+            <th class="px-4 py-3 text-left">Catégorie</th>
+            <th class="px-4 py-3 text-left">Tiers</th>
+            <th class="px-4 py-3 text-left">Projet</th>
+            <th class="px-4 py-3 text-right">Montant</th>
+        </tr>
+    </thead>
+
+    <tbody class="divide-y">
+
+        {% for depense in depenses %}
+            <tr class="hover:bg-gray-50 cursor-pointer depense-row"
+                data-id="{{ depense.id }}">
+
+                <td onclick="event.stopPropagation()">
+                    <input type="checkbox"
+                           name="ids[]"
+                           value="{{ depense.id }}"
+                           class="row-checkbox">
+                </td>
+
+                <td class="px-4 py-2">
+                    {{ depense.date|date('d/m/Y') }}
+                </td>
+
+                <td class="px-4 py-2">
+                    {{ depense.categorie.name ?? '-' }}
+                </td>
+
+                <td class="px-4 py-2">
+                    <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full"
+                          style="
+                          background-color: {{ depense.tiers.tiersType.color }};
+                          color: {{ depense.tiers.tiersType.textColor }};
+                          ">
+
+                        <span class="w-2 h-2 rounded-full"
+                              style="background-color: {{ depense.tiers.tiersType.color }}"></span>
+
+                        <span>{{ depense.tiers.name }}</span>
+                    </span>
+                </td>
+
+                <td class="px-4 py-2">
+                    {% if (depense.projet) %}
+                        <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full"
+                              style="
+                              background-color: {{ depense.projet.color }};
+                              color: {{ depense.projet.textColor }};
+                              ">
+
+                            <span class="w-2 h-2 rounded-full"
+                                  style="background-color: {{ depense.projet.color }}"></span>
+
+                            <span>{{ depense.projet.name }}</span>
+                        </span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+                {#<td class="px-4 py-2 text-right font-medium
+                    {{ depense.categorie.isDepense ? 'text-red-500' : 'text-green-500' }}">
+                    {{ depense.montant|number_format(2, ',', ' ') }} €
+                </td>#}
+
+                {% if depense.categorie.isDepense %}
+                    {% if  depense.montant < 0 %}
+                        <td class="px-4 py-2 text-right text-blue-500 font-medium">
+                            + {{ 
+                            (
+                                (depense.montant|default('0')|replace({' ': '', ',': '.'})) * -1
+                            )
+                            |number_format(2, ',', ' ')
+                            }} €
+                        </td>
+                    {% else %}
+                        <td class="px-4 py-2 text-right text-red-500 font-medium">
+                            - {{ depense.montant|number_format(2, ',', ' ') }} €
+                        </td>
+                    {% endif %}
+                {% else %}
+                    <td class="px-4 py-2 text-right text-green-500 font-medium">
+                        + {{ depense.montant|number_format(2, ',', ' ') }} €
+                    </td>
+                {% endif %}
+            </tr>
+
+            {# DETAILS (hidden) #}
+            <tr class="hidden bg-gray-50 detail-row" id="detail-{{ depense.id }}">
+                <td colspan="6" class="px-4 py-3 text-xs text-gray-600">
+
+                    <div class="grid grid-cols-3 gap-4">
+
+                        <div>
+                            <strong>Commande :</strong> {{ depense.numCommande ?? '-' }}
+                        </div>
+
+                        <div>
+                            <strong>Portefeuille :</strong> {{ depense.portefeuille.libelle }}
+                        </div>
+
+                        <div>
+                            <strong>Relevé :</strong>
+                            {{ depense.releve ? depense.releve.date|date('d/m/Y') : '-' }}
+                        </div>
+                        
+                        <div class="md:row-span-3">
+                            <strong>Note :</strong> {{ depense.note ? depense.note  : '-' }}
+                        </div>
+
+                    </div>
+
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">Pas de dépenses</td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

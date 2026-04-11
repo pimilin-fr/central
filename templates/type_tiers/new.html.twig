@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New TypeTiers{% endblock %}
+
+{% block body %}
+    <h1>Create new TypeTiers</h1>
+
+    {{ include('type_tiers/_form.html.twig') }}
+
+    <a href="{{ path('app_type_tiers_index') }}">back to list</a>
+{% endblock %}

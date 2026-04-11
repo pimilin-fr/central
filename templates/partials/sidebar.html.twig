@@ -1,0 +1,64 @@
+{% set route = app.request.attributes.get('_route') %}
+
+<aside class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+    <nav>
+        <a href="{{ path('app_tiers_index') }}" 
+           class="nav-item nav_tiers flex items-center gap-2  
+           {{ route starts with 'app_tiers_' or route starts with 'app_type_tiers_'
+                ? 'nav_active'
+                : ''
+           }}">
+            {{ ux_icon('mage:user-fill', { fill:"#e67505", 'aria-label': 'Tiers' }) }}
+            <span>Tiers</span>
+        </a>
+
+        <a href="{{ path('app_categorie_index') }}"
+           class="nav-item nav_tiers flex items-center gap-2  
+           {{  route starts with 'app_categorie_'
+                ? 'nav_active'
+                : ''
+           }}">
+            {{ ux_icon('streamline-flex:search-category-solid', { fill:"#e67505", 'aria-label': 'Catégorie' }) }}
+            <span>Catégorie</span
+        </a>
+        <a href="{{ path('app_portefeuille_index') }}"
+           class="nav-item nav_tiers flex items-center gap-2  
+           {{  route starts with 'app_portefeuille_'
+                ? 'nav_active'
+                : ''
+           }}">
+            {{ ux_icon('solar:wallet-money-bold', { fill:"#e67505", 'aria-label': 'Portefeuille' }) }}
+            <span>Portefeuille</span>
+        </a>
+        <a href="{{ path('app_adresse_index') }}"
+           class="nav-item nav_tiers flex items-center gap-2  
+           {{  route starts with 'app_adresse_'
+                ? 'nav_active'
+                : ''
+           }}">
+            {{ ux_icon('entypo:address', { fill:"#e67505", 'aria-label': 'Adresse' }) }}
+            <span>Adresse</span>
+        </a>
+        <a href="{{ path('app_projet_index') }}"
+           class="nav-item nav_tiers flex items-center gap-2  
+           {{  route starts with 'app_projet_'
+                ? 'nav_active'
+                : ''
+           }}">
+            {{ ux_icon('ix:project', { fill:"#e67505", 'aria-label': 'Projet' }) }}
+            <span>Projet</span>
+        </a>
+        <a href="{{ path('app_depenses_index') }}" class="nav-item nav_tiers flex items-center gap-2  
+           {{  route starts with 'app_depenses_'
+                ? 'nav_active'
+                : ''
+           }}">
+            {{ ux_icon('healthicons:money-bag', { fill:"#e67505", 'aria-label': 'Dépenses' }) }}
+            <span>Dépenses</span>
+            
+        </a>
+        <a href="#">📊 Rapports</a>
+    </nav>
+</aside>

@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Type Tiers{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+        {# =========================
+            HEADER : Titre + actions (modernisé)
+            ========================= #}
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+            {# Titre & meta #}
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-800 leading-tight">
+                    {{ typeTiers.name }}
+                </h1>
+
+            </div>
+
+            {# Actions #}
+            <div class="flex flex-col items-end gap-2">
+
+                {# ID du tiers #}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md
+                      bg-gray-200 text-gray-600 text-xs font-mono border
+                      cursor-default select-none"
+                      title="{{ typeTiers.code }}">
+                    #{{ typeTiers.code|slice(0, 30) }}
+                </span>
+
+                {# Boutons #}
+                <div class="flex items-center gap-2 flex-wrap">
+
+                    <a href="{{ path('app_type_tiers_index') }}"
+                       class="inline-flex items-center gap-2 px-3 py-2
+                       text-sm font-medium rounded-lg
+                       bg-gray-600 hover:bg-gray-700 text-white transition">
+                        {{ ux_icon('mdi:arrow-left', {class: 'w-4 h-4'}) }}
+                        Retour
+                    </a>
+
+
+                </div>
+            </div>
+        </div>
+
+        {# =========================
+           ONGLETS FONCTIONNELS
+           ========================= #}
+        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+
+        {% set tabs = [
+            {
+                id: 'summary',
+                label: 'Résumé',
+                content: include('type_tiers/_resume.html.twig')
+            },
+            {
+                id: 'tiers',
+                label: 'Tiers',
+                badge: tiers|length,
+                content: include('tiers/_table.html.twig')
+            },
+            {
+                id: 'edit',
+                label: 'Modifier',
+                icon: 'mdi:pencil',
+                content: include('type_tiers/_form.html.twig', {
+                    form: form
+                })
+            }
+        ] %}
+
+        {% include 'partials/tabs.html.twig' with {
+            tabs: tabs,
+            activeTab: activeTab
+        } %}
+
+
+
+
+
+
+
+    {% endblock %}

@@ -1,0 +1,73 @@
+{% set buttonColors = {
+    orange: 'bg-orange-500 hover:bg-orange-600 text-white',
+    green : 'bg-green-500 hover:bg-green-600 text-white',
+    red:  'bg-red-500 hover:bg-red-600 text-white',
+    gray:   'bg-gray-500 hover:bg-gray-600 text-white',
+    blue: 'bg-blue-500 hover:bg-blue-600 text-white',
+} %}
+
+<div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+
+    {# =========================
+       Titre & sous-titre
+    ========================== #}
+    <div class="flex flex-col gap-3">
+
+        {# Titre principal #}
+        <h1 class="text-2xl font-semibold text-gray-800 leading-tight">
+            {{ title }}
+        </h1>
+        {%  if subTitle is defined %}
+            {# Sous-titre avec liserai #}
+            <div class="flex items-center">
+                <div class="w-1.5 h-6 rounded-sm mr-3"
+                     style="background-color: {{ subTitle.color ?? '#e5e7eb' }};">
+                </div>
+
+                <span class="text-sm font-medium text-gray-600 whitespace-nowrap">
+                    {{ subTitle.label ?? '_' }}
+                </span>
+            </div>
+        {% endif %}
+
+    </div>
+
+    {# =========================
+       Actions
+    ========================== #}
+    <div class="flex flex-col items-end gap-2">
+
+        {# ID du tiers #}
+        {% if item.code is defined %}
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md
+                  bg-gray-200 text-gray-600 text-xs font-mono border
+                  cursor-default select-none"
+                  title="{{ item.code }}">
+                #{{ item.code|slice(0, 40) }}
+            </span>
+        {% endif %}
+
+        {# Boutons #}
+        <div class="flex items-center gap-2 flex-wrap">
+            {% for btn in btns %}
+                <a href="{{ btn.path }}"
+                   class="inline-flex items-center gap-2 px-3 py-2
+                   text-sm font-medium rounded-lg
+                   {{ buttonColors[btn.color] ?? buttonColors.gray }}
+                   transition duration-150 ease-in-out"
+                   {% if btn.attr is defined %}
+                       {% for at in btn.attr %}
+                           {{ at.label }}="{{ at.value }}"
+                       {% endfor %}
+                   {% endif %}
+                   >
+                    {% if btn.icon is defined %}
+                        {{ ux_icon(btn.icon, {class: 'w-4 h-4'}) }}
+                    {% endif %}
+                    {{ btn.label }}
+                </a>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
