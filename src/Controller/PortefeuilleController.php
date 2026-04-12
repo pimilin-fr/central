@@ -74,11 +74,7 @@ final class PortefeuilleController extends AbstractController {
     }
 
     #[Route('/show/{id}', name: 'app_portefeuille_show', methods: ['GET', 'POST'])]
-    public function show(
-            Request $request,
-            Portefeuille $portefeuille,
-            EntityManagerInterface $em
-    ): Response {
+    public function show(Request $request, Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $depRepo = $em->getRepository(Depenses::class);
         $ptfRepo = $em->getRepository(PortefeuilleView::class);
         $ptfView = $ptfRepo->find($portefeuille->getId());
@@ -87,7 +83,7 @@ final class PortefeuilleController extends AbstractController {
                 ["portefeuille" => $portefeuille],
                 ["date" => "ASC", "id" => "ASC"] // IMPORTANT
         );
-        
+
         $groupManager = new \App\Services\DepenseGrouper\DepenseGroupManager();
 
         $groups = $groupManager->build(
@@ -95,7 +91,6 @@ final class PortefeuilleController extends AbstractController {
                 new GroupByReleve(), // interchangeable
                 0
         );
-
 
         // 👉 FORMULAIRE (WRITE)
         $form = $this->createForm(PortefeuilleType::class, $portefeuille);
@@ -111,69 +106,12 @@ final class PortefeuilleController extends AbstractController {
                         'tab' => 'edit'
             ]);
         }
-//        
-//        $groupingService = new DepenseGrouper();
-//        $groups = $groupingService->group(
-//                    $depRepo->findBy([
-//                        "portefeuille" => $portefeuille
-//                    ], [
-//                        "date" => "DESC",
-//                        "id" => "DESC"
-//                    ]),
-//                    new GroupByReleve()
-//            );
-//            
+
         return $this->render('portefeuille/show.html.twig', [
                     'portefeuille' => $ptfView,
                     'form' => $form->createView(),
 //                    'operations' => $operations,
                     'releves' => $groups
-        ]);
-//        // 👉 NON RELEVÉ (ATTENTION: ID, pas objet)
-//        $manager = new ReleveManager($em);
-//        $operations = $em->getRepository(Operation::class)
-//                ->findNonReleveByPortefeuille($portefeuille);
-//        if (empty($operations)) {
-//            $fake = new Releve();
-//            $fake->setPortefeuille($portefeuille);
-//        } else {
-//            $fake = $manager->addOperations(new DateTime(), $operations, false);
-//        }
-//        $fake->setLabel("En attente");
-//
-//        // 👉 PAGINATION "12 MOIS"
-//        $offset = $request->query->getInt('offset', 0); // 0, 12, 24...
-//        $limit = 12;
-//
-//        $releves = $em->getRepository(Releve::class)
-//                ->findLastWithOffset($portefeuille, $limit, $offset);
-//
-//        array_unshift($releves, $fake);
-
-//        return $this->render('portefeuille/show.html.twig', [
-//                    'portefeuille' => $ptfView,
-//                    'form' => $form->createView(),
-////                    'operations' => $operations,
-//                    'releves' => $releves,
-//                    'offset' => $offset,
-//                    'limit' => $limit
-//        ]);
-    }
-
-    #[Route('/{id}/releves', name: 'app_portefeuille_releves_ajax')]
-    public function relevesAjax(
-            Portefeuille $portefeuille,
-            Request $request,
-            ReleveRepository $repo
-    ): Response {
-
-        $offset = $request->query->getInt('offset', 0);
-        $limit = 12;
-
-        $releves = $repo->findLastWithOffset($portefeuille, $limit, $offset);
-
-        return $this->render('portefeuille/_releve.html.twig', [
-                    'releves' => $releves
         ]);
     }
 
@@ -185,7 +123,12 @@ final class PortefeuilleController extends AbstractController {
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_adresse_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Portefeuille modifié avec succès');
+
+            return $this->redirectToRoute('app_portefeuille_show', [
+                        'id' => $portefeuille->getId(),
+                        'tab' => 'edit'
+            ]);
         }
 
         return $this->render('adresse/edit.html.twig', [
@@ -195,15 +138,26 @@ final class PortefeuilleController extends AbstractController {
     }
 
     #[Route('/delete/{id}', name: 'app_portefeuille_delete', methods: ['GET'])]
-    public function delete(
-            Portefeuille $portefeuille,
-            EntityManagerInterface $em
-    ): Response {
-
-        $em->remove($portefeuille);
+    public function delete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
+        $portefeuille->setDeleted(new \DateTimeImmutable());
         $em->flush();
         $this->addFlash('success', 'Portefeuille supprimé avec succès');
 
-        return $this->redirectToRoute('app_portefeuille_index');
+        return $this->redirectToRoute('app_portefeuille_show', [
+                    'id' => $portefeuille->getId(),
+                    'tab' => 'edit'
+        ]);
+    }
+    
+    #[Route('/undelete/{id}', name: 'app_portefeuille_undelete', methods: ['GET'])]
+    public function undelete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
+        $portefeuille->setDeleted(null);
+        $em->flush();
+        $this->addFlash('success', 'Portefeuille restauré avec succès');
+
+        return $this->redirectToRoute('app_portefeuille_show', [
+                    'id' => $portefeuille->getId(),
+                    'tab' => 'edit'
+        ]);
     }
 }
