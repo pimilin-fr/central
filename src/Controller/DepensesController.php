@@ -244,78 +244,13 @@ final class DepensesController extends AbstractController {
                 if (sizeof($depenses) < 1) {
                     break;
                 }
-                $releveRepo = $entityManager->getRepository(\App\Entity\Releve::class);
+                $manager = new \App\Services\ReleveManager($entityManager);                                        
 
                 $date = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
-                $ptf = $depenses[0]->getPortefeuille();
 
                 // relevé à cette date
-                $releve = $releveRepo->findOneBy([
-                    'portefeuille' => $ptf,
-                    'date' => $date,
-                    'isClosed' => false // on ne peu pas éditer un relevé clos
-                ]);
+                $releve = $manager->addOperations($date, $depenses);
 
-                if ($releve) {
-                    // ajout de lignes sur un relevé existant
-                    $solde = $releve->getNewSolde();
-                    $totalDepense = $releve->getTotalDepense();
-                    $totalRevenu = $releve->getTotalRevenu();
-                } else {
-                    // création d'un nouveau relevé
-                    $releve = new \App\Entity\Releve();
-
-                    $lastReleve = $releveRepo->findLastByPortefeuille($ptf);
-                    $solde = $lastReleve?->getNewSolde() ?? 0;
-
-                    $totalDepense = 0;
-                    $totalRevenu = 0;
-                }
-
-                $releve
-                        ->setDate($date)
-                        ->setLastSolde($solde)
-                        ->setPortefeuille($ptf);
-//                $releveRepo = $entityManager->getRepository(\App\Entity\Releve::class);
-//                $date = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
-//                $ptf = $depenses[0]->getPortefeuille(); //le portefeuille est le même pour toutes les ligne
-//
-//                $releve = $releveRepo->findOneBy(['portefeuille' => $ptf, 'date' => $date]);
-//                if (!$releve) {
-//                    $releve = new \App\Entity\Releve();
-//                    $totalDepense = 0;
-//                    $totalRevenu = 0;   
-//                }else{
-//                    $totalDepense = $releve->getTotalDepense();
-//                    $totalRevenu = $releve->getTotalRevenu();
-//                }
-//
-//
-//                $lastReleve = $releveRepo->findLastByPortefeuille($ptf);
-//                
-//                if (!$lastReleve) {
-//                    $solde = 0;
-//                } else {
-//                    $solde = $lastReleve->getNewSolde();
-//                }
-//                $releve->setDate($date)
-//                        ->setLastSolde($solde)
-//                        ->setPortefeuille($ptf)
-//                ;
-                foreach ($depenses as $depense) {
-                    if ($depense->getCategorie()->isDepense()) {
-                        $totalDepense += $depense->getMontant();
-                        $solde -= $depense->getMontant();
-                    } else {
-                        $totalRevenu += $depense->getMontant();
-                        $solde += $depense->getMontant();
-                    }
-                    $depense->setReleve($releve);
-                    $entityManager->persist($depense);
-                }
-                $releve->setNewSolde($solde)
-                        ->setTotalDepense($totalDepense)
-                        ->setTotalRevenu($totalRevenu);
                 $entityManager->persist($releve);
                 $i = sizeof($depenses);
                 $this->addFlash('success', $i . ' ligne(s) ajoutés au relevé du ' . $date->format('d/M/y') . ' avec succès');

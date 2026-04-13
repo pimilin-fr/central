@@ -66,12 +66,20 @@ final class ProjetController extends AbstractController {
                         'tab' => "edit"
                             ], Response::HTTP_SEE_OTHER);
         }
+        
+        $groupManager = new \App\Services\DepenseGrouper\DepenseGroupManager();
+
+        $groups = $groupManager->build(
+                $lignes,
+                new \App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet(), // interchangeable
+                0
+        );
 
         return $this->render('projet/show.html.twig', [
                     'projet' => $projet,
                     'form' => $form,
                     'lignes' => $lignes,
-                    'releves' => [$releve]
+                    'releves' => $groups
         ]);
     }
 
