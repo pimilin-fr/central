@@ -6,16 +6,16 @@ use App\Entity\Depenses;
 use DateTime;
 use Override;
 
-class GroupByPortefeuille implements GroupStrategyInterface {
+class GroupByProjet implements GroupStrategyInterface {
 
     #[Override]
     public function getKey(Depenses $depense): string {
-        return $depense->getPortefeuille() ? 'ptf_' . $depense->getPortefeuille()->getId() : 'no_ptf';
+        return $depense->getProjet() ? 'prj_' . $depense->getProjet()->getId() : 'no_prj';
     }
 
     #[Override]
     public function getLabel(Depenses $depense): string {
-        return $depense->getPortefeuille() ? $depense->getPortefeuille()->getName() : 'Non affecté';
+        return $depense->getProjet() ? $depense->getProjet()->getName() : 'Non affecté';
     }
 
     #[Override]

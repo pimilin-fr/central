@@ -36,20 +36,4 @@ class ReleveRepository extends ServiceEntityRepository {
                         ->getQuery()
                         ->getOneOrNullResult();
     }
-
-    ///---- V2 
-    public function findLastWithOffset(
-            Portefeuille $ptf,
-            int $limit,
-            int $offset
-    ): array {
-        return $this->createQueryBuilder('r')
-                        ->where('r.portefeuille = :ptf')
-                        ->setParameter('ptf', $ptf)
-                        ->orderBy('r.date', 'DESC')
-                        ->setMaxResults($limit)
-                        ->setFirstResult($offset)
-                        ->getQuery()
-                        ->getResult();
-    }
 }

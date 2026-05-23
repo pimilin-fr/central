@@ -34,6 +34,12 @@ class Portefeuille extends ColorableEntity {
     #[ORM\Column(type: 'integer', length: 5)]
     private int $ordre = 1;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deleted;
+
+    #[ORM\Column]
+    private bool $isReal = false;
+
     #[ORM\Column(length: 7, nullable: true)]
     private ?string $couleur = null;
 
@@ -42,7 +48,8 @@ class Portefeuille extends ColorableEntity {
         "ESP." => "Espèce",
         "JUS." => "Justice",
         "EPAR" => "Epargne",
-        "PRET" => "Prêt"
+        "PRET" => "Prêt",
+        "SPEC" => "Spécifique"
     ];
 
     public function getId(): int {
@@ -147,6 +154,24 @@ class Portefeuille extends ColorableEntity {
 
     public function setCouleur(?string $couleur) {
         $this->couleur = $couleur;
+        return $this;
+    }
+
+    public function getDeleted(): ?DateTimeImmutable {
+        return $this->deleted;
+    }
+
+    public function setDeleted(?DateTimeImmutable $deleted) {
+        $this->deleted = $deleted;
+        return $this;
+    }
+
+    public function getIsReal(): bool {
+        return $this->isReal;
+    }
+
+    public function setIsReal(bool $isReal) {
+        $this->isReal = $isReal;
         return $this;
     }
 }

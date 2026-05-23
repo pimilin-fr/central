@@ -84,7 +84,7 @@ final class TiersController extends AbstractController {
         return $this->render('tiers/show.html.twig', [
                     'tiers' => $tiers,
                     'form' => $form,
-                    'depenses' => $depRepo->findBy(['tiers'=>$tiers],["date"=>"DESC"]),
+                    'depenses' => $depRepo->findByTiers($tiers),
                     'addAdresseForm' => $addAdresseForm,
                     'adresses' => $adresses
         ]);

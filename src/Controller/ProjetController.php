@@ -49,11 +49,7 @@ final class ProjetController extends AbstractController {
         $form->handleRequest($request);
         
         $depRepo = $entityManager->getRepository(\App\Entity\Depenses::class);
-        $lignes = $depRepo->findBy([
-            "projet" => $projet
-        ]);
-        $releveManager = new \App\Services\ReleveManager($entityManager, true);
-        $releve = $releveManager->addOperations(new \DateTime(), $lignes );
+        $lignes = $depRepo->findByProjet($projet);
         
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($projet);
@@ -66,12 +62,20 @@ final class ProjetController extends AbstractController {
                         'tab' => "edit"
                             ], Response::HTTP_SEE_OTHER);
         }
+        
+        $groupManager = new \App\Services\DepenseGrouper\DepenseGroupManager();
+
+        $groups = $groupManager->build(
+                $lignes,
+                new \App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet(), // interchangeable
+                0
+        );
 
         return $this->render('projet/show.html.twig', [
                     'projet' => $projet,
                     'form' => $form,
                     'lignes' => $lignes,
-                    'releves' => [$releve]
+                    'releves' => $groups
         ]);
     }
 

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(readOnly: true)]
 #[ORM\Table(name: 'v_portefeuille')]
-class PortefeuilleView
+class PortefeuilleView extends ColorableEntity
 {
     #[ORM\Id]
     #[ORM\Column(name: 'ptf_id', type: 'integer')]
@@ -29,6 +29,9 @@ class PortefeuilleView
 
     #[ORM\Column(name: 'ptf_is_default', type: 'boolean')]
     private bool $isDefault;
+    
+    #[ORM\Column(name: 'ptf_is_real', type: 'boolean')]
+    private bool $isReal = false;
 
     #[ORM\Column(name: 'ptf_couleur', type: 'string', length: 7, nullable: true)]
     private ?string $couleur = null;
@@ -109,6 +112,7 @@ class PortefeuilleView
         return $this->isDefault;
     }
 
+    #[\Override]
     public function getCouleur(): ?string
     {
         return $this->couleur;
@@ -143,4 +147,24 @@ class PortefeuilleView
     {
         return $this->depensesNonCompta;
     }
+    
+    public function getIsDefault(): bool {
+        return $this->isDefault;
+    }
+
+    public function getIsReal(): bool {
+        return $this->isReal;
+    }
+
+    public function setIsDefault(bool $isDefault) {
+        $this->isDefault = $isDefault;
+        return $this;
+    }
+
+    public function setIsReal(bool $isReal) {
+        $this->isReal = $isReal;
+        return $this;
+    }
+
+
 }

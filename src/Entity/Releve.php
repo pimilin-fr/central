@@ -31,21 +31,6 @@ class Releve {
     #[ORM\JoinColumn(nullable: false)]
     private Portefeuille $portefeuille;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private float $totalDepense = 0;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private float $totalRevenu = 0;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private float $lastSolde = 0;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private float $newSolde = 0;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $isClosed = false;
-
     #[ORM\OneToMany(mappedBy: 'releve', targetEntity: Depenses::class)]
     #[ORM\OrderBy(['date' => 'DESC', 'id' => 'DESC'])]
     private Collection $depenses;
@@ -65,22 +50,6 @@ class Releve {
 
     public function getPortefeuille(): Portefeuille {
         return $this->portefeuille;
-    }
-
-    public function getTotalDepense(): float {
-        return $this->totalDepense;
-    }
-
-    public function getTotalRevenu(): float {
-        return $this->totalRevenu;
-    }
-
-    public function getLastSolde(): float {
-        return $this->lastSolde;
-    }
-
-    public function getNewSolde(): float {
-        return $this->newSolde;
     }
 
     public function getLignes(): Collection {
@@ -108,26 +77,6 @@ class Releve {
 
     public function setPortefeuille(Portefeuille $portefeuille) {
         $this->portefeuille = $portefeuille;
-        return $this;
-    }
-
-    public function setTotalDepense(float $totalDepense) {
-        $this->totalDepense = $totalDepense;
-        return $this;
-    }
-
-    public function setTotalRevenu(float $totalRevenu) {
-        $this->totalRevenu = $totalRevenu;
-        return $this;
-    }
-
-    public function setLastSolde(float $lastSolde) {
-        $this->lastSolde = $lastSolde;
-        return $this;
-    }
-
-    public function setNewSolde(float $newSolde) {
-        $this->newSolde = $newSolde;
         return $this;
     }
 
