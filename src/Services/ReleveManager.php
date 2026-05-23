@@ -70,21 +70,11 @@ class ReleveManager {
             return $releve;
         }
 
-        // 🔍 dernier relevé
-        return $this->retriveLastReleve($date, $portefeuille);
-    }
-
-    private function retriveLastReleve(DateTime $date, Portefeuille $portefeuille): Releve {
-        $lastReleve = $this->repoReleve->findLastByPortefeuille($portefeuille);
-
-        if ($lastReleve) {
-            return $lastReleve;
-        }
-
-        $releve = new Releve();
-        $releve->setDate($date);
-        $releve->setPortefeuille($portefeuille);
-
-        return $releve;
+        // 🔍 nouveau relevé
+        $newreleve = new Releve();
+        $newreleve->setDate($date)
+                ->setPortefeuille($portefeuille)
+                ->setLabel('relevé du ' . $date->format('dd/MM/YYYY'));
+        return $newreleve;
     }
 }

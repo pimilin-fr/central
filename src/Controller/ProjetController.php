@@ -49,11 +49,7 @@ final class ProjetController extends AbstractController {
         $form->handleRequest($request);
         
         $depRepo = $entityManager->getRepository(\App\Entity\Depenses::class);
-        $lignes = $depRepo->findBy([
-            "projet" => $projet
-        ]);
-        $releveManager = new \App\Services\ReleveManager($entityManager, true);
-        $releve = $releveManager->addOperations(new \DateTime(), $lignes );
+        $lignes = $depRepo->findByProjet($projet);
         
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($projet);
