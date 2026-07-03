@@ -42,7 +42,7 @@ final class ProjetTypeController extends AbstractController {
         ]);
     }
 
-    #[Route('/show/{id}', name: 'app_projet_type_show', methods: ['GET', 'POST'])]
+    #[Route('/{id}', name: 'app_projet_type_show', methods: ['GET', 'POST'])]
     public function show(ProjetType $type, Request $request, \App\Repository\ProjetRepository $pRepo, EntityManagerInterface $entityManager): Response {
         $form = $this->createForm(ProjetTypeFormType::class, $type);
         $form->handleRequest($request);

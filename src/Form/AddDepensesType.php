@@ -12,25 +12,11 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AddDepensesType extends AbstractType {
-
-//    ->add('tiers', TextType::class, [
-//    'mapped' => false,
-//    'data' => $options['tiers_label'] ?? null,
-//    'attr' => [
-//        'class' => 'autocomplete',
-//        'data-endpoint' => '/tiers/search',
-//        'readonly' => $options['tiers_locked'] ? true : false,
-//    ],
-//])
-//
-//->add('tiers_id', HiddenType::class, [
-//    'mapped' => false,
-//    'data' => $options['tiers_id'] ?? null,
-//])
 
     public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder
@@ -109,7 +95,22 @@ class AddDepensesType extends AbstractType {
                 ->add('tiers_id', HiddenType::class, [
                     'mapped' => false,
                     'data' => $options['tiers_id'],
-        ]);
+                ])
+                /* =========================
+                  Adresse
+                  ========================= */
+                ->add('adresse', ChoiceType::class, [
+                    'mapped' => false,
+                    'required' => false,
+                    'data' => $options['adresse_label'],
+                    'placeholder' => 'Adresse',
+                ])
+                ->add('adresse_id', HiddenType::class, [
+                    'mapped' => false,
+                    'data' => $options['adresse_id'],
+                ])
+
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void {
@@ -122,6 +123,8 @@ class AddDepensesType extends AbstractType {
             'projet_label' => null,
             'tiers_id' => null,
             'tiers_label' => null,
+            'adresse_label' => null,
+            'adresse_id' => null
         ]);
     }
 }

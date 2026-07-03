@@ -24,7 +24,7 @@ class CategorieController extends AbstractController {
 
     #[Route('/new', name: 'app_categorie_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response {
-        
+        die('NOT IMPLEMENTED YET !');//--- TODO ?
     }
 
     #[Route('/search', name: 'json_categories_search')]
@@ -41,7 +41,7 @@ class CategorieController extends AbstractController {
         return $this->json($results);
     }
 
-    #[Route('/show/{id}', name: 'app_categorie_show', methods: ['GET', 'POST'])]
+    #[Route('/{id}', name: 'app_categorie_show', methods: ['GET', 'POST'])]
     public function show(Request $request, Categorie $categorie, EntityManagerInterface $em): Response {
         $form = $this->createForm(CategorieType::class, $categorie);
         $form->handleRequest($request);

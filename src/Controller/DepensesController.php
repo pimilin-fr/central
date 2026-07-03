@@ -74,6 +74,7 @@ final class DepensesController extends AbstractController {
         $catRepo = $entityManager->getRepository(\App\Entity\Categorie::class);
         $tiersRepo = $entityManager->getRepository(Tiers::class);
         $projRepo = $entityManager->getRepository(Projet::class);
+        $adrRepo = $entityManager->getRepository(\App\Entity\Adresse::class);
 
         $portefeuille = null;
         $categorie = new \App\Entity\Categorie();
@@ -126,6 +127,7 @@ final class DepensesController extends AbstractController {
                 $categorieId = $form->get('categorie_id')->getData();
                 $tiersId = $form->get('tiers_id')->getData();
                 $projetId = $form->get('projet_id')->getData();
+                $adresseId = $form->get('adresse_id')->getData();
 
                 if ($categorieId) {
                     $categorie = $catRepo->find($categorieId);
@@ -141,7 +143,11 @@ final class DepensesController extends AbstractController {
                     $projet = $projRepo->find($projetId);
                     $depense->setProjet($projet);
                 }
-                
+                if ($adresseId) {
+                    $adresse = $adrRepo->find($adresseId);
+                    $depense->setAdresse($adresse);
+                }
+
 //                var_dump($form->get('portefeuille')->getData());die;
 
                 /*
@@ -244,7 +250,7 @@ final class DepensesController extends AbstractController {
                 if (sizeof($depenses) < 1) {
                     break;
                 }
-                $manager = new \App\Services\ReleveManager($entityManager);                                        
+                $manager = new \App\Services\ReleveManager($entityManager);
 
                 $date = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
 
@@ -267,7 +273,7 @@ final class DepensesController extends AbstractController {
         return $this->redirect($referer ?? $this->generateUrl('app_depenses_index'));
     }
 
-    #[Route('/show/{id}', name: 'app_depenses_show', methods: ['GET', 'POST'])]
+    #[Route('/{id}', name: 'app_depenses_show', methods: ['GET', 'POST'])]
     public function show(Tiers $tiers, Request $request, TiersAdresseRepository $tiersAdresseRepo, EntityManagerInterface $entityManager): Response {
         $form = $this->createForm(TiersType::class, $tiers);
         $form->handleRequest($request);

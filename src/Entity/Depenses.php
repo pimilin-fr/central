@@ -43,6 +43,10 @@ class Depenses {
     private Tiers $tiers;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Adresse $adresse = null;
+
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Portefeuille $portefeuille = null;
 

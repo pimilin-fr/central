@@ -73,7 +73,7 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
 
-    #[Route('/show/{id}', name: 'app_portefeuille_show', methods: ['GET', 'POST'])]
+    #[Route('/{id}', name: 'app_portefeuille_show', methods: ['GET', 'POST'])]
     public function show(Request $request, Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $depRepo = $em->getRepository(Depenses::class);
         $ptfRepo = $em->getRepository(PortefeuilleView::class);
@@ -115,7 +115,7 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
 
-    #[Route('/edit/{id}', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Adresse $adresse, EntityManagerInterface $entityManager): Response {
         $form = $this->createForm(AdresseType::class, $adresse);
         $form->handleRequest($request);
@@ -137,7 +137,7 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_portefeuille_delete', methods: ['GET'])]
+    #[Route('/{id}/delete', name: 'app_portefeuille_delete', methods: ['GET'])]
     public function delete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $portefeuille->setDeleted(new \DateTimeImmutable());
         $em->flush();
@@ -149,8 +149,8 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
     
-    #[Route('/undelete/{id}', name: 'app_portefeuille_undelete', methods: ['GET'])]
-    public function undelete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
+    #[Route('/{id}/restore/', name: 'app_portefeuille_restore', methods: ['GET'])]
+    public function restore(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $portefeuille->setDeleted(null);
         $em->flush();
         $this->addFlash('success', 'Portefeuille restauré avec succès');

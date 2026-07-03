@@ -7,6 +7,7 @@ use App\Entity\TiersAdresse;
 use App\Form\AddAdresseType;
 use App\Form\TiersType;
 use App\Repository\AdresseRepository;
+use App\Repository\DepensesRepository;
 use App\Repository\TiersAdresseRepository;
 use App\Repository\TiersRepository;
 use DateTimeImmutable;
@@ -49,13 +50,7 @@ final class TiersController extends AbstractController {
     }
 
     #[Route('/show/{id}', name: 'app_tiers_show', methods: ['GET', 'POST'])]
-    public function show(
-            Tiers $tiers,
-            Request $request,
-            TiersAdresseRepository $tiersAdresseRepo,
-            \App\Repository\DepensesRepository $depRepo,
-            EntityManagerInterface $entityManager
-    ): Response {
+    public function show(Tiers $tiers, Request $request, TiersAdresseRepository $tiersAdresseRepo, DepensesRepository $depRepo, EntityManagerInterface $entityManager): Response {
         $form = $this->createForm(TiersType::class, $tiers);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -88,6 +83,22 @@ final class TiersController extends AbstractController {
                     'addAdresseForm' => $addAdresseForm,
                     'adresses' => $adresses
         ]);
+    }
+
+    #[Route('/{id}/adresse', name: 'app_tiers_adresse_list', methods: ['GET'])]
+    public function adresses(Tiers $tiers,TiersAdresseRepository $repo): JsonResponse {
+        $results = [];
+
+        foreach ($repo->findByTiersOrdered($tiers) as $link) {
+
+            $results[] = [
+                'id' => $link->getAdresse()->getId(),
+                'label' => (string) $link->getAdresse(),
+                'principale' => $link->isPrincipale(),
+            ];
+        }
+
+        return $this->json($results);
     }
 
     #[Route('/{id}/adresse/add', name: 'app_tiers_adresse_add', methods: ['POST'])]
@@ -134,24 +145,6 @@ final class TiersController extends AbstractController {
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_tiers_delete', methods: ['GET'])]
-    public function delete(Tiers $tier, EntityManagerInterface $entityManager): Response {
-        $tier->setDeletedAt(new DateTimeImmutable());
-        $entityManager->flush();
-        return $this->redirectToRoute('app_tiers_show', [
-                    'id' => $tier->getId()
-        ]);
-    }
-
-    #[Route('/restore/{id}', name: 'app_tiers_restore', methods: ['GET'])]
-    public function restore(Tiers $tier, EntityManagerInterface $entityManager): Response {
-        $tier->setDeletedAt(null);
-        $entityManager->flush();
-        return $this->redirectToRoute('app_tiers_show', [
-                    'id' => $tier->getId()
-        ]);
-    }
-
     #[Route('/{id}/adresse/unlink/', name: 'app_tiers_adresse_unlink', methods: ['GET'])]
     public function unlinkAdresse(TiersAdresse $tiersAdresse, EntityManagerInterface $em) {
         $id = $tiersAdresse->getTiers()->getId();
@@ -163,6 +156,24 @@ final class TiersController extends AbstractController {
         return $this->redirectToRoute('app_tiers_show', [
                     'id' => $id,
                     'tab' => 'adresses'
+        ]);
+    }
+
+    #[Route('/{id}/delete', name: 'app_tiers_delete', methods: ['GET'])]
+    public function delete(Tiers $tier, EntityManagerInterface $entityManager): Response {
+        $tier->setDeletedAt(new DateTimeImmutable());
+        $entityManager->flush();
+        return $this->redirectToRoute('app_tiers_show', [
+                    'id' => $tier->getId()
+        ]);
+    }
+
+    #[Route('/{id}/restore', name: 'app_tiers_restore', methods: ['GET'])]
+    public function restore(Tiers $tier, EntityManagerInterface $entityManager): Response {
+        $tier->setDeletedAt(null);
+        $entityManager->flush();
+        return $this->redirectToRoute('app_tiers_show', [
+                    'id' => $tier->getId()
         ]);
     }
 
