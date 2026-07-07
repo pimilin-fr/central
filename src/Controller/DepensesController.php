@@ -273,7 +273,7 @@ final class DepensesController extends AbstractController {
         return $this->redirect($referer ?? $this->generateUrl('app_depenses_index'));
     }
 
-    #[Route('/{id}', name: 'app_depenses_show', methods: ['GET', 'POST'])]
+    #[Route('/show/{id}', name: 'app_depenses_show', methods: ['GET', 'POST'])]
     public function show(Tiers $tiers, Request $request, TiersAdresseRepository $tiersAdresseRepo, EntityManagerInterface $entityManager): Response {
         $form = $this->createForm(TiersType::class, $tiers);
         $form->handleRequest($request);

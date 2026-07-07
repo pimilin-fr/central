@@ -85,7 +85,7 @@ final class TiersController extends AbstractController {
         ]);
     }
 
-    #[Route('/{id}/adresse', name: 'app_tiers_adresse_list', methods: ['GET'])]
+    #[Route('/adresses/{id}', name: 'app_tiers_adresse_list', methods: ['GET'])]
     public function adresses(Tiers $tiers,TiersAdresseRepository $repo): JsonResponse {
         $results = [];
 
@@ -101,7 +101,7 @@ final class TiersController extends AbstractController {
         return $this->json($results);
     }
 
-    #[Route('/{id}/adresse/add', name: 'app_tiers_adresse_add', methods: ['POST'])]
+    #[Route('/add_adresse/{id}/', name: 'app_tiers_adresse_add', methods: ['POST'])]
     public function addAdresse(Request $request, Tiers $tiers, EntityManagerInterface $em, TiersAdresseRepository $repo, AdresseRepository $adresseRepo) {
         $tiersAdresse = new TiersAdresse();
         $tiersAdresse->setTiers($tiers);
@@ -145,7 +145,7 @@ final class TiersController extends AbstractController {
         ]);
     }
 
-    #[Route('/{id}/adresse/unlink/', name: 'app_tiers_adresse_unlink', methods: ['GET'])]
+    #[Route('/unlink_adresse/{id}', name: 'app_tiers_adresse_unlink', methods: ['GET'])]
     public function unlinkAdresse(TiersAdresse $tiersAdresse, EntityManagerInterface $em) {
         $id = $tiersAdresse->getTiers()->getId();
         $em->remove($tiersAdresse);
@@ -159,7 +159,7 @@ final class TiersController extends AbstractController {
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_tiers_delete', methods: ['GET'])]
+    #[Route('/delete/{id}', name: 'app_tiers_delete', methods: ['GET'])]
     public function delete(Tiers $tier, EntityManagerInterface $entityManager): Response {
         $tier->setDeletedAt(new DateTimeImmutable());
         $entityManager->flush();
@@ -168,7 +168,7 @@ final class TiersController extends AbstractController {
         ]);
     }
 
-    #[Route('/{id}/restore', name: 'app_tiers_restore', methods: ['GET'])]
+    #[Route('/restore/{id}', name: 'app_tiers_restore', methods: ['GET'])]
     public function restore(Tiers $tier, EntityManagerInterface $entityManager): Response {
         $tier->setDeletedAt(null);
         $entityManager->flush();

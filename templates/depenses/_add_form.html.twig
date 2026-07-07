@@ -1,9 +1,8 @@
 
 {{ form_start(form, {
-    action: path('app_depenses_new'),
+    action: path('app_depenses_new', { portefeuille: form.vars.value.portefeuille ? form.vars.value.portefeuille.id : null }),
     attr: { id: 'depense-form', class:'space-y-6' },
 }) }}
-
 {# =========================
    CHAMPS
    ========================= #}
@@ -110,7 +109,7 @@
         {{ form_label(form.adresse, null, {
             label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
         }) }}
-        
+
         {{ form_widget(form.adresse, {
             attr: {
                 class: 'autocomplete w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
@@ -161,5 +160,5 @@
         Enregistrer
     </button>
 </div>
-
+{{ form_errors(form) }}
 {{ form_end(form) }}

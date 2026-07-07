@@ -73,7 +73,7 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
 
-    #[Route('/{id}', name: 'app_portefeuille_show', methods: ['GET', 'POST'])]
+    #[Route('/show/{id}', name: 'app_portefeuille_show', methods: ['GET', 'POST'])]
     public function show(Request $request, Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $depRepo = $em->getRepository(Depenses::class);
         $ptfRepo = $em->getRepository(PortefeuilleView::class);
@@ -107,15 +107,20 @@ final class PortefeuilleController extends AbstractController {
             ]);
         }
 
+        $depForm = $this->createForm(\App\Form\AddDepensesType::class, new Operation(), [
+            'portefeuille_entity' => $portefeuille,
+        ]);
+        
         return $this->render('portefeuille/show.html.twig', [
                     'portefeuille' => $ptfView,
                     'form' => $form->createView(),
 //                    'operations' => $operations,
+                    'depensesForm' => $depForm,
                     'releves' => $groups
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
+    #[Route('/edit/{id}', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Adresse $adresse, EntityManagerInterface $entityManager): Response {
         $form = $this->createForm(AdresseType::class, $adresse);
         $form->handleRequest($request);
@@ -137,7 +142,7 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_portefeuille_delete', methods: ['GET'])]
+    #[Route('/delete/{id}', name: 'app_portefeuille_delete', methods: ['GET'])]
     public function delete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $portefeuille->setDeleted(new \DateTimeImmutable());
         $em->flush();
@@ -149,7 +154,7 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
     
-    #[Route('/{id}/restore/', name: 'app_portefeuille_restore', methods: ['GET'])]
+    #[Route('/restore/{id}', name: 'app_portefeuille_restore', methods: ['GET'])]
     public function restore(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $portefeuille->setDeleted(null);
         $em->flush();

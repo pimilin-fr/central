@@ -116,6 +116,7 @@ class AddDepensesType extends AbstractType {
     public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'data_class' => Depenses::class,
+            'csrf_protection' => false,
             'portefeuille_entity' => null,
             'categorie_id' => null,
             'categorie_label' => null,

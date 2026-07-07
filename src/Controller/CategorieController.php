@@ -41,7 +41,7 @@ class CategorieController extends AbstractController {
         return $this->json($results);
     }
 
-    #[Route('/{id}', name: 'app_categorie_show', methods: ['GET', 'POST'])]
+    #[Route('/show/{id}', name: 'app_categorie_show', methods: ['GET', 'POST'])]
     public function show(Request $request, Categorie $categorie, EntityManagerInterface $em): Response {
         $form = $this->createForm(CategorieType::class, $categorie);
         $form->handleRequest($request);

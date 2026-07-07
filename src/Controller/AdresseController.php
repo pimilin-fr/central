@@ -43,7 +43,7 @@ final class AdresseController extends AbstractController {
         ]);
     }
 
-    #[Route('/{id}', name: 'app_adresse_show', methods: ['GET', 'POST'])]
+    #[Route('/show/{id}', name: 'app_adresse_show', methods: ['GET', 'POST'])]
     public function show(Adresse $adresse, Request $request, EntityManagerInterface $entityManager): Response {
         $form = $this->createForm(AdresseFormType::class, $adresse);
         $form->handleRequest($request);

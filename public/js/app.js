@@ -40,8 +40,8 @@ const App = {
         this.releves.init();
         this.depenses.init();
         this.selectAll.init();
-        this.modal.init();
         this.adresse.init();
+        this.depenseForm.init();
     },
 
     /* =========================================================
@@ -382,7 +382,7 @@ const App = {
 
                 select.innerHTML = '<option>Chargement...</option>';
 
-                const response = await fetch(`/tiers/${item.id}/adresse`);
+                const response = await fetch(`/tiers/adresses/${item.id}`);
                 const adresses = await response.json();
 
                 select.innerHTML = '';
@@ -434,79 +434,67 @@ const App = {
     },
 
     /* =========================================================
-     Gestion des modales
+     ADD Depenses
      ========================================================= */
-    modal: {
+    depenseForm: {
 
-        init() {
-            App.log('Init modal');
-        },
+        init(scope = document) {
+            App.log('Init depenseForm');
 
-        open(url) {
-            const modal = document.getElementById('modal');
-            const content = document.getElementById('modal-content');
+            scope.querySelectorAll('#depense-form').forEach(form => {
 
-            modal.classList.remove('hidden');
+                if (form.dataset.ajaxInit)
+                    return;
+                form.dataset.ajaxInit = "1";
 
-            fetch(url)
-                    .then(res => res.text())
-                    .then(html => {
-                        content.innerHTML = html;
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
 
-                        App.autocomplete.init(content); // 🔥 Reload Autocomplete
-                        App.modal.bindForm();
-                    });
-        },
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn)
+                        submitBtn.disabled = true;
 
-        close() {
-            document.getElementById('modal').classList.add('hidden');
-        },
+                    const formData = new FormData(form);
 
-        bindForm() {
-            App.depenseAdresse.init(document.getElementById('modal-content'));
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
 
-            const form = document.querySelector('#modal-content form');
-            if (!form)
-                return;
+                        const contentType = response.headers.get('Content-Type') || '';
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
+                        if (contentType.includes('application/json')) {
+                            const data = await response.json();
 
-                const data = new FormData(form);
+                            if (data.success) {
+                                App.events.emit('depense:created', data);
+                                // Recharge la page en gardant l'onglet actif
+                                const url = new URL(window.location);
+                                url.searchParams.set('tab', 'addoperation');
+                                window.location = url;
+                                return;
+                            }
+                        }
 
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: data,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
+                        // Formulaire invalide -> le serveur renvoie le HTML du formulaire (avec erreurs)
+                        const html = await response.text();
+                        const container = form.closest('#tab-addoperation') || form.parentNode;
+                        container.innerHTML = html;
+
+                        // ré-initialiser autocomplete + submit sur le nouveau markup injecté
+                        App.autocomplete.init(container);
+                        App.depenseForm.init(container);
+
+                    } catch (err) {
+                        App.log('depenseForm submit error', err);
+                        if (submitBtn)
+                            submitBtn.disabled = false;
                     }
                 });
-
-                const contentType = response.headers.get('content-type');
-
-                if (contentType && contentType.includes('application/json')) {
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        App.log('Saved');
-
-                        if (document.getElementById('keep-open')?.checked) {
-                            form.reset();
-                        } else {
-                            App.modal.close();
-                        }
-                    }
-
-                } else {
-                    // 🔥 cas erreur Symfony → on réinjecte le HTML
-                    const html = await response.text();
-                    document.getElementById('modal-content').innerHTML = html;
-
-                    // ré-init JS
-                    App.autocomplete.init(document.getElementById('modal-content'));
-                    App.modal.bindForm();
-                }
             });
         }
     }

@@ -1,14 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Portefeuille{% endblock %}
-
-{% block body %}
-    <div class="space-y-6">
-        {# =========================
-            HEADER : Titre + actions (modernisé)
-            ========================= #}
-        {% set btns = [
-                {   
+{#   
                    label: "Opération",
                    path: "#",
                    color: "green",
@@ -17,7 +10,14 @@
                             label: 'onclick', 
                             value: 'App.modal.open("'~path('app_depenses_new', {portefeuille: portefeuille.id})~'")'
                         }]
-                },{
+                },#}
+{% block body %}        
+    <div class="space-y-6">
+        {# =========================
+            HEADER : Titre + actions (modernisé)
+            ========================= #}
+        {% set btns = [
+                {
                     label: "Suppr.",
                     path: path('app_portefeuille_delete', {id:portefeuille.id}),
                     color: 'red',
@@ -51,6 +51,13 @@
             label: 'Modifier',
             icon: 'mdi:pencil',
             content: include('portefeuille/_form.html.twig')
+        },{
+            id: 'addoperation',
+            label: 'Opération',
+            icon: 'ic:round-add',
+            content: include('depenses/_add_form.html.twig', {
+                form: depensesForm
+            })
         }
     ] %}
 
