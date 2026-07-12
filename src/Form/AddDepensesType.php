@@ -12,7 +12,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -99,11 +98,10 @@ class AddDepensesType extends AbstractType {
                 /* =========================
                   Adresse
                   ========================= */
-                ->add('adresse', ChoiceType::class, [
+                ->add('adresse', TextType::class, [
                     'mapped' => false,
                     'required' => false,
                     'data' => $options['adresse_label'],
-                    'placeholder' => 'Adresse',
                 ])
                 ->add('adresse_id', HiddenType::class, [
                     'mapped' => false,

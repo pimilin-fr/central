@@ -178,6 +178,11 @@ final class DepensesController extends AbstractController {
 
                 return $this->redirectToRoute('app_portefeuille_index');
             }
+            if ($form->isSubmitted() && !$form->isValid()) {
+                foreach ($form->getErrors(true, true) as $error) {  // 👈 true, true
+                    error_log('FORM ERROR >>> ' . $error->getMessage() . ' | champ: ' . ($error->getOrigin() ? $error->getOrigin()->getName() : 'form'));
+                }
+            }
 
             /*
              * =========================================================

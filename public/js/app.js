@@ -376,6 +376,7 @@ const App = {
                     return;
 
                 const select = form.querySelector('[name$="[adresse]"]');
+                const hiddenAdresseId = form.querySelector('[name$="[adresse_id]"]');
 
                 if (!select)
                     return;
@@ -385,7 +386,7 @@ const App = {
                 const response = await fetch(`/tiers/adresses/${item.id}`);
                 const adresses = await response.json();
 
-                select.innerHTML = '';
+                select.innerHTML = '<option value="">Adresse</option>';
 
                 adresses.forEach(adresse => {
 
@@ -400,6 +401,18 @@ const App = {
 
                     select.appendChild(option);
 
+                });
+
+                // 👇 synchronise adresse_id avec la sélection initiale (principale)
+                if (hiddenAdresseId) {
+                    hiddenAdresseId.value = select.value;
+                }
+
+                // 👇 synchronise adresse_id à chaque changement manuel
+                select.addEventListener('change', () => {
+                    if (hiddenAdresseId) {
+                        hiddenAdresseId.value = select.value;
+                    }
                 });
 
             });
