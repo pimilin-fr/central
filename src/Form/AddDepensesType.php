@@ -42,8 +42,13 @@ class AddDepensesType extends AbstractType {
                     'class' => Portefeuille::class,
                     'choice_label' => 'name',
                     'expanded' => true,
-                    'data' => $options['portefeuille_entity']
+                    'data' => $options['portefeuille_entity'],
+                    'query_builder' => function (PortefeuilleRepository $repository) {
+                        return $repository->findAllOrdered();
+                    },
                 ])
+
+
 
                 /* =========================
                   CATEGORIE
