@@ -81,7 +81,7 @@ final class PortefeuilleController extends AbstractController {
 
         $depenses = $depRepo->findBy(
                 ["portefeuille" => $portefeuille],
-                ["date" => "ASC", "id" => "ASC"] // IMPORTANT
+                ['date' => 'DESC', 'id' => 'DESC']// IMPORTANT
         );
 
         $groupManager = new \App\Services\DepenseGrouper\DepenseGroupManager();
