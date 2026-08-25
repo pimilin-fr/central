@@ -14,9 +14,11 @@
             {# 🔹 Vérification cohérence #}
             {% set soldeGlobal = portefeuille.totalRevenu - portefeuille.totalDepenses %}
             {% set soldeRecalcule = lastSolde + revenuNC - depenseNC %}
+            
+            {% set isDeleted = portefeuille.deletedAt is not null %}
 
             <a href="{{ path('app_portefeuille_show', {id: portefeuille.id}) }}"
-               class="block bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden border">
+               class="block bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden border {{ isDeleted ? 'opacity-40' : '' }}">
 
                 {# HEADER COLORÉ #}
                 <div class="px-4 py-3 flex justify-between items-center" data-color="{{ portefeuille.textColor }}"

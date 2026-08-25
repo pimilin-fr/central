@@ -24,7 +24,7 @@ class CategorieController extends AbstractController {
 
     #[Route('/new', name: 'app_categorie_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response {
-        
+        die('NOT IMPLEMENTED YET !');//--- TODO ?
     }
 
     #[Route('/search', name: 'json_categories_search')]

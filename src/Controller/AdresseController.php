@@ -59,7 +59,6 @@ final class AdresseController extends AbstractController {
                             ], Response::HTTP_SEE_OTHER);
         }
 
-//        $addAdresseForm = $this->createForm(\App\Entity\TiersAdresse::class, new \App\Entity\TiersAdresse()); 
         return $this->render('adresse/show.html.twig', [
                     'adresse' => $adresse,
                     'form' => $form
@@ -69,8 +68,6 @@ final class AdresseController extends AbstractController {
     #[Route('/search', name: 'api_adresse_search')]
     public function search(Request $request, AdresseRepository $repo): JsonResponse {
         $q = trim($request->query->get('q', ''));
-//        var_dump($q);die;
-
         if (mb_strlen($q) < 2) {
             return $this->json([]);
         }
@@ -82,14 +79,4 @@ final class AdresseController extends AbstractController {
                             'label' => $a->getAdresse() . " (" . $a->getName() . ")",
                                 ], $adresses));
     }
-
-//    #[Route('/delete/{id}', name: 'app_adresse_delete', methods: ['GET'])]
-//    public function delete(Adresse $adresse, EntityManagerInterface $em): Response {
-//
-//        $em->remove($adresse);
-//        $em->flush();
-//        $this->addFlash('success', 'Adresse supprimée avec succès');
-//
-//        return $this->redirectToRoute('app_adresse_index');
-//    }
 }

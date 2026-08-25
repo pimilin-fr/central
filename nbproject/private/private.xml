@@ -3,26 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/Releve.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/Categorie.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/show.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/show.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/_releve.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/show.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Controller/PortefeuilleController.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Controller/DepensesController.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/DepensesRepository.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/AddDepensesType.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/depenses/_table.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/depenses/index.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/depenses/_bulk_depense.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/_add_adresse_form.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/depenses/_depenses_form.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/index.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/_table.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/_table.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/Portefeuille.php</file>
             <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/PortefeuilleView.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/PortefeuilleType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/Depenses.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/AddDepensesType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/PortefeuilleRepository.php</file>
             <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/PortefeuilleViewRepository.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/CategorieRepository.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/OperationView.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/OperationViewRepository.php</file>
         </group>
     </open-files>
 </project-private>

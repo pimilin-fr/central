@@ -15,4 +15,15 @@ class PortefeuilleRepository extends ServiceEntityRepository {
         parent::__construct($registry, Portefeuille::class); 
     }
 
+    public function findAllOrdered($all = false) {
+        $qb = $this->createQueryBuilder('p')
+            ->addOrderBy('p.isDefault',"DESC")    
+            ->addOrderBy('p.name', 'ASC');
+        if(!$all){
+            $qb->andWhere("p.deleted is NULL");
+        }
+            
+        return $qb;
+        
+    }
 }

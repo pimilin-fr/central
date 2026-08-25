@@ -74,6 +74,7 @@ final class DepensesController extends AbstractController {
         $catRepo = $entityManager->getRepository(\App\Entity\Categorie::class);
         $tiersRepo = $entityManager->getRepository(Tiers::class);
         $projRepo = $entityManager->getRepository(Projet::class);
+        $adrRepo = $entityManager->getRepository(\App\Entity\Adresse::class);
 
         $portefeuille = null;
         $categorie = new \App\Entity\Categorie();
@@ -126,6 +127,7 @@ final class DepensesController extends AbstractController {
                 $categorieId = $form->get('categorie_id')->getData();
                 $tiersId = $form->get('tiers_id')->getData();
                 $projetId = $form->get('projet_id')->getData();
+                $adresseId = $form->get('adresse_id')->getData();
 
                 if ($categorieId) {
                     $categorie = $catRepo->find($categorieId);
@@ -141,7 +143,11 @@ final class DepensesController extends AbstractController {
                     $projet = $projRepo->find($projetId);
                     $depense->setProjet($projet);
                 }
-                
+                if ($adresseId) {
+                    $adresse = $adrRepo->find($adresseId);
+                    $depense->setAdresse($adresse);
+                }
+
 //                var_dump($form->get('portefeuille')->getData());die;
 
                 /*
@@ -171,6 +177,11 @@ final class DepensesController extends AbstractController {
                 }
 
                 return $this->redirectToRoute('app_portefeuille_index');
+            }
+            if ($form->isSubmitted() && !$form->isValid()) {
+                foreach ($form->getErrors(true, true) as $error) {  // 👈 true, true
+                    error_log('FORM ERROR >>> ' . $error->getMessage() . ' | champ: ' . ($error->getOrigin() ? $error->getOrigin()->getName() : 'form'));
+                }
             }
 
             /*
@@ -244,7 +255,7 @@ final class DepensesController extends AbstractController {
                 if (sizeof($depenses) < 1) {
                     break;
                 }
-                $manager = new \App\Services\ReleveManager($entityManager);                                        
+                $manager = new \App\Services\ReleveManager($entityManager);
 
                 $date = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
 

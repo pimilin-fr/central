@@ -81,7 +81,7 @@ final class PortefeuilleController extends AbstractController {
 
         $depenses = $depRepo->findBy(
                 ["portefeuille" => $portefeuille],
-                ["date" => "ASC", "id" => "ASC"] // IMPORTANT
+                ['date' => 'DESC', 'id' => 'DESC']// IMPORTANT
         );
 
         $groupManager = new \App\Services\DepenseGrouper\DepenseGroupManager();
@@ -107,10 +107,15 @@ final class PortefeuilleController extends AbstractController {
             ]);
         }
 
+        $depForm = $this->createForm(\App\Form\AddDepensesType::class, new Operation(), [
+            'portefeuille_entity' => $portefeuille,
+        ]);
+        
         return $this->render('portefeuille/show.html.twig', [
                     'portefeuille' => $ptfView,
                     'form' => $form->createView(),
 //                    'operations' => $operations,
+                    'depensesForm' => $depForm,
                     'releves' => $groups
         ]);
     }
@@ -149,8 +154,8 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
     
-    #[Route('/undelete/{id}', name: 'app_portefeuille_undelete', methods: ['GET'])]
-    public function undelete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
+    #[Route('/restore/{id}', name: 'app_portefeuille_restore', methods: ['GET'])]
+    public function restore(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $portefeuille->setDeleted(null);
         $em->flush();
         $this->addFlash('success', 'Portefeuille restauré avec succès');

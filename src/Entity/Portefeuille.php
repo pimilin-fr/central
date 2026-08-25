@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\PortefeuilleRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PortefeuilleRepository::class)]

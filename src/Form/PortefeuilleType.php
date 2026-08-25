@@ -29,7 +29,7 @@ class PortefeuilleType extends AbstractType {
                 ])->add('couleur', ColorType::class, [
                     'label' => 'Couleur',
                     'required' => false,
-                ])->add('isReal', ColorType::class, [
+                ])->add('isReal', CheckboxType::class, [
                     'label' => 'Dépenses Réeles',
                     'required' => false,
                 ])->add('isDefault', CheckboxType::class, [

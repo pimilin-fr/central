@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.3.25.1",
+        version: "v1.4.0.1",
         appName: "Central"
     },
 
@@ -12,14 +12,24 @@ const App = {
         }
     },
 
+    events: {
+        on(event, callback) {
+            document.addEventListener(event, callback);
+            App.log('eventListener', event, callback);
+        },
+
+        emit(event, detail = {}) {
+            document.dispatchEvent(
+                    new CustomEvent(event, {
+                        detail
+                    })
+                    );
+            App.log('event emit', event, detail)
+        }
+
+    },
+
     init() {
-
-        // surcharge config via Twig si dispo
-//        if (window.APP_CONFIG) {
-//            this.config = { ...this.config, ...window.APP_CONFIG };
-//            console.log('CONFIG', this.config);
-//        }
-
         this.log('🚀 Init app');
         this.log('config', this.config);
 
@@ -30,7 +40,8 @@ const App = {
         this.releves.init();
         this.depenses.init();
         this.selectAll.init();
-        this.modal.init();
+        this.adresse.init();
+        this.depenseForm.init();
     },
 
     /* =========================================================
@@ -53,12 +64,12 @@ const App = {
 
                 const resultsBox = document.createElement('div');
                 resultsBox.className = `
-            absolute left-0 right-0 mt-1
-            bg-white border border-gray-200
-            rounded-md shadow-lg
-            max-h-60 overflow-y-auto
-            z-50 hidden
-        `;
+                absolute left-0 right-0 mt-1
+                bg-white border border-gray-200
+                rounded-md shadow-lg
+                max-h-60 overflow-y-auto
+                z-50 hidden
+            `;
 
                 const wrapper = document.createElement('div');
                 wrapper.classList.add('relative');
@@ -129,6 +140,13 @@ const App = {
                                         hidden.value = item.id;
 
                                     resultsBox.classList.add('hidden');
+
+                                    App.events.emit('autocomplete:selected', {
+                                        form,
+                                        input,
+                                        hidden,
+                                        item
+                                    });
                                 });
 
                                 resultsBox.appendChild(option);
@@ -151,121 +169,6 @@ const App = {
 
             });
         }
-
-//        init() {
-//            App.log('Init autocomplete');
-//
-//            document.querySelectorAll('.autocomplete').forEach(input => {
-//
-//                const form = input.closest('form');
-//                if (!form)
-//                    return;
-//
-//                const resultsBox = document.createElement('div');
-//                resultsBox.className = `
-//                    absolute left-0 right-0 mt-1
-//                    bg-white border border-gray-200
-//                    rounded-md shadow-lg
-//                    max-h-60 overflow-y-auto
-//                    z-50 hidden
-//                `;
-//
-//                const wrapper = document.createElement('div');
-//                wrapper.classList.add('relative');
-//
-//                input.parentNode.insertBefore(wrapper, input);
-//                wrapper.appendChild(input);
-//                wrapper.appendChild(resultsBox);
-//
-//                let debounce;
-//
-//                function getHiddenField() {
-//
-//                    const form = input.closest('form');
-//                    if (!form)
-//                        return null;
-//
-//                    const inputName = input.name;
-//
-//                    if (inputName.includes('[')) {
-//                        const hiddenName = inputName.replace(/\]$/, '_id]');
-//                        return form.querySelector(`input[name="${hiddenName}"]`);
-//                    }
-//
-//                    return form.querySelector(`input[name="${inputName}_id"]`);
-//                }
-//
-//                input.addEventListener('input', function () {
-//
-//                    const query = this.value.trim();
-//                    clearTimeout(debounce);
-//
-//                    const hidden = getHiddenField();
-//                    if (hidden)
-//                        hidden.value = '';
-//
-//                    if (query.length < 2) {
-//                        resultsBox.classList.add('hidden');
-//                        return;
-//                    }
-//
-//                    debounce = setTimeout(async () => {
-//
-//                        const endpoint = input.dataset.endpoint;
-//
-//                        try {
-//                            const response = await fetch(`${endpoint}?q=${encodeURIComponent(query)}`);
-//                            const data = await response.json();
-//
-//                            resultsBox.innerHTML = '';
-//
-//                            if (!Array.isArray(data) || data.length === 0) {
-//                                resultsBox.innerHTML =
-//                                        '<div class="px-3 py-2 text-sm text-gray-400">Aucun résultat</div>';
-//                                resultsBox.classList.remove('hidden');
-//                                return;
-//                            }
-//
-//                            data.forEach(item => {
-//
-//                                const option = document.createElement('div');
-//                                option.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer';
-//
-//                                const label = item.label ?? item.name ?? item.text ?? '';
-//                                option.textContent = label;
-//
-//                                option.addEventListener('mousedown', (e) => {
-//                                    e.preventDefault();
-//
-//                                    input.value = label;
-//
-//                                    const hidden = getHiddenField();
-//                                    if (hidden)
-//                                        hidden.value = item.id;
-//
-//                                    resultsBox.classList.add('hidden');
-//                                });
-//
-//                                resultsBox.appendChild(option);
-//                            });
-//
-//                            resultsBox.classList.remove('hidden');
-//
-//                        } catch (error) {
-//                            App.log('Autocomplete error', error);
-//                        }
-//
-//                    }, 250);
-//                });
-//
-//                document.addEventListener('click', function (e) {
-//                    if (!wrapper.contains(e.target)) {
-//                        resultsBox.classList.add('hidden');
-//                    }
-//                });
-//
-//            });
-//        }
     },
 
     /* =========================================================
@@ -459,6 +362,66 @@ const App = {
     },
 
     /* =========================================================
+     DEPENSES addresse
+     ========================================================= */
+    adresse: {
+
+        init() {
+
+            App.events.on('autocomplete:selected', async (e) => {
+
+                const {input, form, item} = e.detail;
+
+                if (!input.name.endsWith('[tiers]'))
+                    return;
+
+                const select = form.querySelector('[name$="[adresse]"]');
+                const hiddenAdresseId = form.querySelector('[name$="[adresse_id]"]');
+
+                if (!select)
+                    return;
+
+                select.innerHTML = '<option>Chargement...</option>';
+
+                const response = await fetch(`/tiers/adresses/${item.id}`);
+                const adresses = await response.json();
+
+                select.innerHTML = '<option value="">Adresse</option>';
+
+                adresses.forEach(adresse => {
+
+                    const option = document.createElement('option');
+
+                    option.value = adresse.id;
+                    option.textContent = adresse.label;
+
+                    if (adresse.principale) {
+                        option.selected = true;
+                    }
+
+                    select.appendChild(option);
+
+                });
+
+                // 👇 synchronise adresse_id avec la sélection initiale (principale)
+                if (hiddenAdresseId) {
+                    hiddenAdresseId.value = select.value;
+                }
+
+                // 👇 synchronise adresse_id à chaque changement manuel
+                select.addEventListener('change', () => {
+                    if (hiddenAdresseId) {
+                        hiddenAdresseId.value = select.value;
+                    }
+                });
+
+            });
+
+        }
+
+    },
+
+    /* =========================================================
      SELECT ALL
      ========================================================= */
     selectAll: {
@@ -484,78 +447,67 @@ const App = {
     },
 
     /* =========================================================
-     Gestion des modales
+     ADD Depenses
      ========================================================= */
-    modal: {
+    depenseForm: {
 
-        init() {
-            App.log('Init modal');
-        },
+        init(scope = document) {
+            App.log('Init depenseForm');
 
-        open(url) {
-            const modal = document.getElementById('modal');
-            const content = document.getElementById('modal-content');
+            scope.querySelectorAll('#depense-form').forEach(form => {
 
-            modal.classList.remove('hidden');
+                if (form.dataset.ajaxInit)
+                    return;
+                form.dataset.ajaxInit = "1";
 
-            fetch(url)
-                    .then(res => res.text())
-                    .then(html => {
-                        content.innerHTML = html;
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
 
-                        App.autocomplete.init(content); // 🔥 Reload Autocomplete
-                        App.modal.bindForm();
-                    });
-        },
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn)
+                        submitBtn.disabled = true;
 
-        close() {
-            document.getElementById('modal').classList.add('hidden');
-        },
+                    const formData = new FormData(form);
 
-        bindForm() {
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
 
-            const form = document.querySelector('#modal-content form');
-            if (!form)
-                return;
+                        const contentType = response.headers.get('Content-Type') || '';
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
+                        if (contentType.includes('application/json')) {
+                            const data = await response.json();
 
-                const data = new FormData(form);
+                            if (data.success) {
+                                App.events.emit('depense:created', data);
+                                // Recharge la page en gardant l'onglet actif
+                                const url = new URL(window.location);
+                                url.searchParams.set('tab', 'addoperation');
+                                window.location = url;
+                                return;
+                            }
+                        }
 
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: data,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
+                        // Formulaire invalide -> le serveur renvoie le HTML du formulaire (avec erreurs)
+                        const html = await response.text();
+                        const container = form.closest('#tab-addoperation') || form.parentNode;
+                        container.innerHTML = html;
+
+                        // ré-initialiser autocomplete + submit sur le nouveau markup injecté
+                        App.autocomplete.init(container);
+                        App.depenseForm.init(container);
+
+                    } catch (err) {
+                        App.log('depenseForm submit error', err);
+                        if (submitBtn)
+                            submitBtn.disabled = false;
                     }
                 });
-
-                const contentType = response.headers.get('content-type');
-
-                if (contentType && contentType.includes('application/json')) {
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        App.log('Saved');
-
-                        if (document.getElementById('keep-open')?.checked) {
-                            form.reset();
-                        } else {
-                            App.modal.close();
-                        }
-                    }
-
-                } else {
-                    // 🔥 cas erreur Symfony → on réinjecte le HTML
-                    const html = await response.text();
-                    document.getElementById('modal-content').innerHTML = html;
-
-                    // ré-init JS
-                    App.autocomplete.init(document.getElementById('modal-content'));
-                    App.modal.bindForm();
-                }
             });
         }
     }

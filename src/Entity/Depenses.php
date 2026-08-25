@@ -43,6 +43,10 @@ class Depenses {
     private Tiers $tiers;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Adresse $adresse = null;
+
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Portefeuille $portefeuille = null;
 
@@ -120,6 +124,10 @@ class Depenses {
         return $this->portefeuille;
     }
 
+    public function getAdresse(): ?Adresse {
+        return $this->adresse;
+    }
+
     public function setCategorie(Categorie $categorie) {
         $this->categorie = $categorie;
         return $this;
@@ -146,6 +154,11 @@ class Depenses {
 
     public function setReleve(?Releve $releve) {
         $this->releve = $releve;
+        return $this;
+    }
+
+    public function setAdresse(?Adresse $adresse) {
+        $this->adresse = $adresse;
         return $this;
     }
 }

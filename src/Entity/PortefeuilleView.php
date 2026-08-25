@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(readOnly: true)]
 #[ORM\Table(name: 'v_portefeuille')]
-class PortefeuilleView extends ColorableEntity
-{
+class PortefeuilleView extends ColorableEntity {
+
     #[ORM\Id]
     #[ORM\Column(name: 'ptf_id', type: 'integer')]
     private int $id;
@@ -29,7 +30,7 @@ class PortefeuilleView extends ColorableEntity
 
     #[ORM\Column(name: 'ptf_is_default', type: 'boolean')]
     private bool $isDefault;
-    
+
     #[ORM\Column(name: 'ptf_is_real', type: 'boolean')]
     private bool $isReal = false;
 
@@ -57,19 +58,18 @@ class PortefeuilleView extends ColorableEntity
     #[ORM\Column(name: 'ptf_depenses_non_compta', type: 'decimal', precision: 32, scale: 2)]
     private float $depensesNonCompta;
 
+    #[ORM\Column(name: 'ptf_deleted_at',type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt;
+
     // ========================
     // 🔸 MÉTHODES MÉTIER
     // ========================
 
-    public function getBalanceActuelle(): float
-    {
-        return ($this->lastSolde ?? 0)
-            + $this->revenuNonCompta
-            - $this->depensesNonCompta;
+    public function getBalanceActuelle(): float {
+        return ($this->lastSolde ?? 0) + $this->revenuNonCompta - $this->depensesNonCompta;
     }
 
-    public function getSoldeTheoriqueGlobal(): float
-    {
+    public function getSoldeTheoriqueGlobal(): float {
         return $this->totalRevenu - $this->totalDepenses;
     }
 
@@ -77,83 +77,73 @@ class PortefeuilleView extends ColorableEntity
     // 🔸 GETTERS
     // ========================
 
-    public function getId(): int
-    {
+    public function getId(): int {
         return $this->id;
     }
 
-    public function getCode(): ?string
-    {
+    public function getCode(): ?string {
         return $this->code;
     }
 
-    public function getName(): string
-    {
+    public function getName(): string {
         return $this->name;
     }
 
-    public function getType(): ?string
-    {
+    public function getType(): ?string {
         return $this->type;
     }
 
-    public function getOrigine(): ?string
-    {
+    public function getOrigine(): ?string {
         return $this->origine;
     }
 
-    public function getLibelle(): string
-    {
+    public function getLibelle(): string {
         return $this->libelle;
     }
 
-    public function isDefault(): bool
-    {
+    public function isDefault(): bool {
         return $this->isDefault;
     }
 
     #[\Override]
-    public function getCouleur(): ?string
-    {
+    public function getCouleur(): ?string {
         return $this->couleur;
     }
 
-    public function getReleve(): ?Releve
-    {
+    public function getReleve(): ?Releve {
         return $this->releve;
     }
 
-    public function getLastSolde(): ?float
-    {
+    public function getLastSolde(): ?float {
         return $this->lastSolde;
     }
 
-    public function getTotalRevenu(): float
-    {
+    public function getTotalRevenu(): float {
         return $this->totalRevenu;
     }
 
-    public function getTotalDepenses(): float
-    {
+    public function getTotalDepenses(): float {
         return $this->totalDepenses;
     }
 
-    public function getRevenuNonCompta(): float
-    {
+    public function getRevenuNonCompta(): float {
         return $this->revenuNonCompta;
     }
 
-    public function getDepensesNonCompta(): float
-    {
+    public function getDepensesNonCompta(): float {
         return $this->depensesNonCompta;
     }
-    
+
     public function getIsDefault(): bool {
         return $this->isDefault;
     }
 
     public function getIsReal(): bool {
         return $this->isReal;
+    }
+
+    public function getDeletedAt(): ?DateTimeImmutable {
+        return $this->deletedAt;
     }
 
     public function setIsDefault(bool $isDefault) {
@@ -165,6 +155,4 @@ class PortefeuilleView extends ColorableEntity
         $this->isReal = $isReal;
         return $this;
     }
-
-
 }
