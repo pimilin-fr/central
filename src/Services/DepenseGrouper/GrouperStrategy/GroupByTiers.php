@@ -3,18 +3,19 @@
 namespace App\Services\DepenseGrouper\GrouperStrategy;
 
 use App\Entity\Depenses;
-use DateTime;
 use Override;
 
-class GroupByYear implements GroupStrategyInterface {
+class GroupByTiers implements GroupStrategyInterface {
 
     #[Override]
     public function getKey(Depenses $depense): string {
-        return $depense->getDate()->format('Y');
+        return $depense->getTiers() ? 'tiers_' . $depense->getTiers()->getId() : 'no_tiers';
     }
 
     #[Override]
     public function getLabel(Depenses $depense): string {
-        return $depense->getDate()->format('Y');
+        return $depense->getTiers() ? $depense->getTiers()->getName() : 'Non affecté';
     }
+
 }
+

@@ -2,7 +2,7 @@
 namespace App\Services\DepenseGrouper\GrouperStrategy;
 
 use App\Entity\Depenses;
-use DateTime;
+//use DateTime;
 
 
 interface GroupStrategyInterface {
@@ -11,5 +11,5 @@ interface GroupStrategyInterface {
 
     public function getLabel(Depenses $depense): string;
 
-    public function getDate(Depenses $depense): ?DateTime;
+//    public function getDate(Depenses $depense): ?DateTime;
 }

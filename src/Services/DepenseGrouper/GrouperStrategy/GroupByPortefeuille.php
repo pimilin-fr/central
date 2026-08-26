@@ -3,7 +3,6 @@
 namespace App\Services\DepenseGrouper\GrouperStrategy;
 
 use App\Entity\Depenses;
-use DateTime;
 use Override;
 
 class GroupByPortefeuille implements GroupStrategyInterface {
@@ -18,8 +17,4 @@ class GroupByPortefeuille implements GroupStrategyInterface {
         return $depense->getPortefeuille() ? $depense->getPortefeuille()->getName() : 'Non affecté';
     }
 
-    #[Override]
-    public function getDate(Depenses $depense): ?DateTime {
-        return $depense->getReleve() ? $depense->getReleve()->getDate() : null;
-    }
 }

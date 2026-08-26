@@ -1,9 +1,7 @@
 
 
 {% for group in groups %}
-    {% set groupKey = group.id 
-        ?? (group.date is defined and group.date ? group.date|date('Ymd') : 'no-date') 
-    %}
+    {% set groupKey = group.key %}
 
     <div class="border-b border-gray-200">
 
@@ -14,13 +12,13 @@
             >
 
             <div class="flex items-center gap-4">
-                {%if group.date is null%}
+                {%if group.key == '0' %}
                     <span class="text-sm font-semibold text-orange-500">
                         {{group.label}} 
                     </span>
                 {%else%}
                     <span class="text-sm font-semibold text-gray-700">
-                        {{ group.date|date('d/m/Y') }}
+                        {{ group.label }}
                     </span>
                 {% endif %}
                 <span class="text-xs text-gray-500">

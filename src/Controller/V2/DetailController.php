@@ -6,12 +6,15 @@ use App\Entity\Depenses;
 use App\Entity\Portefeuille;
 use App\Entity\PortefeuilleView;
 use App\Services\DepenseGrouper\DepenseGroupManager;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByCategorie;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupByReleve;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByTiers;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Request;
 
 class DetailController extends AbstractController {
 
@@ -30,6 +33,15 @@ class DetailController extends AbstractController {
         $reqGroup = $request->query->get('groupBy');
         
         switch ($reqGroup){
+            case 'categorie':
+                $cleanGroup = new GroupByCategorie();
+                break;
+            case 'projet':
+                $cleanGroup = new GroupByProjet();
+                break;
+            case 'tiers':
+                $cleanGroup = new GroupByTiers();
+                break;
             default :
                 $cleanGroup = new GroupByReleve();
                 $reqGroup = "releve";

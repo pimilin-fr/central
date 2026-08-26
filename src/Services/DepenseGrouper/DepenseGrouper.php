@@ -20,8 +20,7 @@ class DepenseGrouper {
             if (!isset($groups[$key])) {
                 $groups[$key] = (new DepenseGroup())
                         ->setKey($key)
-                        ->setLabel($strategy->getLabel($depense))
-                        ->setDate($strategy->getDate($depense));
+                        ->setLabel($strategy->getLabel($depense));
             }
 
             $groups[$key]->addDepense($depense);

@@ -14,7 +14,6 @@ class DepenseGroup {
     private float $totalRevenu = 0;
     private float $previousBalance = 0;
     private float $currentBalance = 0;
-    private ?DateTime $date = null;
 
     // --- KEY ---
     public function getKey(): string {
@@ -86,16 +85,7 @@ class DepenseGroup {
         return $this;
     }
 
-    
-    // --- DATE ---
-    public function getDate(): ?DateTime {
-        return $this->date;
-    }
-
-    public function setDate(?DateTime $date): self {
-        $this->date = $date;
-        return $this;
-    }
+   
 
     // --- TOTAL GLOBAL ---
     public function getTotal(): float {

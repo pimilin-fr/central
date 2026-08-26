@@ -2,14 +2,15 @@
 
 namespace App\Services\DepenseGrouper;
 
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByReleve;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupStrategyInterface;
 
 class DepenseGroupManager
 {
     private DepenseGrouper $grouper;
-    
-    public function __construct(DepenseGrouper $grouper = new DepenseGrouper()) {
+
+    public function __construct(
+        DepenseGrouper $grouper = new DepenseGrouper()
+    ) {
         $this->grouper = $grouper;
     }
 
@@ -20,12 +21,16 @@ class DepenseGroupManager
     ): array {
 
         // 1️⃣ GROUP
-        $groups = $this->grouper->group($depenses, $strategy);
+        $groups = $this->grouper->group(
+            $depenses,
+            $strategy
+        );
 
-        // 2️⃣ TRI ASC (avec gestion null)
+        // 2️⃣ TRI ASC
+        // Nécessaire pour calculer les soldes
         $this->sortAsc($groups);
 
-        // 3️⃣ CALCUL
+        // 3️⃣ CALCUL DES SOLDES
         $runningBalance = $initialBalance;
 
         foreach ($groups as $group) {
@@ -37,7 +42,8 @@ class DepenseGroupManager
             $group->setCurrentBalance($runningBalance);
         }
 
-        // 4️⃣ TRI DESC (affichage)
+        // 4️⃣ TRI DESC
+        // Ordre d'affichage
         $this->sortDesc($groups);
 
         return $groups;
@@ -47,13 +53,20 @@ class DepenseGroupManager
     {
         usort($groups, function (DepenseGroup $a, DepenseGroup $b) {
 
-            $dateA = $a->getDate();
-            $dateB = $b->getDate();
+            $keyA = $a->getKey();
+            $keyB = $b->getKey();
 
-            if ($dateA === null) return 1;
-            if ($dateB === null) return -1;
+            // "0" = groupe sans élément
+            // Toujours en premier
+            if ($keyA === '0' && $keyB !== '0') {
+                return -1;
+            }
 
-            return $dateA <=> $dateB;
+            if ($keyB === '0' && $keyA !== '0') {
+                return 1;
+            }
+
+            return strnatcasecmp($keyA, $keyB);
         });
     }
 
@@ -61,13 +74,21 @@ class DepenseGroupManager
     {
         usort($groups, function (DepenseGroup $a, DepenseGroup $b) {
 
-            $dateA = $a->getDate();
-            $dateB = $b->getDate();
+            $keyA = $a->getKey();
+            $keyB = $b->getKey();
 
-            if ($dateA === null) return -1;
-            if ($dateB === null) return 1;
+            // "0" = groupe sans élément
+            // Toujours en premier,
+            // même en ordre descendant
+            if ($keyA === '0' && $keyB !== '0') {
+                return -1;
+            }
 
-            return $dateB <=> $dateA;
+            if ($keyB === '0' && $keyA !== '0') {
+                return 1;
+            }
+
+            return strnatcasecmp($keyB, $keyA);
         });
     }
 }
