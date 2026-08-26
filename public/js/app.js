@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.4.0.1",
+        version: "v1.4.1.0",
         appName: "Central"
     },
 
@@ -336,6 +336,21 @@ const App = {
                 });
 
                 const target = document.getElementById('releve-' + id);
+                if (target)
+                    target.classList.toggle('hidden');
+            };
+            
+            window.toggleGroup = function (id) {
+
+                const all = document.querySelectorAll('[id^="group-"]');
+
+                all.forEach(el => {
+                    if (el.id !== 'group-' + id) {
+                        el.classList.add('hidden');
+                    }
+                });
+
+                const target = document.getElementById('group-' + id);
                 if (target)
                     target.classList.toggle('hidden');
             };

@@ -9,7 +9,26 @@ class SortByDateDesc implements GroupSorterInterface {
     #[\Override]
     public function sort(array $groups): array {
         usort($groups, function (DepenseGroup $a, DepenseGroup $b) {
-            return ($b->getDate()?->getTimestamp() ?? 0) <=> ($a->getDate()?->getTimestamp() ?? 0);
+
+            $dateA = $a->getDate();
+            $dateB = $b->getDate();
+
+            // Les groupes sans date sont toujours les premiers
+            if ($dateA === null && $dateB !== null) {
+                return -1;
+            }
+
+            if ($dateA !== null && $dateB === null) {
+                return 1;
+            }
+
+            // Les deux sont sans date
+            if ($dateA === null && $dateB === null) {
+                return 0;
+            }
+
+            // Les deux ont une date : plus récent en premier
+            return $dateB <=> $dateA;
         });
 
         return $groups;
