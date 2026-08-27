@@ -6,6 +6,7 @@ use App\Entity\Depenses;
 use App\Entity\Depenses as Operation;
 use App\Entity\Portefeuille;
 use App\Entity\PortefeuilleView;
+use App\Form\AddDepensesType;
 use App\Form\PortefeuilleType;
 use App\Services\DepenseGrouper\DepenseGrouper;
 use App\Services\DepenseGrouper\DepenseGroupManager;
@@ -146,16 +147,16 @@ final class PortefeuilleController extends AbstractController {
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-            
+
             $this->addFlash('success', 'Portefeuille modifié avec succès');
-            
+
             return $this->redirectToRoute(
-                    'app_portefeuille_show',
-                    [
-                        'id' => $portefeuille->getId(),
-                        'tab' => 'edit',
-                    ]
-            );
+                            'app_portefeuille_show',
+                            [
+                                'id' => $portefeuille->getId(),
+                                'tab' => 'edit',
+                            ]
+                    );
         }
 
         return $this->render('portefeuille/_form.html.twig', [
@@ -164,27 +165,44 @@ final class PortefeuilleController extends AbstractController {
         ]);
     }
 
-//    #[Route('/edit/{id}', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
-//    public function edit(Request $request, Adresse $adresse, EntityManagerInterface $entityManager): Response {
-//        $form = $this->createForm(AdresseType::class, $adresse);
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            $entityManager->flush();
-//
-//            $this->addFlash('success', 'Portefeuille modifié avec succès');
-//
-//            return $this->redirectToRoute('app_portefeuille_show', [
-//                        'id' => $portefeuille->getId(),
-//                        'tab' => 'edit'
-//            ]);
-//        }
-//
-//        return $this->render('adresse/edit.html.twig', [
-//                    'adresse' => $adresse,
-//                    'form' => $form,
-//        ]);
-//    }
+    #[Route('/add-operation/{id}', name: 'app_portefeuille_add_operation', methods: ['GET', 'POST'])]
+    public function addOperation(Portefeuille $portefeuille, Request $request, EntityManagerInterface $em): Response {
+        $operation = new Operation();
+
+        $form = $this->createForm(
+                AddDepensesType::class,
+                $operation,
+                [
+                    'portefeuille_entity' => $portefeuille,
+                ]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Si ton AddDepensesType ne fait pas déjà l'association,
+            // on force le portefeuille ici.
+            $operation->setPortefeuille($portefeuille);
+
+            $em->persist($operation);
+            $em->flush();
+
+            $this->addFlash('success', 'Opération ajoutée avec succès');
+
+            return $this->redirectToRoute(
+                            'app_portefeuille_show',
+                            [
+                                'id' => $portefeuille->getId(),
+                                'tab' => 'addoperation',
+                            ]
+                    );
+        }
+
+        return $this->render('depenses/_add_form.html.twig', [
+                    'form' => $form->createView(),
+                    'portefeuille' => $portefeuille,
+        ]);
+    }
 
     #[Route('/delete/{id}', name: 'app_portefeuille_delete', methods: ['GET'])]
     public function delete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
@@ -207,18 +225,6 @@ final class PortefeuilleController extends AbstractController {
         return $this->redirectToRoute('app_portefeuille_show', [
                     'id' => $portefeuille->getId(),
                     'tab' => 'edit'
-        ]);
-    }
-
-    #[Route('/v2/portefeuille/{id}/formulaire', name: 'app_v2_portefeuille_form')]
-    public function editPortefeuille(Portefeuille $portefeuille): Response {
-        $form = $this->createForm(
-                PortefeuilleType::class,
-                $portefeuille
-        );
-
-        return $this->render('portefeuille/_form_.html.twig', [
-                    'form' => $form->createView(),
         ]);
     }
 }

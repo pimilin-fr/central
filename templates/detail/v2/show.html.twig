@@ -49,6 +49,16 @@
                         id: entity.id
                     }
                 ))
+            },{
+                id: 'addoperation',
+                label: 'Opération',
+                icon: 'ic:round-add',
+                content: render(controller(
+                    'App\\Controller\\PortefeuilleController::addOperation',
+                    {
+                        id: entity.id
+                    }
+                ))
             }
         ] %}
 
