@@ -2,14 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Depenses;
 use App\Entity\Tiers;
 use App\Entity\TiersAdresse;
 use App\Form\AddAdresseType;
 use App\Form\TiersType;
 use App\Repository\AdresseRepository;
-use App\Repository\DepensesRepository;
 use App\Repository\TiersAdresseRepository;
 use App\Repository\TiersRepository;
+use App\Services\DepenseGrouper\DepenseGroupManager;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,43 +51,61 @@ final class TiersController extends AbstractController {
     }
 
     #[Route('/show/{id}', name: 'app_tiers_show', methods: ['GET', 'POST'])]
-    public function show(Tiers $tiers, Request $request, TiersAdresseRepository $tiersAdresseRepo, DepensesRepository $depRepo, EntityManagerInterface $entityManager): Response {
-        $form = $this->createForm(TiersType::class, $tiers);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($tiers);
-            $entityManager->flush();
+    public function show(Tiers $tiers, Request $request, EntityManagerInterface $em): Response {
+        $depRepo = $em->getRepository(Depenses::class);
 
-            $this->addFlash('success', 'Tiers modifié avec succès');
-
-            return $this->redirectToRoute('app_tiers_show', [
-                        'id' => $tiers->getId(),
-                        'tab' => "edit"
-                            ], Response::HTTP_SEE_OTHER);
-        }
-
-        $adresses = $tiersAdresseRepo->findByTiersOrdered($tiers);
-
-        $addAdresseForm = $this->createForm(
-                AddAdresseType::class,
-                new TiersAdresse(),
-                [
-                    'action' => $this->generateUrl('app_tiers_adresse_add', [
-                        'id' => $tiers->getId(),
-                    ]),
-                ]
+        $depenses = $depRepo->findBy(
+                ['tiers' => $tiers],
+                ['date' => 'DESC', 'id' => 'DESC']// IMPORTANT
+        );
+        $groupManager = new DepenseGroupManager($request);
+        $groups = $groupManager->build(
+                $depenses,
+                0
         );
         return $this->render('tiers/show.html.twig', [
-                    'tiers' => $tiers,
-                    'form' => $form,
-                    'depenses' => $depRepo->findByTiers($tiers),
-                    'addAdresseForm' => $addAdresseForm,
-                    'adresses' => $adresses
+                    'entity' => $tiers,
+                    'entityType' => 'tiers',
+                    'groups' => $groups,
+                    'groupBy' => $groupManager->getGroupBy()
         ]);
+//public function show(Tiers $tiers, Request $request, TiersAdresseRepository $tiersAdresseRepo, DepensesRepository $depRepo, EntityManagerInterface $entityManager): Response {
+//        $form = $this->createForm(TiersType::class, $tiers);
+//        $form->handleRequest($request);
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $entityManager->persist($tiers);
+//            $entityManager->flush();
+//
+//            $this->addFlash('success', 'Tiers modifié avec succès');
+//
+//            return $this->redirectToRoute('app_tiers_show', [
+//                        'id' => $tiers->getId(),
+//                        'tab' => "edit"
+//                            ], Response::HTTP_SEE_OTHER);
+//        }
+//
+//        $adresses = $tiersAdresseRepo->findByTiersOrdered($tiers);
+//
+//        $addAdresseForm = $this->createForm(
+//                AddAdresseType::class,
+//                new TiersAdresse(),
+//                [
+//                    'action' => $this->generateUrl('app_tiers_adresse_add', [
+//                        'id' => $tiers->getId(),
+//                    ]),
+//                ]
+//        );
+//        return $this->render('tiers/show.html.twig', [
+//                    'tiers' => $tiers,
+//                    'form' => $form,
+//                    'depenses' => $depRepo->findByTiers($tiers),
+//                    'addAdresseForm' => $addAdresseForm,
+//                    'adresses' => $adresses
+//        ]);
     }
 
     #[Route('/adresses/{id}', name: 'app_tiers_adresse_list', methods: ['GET'])]
-    public function adresses(Tiers $tiers,TiersAdresseRepository $repo): JsonResponse {
+    public function adresses(Tiers $tiers, TiersAdresseRepository $repo): JsonResponse {
         $results = [];
 
         foreach ($repo->findByTiersOrdered($tiers) as $link) {

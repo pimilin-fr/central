@@ -1,16 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Portefeuille{% endblock %}
-{#   
-                   label: "Opération",
-                   path: "#",
-                   color: "green",
-                   icon: 'ic:round-add',
-                   attr: [{
-                            label: 'onclick', 
-                            value: 'App.modal.open("'~path('app_depenses_new', {portefeuille: portefeuille.id})~'")'
-                        }]
-                },#}
+{% block title %}Portefeuille - {{ entity.name }} {% endblock %}
+
 {% block body %}        
     <div class="space-y-6">
         {# =========================
@@ -19,7 +10,7 @@
         {% set btns = [
                 {
                     label: "Suppr.",
-                    path: path('app_portefeuille_delete', {id:portefeuille.id}),
+                    path: path('app_portefeuille_delete', {id:entity.id}),
                     color: 'red',
                     icon: 'gridicons:trash'
                 }, {
@@ -32,8 +23,8 @@
 
         {% include 'partials/header.html.twig' with {
             btns: btns,
-            title: 'Portefeuille : '~portefeuille.name,
-            item: portefeuille
+            title: 'Portefeuille : '~entity.name,
+            item: entity
         } %}
 
         {# =========================
@@ -42,24 +33,34 @@
         {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
 
         {% set tabs = [
-        {
-            id: 'summary',
-            label: 'Résumé',
-            content: include('portefeuille/_activite.html.twig')
-        },{
-            id: 'edit',
-            label: 'Modifier',
-            icon: 'mdi:pencil',
-            content: include('portefeuille/_form.html.twig')
-        },{
-            id: 'addoperation',
-            label: 'Opération',
-            icon: 'ic:round-add',
-            content: include('depenses/_add_form.html.twig', {
-                form: depensesForm
-            })
-        }
-    ] %}
+            {
+                id: 'summary',
+                label: 'Résumé',
+                content: include('portefeuille/_activite.html.twig',{
+                    portefeuille: entity
+                })
+            },{
+                id: 'edit',
+                label: 'Modifier',
+                icon: 'mdi:pencil',
+                content: render(controller(
+                    'App\\Controller\\PortefeuilleController::edit',
+                    {
+                        id: entity.id
+                    }
+                ))
+            },{
+                id: 'addoperation',
+                label: 'Opération',
+                icon: 'ic:round-add',
+                content: render(controller(
+                    'App\\Controller\\PortefeuilleController::addOperation',
+                    {
+                        id: entity.id
+                    }
+                ))
+            }
+        ] %}
 
         {% include 'partials/tabs.html.twig' with {
         tabs: tabs,

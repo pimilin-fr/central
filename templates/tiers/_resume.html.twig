@@ -1,30 +1,12 @@
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+{#<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
 
-    {# Résumé #}
+    {# Résumé }
     <div class="lg:col-span-3 bg-white p-5">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-                <p class="text-gray-500">Nom</p>
-                <p class="text-gray-800 font-medium">{{ tiers.name }}</p>
-            </div>
-
-            <div>
-                <p class="text-gray-500">Type</p>
-                <p class="text-gray-800 font-medium">
-                    {{ tiers.tiersType.name ?? '—' }}
-                </p>
-            </div>
-            <div>
-                <p class="text-gray-500">Text de recherche</p>
-                <p class="text-gray-800 font-medium">
-                    {{ tiers.searchText ?? '—' }}
-                </p>
-            </div>
-        </div>
+        
     </div>
 
-    {# Dates (tuile compacte à droite) #}
+    {# Dates (tuile compacte à droite) }
     <div class="bg-gray-200 rounded-xl border shadow-sm p-4 text-sm">
         {% if tiers.deletedAt %}
             <p class="flex items-center gap-2 text-xs text-red-600 font-bold">
@@ -44,4 +26,139 @@
             <p class="text-gray-800">{{ tiers.deletedAt|date('d/m/Y') }}</p>
         {% endif %}
     </div>
+</div>#}
+
+
+
+
+
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+
+    {# SOLDE#
+    <div class="md:col-span-1 bg-gray-100 p-5 rounded-xl border shadow">
+        <div class="text-sm text-gray-800">Solde réel</div>
+
+        {% set solde = portefeuille.balanceActuelle %}
+
+
+        <div class="text-2xl font-bold
+             {{ solde >= 0 ? 'text-green-600' : 'text-red-500' }}">
+            {{ solde|number_format(2, ',', ' ') }} €
+        </div>
+    </div> #}
+
+    {# OPTIONS DE GROUPEMENT #}
+    <div class="md:col-span-2 bg-gray-100 p-5 rounded-xl border shadow">
+        {% include 'detail/v2/_grouping.html.twig' with {
+            groupBy: groupBy,
+            route: 'app_tiers_show',
+            routeParams: {
+                id: tiers.id,
+                tab: 'summary'
+            }
+        } %}
+    </div>
+
+    {# INFOS Tiers #}
+
+
+    <div class="md:col-span-3 bg-gray-100 p-5 rounded-xl shadow border relative overflow-hidden">
+
+        {# Liseré couleur #}
+        <div
+            class="absolute right-0 top-0 h-full w-5"
+            style="background-color: {{ tiers.deletedAt ? '#eb4034' : '#45d161' }}"
+            ></div>
+
+        <div class="pr-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-sm">
+
+            {# =========================
+               LIGNE 1
+               ========================= #}
+
+            {# Nom #}
+            <div>
+                <p class="text-gray-500">Nom</p>
+                <p class="text-gray-800 font-medium">
+                    {{ tiers.name }}
+                </p>
+            </div>
+
+            {# Texte de recherche #}
+            <div>
+                <p class="text-gray-500">Texte de recherche</p>
+                <p class="text-gray-800 font-medium">
+                    {{ tiers.searchText ?? '—' }}
+                </p>
+            </div>
+
+
+            {# =========================
+               LIGNE 2
+               ========================= #}
+
+            {# Créé le #}
+            <div>
+                <p class="text-gray-500">Créé le</p>
+                <p class="text-gray-800 font-medium">
+                    {{ tiers.createdAt|date('d/m/Y') }}
+                </p>
+            </div>
+
+            {# Supprimé le #}
+            {% if tiers.deletedAt %}
+                <div>
+                    <p class="text-gray-500">Supprimé le</p>
+                    <p class="text-gray-800 font-medium">
+                        {{ tiers.deletedAt|date('d/m/Y') }}
+                    </p>
+                </div>
+            {% endif %}
+
+
+            {# =========================
+               LIGNE 3
+               ========================= #}
+
+            {# Type - pleine largeur #}
+            <div class="md:col-span-2">
+                <p class="text-gray-500">Type</p>
+                <p class="text-gray-800 font-medium">
+                    {{ tiers.tiersType.name ?? '—' }}
+                </p>
+            </div>
+
+        </div>
+
+        {# =========================
+           STATUT - LISERÉ VERTICAL
+           ========================= #}
+
+        <div
+            class="absolute right-0 top-0 h-full w-5 flex items-center justify-center"
+            style="background-color: {{ tiers.deletedAt ? '#eb4034' : '#45d161' }}"
+            >
+            <span
+                class="text-white font-bold uppercase whitespace-nowrap"
+                style="transform: rotate(90deg);"
+                >
+                {{ tiers.deletedAt ? 'Inactif' : 'Actif' }}
+            </span>
+        </div>
+
+    </div>
+
 </div>
+
+<div>
+    <form method="post" action="{{ path('app_depenses_bulk_update') }}" class="mb-4"  data-bulk-form>
+        <div class="flex flex-wrap items-end gap-4 bg-gray-100 p-4 rounded-lg border shadow-sm space-y-3 mb-4">
+            {{ include('depenses/_bulk_components.html.twig') }}
+        </div>
+
+        <div id="releves-container">
+            {% include('detail/v2/_releve.html.twig')%}
+        </div>
+    </form>
+</div>
+

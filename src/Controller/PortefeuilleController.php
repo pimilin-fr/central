@@ -10,15 +10,7 @@ use App\Form\AddDepensesType;
 use App\Form\PortefeuilleType;
 use App\Services\DepenseGrouper\DepenseGrouper;
 use App\Services\DepenseGrouper\DepenseGroupManager;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByCategorie;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByMonth;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByQuarter;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupByReleve;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByTiers;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByWeek;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByYear;
-use App\Services\DepenseGrouper\GrouperStrategy\SortByDateDesc;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -91,47 +83,17 @@ final class PortefeuilleController extends AbstractController {
                 ['date' => 'DESC', 'id' => 'DESC']// IMPORTANT
         );
 
-        $groupManager = new DepenseGroupManager();
-        $reqGroup = $request->query->get('groupBy');
-
-        switch ($reqGroup) {
-            case 'categorie':
-                $cleanGroup = new GroupByCategorie();
-                break;
-            case 'projet':
-                $cleanGroup = new GroupByProjet();
-                break;
-            case 'tiers':
-                $cleanGroup = new GroupByTiers();
-                break;
-            case 'annee':
-                $cleanGroup = new GroupByYear();
-                break;
-            case 'trimestre':
-                $cleanGroup = new GroupByQuarter();
-                break;
-            case 'mois':
-                $cleanGroup = new GroupByMonth();
-                break;
-            case 'semaine':
-                $cleanGroup = new GroupByWeek();
-                break;
-            default :
-                $cleanGroup = new GroupByReleve();
-                $reqGroup = "releve";
-        }
-
+        $groupManager = new DepenseGroupManager($request);
         $groups = $groupManager->build(
                 $depenses,
-                $cleanGroup,
                 0
         );
 
-        return $this->render('detail/v2/show.html.twig', [
+        return $this->render('portefeuille/show.html.twig', [
                     'entity' => $ptfView,
                     'entityType' => 'portefeuille',
                     'groups' => $groups,
-                    'groupBy' => $reqGroup
+                    'groupBy' => $groupManager->getGroupBy()
         ]);
     }
 

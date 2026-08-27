@@ -32,18 +32,18 @@
             <a
                 href="{{ path(route, routeParams|merge(queryParams)) }}"
                 class="
-                    inline-flex items-center
-                    px-3 py-1.5
-                    rounded-md
-                    text-sm font-medium
-                    border
-                    transition
-                    {{ groupBy == key
+                inline-flex items-center
+                px-3 py-1.5
+                rounded-md
+                text-sm font-medium
+                border
+                transition
+                {{ groupBy == key
                         ? 'bg-gray-500 text-white border-gray-500'
                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
-                    }}
+                }}
                 "
-            >
+                >
                 {{ label }}
             </a>
 
@@ -64,6 +64,7 @@
 
         {% set elementOptions = {
             releve: 'Relevé',
+            portefeuille: 'Portefeuille',
             categorie: 'Catégorie',
             tiers: 'Tiers',
             projet: 'Projet'
@@ -71,25 +72,25 @@
 
         {% for key, label in elementOptions %}
 
-            {% set queryParams = app.request.query.all|merge({
+            {% set queryParams = app.request.query.all|filter((value, name) => name != 'tab')|merge({
                 groupBy: key
             }) %}
 
             <a
                 href="{{ path(route, routeParams|merge(queryParams)) }}"
                 class="
-                    inline-flex items-center
-                    px-3 py-1.5
-                    rounded-md
-                    text-sm font-medium
-                    border
-                    transition
-                    {{ groupBy == key
+                inline-flex items-center
+                px-3 py-1.5
+                rounded-md
+                text-sm font-medium
+                border
+                transition
+                {{ groupBy == key
                         ? 'bg-gray-500 text-white border-gray-500'
                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
-                    }}
+                }}
                 "
-            >
+                >
                 {{ label }}
             </a>
 

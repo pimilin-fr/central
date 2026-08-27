@@ -2,28 +2,35 @@
 
 namespace App\Services\DepenseGrouper;
 
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByCategorie;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByMonth;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByPortefeuille;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByQuarter;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByReleve;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByTiers;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByWeek;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByYear;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupStrategyInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-class DepenseGroupManager
-{
+class DepenseGroupManager {
+
     private DepenseGrouper $grouper;
+    private string $groupBy;
+    public static final $REQ_PARAM_NAME = 'groupBy';
 
-    public function __construct(
-        DepenseGrouper $grouper = new DepenseGrouper()
-    ) {
+    public function __construct(Request $request, DepenseGrouper $grouper = new DepenseGrouper()) {
         $this->grouper = $grouper;
+        $this->groupBy = $request->query->get('groupBy', 'releve');
     }
 
-    public function build(
-        array $depenses,
-        GroupStrategyInterface $strategy,
-        float $initialBalance = 0
-    ): array {
+    public function build(array $depenses, float $initialBalance = 0): array {
 
         // 1️⃣ GROUP
         $groups = $this->grouper->group(
-            $depenses,
-            $strategy
+                $depenses,
+                $this->resolveStrategy()
         );
 
         // 2️⃣ TRI ASC
@@ -49,8 +56,7 @@ class DepenseGroupManager
         return $groups;
     }
 
-    private function sortAsc(array &$groups): void
-    {
+    private function sortAsc(array &$groups): void {
         usort($groups, function (DepenseGroup $a, DepenseGroup $b) {
 
             $keyA = $a->getKey();
@@ -70,8 +76,7 @@ class DepenseGroupManager
         });
     }
 
-    private function sortDesc(array &$groups): void
-    {
+    private function sortDesc(array &$groups): void {
         usort($groups, function (DepenseGroup $a, DepenseGroup $b) {
 
             $keyA = $a->getKey();
@@ -90,5 +95,23 @@ class DepenseGroupManager
 
             return strnatcasecmp($keyB, $keyA);
         });
+    }
+
+    public function getGroupBy(): string {
+        return $this->groupBy;
+    }
+
+    private function resolveStrategy(): GroupStrategyInterface {
+        return match ($this->groupBy) {
+            'portefeuille' => new GroupByPortefeuille(),
+            'categorie' => new GroupByCategorie(),
+            'projet' => new GroupByProjet(),
+            'tiers' => new GroupByTiers(),
+            'annee' => new GroupByYear(),
+            'trimestre' => new GroupByQuarter(),
+            'mois' => new GroupByMonth(),
+            'semaine' => new GroupByWeek(),
+            default => new GroupByReleve(),
+        };
     }
 }
