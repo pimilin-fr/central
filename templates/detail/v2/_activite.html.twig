@@ -16,16 +16,9 @@
     
     {# OPTIONS DE GROUPEMENT #}
     <div class="md:col-span-2 bg-gray-100 p-5 rounded-xl border shadow">
-        {#% include('detail/v2/_grouping.html.twig' with {
-            groupBy: groupBy,
-            route: 'app_v2_portefeuille_show',
-            routeParams: {
-                id: portefeuille.id
-            }
-        })%#}
         {% include 'detail/v2/_grouping.html.twig' with {
             groupBy: groupBy,
-            route: 'app_v2_portefeuille_show',
+            route: 'app_portefeuille_show',
             routeParams: {
                 id: portefeuille.id
             }

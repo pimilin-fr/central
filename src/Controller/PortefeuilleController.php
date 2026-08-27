@@ -2,17 +2,23 @@
 
 namespace App\Controller;
 
-use App\Entity\Adresse;
 use App\Entity\Depenses;
 use App\Entity\Depenses as Operation;
 use App\Entity\Portefeuille;
 use App\Entity\PortefeuilleView;
-use App\Form\AdresseType;
 use App\Form\PortefeuilleType;
-use App\Repository\ReleveRepository;
 use App\Services\DepenseGrouper\DepenseGrouper;
+use App\Services\DepenseGrouper\DepenseGroupManager;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByCategorie;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByMonth;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByQuarter;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupByReleve;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByTiers;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByWeek;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByYear;
 use App\Services\DepenseGrouper\GrouperStrategy\SortByDateDesc;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,67 +90,105 @@ final class PortefeuilleController extends AbstractController {
                 ['date' => 'DESC', 'id' => 'DESC']// IMPORTANT
         );
 
-        $groupManager = new \App\Services\DepenseGrouper\DepenseGroupManager();
+        $groupManager = new DepenseGroupManager();
+        $reqGroup = $request->query->get('groupBy');
+
+        switch ($reqGroup) {
+            case 'categorie':
+                $cleanGroup = new GroupByCategorie();
+                break;
+            case 'projet':
+                $cleanGroup = new GroupByProjet();
+                break;
+            case 'tiers':
+                $cleanGroup = new GroupByTiers();
+                break;
+            case 'annee':
+                $cleanGroup = new GroupByYear();
+                break;
+            case 'trimestre':
+                $cleanGroup = new GroupByQuarter();
+                break;
+            case 'mois':
+                $cleanGroup = new GroupByMonth();
+                break;
+            case 'semaine':
+                $cleanGroup = new GroupByWeek();
+                break;
+            default :
+                $cleanGroup = new GroupByReleve();
+                $reqGroup = "releve";
+        }
 
         $groups = $groupManager->build(
                 $depenses,
-                new GroupByReleve(), // interchangeable
+                $cleanGroup,
                 0
         );
 
-        // 👉 FORMULAIRE (WRITE)
-        $form = $this->createForm(PortefeuilleType::class, $portefeuille);
+        return $this->render('detail/v2/show.html.twig', [
+                    'entity' => $ptfView,
+                    'entityType' => 'portefeuille',
+                    'groups' => $groups,
+                    'groupBy' => $reqGroup
+        ]);
+    }
+
+    #[Route('/edit/{id}', name: 'app_portefeuille_edit', methods: ['GET', 'POST'])]
+    public function edit(Portefeuille $portefeuille, Request $request, EntityManagerInterface $em): Response {
+
+        $form = $this->createForm(
+                PortefeuilleType::class,
+                $portefeuille
+        );
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $portefeuille->regenerateCode();
             $em->flush();
-
-            return $this->redirectToRoute('app_portefeuille_show', [
-                        'id' => $portefeuille->getId(),
-                        'tab' => 'edit'
-            ]);
-        }
-
-        $depForm = $this->createForm(\App\Form\AddDepensesType::class, new Operation(), [
-            'portefeuille_entity' => $portefeuille,
-        ]);
-
-        return $this->render('portefeuille/show.html.twig', [
-                    'portefeuille' => $ptfView,
-                    'form' => $form->createView(),
-//                    'operations' => $operations,
-                    'depensesForm' => $depForm,
-                    'releves' => $groups
-        ]);
-    }
-
-    #[Route('/edit/{id}', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Adresse $adresse, EntityManagerInterface $entityManager): Response {
-        $form = $this->createForm(AdresseType::class, $adresse);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
+            
             $this->addFlash('success', 'Portefeuille modifié avec succès');
-
-            return $this->redirectToRoute('app_portefeuille_show', [
+            
+            return $this->redirectToRoute(
+                    'app_portefeuille_show',
+                    [
                         'id' => $portefeuille->getId(),
-                        'tab' => 'edit'
-            ]);
+                        'tab' => 'edit',
+                    ]
+            );
         }
 
-        return $this->render('adresse/edit.html.twig', [
-                    'adresse' => $adresse,
-                    'form' => $form,
+        return $this->render('portefeuille/_form.html.twig', [
+                    'form' => $form->createView(),
+                    'portefeuille' => $portefeuille,
         ]);
     }
+
+//    #[Route('/edit/{id}', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
+//    public function edit(Request $request, Adresse $adresse, EntityManagerInterface $entityManager): Response {
+//        $form = $this->createForm(AdresseType::class, $adresse);
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $entityManager->flush();
+//
+//            $this->addFlash('success', 'Portefeuille modifié avec succès');
+//
+//            return $this->redirectToRoute('app_portefeuille_show', [
+//                        'id' => $portefeuille->getId(),
+//                        'tab' => 'edit'
+//            ]);
+//        }
+//
+//        return $this->render('adresse/edit.html.twig', [
+//                    'adresse' => $adresse,
+//                    'form' => $form,
+//        ]);
+//    }
 
     #[Route('/delete/{id}', name: 'app_portefeuille_delete', methods: ['GET'])]
     public function delete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
-        $portefeuille->setDeleted(new \DateTimeImmutable());
+        $portefeuille->setDeleted(new DateTimeImmutable());
         $em->flush();
         $this->addFlash('success', 'Portefeuille supprimé avec succès');
 
