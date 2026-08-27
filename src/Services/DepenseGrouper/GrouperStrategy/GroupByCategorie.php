@@ -9,7 +9,7 @@ class GroupByCategorie implements GroupStrategyInterface
     #[Override]
     public function getKey(Depenses $depense): string
     {
-        return 'categorie_' . $depense->getCategorie()->getId();
+        return 'categorie_' . urlencode($depense->getCategorie()->fullName("-"));
     }
 
     #[Override]

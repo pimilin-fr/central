@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class DetailController extends AbstractController {
 
     #[Route('/v2/portefeuille/{id}', name: 'app_v2_portefeuille_show')]
-    public function portefeuille(Portefeuille $portefeuille, EntityManagerInterface $em, Request $request): Response {
+    public function showPortefeuille(Portefeuille $portefeuille, EntityManagerInterface $em, Request $request): Response {
         $depRepo = $em->getRepository(Depenses::class);
         $ptfRepo = $em->getRepository(PortefeuilleView::class);
         $ptfView = $ptfRepo->find($portefeuille->getId());
@@ -41,6 +41,18 @@ class DetailController extends AbstractController {
                 break;
             case 'tiers':
                 $cleanGroup = new GroupByTiers();
+                break;
+            case 'annee':
+                $cleanGroup = new \App\Services\DepenseGrouper\GrouperStrategy\GroupByYear();
+                break;
+            case 'trimestre':
+                $cleanGroup = new \App\Services\DepenseGrouper\GrouperStrategy\GroupByQuarter();
+                break;
+            case 'mois':
+                $cleanGroup = new \App\Services\DepenseGrouper\GrouperStrategy\GroupByMonth();
+                break;
+            case 'semaine':
+                $cleanGroup = new \App\Services\DepenseGrouper\GrouperStrategy\GroupByWeek();
                 break;
             default :
                 $cleanGroup = new GroupByReleve();

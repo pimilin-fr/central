@@ -10,11 +10,17 @@ class GroupByWeek implements GroupStrategyInterface {
 
     #[Override]
     public function getKey(Depenses $depense): string {
-        return $depense->getDate()->format('o-\WW'); // année ISO + semaine
+        return $depense->getDate()->format('o\WW'); // année ISO + semaine
     }
 
     #[Override]
     public function getLabel(Depenses $depense): string {
-        return 'Semaine ' . $depense->getDate()->format('W Y');
+        $date = $depense->getDate();
+
+        $debut = (clone $date)->modify('monday this week');
+        $fin = (clone $debut)->modify('+6 days');
+
+        return 'Du ' . $debut->format('d/m') . ' au ' . $fin->format('d/m/Y');
+//        return 'Semaine ' . $depense->getDate()->format('W Y');
     }
 }

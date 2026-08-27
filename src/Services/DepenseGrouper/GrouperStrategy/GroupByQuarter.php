@@ -11,7 +11,7 @@ class GroupByQuarter implements GroupStrategyInterface {
     public function getKey(Depenses $depense): string {
         $date = $depense->getDate();
         $quarter = (int) ceil($date->format('n') / 3);
-        return $date->format('Y') . '-Q' . $quarter;
+        return $date->format('Y') . 'Q' . $quarter;
     }
 
     #[Override]

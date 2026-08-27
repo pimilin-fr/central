@@ -55,10 +55,13 @@ class Categorie {
     }
 
     public function __toString(): string {
+        return $this->fullName();
+    }
+    
+    public function fullName(string $separateur="/"){
         if ($this->parent) {
-            return $this->parent->__toString() . " / " . $this->name;
+            return $this->parent->fullName($separateur). $separateur . $this->name;
         }
-
         return $this->name;
     }
 
