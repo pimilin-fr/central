@@ -32,12 +32,23 @@
         ========================= #}
         {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
 
-        {% set tabs = [{
+        {% set tabs = [
+            {
                 id: 'summary',
                 label: 'Résumé',
                 content: include('detail/v2/_activite.html.twig',{
                     portefeuille: entity
                 })
+            },{
+                id: 'edit',
+                label: 'Modifier',
+                icon: 'mdi:pencil',
+                content: render(controller(
+                    'App\\Controller\\V2\\DetailController::editPortefeuille',
+                    {
+                        id: entity.id
+                    }
+                ))
             }
         ] %}
 

@@ -1,4 +1,11 @@
-{{ form_start(form, { attr: { class: 'space-y-6' } }) }}
+{{ form_start(form, {
+    action: path('app_v2_portefeuille_edit', {
+        id: portefeuille.id
+    }),
+    attr: {
+        class: 'space-y-6'
+    }
+}) }}
 
 {# =========================
    CHAMPS

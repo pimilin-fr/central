@@ -5,11 +5,16 @@ namespace App\Controller\V2;
 use App\Entity\Depenses;
 use App\Entity\Portefeuille;
 use App\Entity\PortefeuilleView;
+use App\Form\PortefeuilleType;
 use App\Services\DepenseGrouper\DepenseGroupManager;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupByCategorie;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByMonth;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByQuarter;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupByReleve;
 use App\Services\DepenseGrouper\GrouperStrategy\GroupByTiers;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByWeek;
+use App\Services\DepenseGrouper\GrouperStrategy\GroupByYear;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,8 +36,8 @@ class DetailController extends AbstractController {
 
         $groupManager = new DepenseGroupManager();
         $reqGroup = $request->query->get('groupBy');
-        
-        switch ($reqGroup){
+
+        switch ($reqGroup) {
             case 'categorie':
                 $cleanGroup = new GroupByCategorie();
                 break;
@@ -43,25 +48,25 @@ class DetailController extends AbstractController {
                 $cleanGroup = new GroupByTiers();
                 break;
             case 'annee':
-                $cleanGroup = new \App\Services\DepenseGrouper\GrouperStrategy\GroupByYear();
+                $cleanGroup = new GroupByYear();
                 break;
             case 'trimestre':
-                $cleanGroup = new \App\Services\DepenseGrouper\GrouperStrategy\GroupByQuarter();
+                $cleanGroup = new GroupByQuarter();
                 break;
             case 'mois':
-                $cleanGroup = new \App\Services\DepenseGrouper\GrouperStrategy\GroupByMonth();
+                $cleanGroup = new GroupByMonth();
                 break;
             case 'semaine':
-                $cleanGroup = new \App\Services\DepenseGrouper\GrouperStrategy\GroupByWeek();
+                $cleanGroup = new GroupByWeek();
                 break;
             default :
                 $cleanGroup = new GroupByReleve();
                 $reqGroup = "releve";
         }
-        
+
         $groups = $groupManager->build(
                 $depenses,
-                $cleanGroup, // interchangeable
+                $cleanGroup,
                 0
         );
 
@@ -70,6 +75,34 @@ class DetailController extends AbstractController {
                     'entityType' => 'portefeuille',
                     'groups' => $groups,
                     'groupBy' => $reqGroup
+        ]);
+    }
+
+    #[Route('/v2/portefeuille/{id}/edit', name: 'app_v2_portefeuille_edit', methods: ['GET', 'POST'])]
+    public function editPortefeuille(Portefeuille $portefeuille, Request $request, EntityManagerInterface $em): Response {
+        
+        $form = $this->createForm(
+                PortefeuilleType::class,
+                $portefeuille
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            return $this->redirectToRoute(
+                            'app_v2_portefeuille_show',
+                            [
+                                'id' => $portefeuille->getId(),
+                                'tab' => 'edit',
+                            ]
+                    );
+        }
+
+        return $this->render('portefeuille/_form.html.twig', [
+                    'form' => $form->createView(),
+                    'portefeuille' => $portefeuille,
         ]);
     }
 }

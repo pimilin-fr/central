@@ -110,7 +110,7 @@ final class PortefeuilleController extends AbstractController {
         $depForm = $this->createForm(\App\Form\AddDepensesType::class, new Operation(), [
             'portefeuille_entity' => $portefeuille,
         ]);
-        
+
         return $this->render('portefeuille/show.html.twig', [
                     'portefeuille' => $ptfView,
                     'form' => $form->createView(),
@@ -153,7 +153,7 @@ final class PortefeuilleController extends AbstractController {
                     'tab' => 'edit'
         ]);
     }
-    
+
     #[Route('/restore/{id}', name: 'app_portefeuille_restore', methods: ['GET'])]
     public function restore(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
         $portefeuille->setDeleted(null);
@@ -163,6 +163,18 @@ final class PortefeuilleController extends AbstractController {
         return $this->redirectToRoute('app_portefeuille_show', [
                     'id' => $portefeuille->getId(),
                     'tab' => 'edit'
+        ]);
+    }
+
+    #[Route('/v2/portefeuille/{id}/formulaire', name: 'app_v2_portefeuille_form')]
+    public function editPortefeuille(Portefeuille $portefeuille): Response {
+        $form = $this->createForm(
+                PortefeuilleType::class,
+                $portefeuille
+        );
+
+        return $this->render('portefeuille/_form_.html.twig', [
+                    'form' => $form->createView(),
         ]);
     }
 }
