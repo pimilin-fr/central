@@ -49,7 +49,7 @@ final class PortefeuilleController extends AbstractController {
 
             $items[$ptf->getId()] = [
                 "portefeuille" => $ptf,
-                "releves" => (new SortByDateDesc())->sort($groups)
+                "releves" => $groups
             ];
         }
 
