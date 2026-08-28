@@ -51,23 +51,34 @@ final class TiersController extends AbstractController {
     }
 
     #[Route('/show/{id}', name: 'app_tiers_show', methods: ['GET', 'POST'])]
-    public function show(Tiers $tiers, Request $request, EntityManagerInterface $em): Response {
+    public function show(Tiers $tiers, Request $request, EntityManagerInterface $em, TiersAdresseRepository $tiersAdresseRepo): Response {
         $depRepo = $em->getRepository(Depenses::class);
+//        $tiersAdresseRepo = $em->getRepository(TiersAdresse::class);
 
-        $depenses = $depRepo->findBy(
-                ['tiers' => $tiers],
-                ['date' => 'DESC', 'id' => 'DESC']// IMPORTANT
-        );
+        $depenses = $depRepo->createQueryBuilder('d')
+                ->join('d.portefeuille', 'p')
+                ->andWhere('d.tiers = :tiers')
+                ->andWhere('p.isReal = :isReal')
+                ->setParameter('tiers', $tiers)
+                ->setParameter('isReal', true)
+                ->orderBy('d.date', 'DESC')
+                ->addOrderBy('d.id', 'DESC')
+                ->getQuery()
+                ->getResult();
         $groupManager = new DepenseGroupManager($request);
         $groups = $groupManager->build(
                 $depenses,
                 0
         );
+
+        $adresses = $tiersAdresseRepo->findByTiersOrdered($tiers);
+
         return $this->render('tiers/show.html.twig', [
                     'entity' => $tiers,
                     'entityType' => 'tiers',
                     'groups' => $groups,
-                    'groupBy' => $groupManager->getGroupBy()
+                    'groupBy' => $groupManager->getGroupBy(),
+                    'adresses' => $adresses
         ]);
 //public function show(Tiers $tiers, Request $request, TiersAdresseRepository $tiersAdresseRepo, DepensesRepository $depRepo, EntityManagerInterface $entityManager): Response {
 //        $form = $this->createForm(TiersType::class, $tiers);
@@ -104,7 +115,7 @@ final class TiersController extends AbstractController {
 //        ]);
     }
 
-    #[Route('/adresses/{id}', name: 'app_tiers_adresse_list', methods: ['GET'])]
+    #[Route('/js/adresses/{id}', name: 'app_tiers_adresse_list', methods: ['GET'])]
     public function adresses(Tiers $tiers, TiersAdresseRepository $repo): JsonResponse {
         $results = [];
 
@@ -120,33 +131,22 @@ final class TiersController extends AbstractController {
         return $this->json($results);
     }
 
-    #[Route('/add_adresse/{id}/', name: 'app_tiers_adresse_add', methods: ['POST'])]
-    public function addAdresse(Request $request, Tiers $tiers, EntityManagerInterface $em, TiersAdresseRepository $repo, AdresseRepository $adresseRepo) {
+    #[Route('/add-adresse/{id}', name: 'app_tiers_add_adresse', methods: ['GET', 'POST'])]
+    public function addAdresse(Tiers $tiers, Request $request, EntityManagerInterface $em): Response {
+        $adresseRepo = $em->getRepository(\App\Entity\Adresse::class);
         $tiersAdresse = new TiersAdresse();
         $tiersAdresse->setTiers($tiers);
 
         $form = $this->createForm(AddAdresseType::class, $tiersAdresse);
         $form->handleRequest($request);
-        // 🔹 Récupération de la valeur non mappée
-        $adresseValue = $form->get('adresse_id')->getData();
-
-        // 🔹 Recherche de l'adresse (ex: par ID ou libellé)
-        $adresse = $adresseRepo->findOneBy([
-            'id' => intval($adresseValue)
-        ]);
-        $tiersAdresse->setAdresse($adresse);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // 🔹 Récupération de la valeur non mappée
+            $adresseValue = $form->get('adresse_id')->getData();
+            // 🔹 Recherche de l'adresse (ex: par ID ou libellé)
+            $adresse = $adresseRepo->findOneBy(['id' => intval($adresseValue)]);
 
-            // ⚠️ Si la nouvelle adresse est principale
-            if ($tiersAdresse->isPrincipale()) {
-
-                // 1️⃣ Retirer l'ancienne principale
-//                $repo->unsetPrincipaleForTiers($tiers);
-                // 2️⃣ Marquer celle-ci comme principale
-                $tiersAdresse->setIsPrincipale(true);
-            }
-
+            $tiersAdresse->setAdresse($adresse);
             $em->persist($tiersAdresse);
             $em->flush();
 
@@ -154,17 +154,17 @@ final class TiersController extends AbstractController {
 
             return $this->redirectToRoute('app_tiers_show', [
                         'id' => $tiers->getId(),
-                        'tab' => 'adresses'
+                        'tab' => 'adresses',
             ]);
         }
 
-        return $this->render('tiers/add_adresse_form.html.twig', [
-                    'addAdresseForm' => $form->createView(),
+        return $this->render('tiers/_add_adresse_form.html.twig', [
+                    'form' => $form->createView(),
                     'tiers' => $tiers,
         ]);
     }
 
-    #[Route('/unlink_adresse/{id}', name: 'app_tiers_adresse_unlink', methods: ['GET'])]
+    #[Route('/unlink-adresse/{id}', name: 'app_tiers_adresse_unlink', methods: ['GET'])]
     public function unlinkAdresse(TiersAdresse $tiersAdresse, EntityManagerInterface $em) {
         $id = $tiersAdresse->getTiers()->getId();
         $em->remove($tiersAdresse);

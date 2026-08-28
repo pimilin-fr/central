@@ -1,17 +1,28 @@
-{{ form_start(addAdresseForm, {'attr': {'class': 'flex items-center gap-4 flex-wrap'}}) }}
+{#{{ form_start(form, {'attr': {'class': 'flex items-center gap-4 flex-wrap'}}) }}#}
+{{ form_start(form, {
+    action: path('app_tiers_add_adresse', {
+        id: tiers.id
+    }),
+    attr: {
+        class: 'flex items-center gap-4 flex-wrap'
+    }
+}) }}
+
+
+
 
 {# Adresse : label + input sur la même ligne #}
 <div class="flex items-center gap-2 flex-1 min-w-[250px]">
-    {{ form_label(addAdresseForm.adresse, null, {'label_attr': {'class': 'text-sm font-medium text-gray-700'}}) }}
-    {{ form_widget(addAdresseForm.adresse, {
+    {{ form_label(form.adresse, null, {'label_attr': {'class': 'text-sm font-medium text-gray-700'}}) }}
+    {{ form_widget(form.adresse, {
             'attr': {
-                'class': addAdresseForm.adresse.vars.attr.class ~ ' flex-1 rounded-md 
+                'class': form.adresse.vars.attr.class ~ ' flex-1 rounded-md 
                         border border-gray-300 shadow-sm 
                         focus:border-green-500 focus:ring-1 focus:ring-green-500'
             }
         }) }}
 
-    {#{{ form_widget(addAdresseForm.adresse, {
+    {#{{ form_widget(form.adresse, {
         'attr': {
             'class': 'flex-1 rounded-md border-gray-300 shadow-sm focus:ring-orange-500 focus:border-orange-500'
         }
@@ -20,8 +31,8 @@
 
 {# Checkbox "Principale" #}
 <div class="flex items-center gap-1">
-    {{ form_label(addAdresseForm.isPrincipale, 'Principale', {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
-    {{ form_widget(addAdresseForm.isPrincipale, {'attr': {'class': 'rounded text-green-500 accent-green-600'}}) }}
+    {{ form_label(form.isPrincipale, 'Principale', {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
+    {{ form_widget(form.isPrincipale, {'attr': {'class': 'rounded text-green-500 accent-green-600'}}) }}
 
 </div>
 
@@ -32,4 +43,4 @@
     Ajouter
 </button>
 
-{{ form_end(addAdresseForm) }}
+{{ form_end(form) }}

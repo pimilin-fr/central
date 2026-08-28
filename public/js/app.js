@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.4.1.0",
+        version: "v1.4.1.4",
         appName: "Central"
     },
 
@@ -15,7 +15,7 @@ const App = {
     events: {
         on(event, callback) {
             document.addEventListener(event, callback);
-            App.log('eventListener', event, callback);
+            //App.log('eventListener', event, callback);
         },
 
         emit(event, detail = {}) {
@@ -24,7 +24,7 @@ const App = {
                         detail
                     })
                     );
-            App.log('event emit', event, detail)
+            //App.log('event emit', event, detail)
         }
 
     },
@@ -72,11 +72,18 @@ const App = {
             `;
 
                 const wrapper = document.createElement('div');
-                wrapper.classList.add('relative');
+                wrapper.classList.add(
+                        'relative',
+                        'flex-1',
+                        'min-w-0',
+                        'w-full'
+                        );
 
                 input.parentNode.insertBefore(wrapper, input);
                 wrapper.appendChild(input);
                 wrapper.appendChild(resultsBox);
+
+                input.classList.add('w-full');
 
                 let debounce;
 
@@ -325,21 +332,6 @@ const App = {
         init() {
             App.log('Init relevés');
 
-            window.toggleReleve = function (id) {
-
-                const all = document.querySelectorAll('[id^="releve-"]');
-
-                all.forEach(el => {
-                    if (el.id !== 'releve-' + id) {
-                        el.classList.add('hidden');
-                    }
-                });
-
-                const target = document.getElementById('releve-' + id);
-                if (target)
-                    target.classList.toggle('hidden');
-            };
-            
             window.toggleGroup = function (id) {
 
                 const all = document.querySelectorAll('[id^="group-"]');
@@ -398,7 +390,7 @@ const App = {
 
                 select.innerHTML = '<option>Chargement...</option>';
 
-                const response = await fetch(`/tiers/adresses/${item.id}`);
+                const response = await fetch(`/tiers/js/adresses/${item.id}`);
                 const adresses = await response.json();
 
                 select.innerHTML = '<option value="">Adresse</option>';

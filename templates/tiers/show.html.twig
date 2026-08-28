@@ -63,7 +63,18 @@
                 content: include('tiers/_resume.html.twig',{
                     tiers: entity
                 })
-            },
+            }, {
+                id: 'adresses',
+                label: 'Adresses',
+                badge: adresses|length,
+                content: render(controller(
+                        'App\\Controller\\TiersController::addAdresse',
+                        {
+                            id: entity.id
+                        }
+                    ))
+                    ~ include('tiers/_show_adresses.html.twig')
+            }
         ]%}
 
         {#% set tabs = [
