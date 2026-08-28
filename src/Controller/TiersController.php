@@ -131,6 +131,31 @@ final class TiersController extends AbstractController {
         return $this->json($results);
     }
 
+    #[Route('/edit/{id}', name: 'app_tiers_edit', methods: ['GET', 'POST'])]
+    public function edit(Tiers $tiers, Request $request, EntityManagerInterface $em): Response {
+        $form = $this->createForm(TiersType::class, $tiers);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            
+            $em->persist($tiers);
+            $em->flush();
+
+            $this->addFlash('success', 'Tiers modifié avec succès');
+
+            return $this->redirectToRoute('app_tiers_show', [
+                        'id' => $tiers->getId(),
+                        'tab' => 'edit',
+            ]);
+        }
+
+        return $this->render('tiers/_form.html.twig', [
+                    'form' => $form->createView(),
+                    'tiers' => $tiers,
+        ]);
+    }
+
     #[Route('/add-adresse/{id}', name: 'app_tiers_add_adresse', methods: ['GET', 'POST'])]
     public function addAdresse(Tiers $tiers, Request $request, EntityManagerInterface $em): Response {
         $adresseRepo = $em->getRepository(\App\Entity\Adresse::class);

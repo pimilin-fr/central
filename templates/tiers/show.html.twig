@@ -63,7 +63,17 @@
                 content: include('tiers/_resume.html.twig',{
                     tiers: entity
                 })
-            }, {
+            },{
+                id: 'edit',
+                label: 'Modifier',
+                icon: 'mdi:pencil',
+                content: render(controller(
+                        'App\\Controller\\TiersController::edit',
+                        {
+                            id: entity.id
+                        }
+                    ))
+            },{
                 id: 'adresses',
                 label: 'Adresses',
                 badge: adresses|length,

@@ -1,55 +1,81 @@
-{{ form_start(form) }}
+{{ form_start(form, {
+    action: path('app_tiers_edit', {
+        id: tiers.id
+    }),
+    attr: {
+        class: 'space-y-6'
+    }
+}) }}
+
 {# =========================
-CHAMPS
-========================= #}
+   INFORMATIONS DU TIERS
+   ========================= #}
+
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
     {# Nom #}
     <div>
         {{ form_label(form.name, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+            label_attr: {
+                class: 'block text-sm font-medium text-gray-700 mb-1'
+            }
         }) }}
 
         {{ form_widget(form.name, {
             attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+                class: 'w-full rounded-lg border-gray-300 bg-white
+                       focus:border-orange-500 focus:ring-orange-500'
             }
         }) }}
 
         {{ form_errors(form.name) }}
     </div>
-    {# tiersType #}
+
+
+    {# Type #}
     <div>
         {{ form_label(form.tiersType, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+            label_attr: {
+                class: 'block text-sm font-medium text-gray-700 mb-1'
+            }
         }) }}
 
         {{ form_widget(form.tiersType, {
             attr: {
-                class: 'autocomplete w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+                class: 'autocomplete w-full rounded-lg border-gray-300 bg-white
+                       focus:border-orange-500 focus:ring-orange-500'
             }
         }) }}
 
         {{ form_errors(form.tiersType) }}
     </div>
-    
-    {# searchText #}
-    <div class=" md:col-span-2">
+
+
+    {# Texte de recherche #}
+    <div class="md:col-span-2">
         {{ form_label(form.searchText, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+            label_attr: {
+                class: 'block text-sm font-medium text-gray-700 mb-1'
+            }
         }) }}
 
         {{ form_widget(form.searchText, {
             attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
+                class: 'w-full rounded-lg border-gray-300 bg-white
+                       focus:border-orange-500 focus:ring-orange-500'
             }
         }) }}
 
         {{ form_errors(form.searchText) }}
     </div>
+
 </div>
+
+
 {# =========================
-ACTIONS
-========================= #}
+   ACTIONS
+   ========================= #}
+
 <div class="flex justify-end gap-3 pt-4">
     <button type="submit"
             class="inline-flex items-center gap-2 px-4 py-2
@@ -59,5 +85,6 @@ ACTIONS
         Enregistrer
     </button>
 </div>
+
 
 {{ form_end(form) }}
