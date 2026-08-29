@@ -6,8 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\UniqueConstraint(columns: ['tiers_id', 'adresse_id'])]
-class TiersAdresse
-{
+class TiersAdresse {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -40,9 +40,10 @@ class TiersAdresse
         return $this->isPrincipale;
     }
 
-    public function isPrincipale():bool {
+    public function isPrincipale(): bool {
         return $this->getIsPrincipale();
     }
+
     public function getType(): ?string {
         return $this->type;
     }
@@ -71,6 +72,4 @@ class TiersAdresse
         $this->type = $type;
         return $this;
     }
-
-
 }

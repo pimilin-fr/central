@@ -1,37 +1,3 @@
-{#<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-
-    {# Résumé }
-    <div class="lg:col-span-3 bg-white p-5">
-
-        
-    </div>
-
-    {# Dates (tuile compacte à droite) }
-    <div class="bg-gray-200 rounded-xl border shadow-sm p-4 text-sm">
-        {% if tiers.deletedAt %}
-            <p class="flex items-center gap-2 text-xs text-red-600 font-bold">
-                {{ ux_icon('fluent-mdl2:status-error-full', { class: 'w-4 h-4' }) }}
-                <span>Inactif</span>
-            </p>
-        {% else %}
-            <p class="flex items-center gap-2 text-xs text-green-600 font-bold">
-                {{ ux_icon('pajamas:status-active', { class: 'w-4 h-4' }) }}
-                <span>Actif</span>
-            </p>
-        {% endif %}
-        <p class="mt-2 text-xs text-gray-500 uppercase">Créé le</p>
-        <p class="text-gray-800">{{ tiers.createdAt|date('d/m/Y') }}</p>
-        {% if tiers.deletedAt %}
-            <p class="mt-2 text-xs text-gray-500 uppercase">Suppr le</p>
-            <p class="text-gray-800">{{ tiers.deletedAt|date('d/m/Y') }}</p>
-        {% endif %}
-    </div>
-</div>#}
-
-
-
-
-
 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
 
     {# SOLDE#
@@ -135,7 +101,7 @@
            ========================= #}
 
         <div
-            class="absolute right-0 top-0 h-full w-5 flex items-center justify-center"
+            class="absolute right-0 top-0 h-full w-6 flex items-center justify-center"
             style="background-color: {{ tiers.deletedAt ? '#eb4034' : '#45d161' }}"
             >
             <span

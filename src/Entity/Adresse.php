@@ -281,14 +281,6 @@ class Adresse {
     }
 
     public function getLatitude(): ?float {
-        if (!$this->latitude) {
-            $geocoder = new \App\Services\Geocoder();
-            $coords = $geocoder->geocode($this->getAdresse());
-            if ($coords) {
-                $this->setLatitude($coords['lat']);
-                $this->setLongitude($coords['lng']);
-            }
-        }
         return $this->latitude;
     }
 
@@ -312,8 +304,7 @@ class Adresse {
                 (($this->getNum() != 0) ? $this->getNum() . ", " : "") .
                 $this->getBisTer() . " " .
                 $this->getTypeVoie() . " " .
-                $this->getNomVoie() . " (" .
-                $this->getVille() . ")"
+                $this->getNomVoie()
         );
     }
 }

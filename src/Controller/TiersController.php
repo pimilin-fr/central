@@ -80,39 +80,6 @@ final class TiersController extends AbstractController {
                     'groupBy' => $groupManager->getGroupBy(),
                     'adresses' => $adresses
         ]);
-//public function show(Tiers $tiers, Request $request, TiersAdresseRepository $tiersAdresseRepo, DepensesRepository $depRepo, EntityManagerInterface $entityManager): Response {
-//        $form = $this->createForm(TiersType::class, $tiers);
-//        $form->handleRequest($request);
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            $entityManager->persist($tiers);
-//            $entityManager->flush();
-//
-//            $this->addFlash('success', 'Tiers modifié avec succès');
-//
-//            return $this->redirectToRoute('app_tiers_show', [
-//                        'id' => $tiers->getId(),
-//                        'tab' => "edit"
-//                            ], Response::HTTP_SEE_OTHER);
-//        }
-//
-//        $adresses = $tiersAdresseRepo->findByTiersOrdered($tiers);
-//
-//        $addAdresseForm = $this->createForm(
-//                AddAdresseType::class,
-//                new TiersAdresse(),
-//                [
-//                    'action' => $this->generateUrl('app_tiers_adresse_add', [
-//                        'id' => $tiers->getId(),
-//                    ]),
-//                ]
-//        );
-//        return $this->render('tiers/show.html.twig', [
-//                    'tiers' => $tiers,
-//                    'form' => $form,
-//                    'depenses' => $depRepo->findByTiers($tiers),
-//                    'addAdresseForm' => $addAdresseForm,
-//                    'adresses' => $adresses
-//        ]);
     }
 
     #[Route('/js/adresses/{id}', name: 'app_tiers_adresse_list', methods: ['GET'])]
@@ -187,6 +154,21 @@ final class TiersController extends AbstractController {
                     'form' => $form->createView(),
                     'tiers' => $tiers,
         ]);
+    }
+    
+    #[Route('/adresse/{tiers}/toggle-principale/{id}',name: 'app_tiers_adresse_toggle_principale',methods: ['GET'])]
+    public function togglePrincipale(Tiers $tiers, TiersAdresse $tiersAdresse,EntityManagerInterface $em): Response {
+        $tiersAdresse->setIsPrincipale(!$tiersAdresse->isPrincipale());
+
+        $em->flush();
+
+        return $this->redirectToRoute(
+            'app_tiers_show',
+            [
+                'id' => $tiers->getId(),
+                'tab' => 'adresses',
+            ]
+        );
     }
 
     #[Route('/unlink-adresse/{id}', name: 'app_tiers_adresse_unlink', methods: ['GET'])]
