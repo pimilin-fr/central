@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\DepenseGrouper;
+namespace App\Service\DepenseGrouper;
 
 use App\Entity\Depenses;
 use DateTime;

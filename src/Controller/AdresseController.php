@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Adresse;
 use App\Form\AdresseFormType;
-use App\Form\AdresseType;
 use App\Repository\AdresseRepository;
+use App\Service\Geocoder\Geocoder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,44 +25,67 @@ final class AdresseController extends AbstractController {
     }
 
     #[Route('/new', name: 'app_adresse_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response {
+    public function new(Request $request, EntityManagerInterface $entityManager, Geocoder $geocoder): Response {
         $adresse = new Adresse();
-        $form = $this->createForm(AdresseFormType::class, $adresse);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($adresse);
-            $entityManager->flush();
-            $this->addFlash('success', 'Adresse ajoutée avec succès');
-            return $this->redirectToRoute('app_adresse_show', ['id' => $adresse->getId()], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('adresse/new.html.twig', [
-                    'adresse' => $adresse,
-                    'form' => $form,
-        ]);
+        return $this->handleForm(
+                        $request,
+                        $adresse,
+                        $entityManager,
+                        $geocoder,
+                        'Adresse ajoutée avec succès'
+                );
     }
 
     #[Route('/show/{id}', name: 'app_adresse_show', methods: ['GET', 'POST'])]
-    public function show(Adresse $adresse, Request $request, EntityManagerInterface $entityManager): Response {
+    public function show(Adresse $adresse, Request $request, EntityManagerInterface $entityManager, Geocoder $geocoder): Response {
+        return $this->handleForm(
+                        $request,
+                        $adresse,
+                        $entityManager,
+                        $geocoder,
+                        'Adresse modifiée avec succès'
+                );
+    }
+
+    private function handleForm(Request $request, Adresse $adresse, EntityManagerInterface $entityManager, Geocoder $geocoder, string $successMessage): Response {
         $form = $this->createForm(AdresseFormType::class, $adresse);
+
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // Géocodage uniquement lors de la sauvegarde
+            $coords = $geocoder->geocode($adresse);
+
+//            var_dump($coords);die('...');
+            if ($coords !== null) {
+                $adresse->setLatitude($coords['lat']);
+                $adresse->setLongitude($coords['lng']);
+            }
+
             $entityManager->persist($adresse);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Adresse modifiée avec succès');
+            $this->addFlash('success', $successMessage);
 
-            return $this->redirectToRoute('app_adresse_show', [
-                        'id' => $adresse->getId(),
-                        'tab' => "edit"
-                            ], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute(
+                            'app_adresse_show',
+                            [
+                                'id' => $adresse->getId(),
+                                'tab' => 'edit',
+                            ],
+                            Response::HTTP_SEE_OTHER
+                    );
         }
 
-        return $this->render('adresse/show.html.twig', [
-                    'adresse' => $adresse,
-                    'form' => $form
-        ]);
+        return $this->render(
+                        $adresse->getId() === null ? 'adresse/new.html.twig' : 'adresse/show.html.twig',
+                        [
+                            'adresse' => $adresse,
+                            'form' => $form,
+                        ]
+                );
     }
 
     #[Route('/search', name: 'api_adresse_search')]

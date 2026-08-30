@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\DepenseGrouper;
+namespace App\Service\DepenseGrouper;
 
 //use App\Entity\Depenses;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupStrategyInterface;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupStrategyInterface;
 
 class DepenseGrouper {
 

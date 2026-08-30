@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Services\DepenseGrouper;
+namespace App\Service\DepenseGrouper;
 
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByCategorie;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByMonth;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByPortefeuille;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByQuarter;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByReleve;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByTiers;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByWeek;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupByYear;
-use App\Services\DepenseGrouper\GrouperStrategy\GroupStrategyInterface;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByCategorie;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByMonth;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByPortefeuille;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByProjet;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByQuarter;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByReleve;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByTiers;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByWeek;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByYear;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupStrategyInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class DepenseGroupManager {

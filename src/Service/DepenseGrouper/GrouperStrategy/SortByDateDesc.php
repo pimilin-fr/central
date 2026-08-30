@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services\DepenseGrouper\GrouperStrategy;
+namespace App\Service\DepenseGrouper\GrouperStrategy;
 
-use App\Services\DepenseGrouper\DepenseGroup;
+use App\Service\DepenseGrouper\DepenseGroup;
 
 class SortByDateDesc implements GroupSorterInterface {
 

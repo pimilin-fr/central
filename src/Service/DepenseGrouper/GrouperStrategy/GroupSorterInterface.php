@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\DepenseGrouper\GrouperStrategy;
+namespace App\Service\DepenseGrouper\GrouperStrategy;
 
 interface GroupSorterInterface {
 

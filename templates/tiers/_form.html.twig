@@ -1,7 +1,12 @@
-{{ form_start(form, {
-    action: path('app_tiers_edit', {
+{% set formAction =  path('app_tiers_new') %}
+{% if tiers is defined %}
+    {% set formAction =  path('app_tiers_edit', {
         id: tiers.id
-    }),
+    })
+    %}
+{% endif %}
+{{ form_start(form, {
+    action: formAction ,
     attr: {
         class: 'space-y-6'
     }
