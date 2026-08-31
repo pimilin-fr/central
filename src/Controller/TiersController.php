@@ -2,15 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Adresse;
 use App\Entity\Depenses;
 use App\Entity\Tiers;
 use App\Entity\TiersAdresse;
 use App\Form\AddAdresseType;
 use App\Form\TiersType;
-use App\Repository\AdresseRepository;
 use App\Repository\TiersAdresseRepository;
 use App\Repository\TiersRepository;
-use App\Services\DepenseGrouper\DepenseGroupManager;
+use App\Service\DepenseGrouper\DepenseGroupManager;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -125,7 +125,7 @@ final class TiersController extends AbstractController {
 
     #[Route('/add-adresse/{id}', name: 'app_tiers_add_adresse', methods: ['GET', 'POST'])]
     public function addAdresse(Tiers $tiers, Request $request, EntityManagerInterface $em): Response {
-        $adresseRepo = $em->getRepository(\App\Entity\Adresse::class);
+        $adresseRepo = $em->getRepository(Adresse::class);
         $tiersAdresse = new TiersAdresse();
         $tiersAdresse->setTiers($tiers);
 

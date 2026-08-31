@@ -33,8 +33,7 @@ types|length > 0
     id: 'adresse-type-' ~ type.id,
     label: type.name,
     badge: typeAdresses|length,
-    content: include('adresse/_type.html.twig', {
-        type: type,
+    content: include('adresse/_children.html.twig', {
         adresses: typeAdresses
     })
 }]) %}
