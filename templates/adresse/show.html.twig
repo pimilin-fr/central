@@ -18,6 +18,21 @@
                 }
             ]) %}
         {% endif %}
+        {% if adresse.deletedAt is null %}
+            {% set btns = btns|merge([{
+                label: "Suppr",
+                path: path('app_adresse_delete',{id: adresse.id}),
+                color: 'red',
+                icon: 'gridicons:trash',
+            }]) %}
+        {% else %}
+            {% set btns = btns|merge([ {
+                label: "Retaure",
+                path: path('app_adresse_restore', {id:adresse.id}),
+                color: 'blue',
+                icon: 'fa-solid:trash-restore-alt'
+            }])%}
+        {% endif %}
         {% set btns = btns|merge([{
                 label: "Retour",
                 path: path('app_adresse_index'),

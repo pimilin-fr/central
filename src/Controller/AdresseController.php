@@ -6,6 +6,7 @@ use App\Entity\Adresse;
 use App\Form\AdresseFormType;
 use App\Repository\AdresseRepository;
 use App\Service\Geocoder\Geocoder;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -108,6 +109,30 @@ final class AdresseController extends AbstractController {
                 );
     }
 
+    #[Route('/delete/{id}', name: 'app_adresse_delete', methods: ['GET'])]
+    public function delete(Adresse $adresse, EntityManagerInterface $em): Response {
+        $adresse->setDeletedAt(new DateTimeImmutable());
+        $em->flush();
+        $this->addFlash('success', 'Adresse supprimée avec succès');
+
+        return $this->redirectToRoute('app_adresse_show', [
+                    'id' => $adresse->getId(),
+                    'tab' => 'summary'
+        ]);
+    }
+
+    #[Route('/restore/{id}', name: 'app_adresse_restore', methods: ['GET'])]
+    public function restore(Adresse $adresse, EntityManagerInterface $em): Response {
+        $adresse->setDeletedAt(null);
+        $em->flush();
+        $this->addFlash('success', 'Portefeuille supprimé avec succès');
+
+        return $this->redirectToRoute('app_adresse_show', [
+                    'id' => $adresse->getId(),
+                    'tab' => 'summary'
+        ]);
+    }
+    
     #[Route('/search', name: 'api_adresse_search')]
     public function search(Request $request, AdresseRepository $repo): JsonResponse {
         $q = trim($request->query->get('q', ''));
