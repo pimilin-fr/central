@@ -47,7 +47,7 @@
                 id: 'childs',
                 label: 'Enfants',
                 badge: adresse.children|length,
-                content: include('adresse/_table.html.twig', { adresses: adresse.children})
+                content: include('adresse/_children.html.twig', { adresses: adresse.children})
             },{
                 id:'edit',
                 content: include('adresse/_form.html.twig'),

@@ -1,0 +1,31 @@
+<div>
+
+    {% if adresses|length > 0 %}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+
+            {% for adresse in adresses %}
+                {% include 'adresse/_adresse_disp.html.twig' %}
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="text-center py-12 text-gray-500">
+
+            {{ ux_icon('mdi:source-branch', {
+                class: 'w-10 h-10 mx-auto text-gray-300 mb-3'
+            }) }}
+
+            <p class="text-sm">
+                Cette adresse n'a pas d'adresse enfant.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+

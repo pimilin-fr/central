@@ -3,9 +3,12 @@
 namespace App\Service\Geocoder;
 
 use App\Entity\Adresse;
+use App\Service\Geocoder\Query\AdresseExactGeoQueryBuilder;
+use App\Service\Geocoder\Query\AdresseForceeGeoQueryBuilder;
+use App\Service\Geocoder\Query\AdresseGeoQueryBuilder;
+use App\Service\Geocoder\Query\StructuredGeoQueryBuilder;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpClient\Response\CurlResponse;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class Geocoder {
@@ -18,51 +21,79 @@ class Geocoder {
         $this->httpClient = $httpClient;
     }
 
-    public function geocode(Adresse $adresse): ?array {
-        $request = $this->buidRequest($adresse);
+    private function generateBuilders(Adresse $adresse): array {
+        return [
+            new StructuredGeoQueryBuilder($adresse),
+            new AdresseForceeGeoQueryBuilder($adresse),
+            new AdresseGeoQueryBuilder($adresse),
+            new AdresseGeoQueryBuilder($adresse),
+            new AdresseExactGeoQueryBuilder($adresse),
+        ];
+    }
+
+    public function geocode(Adresse $adresse): array {
+        $builders = $this->generateBuilders($adresse);
+
+        $errors = [];
 
         try {
-            $response = $this->httpClient->request(
-                    'GET',
-                    self::NOMINATIM_URL,
-                    $request
-            );
 
-            $data = $this->reteriveData($response);
+            foreach ($builders as $builder) {
 
-            if (!isset($data[0]['lat'], $data[0]['lon'])) {
-                throw new GeocoderException(
-                                'No Lat Lon property received in response',
-                                3
-                        );
+                $request = $builder->build();
+
+                /*
+                 * Le builder peut décider qu'il n'est
+                 * pas applicable à cette adresse.
+                 */
+                if ($request === null) {
+                    $errors[$builder->getName()] = 'Not applicable';
+                    continue;
+                }
+
+                $response = $this->httpClient->request(
+                        'GET',
+                        self::NOMINATIM_URL,
+                        $request
+                );
+
+                $data = $this->retrieveData($response);
+
+                /*
+                 * Aucun résultat :
+                 * on essaye la stratégie suivante.
+                 */
+                if (empty($data)) {
+                    $errors[$builder->getName()] = [
+                        'message' => 'No result',
+                        'request' => $request,
+                        'response' => $data,
+                    ];
+
+                    continue;
+                }
+
+                /*
+                 * Premier résultat valide :
+                 * terminé.
+                 */
+                return $this->extractCoordinates($data);
             }
 
-            return [
-                'lat' => (float) $data[0]['lat'],
-                'lng' => (float) $data[0]['lon'],
-            ];
+            throw new GeocoderException(
+                            $this->buildNoResultMessage($errors),
+                            2
+                    );
         } catch (GeocoderException $e) {
-
-            // Nos propres erreurs : on les laisse remonter telles quelles.
+            echo '<pre>';
+            var_dump($errors);
+            die;
             throw $e;
         } catch (TransportExceptionInterface $e) {
 
             throw new GeocoderException(
                             'Network error: ' . $e->getMessage(),
                             10,
-                            $e
-                    );
-        } catch (HttpExceptionInterface $e) {
-
-            $statusCode = $e->getResponse()->getStatusCode();
-
-            throw new GeocoderException(
-                            sprintf(
-                                    'HTTP error %d: %s',
-                                    $statusCode,
-                                    $e->getMessage()
-                            ),
-                            $statusCode,
                             $e
                     );
         } catch (Throwable $e) {
@@ -75,21 +106,7 @@ class Geocoder {
         }
     }
 
-    private function buidRequest(Adresse $adresse): array {
-        return [
-            "query" => [
-                "format" => "json",
-                "limit" => 1,
-                "q" => $adresse->__toString()
-            ],
-            "headers" => [
-                "User-Agent" => 'localapp-central/1.0',
-            ],
-            "timeout" => 20
-        ];
-    }
-
-    private function reteriveData(CurlResponse $response): array {
+    private function retrieveData($response): array {
         $statusCode = $response->getStatusCode();
 
         if ($statusCode < 200 || $statusCode >= 300) {
@@ -103,15 +120,35 @@ class Geocoder {
                     );
         }
 
-        $data = $response->toArray(false);
+        return $response->toArray(false);
+    }
 
-        if (empty($data)) {
+    private function extractCoordinates(array $data): array {
+        if (!isset($data[0]['lat'], $data[0]['lon'])) {
             throw new GeocoderException(
-                            'Empty response',
-                            2
+                            'No Lat Lon property received in response',
+                            3
                     );
         }
 
-        return $data;
+        return [
+            'lat' => (float) $data[0]['lat'],
+            'lng' => (float) $data[0]['lon'],
+        ];
+    }
+
+    private function buildNoResultMessage(array $errors): string {
+        $message = "No geocoding result found.";
+
+        foreach ($errors as $name => $error) {
+
+            $message .= sprintf(
+                    "\n\n[%s]\n%s",
+                    $name,
+                    is_array($error) ? ($error['message'] ?? 'Unknown error') : $error
+            );
+        }
+
+        return $message;
     }
 }

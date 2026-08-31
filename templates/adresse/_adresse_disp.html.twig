@@ -1,0 +1,131 @@
+{% set bgColor = adresse.adresseType.couleur ?? '#F97316' %}
+{% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
+
+{% set isDeleted = adresse.deletedAt is not null %}
+
+{% set hasGeolocation =
+                    adresse.latitude is not null
+                    and adresse.longitude is not null
+%}
+
+<a href="{{ path('app_adresse_show', {id: adresse.id}) }}"
+   class="block relative bg-white rounded-xl shadow-sm hover:shadow-lg transition border overflow-hidden p-6 pr-12
+   {{ isDeleted ? 'opacity-40' : '' }}">
+
+    {# =================================================
+       LISERÉ DROIT
+       ================================================= #}
+
+    <div class="absolute top-0 right-0 h-full w-8 flex items-center justify-center rounded-r-xl text-white"
+         style="background-color: {{ bgColor }}; color: {{ textColor }};">
+        <span class="text-xs font-bold tracking-wider rotate-90 whitespace-nowrap ">
+            {{ adresse.villeCourte }}
+        </span>
+    </div>
+
+    {# =================================================
+       NOM + GEOLOCALISATION
+       ================================================= #}
+
+    <div class="flex items-center gap-3">
+        <div class="shrink-0 w-12 h-12 rounded-full flex items-center justify-center  shadow-sm
+             {{ hasGeolocation ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}}"
+             title="{{ hasGeolocation ? 'Adresse géolocalisée' : 'Adresse non géolocalisée' }}"            >
+            {{ ux_icon( hasGeolocation ? 'mdi:map-marker' : 'mdi:map-marker-off-outline', {class: 'w-6 h-6'} ) }}
+        </div>
+
+        <div class="min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 truncate ">
+                {{ adresse.name }}
+            </h3>
+        </div>
+    </div>
+
+    <hr class="my-3">
+
+
+    {# =================================================
+       ADRESSE
+       ================================================= #}
+
+    <p class="
+       text-sm
+       text-gray-600
+       leading-relaxed
+       min-h-[2.5rem]
+       ">
+        {{ adresse.adresse }}
+    </p>
+
+
+    {# =================================================
+       LOCALISATION
+       ================================================= #}
+
+    {% if adresse.codePostal or adresse.ville or adresse.pays %}
+
+        <div class="
+             flex
+             flex-wrap
+             items-center
+             gap-x-2
+             gap-y-1
+             mt-4
+             text-xs
+             text-gray-500
+             ">
+
+            {% if adresse.codePostal %}
+                <span>{{ adresse.codePostal }}</span>
+            {% endif %}
+
+            {% if adresse.ville %}
+                {% if adresse.codePostal %}
+                    <span>·</span>
+                {% endif %}
+
+                <span>{{ adresse.ville }}</span>
+            {% endif %}
+
+            {% if adresse.pays %}
+                <span>·</span>
+                <span>{{ adresse.pays }}</span>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+
+    {# =================================================
+       SUPPRIMÉE
+       ================================================= #}
+
+    {% if isDeleted %}
+
+        <div class="mt-3">
+
+            <span class="
+                  inline-flex
+                  items-center
+                  gap-1.5
+                  px-2
+                  py-1
+                  rounded-md
+                  bg-gray-100
+                  text-gray-500
+                  text-xs
+                  font-medium
+                  ">
+                {{ ux_icon('mdi:delete-outline', {
+                                    class: 'w-3.5 h-3.5'
+                                }) }}
+
+                Adresse supprimée
+            </span>
+
+        </div>
+
+    {% endif %}
+
+</a>

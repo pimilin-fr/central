@@ -81,8 +81,9 @@ class Adresse {
     public function __construct() {
         $this->children = new ArrayCollection();
     }
-    
+
     /* ------ GETTER ------    */
+
     public function getId(): ?int {
         return $this->id;
     }
@@ -164,6 +165,7 @@ class Adresse {
     }
 
     /* ---- SETTER ---- */
+
     public function setName(?string $name) {
         $this->name = $name;
         return $this;
@@ -259,14 +261,15 @@ class Adresse {
         return $this;
     }
 
-    
     /* ---- SPECIFIC ---- */
-    public function getGeoAdresse(){
-        
+
+    public function isGeolocalisee(): bool {
+        return $this->latitude !== null && $this->longitude !== null;
     }
 
-
-
+    public function isDeleted(): bool {
+        return $this->deletedAt !== null;
+    }
 
     public function getVilleCourte(): string {
         $ville = trim($this->ville);
@@ -316,9 +319,9 @@ class Adresse {
                 (($this->getNum() != 0) ? $this->getNum() . ", " : "") .
                 $this->getBisTer() . " " .
                 $this->getTypeVoie() . " " .
-                $this->getNomVoie(). " ,".
-                $this->getCodePostal()." ".
-                $this->getVille()." ".
+                $this->getNomVoie() . " ," .
+                $this->getCodePostal() . " " .
+                $this->getVille() . " " .
                 $this->getPays()
         );
     }

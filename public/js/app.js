@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.4.1.4",
+        version: "v1.5.0.0",
         appName: "Central"
     },
 
@@ -35,13 +35,204 @@ const App = {
 
         this.autocomplete.init();
         this.tabs.init();
+        this.maps.init();
         this.bulk.init();
         this.loadMore.init();
-        this.releves.init();
+        this.grouper.init();
         this.depenses.init();
         this.selectAll.init();
         this.adresse.init();
         this.depenseForm.init();
+    },
+
+    /* =========================================================
+     MAPS
+     ========================================================= */
+    maps: {
+
+        instances: new Map(),
+
+        init() {
+            App.log('Init maps');
+
+            if (typeof L === 'undefined') {
+                App.log('Leaflet non disponible');
+                return;
+            }
+
+            /*
+             * Carte déjà visible au chargement.
+             */
+            this.initVisibleMaps();
+
+            /*
+             * Carte située dans un onglet.
+             *
+             * Elle sera initialisée uniquement après que son onglet
+             * soit devenu visible.
+             */
+            App.events.on('tab:activated', (e) => {
+                const content = e.detail.content;
+
+                if (!content)
+                    return;
+
+                this.initMaps(content);
+                this.invalidateMaps(content);
+            });
+        },
+
+        initVisibleMaps() {
+            document.querySelectorAll('[data-map]').forEach(mapElement => {
+
+                if (this.isVisible(mapElement)) {
+                    this.initMap(mapElement);
+                }
+
+            });
+        },
+
+        initMaps(scope = document) {
+            scope.querySelectorAll('[data-map]').forEach(mapElement => {
+                this.initMap(mapElement);
+            });
+        },
+
+        initMap(mapElement) {
+
+            if (!mapElement)
+                return;
+
+            /*
+             * Évite une double initialisation.
+             */
+            if (this.instances.has(mapElement))
+                return;
+
+            if (!this.isVisible(mapElement))
+                return;
+
+            const type = mapElement.dataset.mapType || 'point';
+
+            switch (type) {
+
+                case 'point':
+                    this.initPoint(mapElement);
+                    break;
+
+                    /*
+                     * Prévu pour la suite.
+                     *
+                     * On ne les implémente pas encore mais l'architecture
+                     * est déjà prête.
+                     */
+                case 'multipoint':
+                    this.initMultipoint(mapElement);
+                    break;
+
+                case 'polygon':
+                case 'zoning':
+                    this.initPolygon(mapElement);
+                    break;
+
+                default:
+                    App.log('Type de carte inconnu:', type);
+            }
+        },
+
+        initPoint(mapElement) {
+
+            const latitude = parseFloat(mapElement.dataset.latitude);
+            const longitude = parseFloat(mapElement.dataset.longitude);
+
+            if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                App.log('Coordonnées invalides', {
+                    latitude,
+                    longitude
+                });
+                return;
+            }
+
+            const map = L.map(mapElement).setView(
+                    [latitude, longitude],
+                    17
+                    );
+
+            L.tileLayer(
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    {
+                        maxZoom: 19,
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }
+            ).addTo(map);
+
+            L.marker([
+                latitude,
+                longitude
+            ]).addTo(map);
+
+            this.instances.set(mapElement, map);
+
+            /*
+             * Leaflet peut encore avoir besoin d'un recalcul après
+             * l'affichage réel du conteneur.
+             */
+            requestAnimationFrame(() => {
+                map.invalidateSize();
+            });
+        },
+
+        /*
+         * Placeholder pour la future gestion multipoint.
+         */
+        initMultipoint(mapElement) {
+            App.log('Multipoint : pas encore implémenté', mapElement);
+        },
+
+        /*
+         * Placeholder pour la future gestion polygon / zoning.
+         */
+        initPolygon(mapElement) {
+            App.log('Polygon/Zoning : pas encore implémenté', mapElement);
+        },
+
+        invalidateMaps(scope = document) {
+
+            scope.querySelectorAll('[data-map]').forEach(mapElement => {
+
+                const map = this.instances.get(mapElement);
+
+                if (!map)
+                    return;
+
+                requestAnimationFrame(() => {
+                    map.invalidateSize();
+                });
+
+            });
+        },
+
+        isVisible(element) {
+
+            if (!element)
+                return false;
+
+            /*
+             * Un parent peut être caché par .hidden.
+             */
+            let current = element;
+
+            while (current && current !== document.body) {
+
+                if (current.classList && current.classList.contains('hidden')) {
+                    return false;
+                }
+
+                current = current.parentElement;
+            }
+
+            return element.offsetWidth > 0 && element.offsetHeight > 0;
+        }
     },
 
     /* =========================================================
@@ -181,6 +372,9 @@ const App = {
     /* =========================================================
      TABS
      ========================================================= */
+    /* =========================================================
+     TABS
+     ========================================================= */
     tabs: {
 
         init() {
@@ -202,12 +396,14 @@ const App = {
                     });
 
                     const content = container.querySelector('#tab-' + tab);
+
                     if (!content)
                         return;
 
                     content.classList.remove('hidden');
 
                     const btn = container.querySelector(`[data-tab="${tab}"]`);
+
                     if (btn) {
                         btn.classList.add('border-orange-500', 'text-orange-600');
                         btn.classList.remove('border-transparent', 'text-gray-500');
@@ -216,6 +412,19 @@ const App = {
                     const url = new URL(window.location);
                     url.searchParams.set('tab', tab);
                     history.replaceState({}, '', url);
+
+                    /*
+                     * Signale aux modules qu'un onglet vient d'être affiché.
+                     *
+                     * Important pour Leaflet :
+                     * une carte ne doit pas calculer sa taille lorsqu'elle
+                     * se trouve encore dans un élément display:none.
+                     */
+                    App.events.emit('tab:activated', {
+                        container,
+                        tab,
+                        content
+                    });
                 }
 
                 buttons.forEach(btn => {
@@ -327,8 +536,7 @@ const App = {
     /* =========================================================
      RELEVES (toggle)
      ========================================================= */
-    releves: {
-
+    grouper: {
         init() {
             App.log('Init relevés');
 
@@ -372,9 +580,7 @@ const App = {
      DEPENSES addresse
      ========================================================= */
     adresse: {
-
         init() {
-
             App.events.on('autocomplete:selected', async (e) => {
 
                 const {input, form, item} = e.detail;

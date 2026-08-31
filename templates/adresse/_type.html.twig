@@ -1,0 +1,27 @@
+{% set bgColor = type.couleur ?? '#F97316' %}
+{% set textColor = type.textColor ?? '#FFFFFF' %}
+
+<div>
+
+
+    {# =========================================================
+       EN-TÊTE DU TYPE
+       ========================================================= #}
+
+    <div class="flex items-center gap-3 mb-5">
+
+        <div
+            class="w-2 h-8 rounded-full"
+            style="background-color: {{ bgColor }}"
+            ></div>
+    </div>
+
+
+    {# =========================================================
+       LISTE DES ADRESSES
+       ========================================================= #}
+
+    {% include 'adresse/_children.html.twig' %}
+
+
+</div>

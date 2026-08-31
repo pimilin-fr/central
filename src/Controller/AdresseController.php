@@ -19,8 +19,28 @@ final class AdresseController extends AbstractController {
 
     #[Route(name: 'app_adresse_index', methods: ['GET'])]
     public function index(AdresseRepository $adresseRepository): Response {
+        $adresses = $adresseRepository->findAllOrdered();
+
+        $adressesParType = [];
+
+        foreach ($adresses as $adresse) {
+
+            $type = $adresse->getAdresseType();
+            $typeId = $type->getId();
+
+            if (!isset($adressesParType[$typeId])) {
+                $adressesParType[$typeId] = [
+                    'type' => $type,
+                    'adresses' => [],
+                ];
+            }
+
+            $adressesParType[$typeId]['adresses'][] = $adresse;
+        }
+
         return $this->render('adresse/index.html.twig', [
-                    'adresses' => $adresseRepository->findAllOrdered(),
+                    'adresses' => $adresses,
+                    'adressesParType' => $adressesParType,
         ]);
     }
 

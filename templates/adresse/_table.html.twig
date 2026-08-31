@@ -1,61 +1,70 @@
-<div class="p-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6">
-        {% for adresse in adresses %}
-            {% set bgColor = adresse.adresseType.couleur ?? '#F97316' %}
-            {% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
+{# =========================================================
+CONSTRUCTION DES TYPES D'ADRESSES
+========================================================= #}
 
-            <a href="{{ path('app_adresse_show', {id: adresse.id}) }}"
-               class="block bg-white rounded-xl shadow hover:shadow-lg transition relative
-               p-6 pr-10 border">
-                {# --- Cercle année / mois --- #}
-                <div class="absolute -top-3 -left-3
-                     w-16 h-16
-                     rounded-full bg-orange-500
-                     flex flex-col items-center justify-center
-                     text-white font-bold text-xs shadow"
-                     style="background-color: {{ bgColor }}; color: {{ textColor }};
-                     ">
+{% set types = [] %}
 
-                    <span class="leading-none">{{ adresse.adresseType.name|slice(0, 5) }}</span>
-                </div>
+{% for adresse in adresses %}
+{% if adresse.adresseType.id not in types|map(type => type.id) %}
+{% set types = types|merge([adresse.adresseType]) %}
+{% endif %}
+{% endfor %}
 
-                {# --- LISERAI DROIT --- #}
-                <div class="absolute top-0 right-0 h-full w-8
-                     bg-orange-500
-                     flex items-center justify-center
-                     rounded-r-xl text-white" style="background-color: {{ bgColor }}; color: {{ textColor }};"
-                     ">
+{# =========================================================
+ONGLETS
+========================================================= #}
 
-                    <span class=" text-xs font-bold tracking-wider
-                          rotate-90 whitespace-nowrap" >
-                        {{ adresse.villeCourte}}
-                    </span>
-                </div>
+{% set activeTab = app.request.query.get('tab') ?? (
+types|length > 0
+? 'adresse-type-' ~ types[0].id
+: null
+) %}
 
-                {# --- CONTENU --- #}
-                <div class="flex flex-col h-full">
+{% set tabs = [] %}
 
-                    {# Ligne titre (remontée) #}
-                    <div class="flex items-center mb-2 pl-14 -mt-2">
-                        <h3 class="text-lg font-semibold text-gray-900 truncate">
-                            {{ adresse.name }}
-                        </h3>
-                    </div>
+{% for type in types %}
 
-                    <hr class="mb-2 mt-2"/>
 
-                    {# Type #}
-                    <p class="text-sm text-gray-500 mb-4">
-                        {{ adresse.adresse  }}
-                    </p>
+{% set typeAdresses = adresses|filter(adresse =>
+    adresse.adresseType.id == type.id
+) %}
 
-                </div>
-            </a>
-        {% else %}
-            <div class="col-span-full text-center text-gray-500 py-12">
-                Aucune adresse trouvée
-            </div>
-        {% endfor %}
-    </div>
+{% set tabs = tabs|merge([{
+    id: 'adresse-type-' ~ type.id,
+    label: type.name,
+    badge: typeAdresses|length,
+    content: include('adresse/_type.html.twig', {
+        type: type,
+        adresses: typeAdresses
+    })
+}]) %}
+
+
+{% endfor %}
+
+{% if tabs|length > 0 %}
+
+
+{% include 'partials/tabs.html.twig' with {
+    tabs: tabs,
+    activeTab: activeTab
+} %}
+
+
+{% else %}
+
+
+<div class="text-center text-gray-500 py-12">
+
+    {{ ux_icon('mdi:map-marker-off-outline', {
+        class: 'w-10 h-10 mx-auto text-gray-300 mb-3'
+    }) }}
+
+    <p class="text-sm">
+        Aucune adresse trouvée
+    </p>
 
 </div>
+
+
+{% endif %}

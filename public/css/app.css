@@ -6,3 +6,10 @@
 .animate-fadeIn {
     animation: fadeIn 0.15s ease-out;
 }
+
+.app-map {
+    width: 100%;
+    min-height: 600px;
+    height: 100%;
+    
+}
