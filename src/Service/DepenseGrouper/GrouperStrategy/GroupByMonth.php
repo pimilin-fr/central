@@ -6,7 +6,7 @@ use App\Entity\Depenses;
 use IntlDateFormatter;
 use Override;
 
-class GroupByMonth implements GroupStrategyInterface {
+class GroupByMonth extends GroupByDateStrategyAbstractClass {
 
     #[Override]
     public function getKey(Depenses $depense): string {
@@ -25,20 +25,5 @@ class GroupByMonth implements GroupStrategyInterface {
         );
 
         return $formatter->format($depense->getDate());
-    }
-
-    #[\Override]
-    public function isCumulative(): bool {
-        return true;
-    }
-
-    #[\Override]
-    public function getSortValue(Depenses $depense): mixed {
-        return $depense->getDate()->format('Ym');
-    }
-
-    #[\Override]
-    public function getSortDirection(): string {
-        return self::SORT_DESC;
     }
 }

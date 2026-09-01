@@ -31,4 +31,9 @@ class GroupByReleve implements GroupStrategyInterface {
     public function getSortDirection(): string {
         return self::SORT_DESC;
     }
+
+    #[\Override]
+    public function isNull(Depenses $depense): bool {
+        return ($depense->getReleve() === null);
+    }
 }

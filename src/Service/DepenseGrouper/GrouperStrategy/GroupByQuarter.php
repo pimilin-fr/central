@@ -5,7 +5,7 @@ namespace App\Service\DepenseGrouper\GrouperStrategy;
 use App\Entity\Depenses;
 use Override;
 
-class GroupByQuarter implements GroupStrategyInterface {
+class GroupByQuarter extends GroupByDateStrategyAbstractClass  {
 
     #[Override]
     public function getKey(Depenses $depense): string {
@@ -22,19 +22,7 @@ class GroupByQuarter implements GroupStrategyInterface {
     }
 
     #[\Override]
-    public function isCumulative(): bool {
-        return true;
-    }
-
-
-
-    #[\Override]
     public function getSortValue(Depenses $depense): mixed {
         return $this->getKey($depense);
-    }
-
-    #[\Override]
-    public function getSortDirection(): string {
-        return self::SORT_DESC;
     }
 }

@@ -31,4 +31,9 @@ class GroupByProjet implements GroupStrategyInterface {
     public function getSortDirection(): string {
         return self::SORT_ASC;
     }
+
+    #[\Override]
+    public function isNull(Depenses $depense): bool {
+        return ($depense->getProjet() === null);
+    }
 }

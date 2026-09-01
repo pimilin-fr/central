@@ -29,7 +29,12 @@ class GroupByTiers implements GroupStrategyInterface {
 
     #[\Override]
     public function isCumulative(): bool {
-        
+        return false;
+    }
+
+    #[\Override]
+    public function isNull(Depenses $depense): bool {
+        return ($depense->getTiers() === null);
     }
 }
 

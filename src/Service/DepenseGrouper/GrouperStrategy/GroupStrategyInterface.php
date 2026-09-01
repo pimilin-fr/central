@@ -18,4 +18,6 @@ interface GroupStrategyInterface {
     public function getSortValue(Depenses $depense): mixed;
 
     public function getSortDirection(): string;
+    
+    public function isNull(Depenses $depense): bool;
 }

@@ -27,82 +27,137 @@ class DepenseGroupManager {
 
     public function build(array $depenses, float $initialBalance = 0): array {
 
-        // 1️⃣ GROUP
-        $groups = $this->grouper->group(
-                $depenses,
-                $this->resolveStrategy()
-        );
+        $strategy = $this->resolveStrategy();
 
-        // 2️⃣ TRI ASC
-        // Nécessaire pour calculer les soldes
-        $this->sortAsc($groups);
+        // 1. GROUPER
+        $groups = $this->grouper->group($depenses, $strategy);
 
-        // 3️⃣ CALCUL DES SOLDES
-        $runningBalance = $initialBalance;
+        // 2. SÉPARER LE NULL
+        $nullGroup = null;
+        $normalGroups = [];
 
         foreach ($groups as $group) {
 
-            $group->setPreviousBalance($runningBalance);
+            if ($group->isNullGroup()) {
+                $nullGroup = $group;
+                continue;
+            }
 
-            $runningBalance += $group->getNet();
-
-            $group->setCurrentBalance($runningBalance);
+            $normalGroups[] = $group;
         }
 
-        // 4️⃣ TRI DESC
-        // Ordre d'affichage
-        $this->sortDesc($groups);
+        // 3. TRI DES GROUPES NORMAUX POUR LE CALCUL
+        $this->sortGroupsForCalculation($normalGroups, $strategy);
 
-        return $groups;
-    }
+        // 4. CUMUL
+        if ($strategy->isCumulative()) {
 
-    private function sortAsc(array &$groups): void {
-        usort($groups, function (DepenseGroup $a, DepenseGroup $b) {
+            $runningBalance = $initialBalance;
 
-            $keyA = $a->getKey();
-            $keyB = $b->getKey();
-
-            // "0" = groupe sans élément
-            // Toujours en premier
-            if ($keyA === '0' && $keyB !== '0') {
-                return -1;
+            foreach ($normalGroups as $group) {
+                $group->setPreviousBalance($runningBalance);
+                $runningBalance += $group->getNet();
+                $group->setCurrentBalance($runningBalance);
             }
 
-            if ($keyB === '0' && $keyA !== '0') {
-                return 1;
-            }
+            $nullGroup->setPreviousBalance($runningBalance);
+            $runningBalance += $nullGroup->getNet();
+            $nullGroup->setCurrentBalance($runningBalance);
+        }
 
-            return strnatcasecmp($keyA, $keyB);
-        });
-    }
+        // 5. TRI POUR L'AFFICHAGE
+        $this->sortGroupsForDisplay($normalGroups, $strategy);
 
-    private function sortDesc(array &$groups): void {
-        usort($groups, function (DepenseGroup $a, DepenseGroup $b) {
-
-            $keyA = $a->getKey();
-            $keyB = $b->getKey();
-
-            // "0" = groupe sans élément
-            // Toujours en premier,
-            // même en ordre descendant
-            if ($keyA === '0' && $keyB !== '0') {
-                return -1;
-            }
-
-            if ($keyB === '0' && $keyA !== '0') {
-                return 1;
-            }
-
-            return strnatcasecmp($keyB, $keyA);
-        });
+        // 6. NULL TOUJOURS EN PREMIER À L'AFFICHAGE
+        return array_merge([$nullGroup],$normalGroups);
     }
 
     public function getGroupBy(): string {
         return $this->groupBy;
     }
 
+    /**
+     * Tri dans l'ordre nécessaire au calcul du cumul.
+     *
+     * Le sens est l'inverse du sens d'affichage.
+     */
+    private function sortGroupsForCalculation(
+            array &$groups,
+            GroupStrategyInterface $strategy
+    ): void {
+
+        $direction = $strategy->getSortDirection();
+
+        /*
+         * Le cumul se fait dans le sens inverse de l'affichage.
+         */
+        $direction = $direction === GroupStrategyInterface::SORT_ASC ? GroupStrategyInterface::SORT_DESC : GroupStrategyInterface::SORT_ASC;
+
+        usort(
+                $groups,
+                function (
+                        DepenseGroup $a,
+                        DepenseGroup $b
+                ) use ($direction) {
+
+                    $comparison = $this->compare(
+                            $a->getSortValue(),
+                            $b->getSortValue()
+                    );
+
+                    return $direction === GroupStrategyInterface::SORT_ASC ? $comparison : -$comparison;
+                }
+        );
+    }
+
+    /**
+     * Tri dans l'ordre d'affichage.
+     */
+    private function sortGroupsForDisplay(
+            array &$groups,
+            GroupStrategyInterface $strategy
+    ): void {
+
+        $direction = $strategy->getSortDirection();
+
+        usort(
+                $groups,
+                function (
+                        DepenseGroup $a,
+                        DepenseGroup $b
+                ) use ($direction) {
+
+                    $comparison = $this->compare(
+                            $a->getSortValue(),
+                            $b->getSortValue()
+                    );
+
+                    return $direction === GroupStrategyInterface::SORT_ASC ? $comparison : -$comparison;
+                }
+        );
+    }
+
+    /**
+     * Comparaison générique des valeurs de tri.
+     */
+    private function compare(
+            mixed $a,
+            mixed $b
+    ): int {
+
+        if (is_numeric($a) && is_numeric($b)) {
+            return $a <=> $b;
+        }
+
+        return strnatcasecmp(
+                (string) $a,
+                (string) $b
+        );
+    }
+
     private function resolveStrategy(): GroupStrategyInterface {
         return match ($this->groupBy) {
+
             'portefeuille' => new GroupByPortefeuille(),
             'categorie' => new GroupByCategorie(),
             'projet' => new GroupByProjet(),

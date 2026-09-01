@@ -53,7 +53,7 @@
 
 
                 {# BALANCES : uniquement si cumulatif #}
-
+                
                 {% if group.cumulative %}
 
                     <span class="text-gray-500">
@@ -63,7 +63,8 @@
                     <span class="font-semibold {{ group.currentBalance >= 0 ? 'text-gray-800' : 'text-red-500' }}">
                         → {{ group.currentBalance|number_format(2, ',', ' ') }} €
                     </span>
-
+                {% else %}
+                    ???? {{ group.cumulative|yaml_dump }}
                 {% endif %}
 
             </div>

@@ -4,31 +4,27 @@ namespace App\Service\DepenseGrouper;
 
 use App\Entity\Depenses;
 
-class DepenseGroup
-{
+class DepenseGroup {
+
     private string $key;
     private string $label;
     private array $depenses = [];
-
     private float $totalDepense = 0;
     private float $totalRevenu = 0;
-
     private float $previousBalance = 0;
     private float $currentBalance = 0;
-
     private bool $cumulative = false;
-
+    private mixed $sortValue = null;
+    private bool $nullGroup = false;
     // =========================================================
     // KEY
     // =========================================================
 
-    public function getKey(): string
-    {
+    public function getKey(): string {
         return $this->key;
     }
 
-    public function setKey(string $key): self
-    {
+    public function setKey(string $key): self {
         $this->key = $key;
 
         return $this;
@@ -38,13 +34,11 @@ class DepenseGroup
     // LABEL
     // =========================================================
 
-    public function getLabel(): string
-    {
+    public function getLabel(): string {
         return $this->label;
     }
 
-    public function setLabel(string $label): self
-    {
+    public function setLabel(string $label): self {
         $this->label = $label;
 
         return $this;
@@ -54,13 +48,11 @@ class DepenseGroup
     // DEPENSES
     // =========================================================
 
-    public function getDepenses(): array
-    {
+    public function getDepenses(): array {
         return $this->depenses;
     }
 
-    public function addDepense(Depenses $depense): self
-    {
+    public function addDepense(Depenses $depense): self {
         $this->depenses[] = $depense;
 
         if ($depense->getCategorie()->isDepense()) {
@@ -76,23 +68,19 @@ class DepenseGroup
     // TOTALS
     // =========================================================
 
-    public function getTotalDepense(): float
-    {
+    public function getTotalDepense(): float {
         return $this->totalDepense;
     }
 
-    public function getTotalRevenu(): float
-    {
+    public function getTotalRevenu(): float {
         return $this->totalRevenu;
     }
 
-    public function getNet(): float
-    {
+    public function getNet(): float {
         return $this->totalRevenu - $this->totalDepense;
     }
 
-    public function getTotal(): float
-    {
+    public function getTotal(): float {
         return $this->getNet();
     }
 
@@ -100,13 +88,11 @@ class DepenseGroup
     // CUMUL
     // =========================================================
 
-    public function isCumulative(): bool
-    {
+    public function isCumulative(): bool {
         return $this->cumulative;
     }
 
-    public function setCumulative(bool $cumulative): self
-    {
+    public function setCumulative(bool $cumulative): self {
         $this->cumulative = $cumulative;
 
         return $this;
@@ -116,29 +102,55 @@ class DepenseGroup
     // SOLDES
     // =========================================================
 
-    public function setPreviousBalance(float $balance): self
-    {
+    public function setPreviousBalance(float $balance): self {
         $this->previousBalance = $balance;
         $this->currentBalance = $balance + $this->getNet();
 
         return $this;
     }
 
-    public function getPreviousBalance(): float
-    {
+    public function getPreviousBalance(): float {
         return $this->previousBalance;
     }
 
-    public function setCurrentBalance(float $balance): self
-    {
+    public function setCurrentBalance(float $balance): self {
         $this->currentBalance = $balance;
 
         return $this;
     }
 
-    public function getCurrentBalance(): float
-    {
+    public function getCurrentBalance(): float {
         return $this->currentBalance;
     }
+
+    
+    // =========================================================
+    // SORTING
+    // =========================================================
+    public function getSortValue(): mixed {
+        return $this->sortValue;
+    }
+
+    public function setSortValue(mixed $sortValue): self {
+        $this->sortValue = $sortValue;
+
+        return $this;
+    }
+    
+    // =========================================================
+    // NULL
+    // =========================================================
+    public function isNullGroup(): bool
+{
+    return $this->nullGroup;
+}
+
+public function setNullGroup(bool $nullGroup): self
+{
+    $this->nullGroup = $nullGroup;
+
+    return $this;
+}
+
 }
 
