@@ -17,4 +17,18 @@ class GroupByProjet implements GroupStrategyInterface {
         return $depense->getProjet() ? $depense->getProjet()->getName() : 'Non affecté';
     }
 
+    #[\Override]
+    public function isCumulative(): bool {
+        return false;
+    }
+
+    #[\Override]
+    public function getSortValue(Depenses $depense): mixed {
+        return $this->getLabel($depense);
+    }
+
+    #[\Override]
+    public function getSortDirection(): string {
+        return self::SORT_ASC;
+    }
 }

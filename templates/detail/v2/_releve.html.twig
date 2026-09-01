@@ -1,63 +1,82 @@
-
-
 {% for group in groups %}
+
     {% set groupKey = group.key %}
 
     <div class="border-b border-gray-200">
 
-        {# HEADER RELEVÉ (résumé) #}
-        <div 
-            class="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 transition"
-            onclick="toggleGroup('{{ groupKey }}')"
-            >
+        {# =====================================================
+           HEADER
+           ===================================================== #}
+
+        <div class="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 transition"
+             onclick="toggleGroup('{{ groupKey }}')">
 
             <div class="flex items-center gap-4">
-                {%if group.key == '0' %}
-                    <span class="text-sm font-semibold text-orange-500">
-                        {{group.label}} 
-                    </span>
-                {%else%}
-                    <span class="text-sm font-semibold text-gray-700">
-                        {{ group.label }}
-                    </span>
-                {% endif %}
+
+                <span class="text-sm font-semibold {{ groupKey == '0' ? 'text-orange-500' : 'text-gray-700' }}">
+                    {{ group.label }}
+                </span>
+
                 <span class="text-xs text-gray-500">
                     {% if group.depenses is not empty %}
-                        {{ group.depenses|length }} opérations
+                        {{ group.depenses|length }} opération{{ group.depenses|length > 1 ? 's' : '' }}
                     {% else %}
-                        aucune opérations
+                        aucune opération
                     {% endif %}
                 </span>
 
             </div>
 
+
             <div class="flex items-center gap-6 text-sm">
 
-                <span class="text-red-500 font-medium">
-                    - {{ group.totalDepense|number_format(2, ',', ' ') }} €
-                </span>
+                {# DÉPENSES #}
 
-                <span class="text-green-600 font-medium">
-                    + {{ group.totalRevenu|number_format(2, ',', ' ') }} €
-                </span>
+                {% if group.totalDepense > 0 %}
 
-                <span class="text-gray-500">
-                    {{ group.previousBalance|number_format(2, ',', ' ') }} €
-                </span>
+                    <span class="text-red-500 font-medium">
+                        - {{ group.totalDepense|number_format(2, ',', ' ') }} €
+                    </span>
 
-                <span class="font-semibold">
-                    → {{ group.currentBalance|number_format(2, ',', ' ') }} €
-                </span>
+                {% endif %}
+
+
+                {# REVENUS #}
+
+                {% if group.totalRevenu > 0 %}
+
+                    <span class="text-green-600 font-medium">
+                        + {{ group.totalRevenu|number_format(2, ',', ' ') }} €
+                    </span>
+
+                {% endif %}
+
+
+                {# BALANCES : uniquement si cumulatif #}
+
+                {% if group.cumulative %}
+
+                    <span class="text-gray-500">
+                        {{ group.previousBalance|number_format(2, ',', ' ') }} €
+                    </span>
+
+                    <span class="font-semibold {{ group.currentBalance >= 0 ? 'text-gray-800' : 'text-red-500' }}">
+                        → {{ group.currentBalance|number_format(2, ',', ' ') }} €
+                    </span>
+
+                {% endif %}
 
             </div>
 
         </div>
 
-        {# DETAILS #}
-        <div 
-            id="group-{{ groupKey }}" 
-            class="hidden"
-            >
+
+        {# =====================================================
+           DETAILS
+           ===================================================== #}
+
+        <div id="group-{{ groupKey }}" class="hidden">
+
             {{ include('depenses/_table.html.twig', {
                 depenses: group.depenses
             }) }}

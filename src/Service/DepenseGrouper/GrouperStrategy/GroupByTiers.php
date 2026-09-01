@@ -9,13 +9,27 @@ class GroupByTiers implements GroupStrategyInterface {
 
     #[Override]
     public function getKey(Depenses $depense): string {
-        return $depense->getTiers() ? 'tiers_' . $depense->getTiers()->getId() : 'no_tiers';
+        return 'tiers_' . $depense->getTiers()->getId();
     }
 
     #[Override]
     public function getLabel(Depenses $depense): string {
-        return $depense->getTiers() ? $depense->getTiers()->getName() : 'Non affecté';
+        return $depense->getTiers()->getName();
     }
 
+    #[\Override]
+    public function getSortDirection(): string {
+        return self::SORT_ASC;
+    }
+
+    #[\Override]
+    public function getSortValue(Depenses $depense): mixed {
+        return $this->getLabel($depense);
+    }
+
+    #[\Override]
+    public function isCumulative(): bool {
+        
+    }
 }
 

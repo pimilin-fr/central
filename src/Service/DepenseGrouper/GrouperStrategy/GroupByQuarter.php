@@ -21,15 +21,20 @@ class GroupByQuarter implements GroupStrategyInterface {
         return sprintf('T%d %s', $quarter, $date->format('Y'));
     }
 
-//    #[Override]
-//    public function getDate(Depenses $depense): ?DateTime {
-//        $date = clone $depense->getDate();
-//        $quarter = (int) ceil($date->format('n') / 3);
-//
-//        $firstMonth = ($quarter - 1) * 3 + 1;
-//
-//        return $date
-//                        ->setDate((int) $date->format('Y'), $firstMonth, 1)
-//                        ->setTime(0, 0);
-//    }
+    #[\Override]
+    public function isCumulative(): bool {
+        return true;
+    }
+
+
+
+    #[\Override]
+    public function getSortValue(Depenses $depense): mixed {
+        return $this->getKey($depense);
+    }
+
+    #[\Override]
+    public function getSortDirection(): string {
+        return self::SORT_DESC;
+    }
 }

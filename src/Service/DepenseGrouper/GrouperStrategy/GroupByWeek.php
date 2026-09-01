@@ -3,7 +3,6 @@
 namespace App\Service\DepenseGrouper\GrouperStrategy;
 
 use App\Entity\Depenses;
-use DateTime;
 use Override;
 
 class GroupByWeek implements GroupStrategyInterface {
@@ -22,5 +21,20 @@ class GroupByWeek implements GroupStrategyInterface {
 
         return 'Du ' . $debut->format('d/m') . ' au ' . $fin->format('d/m/Y');
 //        return 'Semaine ' . $depense->getDate()->format('W Y');
+    }
+
+    #[\Override]
+    public function getSortDirection(): string {
+        return self::SORT_DESC;
+    }
+
+    #[\Override]
+    public function getSortValue(Depenses $depense): mixed {
+        return $this->getKey($depense);
+    }
+
+    #[\Override]
+    public function isCumulative(): bool {
+        return true;
     }
 }
