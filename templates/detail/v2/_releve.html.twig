@@ -37,7 +37,10 @@
                     <span class="text-red-500 font-medium">
                         - {{ group.totalDepense|number_format(2, ',', ' ') }} €
                     </span>
-
+                {% elseif group.totalDepense < 0 %}
+                    <span class="text-blue-500 font-medium">
+                        + {{ group.totalDepense|abs|number_format(2, ',', ' ') }} €
+                    </span>
                 {% endif %}
 
 
@@ -48,7 +51,10 @@
                     <span class="text-green-600 font-medium">
                         + {{ group.totalRevenu|number_format(2, ',', ' ') }} €
                     </span>
-
+                {% elseif group.totalRevenu < 0%}
+                    <span class="text-red-500 font-bold">
+                        - {{ group.totalRevenu|number_format(2, ',', ' ') }} €
+                    </span>
                 {% endif %}
 
 
@@ -63,8 +69,6 @@
                     <span class="font-semibold {{ group.currentBalance >= 0 ? 'text-gray-800' : 'text-red-500' }}">
                         → {{ group.currentBalance|number_format(2, ',', ' ') }} €
                     </span>
-                {% else %}
-                    ???? {{ group.cumulative|yaml_dump }}
                 {% endif %}
 
             </div>

@@ -33,13 +33,13 @@ class DepenseGroupManager {
         $groups = $this->grouper->group($depenses, $strategy);
 
         // 2. SÉPARER LE NULL
-        $nullGroup = null;
+        $nullGroups = [];
         $normalGroups = [];
 
         foreach ($groups as $group) {
 
             if ($group->isNullGroup()) {
-                $nullGroup = $group;
+                $nullGroups[] = $group;
                 continue;
             }
 
@@ -60,16 +60,18 @@ class DepenseGroupManager {
                 $group->setCurrentBalance($runningBalance);
             }
 
-            $nullGroup->setPreviousBalance($runningBalance);
-            $runningBalance += $nullGroup->getNet();
-            $nullGroup->setCurrentBalance($runningBalance);
+            foreach ($nullGroups as $group) {
+                $group->setPreviousBalance($runningBalance);
+                $runningBalance += $group->getNet();
+                $group->setCurrentBalance($runningBalance);
+            }
         }
 
         // 5. TRI POUR L'AFFICHAGE
         $this->sortGroupsForDisplay($normalGroups, $strategy);
 
         // 6. NULL TOUJOURS EN PREMIER À L'AFFICHAGE
-        return array_merge([$nullGroup],$normalGroups);
+        return array_merge($nullGroups, $normalGroups);
     }
 
     public function getGroupBy(): string {
