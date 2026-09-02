@@ -113,7 +113,8 @@
                               data-longitude="{{ adresse.longitude }}"
                               data-id="{{ adresse.id }}"
                               data-name="{{ adresse.name }}"
-                              data-principale="{{ ta.isPrincipale ? '1' : '0' }}">
+                              data-principale="{{ ta.isPrincipale ? '1' : '0' }}"
+                              data-url="{{ path('app_adresse_show', {id: adresse.id}) }}">
                         </span>
 
                     {% endif %}

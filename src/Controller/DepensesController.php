@@ -2,19 +2,21 @@
 
 namespace App\Controller;
 
+use App\Entity\Adresse;
+use App\Entity\Categorie;
 use App\Entity\Depenses;
+use App\Entity\Portefeuille;
 use App\Entity\Projet;
 use App\Entity\Tiers;
 use App\Entity\TiersAdresse;
 use App\Form\AddAdresseType;
 use App\Form\AddDepensesType;
 use App\Form\TiersType;
-use App\Repository\CategorieRepository;
 use App\Repository\DepensesRepository;
 use App\Repository\PortefeuilleRepository;
-use App\Repository\ProjetRepository;
 use App\Repository\TiersAdresseRepository;
-use App\Repository\TiersRepository;
+use App\Service\ReleveManager;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,14 +72,14 @@ final class DepensesController extends AbstractController {
          * =========================================================
          */
         $query = $request->query;
-        $ptfRepo = $entityManager->getRepository(\App\Entity\Portefeuille::class);
-        $catRepo = $entityManager->getRepository(\App\Entity\Categorie::class);
+        $ptfRepo = $entityManager->getRepository(Portefeuille::class);
+        $catRepo = $entityManager->getRepository(Categorie::class);
         $tiersRepo = $entityManager->getRepository(Tiers::class);
         $projRepo = $entityManager->getRepository(Projet::class);
-        $adrRepo = $entityManager->getRepository(\App\Entity\Adresse::class);
+        $adrRepo = $entityManager->getRepository(Adresse::class);
 
         $portefeuille = null;
-        $categorie = new \App\Entity\Categorie();
+        $categorie = new Categorie();
         $tiers = new Tiers();
         $projet = new Projet();
         if ($query->get('portefeuille')) {
@@ -240,7 +242,7 @@ final class DepensesController extends AbstractController {
 //                var_dump($projet, $depenses, $request->request->all());
                 break;
             case 'set_date_paiement':
-                $date = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
+                $date = DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
 
                 foreach ($depenses as $depense) {
                     $depense->setDatePaiement($date);
@@ -255,9 +257,9 @@ final class DepensesController extends AbstractController {
                 if (sizeof($depenses) < 1) {
                     break;
                 }
-                $manager = new \App\Services\ReleveManager($entityManager);
+                $manager = new ReleveManager($entityManager);
 
-                $date = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
+                $date = DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
 
                 // relevé à cette date
                 $releve = $manager->addOperations($date, $depenses);

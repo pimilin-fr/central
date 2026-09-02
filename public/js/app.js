@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.5.0.0",
+        version: "v1.5.1.3",
         appName: "Central"
     },
 
@@ -52,6 +52,54 @@ const App = {
 
         instances: new Map(),
 
+        config: {
+
+            marker: {
+                radius: 10,
+                borderColor: '#FFFFFF',
+                borderWeight: 2,
+                fillOpacity: 0.8,
+
+                colors: {
+                    principale: '#16A34A',
+                    secondaire: '#64748B',
+                    default: '#2563EB'
+                }
+            },
+
+            popup: {
+                titleClass: 'font-semibold text-gray-900',
+                metaClass: 'text-xs text-gray-500 mt-1',
+                linkClass: 'inline-flex items-center mt-2 text-sm font-medium text-orange-600 hover:text-orange-700',
+
+                texts: {
+                    principale: 'Adresse principale',
+                    secondaire: 'Adresse secondaire',
+                    voirAdresse: 'Voir l’adresse'
+                }
+            },
+
+            tileLayer: {
+                url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                options: {
+                    maxZoom: 19,
+                    attribution: '&copy; Central utilise OpenStreetMap'
+                }
+            },
+
+            defaultView: {
+                latitude: 46.6,
+                longitude: 2.4,
+                zoom: 6
+            },
+
+            singlePointZoom: 16,
+
+            bounds: {
+                padding: 0.15
+            }
+        },
+
         init() {
             App.log('Init maps');
 
@@ -83,6 +131,7 @@ const App = {
         },
 
         initVisibleMaps() {
+
             document.querySelectorAll('[data-map]').forEach(mapElement => {
 
                 if (this.isVisible(mapElement)) {
@@ -93,6 +142,7 @@ const App = {
         },
 
         initMaps(scope = document) {
+
             scope.querySelectorAll('[data-map]').forEach(mapElement => {
                 this.initMap(mapElement);
             });
@@ -120,12 +170,6 @@ const App = {
                     this.initPoint(mapElement);
                     break;
 
-                    /*
-                     * Prévu pour la suite.
-                     *
-                     * On ne les implémente pas encore mais l'architecture
-                     * est déjà prête.
-                     */
                 case 'multipoint':
                     this.initMultipoint(mapElement);
                     break;
@@ -140,8 +184,23 @@ const App = {
             }
         },
 
-        initPoint(mapElement) {
+        createMarker(latitude, longitude, options = {}) {
 
+            const config = this.config.marker;
+
+            return L.circleMarker(
+                    [latitude, longitude],
+                    {
+                        radius: config.radius,
+                        color: config.borderColor,
+                        weight: config.borderWeight,
+                        fillColor: options.color ?? config.colors.default,
+                        fillOpacity: config.fillOpacity
+                    }
+            );
+        },
+
+        initPoint(mapElement) {
             const latitude = parseFloat(mapElement.dataset.latitude);
             const longitude = parseFloat(mapElement.dataset.longitude);
 
@@ -155,45 +214,144 @@ const App = {
 
             const map = L.map(mapElement).setView(
                     [latitude, longitude],
-                    17
+                    this.config.singlePointZoom
                     );
 
             L.tileLayer(
-                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    {
-                        maxZoom: 19,
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }
-            ).addTo(map);
+                    this.config.tileLayer.url,
+                    this.config.tileLayer.options
+                    ).addTo(map);
 
-            L.marker([
-                latitude,
-                longitude
-            ]).addTo(map);
+            const marker = this.createMarker(latitude, longitude, {
+                color: this.config.marker.colors.default
+            });
+
+            marker.addTo(map);
 
             this.instances.set(mapElement, map);
 
-            /*
-             * Leaflet peut encore avoir besoin d'un recalcul après
-             * l'affichage réel du conteneur.
-             */
             requestAnimationFrame(() => {
                 map.invalidateSize();
             });
         },
 
-        /*
-         * Placeholder pour la future gestion multipoint.
-         */
         initMultipoint(mapElement) {
-            App.log('Multipoint : pas encore implémenté', mapElement);
+            const pointElements = Array.from(
+                    mapElement.querySelectorAll('[data-map-point]')
+                    );
+
+            const map = L.map(mapElement);
+
+            L.tileLayer(
+                    this.config.tileLayer.url,
+                    this.config.tileLayer.options
+                    ).addTo(map);
+
+            const markers = [];
+
+            pointElements.forEach(pointElement => {
+                const latitude = parseFloat(pointElement.dataset.latitude);
+                const longitude = parseFloat(pointElement.dataset.longitude);
+
+                if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                    App.log(
+                            'Point multipoint ignoré : coordonnées invalides',
+                            pointElement.dataset
+                            );
+                    return;
+                }
+
+                const isPrincipale =
+                        pointElement.dataset.principale === '1';
+
+                const marker = this.createMarker(
+                        latitude,
+                        longitude,
+                        {
+                            color: isPrincipale
+                                    ? this.config.marker.colors.principale
+                                    : this.config.marker.colors.secondaire
+                        }
+                );
+
+                marker.addTo(map);
+
+                markers.push(marker);
+            });
+
+            /*
+             * Positionnement initial de la carte
+             */
+            if (markers.length === 0) {
+
+                map.setView(
+                        [
+                            this.config.defaultView.latitude,
+                            this.config.defaultView.longitude
+                        ],
+                        this.config.defaultView.zoom
+                        );
+
+            } else if (markers.length === 1) {
+
+                map.setView(
+                        markers[0].getLatLng(),
+                        this.config.singlePointZoom
+                        );
+
+            } else {
+
+                const bounds = L.latLngBounds(
+                        markers.map(marker => marker.getLatLng())
+                        );
+
+                map.fitBounds(
+                        bounds.pad(this.config.bounds.padding)
+                        );
+            }
+
+            this.instances.set(mapElement, map);
+
+            requestAnimationFrame(() => {
+                map.invalidateSize();
+
+                /*
+                 * On recalcule les bounds après affichage,
+                 * notamment lorsque la carte se trouve dans un onglet.
+                 */
+                if (markers.length > 1) {
+                    const bounds = L.latLngBounds(
+                            markers.map(marker => marker.getLatLng())
+                            );
+
+                    map.fitBounds(
+                            bounds.pad(this.config.bounds.padding)
+                            );
+                }
+            });
         },
 
-        /*
-         * Placeholder pour la future gestion polygon / zoning.
-         */
         initPolygon(mapElement) {
-            App.log('Polygon/Zoning : pas encore implémenté', mapElement);
+
+            App.log(
+                    'Polygon/Zoning : pas encore implémenté',
+                    mapElement
+                    );
+        },
+
+        escapeHtml(value) {
+
+            return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+        },
+
+        escapeAttribute(value) {
+
+            return this.escapeHtml(value);
         },
 
         invalidateMaps(scope = document) {
@@ -224,14 +382,18 @@ const App = {
 
             while (current && current !== document.body) {
 
-                if (current.classList && current.classList.contains('hidden')) {
+                if (
+                        current.classList &&
+                        current.classList.contains('hidden')
+                        ) {
                     return false;
                 }
 
                 current = current.parentElement;
             }
 
-            return element.offsetWidth > 0 && element.offsetHeight > 0;
+            return element.offsetWidth > 0 &&
+                    element.offsetHeight > 0;
         }
     },
 
@@ -369,9 +531,6 @@ const App = {
         }
     },
 
-    /* =========================================================
-     TABS
-     ========================================================= */
     /* =========================================================
      TABS
      ========================================================= */
