@@ -62,7 +62,14 @@
                 id: 'childs',
                 label: 'Enfants',
                 badge: adresse.children|length,
+                icon: 'mdi:baby-bottle',
                 content: include('adresse/_children.html.twig', { adresses: adresse.children})
+            },{
+                id: 'tiers',
+                label: 'Tiers liés',
+                badge: adresse.tiers|length,
+                icon: 'mage:user-fill',
+                content: include('tiers/_table.html.twig', {tiers: adresse.tiers}),
             },{
                 id:'edit',
                 content: include('adresse/_form.html.twig'),
@@ -75,6 +82,5 @@
             tabs: tabs,
             activeTab: activeTab
         } %}
-
     </div>
 {% endblock %}

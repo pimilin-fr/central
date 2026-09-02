@@ -28,15 +28,6 @@ class TiersType extends AbstractType {
                         'placeholder' => 'Saisir le texte.'
                     ]
                 ])
-//                ->add('adresse_name', TextType::class, [
-//                    'mapped' => false,
-//                    'label' => 'Adresse principale',
-//                    'required' => false,
-//                    'attr' => [
-//                        'data-endpoint' => '/adresse/search',
-//                    ],
-//                ])
-//                ->add('adresse_name', HiddenType::class)
                 ->add('tiersType', EntityType::class, [
                     'class' => TypeTiers::class,
                     'choice_label' => 'name',

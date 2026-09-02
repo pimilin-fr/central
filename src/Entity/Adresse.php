@@ -78,8 +78,12 @@ class Adresse {
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'adresse', targetEntity: TiersAdresse::class)]
+    private Collection $tiersAdresses;
+
     public function __construct() {
         $this->children = new ArrayCollection();
+        $this->tiersAdresses = new ArrayCollection();
     }
 
     /* ------ GETTER ------    */
@@ -275,9 +279,12 @@ class Adresse {
         $ville = trim($this->ville);
 
         // Normaliser les tirets spéciaux
-        $ville = str_replace(['‑', '–', '—'], '-', $ville);
+        $ville = str_replace(['-', '–', '—'], '-', $ville);
 
-        // Mots à ignorer si orphelins
+        // Remplacer systématiquement "Saint" par "St"
+        $ville = preg_replace('/\bSaint\b/ui', 'St', $ville);
+
+        // Mots à ignorer s'ils sont seuls
         $ignore = ['les', 'en', 'lès'];
 
         // Découper d'abord sur tiret
@@ -285,32 +292,72 @@ class Adresse {
 
         foreach ($parts as $part) {
             $part = trim($part);
-            if ($part === '')
+
+            if ($part === '') {
                 continue;
+            }
 
             // Découper ce morceau sur espace
-            $subParts = explode(' ', $part);
+            $subParts = preg_split('/\s+/', $part);
 
             $result = '';
             $firstWord = $subParts[0] ?? '';
             $secondWord = $subParts[1] ?? '';
 
-            // Si le premier mot est un petit mot comme "Le", on le garde avec le suivant
+            /*
+             * Si le premier mot est court (Le, La, St, etc.),
+             * on le garde avec le suivant.
+             */
             if (mb_strlen($firstWord) <= 3 && $secondWord !== '') {
                 $result = $firstWord . ' ' . $secondWord;
             } else {
-                // Sinon on prend juste le premier mot significatif
                 $result = $firstWord;
             }
 
-            // Vérifie que ce n'est pas un mot à ignorer (les, en, lès)
-            if (!in_array(mb_strtolower($result), $ignore)) {
+            // Vérifie que ce n'est pas un mot à ignorer
+            if (!in_array(mb_strtolower($result), $ignore, true)) {
                 return $result;
             }
         }
 
-        // Fallback : premier mot si tout échoue
+        // Fallback
         return explode(' ', $ville)[0];
+    }
+
+    public function getTiersAdresses(): Collection {
+        return $this->tiersAdresses;
+    }
+
+    public function getTiers(): array {
+        $tiers = [];
+
+        $collectTiers = function (Adresse $adresse) use (&$collectTiers, &$tiers): void {
+
+            // Tiers directement liés à cette adresse
+            foreach ($adresse->getTiersAdresses() as $tiersAdresse) {
+                $tiersItem = $tiersAdresse->getTiers();
+
+                if ($tiersItem === null) {
+                    continue;
+                }
+
+                $tiersId = $tiersItem->getId();
+
+                // Évite les doublons
+                if (!isset($tiers[$tiersId])) {
+                    $tiers[$tiersId] = $tiersItem;
+                }
+            }
+
+            // Tiers des enfants
+            foreach ($adresse->getChildren() as $child) {
+                $collectTiers($child);
+            }
+        };
+
+        $collectTiers($this);
+
+        return array_values($tiers);
     }
 
     public function __toString(): string {

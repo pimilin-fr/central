@@ -29,12 +29,7 @@ class Tiers {
     #[ORM\JoinColumn(nullable: false)]
     private TypeTiers $tiersType;
 
-    #[ORM\OneToMany(
-                mappedBy: 'tiers',
-                targetEntity: TiersAdresse::class,
-                orphanRemoval: true,
-                cascade: ['persist']
-        )]
+    #[ORM\OneToMany(mappedBy: 'tiers', targetEntity: TiersAdresse::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $tiersAdresses;
 
     #[ORM\Column(type: 'datetime_immutable')]

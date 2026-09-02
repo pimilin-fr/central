@@ -87,37 +87,11 @@
             }
         ]%}
 
-        {#% set tabs = [
-            {
-                id: 'summary',
-                label: 'Résumé',
-                content: include('tiers/_resume.html.twig')
-            },
-            {
-                id: 'adresses',
-                label: 'Adresses',
-                badge: adresses|length,
-                content: include('tiers/_add_adresse_form.html.twig')
-                    ~ include('tiers/_show_adresses.html.twig')
-            },
-            {
-                id: 'lines',
-                label: 'Opérations',
-                badge: depenses|length,
-                content: include('depenses/_bulk_depense.html.twig')
-            },{
-                id: 'edit',
-                label: 'Modifier',
-                icon: 'mdi:pencil',
-                content: include('tiers/_form.html.twig')
-            }
-            ] %#}
-
         {% include 'partials/tabs.html.twig' with {
             tabs: tabs,
             activeTab: activeTab
             } %}
 
-
+           
     </div>
 {% endblock %}
