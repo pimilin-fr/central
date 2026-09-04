@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.5.1.3",
+        version: "v1.5.2.0",
         appName: "Central"
     },
 
@@ -61,6 +61,7 @@ const App = {
                 fillOpacity: 0.8,
 
                 colors: {
+                    current: '#F97316',
                     principale: '#16A34A',
                     secondaire: '#64748B',
                     default: '#2563EB'
@@ -165,7 +166,6 @@ const App = {
             const type = mapElement.dataset.mapType || 'point';
 
             switch (type) {
-
                 case 'point':
                     this.initPoint(mapElement);
                     break;
@@ -177,6 +177,10 @@ const App = {
                 case 'polygon':
                 case 'zoning':
                     this.initPolygon(mapElement);
+                    break;
+
+                case 'hierarchical':
+                    this.initHierarchical(mapElement);
                     break;
 
                 default:
@@ -339,6 +343,179 @@ const App = {
                     );
         },
 
+        initHierarchical(mapElement) {
+            const currentElement = mapElement.querySelector('[data-map-current]');
+
+            const map = L.map(mapElement);
+
+            L.tileLayer(
+                    this.config.tileLayer.url,
+                    this.config.tileLayer.options
+                    ).addTo(map);
+
+            const markers = [];
+
+            /*
+             * =========================================================
+             * POINT COURANT
+             * =========================================================
+             */
+
+            if (currentElement) {
+                const latitude = parseFloat(
+                        currentElement.dataset.latitude
+                        );
+
+                const longitude = parseFloat(
+                        currentElement.dataset.longitude
+                        );
+
+                if (
+                        Number.isFinite(latitude) &&
+                        Number.isFinite(longitude)
+                        ) {
+                    const marker = this.createMarker(
+                            latitude,
+                            longitude,
+                            {
+                                color: this.config.marker.colors.current
+                            }
+                    );
+
+                    marker.bindPopup(
+                            `<strong>${this.escapeHtml(
+                                    currentElement.dataset.name || ''
+                                    )}</strong>`
+                            );
+
+                    marker.addTo(map);
+
+                    markers.push(marker);
+                }
+            }
+
+
+            /*
+             * =========================================================
+             * ZONES
+             * =========================================================
+             */
+
+            const zones = Array.from(
+                    mapElement.querySelectorAll('[data-map-zone]')
+                    );
+
+            const colors = this.getHierarchicalColors(zones.length);
+
+            zones.forEach((zoneElement, zoneIndex) => {
+                const color = colors[zoneIndex];
+
+                const points = Array.from(
+                        zoneElement.querySelectorAll('[data-map-point]')
+                        );
+
+                points.forEach(pointElement => {
+                    const latitude = parseFloat(
+                            pointElement.dataset.latitude
+                            );
+
+                    const longitude = parseFloat(
+                            pointElement.dataset.longitude
+                            );
+
+                    if (
+                            !Number.isFinite(latitude) ||
+                            !Number.isFinite(longitude)
+                            ) {
+                        return;
+                    }
+
+                    const marker = this.createMarker(
+                            latitude,
+                            longitude,
+                            {
+                                color
+                            }
+                    );
+
+                    const name = pointElement.dataset.name || '';
+                    const zoneName = zoneElement.dataset.zoneName || '';
+
+                    marker.bindPopup(`
+                <div>
+                    <strong>${this.escapeHtml(name)}</strong>
+
+                    ${
+                            zoneName
+                            ? `<div class="${this.config.popup.metaClass}">
+                                ${this.escapeHtml(zoneName)}
+                               </div>`
+                            : ''
+                            }
+                </div>
+            `);
+
+                    marker.addTo(map);
+
+                    markers.push(marker);
+                });
+            });
+
+
+            /*
+             * =========================================================
+             * VUE DE LA CARTE
+             * =========================================================
+             */
+
+            if (markers.length === 0) {
+                map.setView(
+                        [
+                            this.config.defaultView.latitude,
+                            this.config.defaultView.longitude
+                        ],
+                        this.config.defaultView.zoom
+                        );
+            } else if (markers.length === 1) {
+                map.setView(
+                        markers[0].getLatLng(),
+                        this.config.singlePointZoom
+                        );
+            } else {
+                const bounds = L.latLngBounds(
+                        markers.map(marker => marker.getLatLng())
+                        );
+
+                map.fitBounds(
+                        bounds.pad(this.config.bounds.padding)
+                        );
+            }
+
+
+            this.instances.set(mapElement, map);
+
+
+            /*
+             * =========================================================
+             * INVALIDATE APRÈS RENDU
+             * =========================================================
+             */
+
+            requestAnimationFrame(() => {
+                map.invalidateSize();
+
+                if (markers.length > 1) {
+                    const bounds = L.latLngBounds(
+                            markers.map(marker => marker.getLatLng())
+                            );
+
+                    map.fitBounds(
+                            bounds.pad(this.config.bounds.padding)
+                            );
+                }
+            });
+        },
+
         escapeHtml(value) {
 
             return String(value)
@@ -394,6 +571,27 @@ const App = {
 
             return element.offsetWidth > 0 &&
                     element.offsetHeight > 0;
+        },
+
+        getHierarchicalColors(count) {
+            if (count <= 0) {
+                return [];
+            }
+
+            // Un seul groupe :
+            // pas besoin de faire une roue chromatique
+            if (count === 1) {
+                return [this.config.marker.colors.default];
+            }
+
+            return Array.from(
+                    {length: count},
+                    (_, index) => {
+                const hue = Math.round((index * 360) / count);
+
+                return `hsl(${hue}, 70%, 50%)`;
+            }
+            );
         }
     },
 
