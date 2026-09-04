@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.5.2.0",
+        version: "v1.5.3.0",
         appName: "Central"
     },
 
@@ -68,6 +68,12 @@ const App = {
                 }
             },
 
+            zone: {
+                fillOpacity: 0.18,
+                borderOpacity: 0.7,
+                borderWeight: 2
+            },
+
             popup: {
                 titleClass: 'font-semibold text-gray-900',
                 metaClass: 'text-xs text-gray-500 mt-1',
@@ -109,17 +115,8 @@ const App = {
                 return;
             }
 
-            /*
-             * Carte déjà visible au chargement.
-             */
             this.initVisibleMaps();
 
-            /*
-             * Carte située dans un onglet.
-             *
-             * Elle sera initialisée uniquement après que son onglet
-             * soit devenu visible.
-             */
             App.events.on('tab:activated', (e) => {
                 const content = e.detail.content;
 
@@ -154,9 +151,6 @@ const App = {
             if (!mapElement)
                 return;
 
-            /*
-             * Évite une double initialisation.
-             */
             if (this.instances.has(mapElement))
                 return;
 
@@ -166,6 +160,7 @@ const App = {
             const type = mapElement.dataset.mapType || 'point';
 
             switch (type) {
+
                 case 'point':
                     this.initPoint(mapElement);
                     break;
@@ -205,14 +200,17 @@ const App = {
         },
 
         initPoint(mapElement) {
+
             const latitude = parseFloat(mapElement.dataset.latitude);
             const longitude = parseFloat(mapElement.dataset.longitude);
 
             if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+
                 App.log('Coordonnées invalides', {
                     latitude,
                     longitude
                 });
+
                 return;
             }
 
@@ -226,9 +224,13 @@ const App = {
                     this.config.tileLayer.options
                     ).addTo(map);
 
-            const marker = this.createMarker(latitude, longitude, {
-                color: this.config.marker.colors.default
-            });
+            const marker = this.createMarker(
+                    latitude,
+                    longitude,
+                    {
+                        color: this.config.marker.colors.default
+                    }
+            );
 
             marker.addTo(map);
 
@@ -240,6 +242,7 @@ const App = {
         },
 
         initMultipoint(mapElement) {
+
             const pointElements = Array.from(
                     mapElement.querySelectorAll('[data-map-point]')
                     );
@@ -254,14 +257,22 @@ const App = {
             const markers = [];
 
             pointElements.forEach(pointElement => {
-                const latitude = parseFloat(pointElement.dataset.latitude);
-                const longitude = parseFloat(pointElement.dataset.longitude);
+
+                const latitude = parseFloat(
+                        pointElement.dataset.latitude
+                        );
+
+                const longitude = parseFloat(
+                        pointElement.dataset.longitude
+                        );
 
                 if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+
                     App.log(
                             'Point multipoint ignoré : coordonnées invalides',
                             pointElement.dataset
                             );
+
                     return;
                 }
 
@@ -283,9 +294,6 @@ const App = {
                 markers.push(marker);
             });
 
-            /*
-             * Positionnement initial de la carte
-             */
             if (markers.length === 0) {
 
                 map.setView(
@@ -317,13 +325,11 @@ const App = {
             this.instances.set(mapElement, map);
 
             requestAnimationFrame(() => {
+
                 map.invalidateSize();
 
-                /*
-                 * On recalcule les bounds après affichage,
-                 * notamment lorsque la carte se trouve dans un onglet.
-                 */
                 if (markers.length > 1) {
+
                     const bounds = L.latLngBounds(
                             markers.map(marker => marker.getLatLng())
                             );
@@ -343,8 +349,29 @@ const App = {
                     );
         },
 
+        /*
+         * =========================================================
+         * CARTE HIÉRARCHIQUE
+         * =========================================================
+         *
+         * Le PHP fournit déjà :
+         *
+         * current
+         * zones[]
+         *   └── points[]
+         *
+         * Le JS ne fait donc aucune recherche dans la hiérarchie.
+         * Il se contente de dessiner :
+         *
+         * - le point courant
+         * - les points des rues
+         * - une zone autour de chaque groupe
+         */
+
         initHierarchical(mapElement) {
-            const currentElement = mapElement.querySelector('[data-map-current]');
+
+            const currentElement =
+                    mapElement.querySelector('[data-map-current]');
 
             const map = L.map(mapElement);
 
@@ -354,6 +381,7 @@ const App = {
                     ).addTo(map);
 
             const markers = [];
+            const zoneLayers = [];
 
             /*
              * =========================================================
@@ -362,6 +390,7 @@ const App = {
              */
 
             if (currentElement) {
+
                 const latitude = parseFloat(
                         currentElement.dataset.latitude
                         );
@@ -374,6 +403,7 @@ const App = {
                         Number.isFinite(latitude) &&
                         Number.isFinite(longitude)
                         ) {
+
                     const marker = this.createMarker(
                             latitude,
                             longitude,
@@ -382,18 +412,22 @@ const App = {
                             }
                     );
 
-                    marker.bindPopup(
-                            `<strong>${this.escapeHtml(
-                                    currentElement.dataset.name || ''
-                                    )}</strong>`
-                            );
+                    const name =
+                            currentElement.dataset.name || '';
+
+                    marker.bindPopup(`
+                    <div>
+                        <strong class="${this.config.popup.titleClass}">
+                            ${this.escapeHtml(name)}
+                        </strong>
+                    </div>
+                `);
 
                     marker.addTo(map);
 
                     markers.push(marker);
                 }
             }
-
 
             /*
              * =========================================================
@@ -405,16 +439,30 @@ const App = {
                     mapElement.querySelectorAll('[data-map-zone]')
                     );
 
-            const colors = this.getHierarchicalColors(zones.length);
+            const colors =
+                    this.getHierarchicalColors(zones.length);
 
             zones.forEach((zoneElement, zoneIndex) => {
+
                 const color = colors[zoneIndex];
 
-                const points = Array.from(
+                const zoneName =
+                        zoneElement.dataset.zoneName || '';
+
+                const pointElements = Array.from(
                         zoneElement.querySelectorAll('[data-map-point]')
                         );
 
-                points.forEach(pointElement => {
+                const points = [];
+
+                /*
+                 * -----------------------------------------------------
+                 * POINTS DU GROUPE
+                 * -----------------------------------------------------
+                 */
+
+                pointElements.forEach(pointElement => {
+
                     const latitude = parseFloat(
                             pointElement.dataset.latitude
                             );
@@ -430,6 +478,11 @@ const App = {
                         return;
                     }
 
+                    points.push([
+                        latitude,
+                        longitude
+                    ]);
+
                     const marker = this.createMarker(
                             latitude,
                             longitude,
@@ -438,29 +491,52 @@ const App = {
                             }
                     );
 
-                    const name = pointElement.dataset.name || '';
-                    const zoneName = zoneElement.dataset.zoneName || '';
+                    const name =
+                            pointElement.dataset.name || '';
 
                     marker.bindPopup(`
-                <div>
-                    <strong>${this.escapeHtml(name)}</strong>
+                    <div>
+                        <strong class="${this.config.popup.titleClass}">
+                            ${this.escapeHtml(name)}
+                        </strong>
 
-                    ${
+                        ${
                             zoneName
-                            ? `<div class="${this.config.popup.metaClass}">
-                                ${this.escapeHtml(zoneName)}
-                               </div>`
+                            ? `
+                                    <div class="${this.config.popup.metaClass}">
+                                        ${this.escapeHtml(zoneName)}
+                                    </div>
+                                  `
                             : ''
                             }
-                </div>
-            `);
+                    </div>
+                `);
 
                     marker.addTo(map);
 
                     markers.push(marker);
                 });
-            });
 
+                /*
+                 * -----------------------------------------------------
+                 * ZONE VISUELLE
+                 * -----------------------------------------------------
+                 */
+
+                if (points.length > 0) {
+
+                    const zone = this.createZonePolygon(
+                            points,
+                            color,
+                            zoneName
+                            );
+
+                    if (zone) {
+                        zone.addTo(map);
+                        zoneLayers.push(zone);
+                    }
+                }
+            });
 
             /*
              * =========================================================
@@ -469,6 +545,7 @@ const App = {
              */
 
             if (markers.length === 0) {
+
                 map.setView(
                         [
                             this.config.defaultView.latitude,
@@ -476,12 +553,16 @@ const App = {
                         ],
                         this.config.defaultView.zoom
                         );
+
             } else if (markers.length === 1) {
+
                 map.setView(
                         markers[0].getLatLng(),
                         this.config.singlePointZoom
                         );
+
             } else {
+
                 const bounds = L.latLngBounds(
                         markers.map(marker => marker.getLatLng())
                         );
@@ -491,20 +572,14 @@ const App = {
                         );
             }
 
-
             this.instances.set(mapElement, map);
 
-
-            /*
-             * =========================================================
-             * INVALIDATE APRÈS RENDU
-             * =========================================================
-             */
-
             requestAnimationFrame(() => {
+
                 map.invalidateSize();
 
                 if (markers.length > 1) {
+
                     const bounds = L.latLngBounds(
                             markers.map(marker => marker.getLatLng())
                             );
@@ -514,6 +589,313 @@ const App = {
                             );
                 }
             });
+        },
+
+        /*
+         * =========================================================
+         * CRÉATION D'UNE ZONE
+         * =========================================================
+         *
+         * 3 points ou plus :
+         *     → enveloppe convexe
+         *
+         * 2 points :
+         *     → rectangle autour des deux points
+         *
+         * 1 point :
+         *     → petit cercle
+         */
+
+        createZonePolygon(points, color, zoneName) {
+
+            if (!points || points.length === 0) {
+                return null;
+            }
+
+            const config = this.config.zone;
+
+            /*
+             * ---------------------------------------------------------
+             * UN SEUL POINT
+             * ---------------------------------------------------------
+             */
+
+            if (points.length === 1) {
+
+                const center = points[0];
+
+                const zone = L.circle(
+                        center,
+                        {
+                            radius: 350,
+                            color: color,
+                            weight: config.borderWeight,
+                            opacity: config.borderOpacity,
+                            fillColor: color,
+                            fillOpacity: config.fillOpacity
+                        }
+                );
+
+                if (zoneName) {
+                    zone.bindPopup(`
+                    <strong class="${this.config.popup.titleClass}">
+                        ${this.escapeHtml(zoneName)}
+                    </strong>
+                `);
+                }
+
+                return zone;
+            }
+
+            /*
+             * ---------------------------------------------------------
+             * DEUX POINTS
+             * ---------------------------------------------------------
+             */
+
+            if (points.length === 2) {
+
+                const rectangle =
+                        this.createTwoPointZone(points);
+
+                const zone = L.polygon(
+                        rectangle,
+                        {
+                            color: color,
+                            weight: config.borderWeight,
+                            opacity: config.borderOpacity,
+                            fillColor: color,
+                            fillOpacity: config.fillOpacity
+                        }
+                );
+
+                if (zoneName) {
+                    zone.bindPopup(`
+                    <strong class="${this.config.popup.titleClass}">
+                        ${this.escapeHtml(zoneName)}
+                    </strong>
+                `);
+                }
+
+                return zone;
+            }
+
+            /*
+             * ---------------------------------------------------------
+             * TROIS POINTS OU PLUS
+             * ---------------------------------------------------------
+             */
+
+            const hull = this.convexHull(points);
+
+            if (hull.length < 3) {
+                return null;
+            }
+
+            const zone = L.polygon(
+                    hull,
+                    {
+                        color: color,
+                        weight: config.borderWeight,
+                        opacity: config.borderOpacity,
+                        fillColor: color,
+                        fillOpacity: config.fillOpacity
+                    }
+            );
+
+            if (zoneName) {
+                zone.bindPopup(`
+                <strong class="${this.config.popup.titleClass}">
+                    ${this.escapeHtml(zoneName)}
+                </strong>
+            `);
+            }
+
+            return zone;
+        },
+
+        /*
+         * =========================================================
+         * ENVELOPPE CONVEXE
+         * =========================================================
+         */
+
+        convexHull(points) {
+
+            const sorted = points
+                    .map(point => [
+                            Number(point[0]),
+                            Number(point[1])
+                        ])
+                    .sort((a, b) => {
+
+                        if (a[1] === b[1]) {
+                            return a[0] - b[0];
+                        }
+
+                        return a[1] - b[1];
+                    });
+
+            if (sorted.length <= 2) {
+                return sorted;
+            }
+
+            const cross = (o, a, b) => {
+
+                return (
+                        (a[1] - o[1]) * (b[0] - o[0]) -
+                        (a[0] - o[0]) * (b[1] - o[1])
+                        );
+            };
+
+            const lower = [];
+
+            for (const point of sorted) {
+
+                while (
+                        lower.length >= 2 &&
+                        cross(
+                                lower[lower.length - 2],
+                                lower[lower.length - 1],
+                                point
+                                ) <= 0
+                        ) {
+                    lower.pop();
+                }
+
+                lower.push(point);
+            }
+
+            const upper = [];
+
+            for (let i = sorted.length - 1; i >= 0; i--) {
+
+                const point = sorted[i];
+
+                while (
+                        upper.length >= 2 &&
+                        cross(
+                                upper[upper.length - 2],
+                                upper[upper.length - 1],
+                                point
+                                ) <= 0
+                        ) {
+                    upper.pop();
+                }
+
+                upper.push(point);
+            }
+
+            lower.pop();
+            upper.pop();
+
+            return lower.concat(upper);
+        },
+
+        /*
+         * =========================================================
+         * ZONE POUR DEUX POINTS
+         * =========================================================
+         */
+
+        createTwoPointZone(points) {
+
+            const [pointA, pointB] = points;
+
+            const lat1 = pointA[0];
+            const lng1 = pointA[1];
+
+            const lat2 = pointB[0];
+            const lng2 = pointB[1];
+
+            const latDiff = lat2 - lat1;
+            const lngDiff = lng2 - lng1;
+
+            const length =
+                    Math.sqrt(
+                            (latDiff * latDiff) +
+                            (lngDiff * lngDiff)
+                            );
+
+            /*
+             * Petit décalage perpendiculaire.
+             *
+             * La valeur est volontairement simple :
+             * on cherche ici une zone de visualisation,
+             * pas une frontière géographique réelle.
+             */
+
+            const offset = Math.max(
+                    length * 0.15,
+                    0.002
+                    );
+
+            const perpLat =
+                    -lngDiff / (length || 1) * offset;
+
+            const perpLng =
+                    latDiff / (length || 1) * offset;
+
+            return [
+                [
+                    lat1 + perpLat,
+                    lng1 + perpLng
+                ],
+                [
+                    lat2 + perpLat,
+                    lng2 + perpLng
+                ],
+                [
+                    lat2 - perpLat,
+                    lng2 - perpLng
+                ],
+                [
+                    lat1 - perpLat,
+                    lng1 - perpLng
+                ]
+            ];
+        },
+
+        /*
+         * =========================================================
+         * COULEURS DES ZONES
+         * =========================================================
+         */
+
+        getHierarchicalColors(count) {
+
+            if (count <= 0) {
+                return [];
+            }
+
+            /*
+             * Une seule zone :
+             * on utilise le bleu Central.
+             */
+
+            if (count === 1) {
+                return [
+                    this.config.marker.colors.default
+                ];
+            }
+
+            /*
+             * Plusieurs zones :
+             * roue chromatique.
+             */
+
+            return Array.from(
+                    {length: count},
+                    (_, index) => {
+
+                const hue =
+                        Math.round(
+                                (index * 360) / count
+                                );
+
+                return `hsl(${hue}, 70%, 50%)`;
+            }
+            );
         },
 
         escapeHtml(value) {
@@ -552,12 +934,12 @@ const App = {
             if (!element)
                 return false;
 
-            /*
-             * Un parent peut être caché par .hidden.
-             */
             let current = element;
 
-            while (current && current !== document.body) {
+            while (
+                    current &&
+                    current !== document.body
+                    ) {
 
                 if (
                         current.classList &&
@@ -569,32 +951,13 @@ const App = {
                 current = current.parentElement;
             }
 
-            return element.offsetWidth > 0 &&
-                    element.offsetHeight > 0;
-        },
-
-        getHierarchicalColors(count) {
-            if (count <= 0) {
-                return [];
-            }
-
-            // Un seul groupe :
-            // pas besoin de faire une roue chromatique
-            if (count === 1) {
-                return [this.config.marker.colors.default];
-            }
-
-            return Array.from(
-                    {length: count},
-                    (_, index) => {
-                const hue = Math.round((index * 360) / count);
-
-                return `hsl(${hue}, 70%, 50%)`;
-            }
-            );
+            return (
+                    element.offsetWidth > 0 &&
+                    element.offsetHeight > 0
+                    );
         }
     },
-
+    
     /* =========================================================
      AUTOCOMPLETE
      ========================================================= */
