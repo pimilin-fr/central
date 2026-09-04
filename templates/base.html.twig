@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         {% block importmap %}{{ importmap('app') }}{% endblock %}
+        <script defer src="{{ asset('js/maps.js') }}"></script>
         <script defer src="{{ asset('js/app.js') }}"></script>
     </head>
     <body>

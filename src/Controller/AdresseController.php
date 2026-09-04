@@ -123,6 +123,10 @@ final class AdresseController extends AbstractController {
                 'name' => $adresse->getName(),
                 'latitude' => $adresse->getLatitude(),
                 'longitude' => $adresse->getLongitude(),
+                'url' => $this->generateUrl(
+                        'app_adresse_show',
+                        ['id' => $adresse->getId()]
+                ),
             ],
             'zones' => [],
         ];
@@ -166,6 +170,10 @@ final class AdresseController extends AbstractController {
                     'name' => $child->getName(),
                     'latitude' => $child->getLatitude(),
                     'longitude' => $child->getLongitude(),
+                    'url' => $this->generateUrl(
+                            'app_adresse_show',
+                            ['id' => $child->getId()]
+                    ),
                 ];
             }
 
@@ -202,7 +210,7 @@ final class AdresseController extends AbstractController {
         return $map;
     }
 
-    private function collectRuePoints(  Adresse $adresse,array &$points): void {
+    private function collectRuePoints(Adresse $adresse, array &$points): void {
         /*
          * Nous sommes arrivés à une Rue.
          */
@@ -213,6 +221,10 @@ final class AdresseController extends AbstractController {
                     'name' => $adresse->getName(),
                     'latitude' => $adresse->getLatitude(),
                     'longitude' => $adresse->getLongitude(),
+                    'url' => $this->generateUrl(
+                            'app_adresse_show',
+                            ['id' => $adresse->getId()]
+                    ),
                 ];
             }
 

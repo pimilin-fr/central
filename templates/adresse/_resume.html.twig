@@ -179,10 +179,11 @@ GÉOLOCALISATION
                        ================================================= #}
                     {% if hasCurrentGeolocation %}
                         <span data-map-current
-                              data-id="{{ adresse.id }}"
-                              data-name="{{ adresse.name }}"
-                              data-latitude="{{ adresse.latitude }}"
-                              data-longitude="{{ adresse.longitude }}">
+                              data-id="{{ adresseMap.current.id }}"
+                              data-name="{{ adresseMap.current.name }}"
+                              data-url="{{ adresseMap.current.url }}"
+                              data-latitude="{{ adresseMap.current.latitude }}"
+                              data-longitude="{{ adresseMap.current.longitude }}">
                         </span>
                     {% endif %}
 
@@ -197,6 +198,7 @@ GÉOLOCALISATION
                                 <span data-map-point
                                       data-id="{{ point.id }}"
                                       data-name="{{ point.name }}"
+                                      data-url="{{ point.url }}"
                                       data-latitude="{{ point.latitude }}"
                                       data-longitude="{{ point.longitude }}">
                                 </span>
@@ -265,14 +267,14 @@ GÉOLOCALISATION
                             {{ ux_icon('mdi:map-marker-alert', {class: 'w-4 h-4'}) }} 
                             Adresse complète
                         </p>
-                        
+
                         <p class="text-sm text-gray-700 leading-relaxed break-words">
                             {{ adresse.adresse }}
                         </p>
 
                     </div>
                 {% endif %}
-                
+
                 {# =================================================
                    ADRESSE FORCÉE
                    ================================================= #}
