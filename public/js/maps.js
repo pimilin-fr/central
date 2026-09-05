@@ -3,14 +3,14 @@ const CentralMaps = {
 
     config: {
         debug: true,
-        version: "v1.0",
-        appName: "Central-ModuleMap",
+        version: 'v1.3.1',
+        appName: 'Central-ModuleMap',
+
         marker: {
             radius: 10,
             borderColor: '#FFFFFF',
             borderWeight: 2,
             fillOpacity: 0.8,
-
             colors: {
                 current: '#F97316',
                 principale: '#16A34A',
@@ -22,14 +22,15 @@ const CentralMaps = {
         zone: {
             fillOpacity: 0.12,
             borderOpacity: 0.85,
-            borderWeight: 2
+            borderWeight: 2,
+            marginMeters: 250,
+            singlePointRadiusMeters: 350
         },
 
         popup: {
             titleClass: 'font-semibold text-gray-900',
             metaClass: 'text-xs text-gray-500 mt-1',
             linkClass: 'inline-flex items-center mt-2 text-sm font-medium text-orange-600 hover:text-orange-700',
-
             texts: {
                 principale: 'Adresse principale',
                 secondaire: 'Adresse secondaire',
@@ -39,7 +40,6 @@ const CentralMaps = {
 
         tileLayer: {
             url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-
             options: {
                 maxZoom: 19,
                 attribution: '&copy; Central utilise OpenStreetMap'
@@ -60,68 +60,66 @@ const CentralMaps = {
     },
 
     log(...args) {
-        if (this.config.debug) {
-            console.log(
-                    "[" + this.config.appName + "-" + this.config.version + "]",
-                    ...args
-                    );
+        if (!this.config.debug) {
+            return;
         }
+
+        console.log(
+                `[${this.config.appName}-${this.config.version}]`,
+                ...args
+                );
     },
 
     init() {
+        this.log('Init maps');
 
-        CentralMaps.log(`Init maps`);
         if (typeof L === 'undefined') {
-            CentralMaps.log('Leaflet non disponible');
+            this.log('Leaflet non disponible');
             return;
         }
 
         this.initVisibleMaps();
 
-        App.events.on('tab:activated', (e) => {
-            const content = e.detail.content;
+        if (typeof App !== 'undefined' && App.events) {
+            App.events.on('tab:activated', (e) => {
+                const content = e.detail?.content;
 
-            if (!content)
-                return;
+                if (!content) {
+                    return;
+                }
 
-            this.initMaps(content);
-            this.invalidateMaps(content);
-        });
+                this.initMaps(content);
+                this.invalidateMaps(content);
+            });
+        }
     },
 
     initVisibleMaps() {
-
-        document.querySelectorAll('[data-map]').forEach(mapElement => {
-
+        document.querySelectorAll('[data-map]').forEach((mapElement) => {
             if (this.isVisible(mapElement)) {
                 this.initMap(mapElement);
             }
-
         });
     },
 
     initMaps(scope = document) {
-
-        scope.querySelectorAll('[data-map]').forEach(mapElement => {
+        scope.querySelectorAll('[data-map]').forEach((mapElement) => {
             this.initMap(mapElement);
         });
     },
 
     initMap(mapElement) {
-
-        if (!mapElement)
+        if (!mapElement || this.instances.has(mapElement)) {
             return;
+        }
 
-        if (this.instances.has(mapElement))
+        if (!this.isVisible(mapElement)) {
             return;
-
-        if (!this.isVisible(mapElement))
-            return;
+        }
 
         const type = mapElement.dataset.mapType || 'point';
 
         switch (type) {
-
             case 'point':
                 this.initPoint(mapElement);
                 break;
@@ -135,41 +133,28 @@ const CentralMaps = {
                 break;
 
             default:
-                CentralMaps.log('Type de carte inconnu:', type);
+                this.log('Type de carte inconnu:', type);
         }
     },
 
     createMarker(latitude, longitude, options = {}) {
-
         const config = this.config.marker;
 
-        return L.circleMarker(
-                [latitude, longitude],
-                {
-                    radius: config.radius,
-                    color: config.borderColor,
-                    weight: config.borderWeight,
-                    fillColor: options.color ?? config.colors.default,
-                    fillOpacity: config.fillOpacity
-                }
-        );
+        return L.circleMarker([latitude, longitude], {
+            radius: config.radius,
+            color: config.borderColor,
+            weight: config.borderWeight,
+            fillColor: options.color ?? config.colors.default,
+            fillOpacity: config.fillOpacity
+        });
     },
 
-    /* =========================================================
-     * CARTE SIMPLE
-     * ========================================================= */
-
     initPoint(mapElement) {
-
         const latitude = parseFloat(mapElement.dataset.latitude);
         const longitude = parseFloat(mapElement.dataset.longitude);
 
-        if (
-                !Number.isFinite(latitude) ||
-                !Number.isFinite(longitude)
-                ) {
-
-            CentralMaps.log('Coordonnées invalides', {
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+            this.log('Coordonnées invalides', {
                 latitude,
                 longitude
             });
@@ -182,39 +167,29 @@ const CentralMaps = {
                 this.config.singlePointZoom
                 );
 
+        this.instances.set(mapElement, map);
+
         L.tileLayer(
                 this.config.tileLayer.url,
                 this.config.tileLayer.options
                 ).addTo(map);
 
-        const marker = this.createMarker(
+        this.createMarker(
                 latitude,
                 longitude,
-                {
-                    color: this.config.marker.colors.default
-                }
-        );
+                {color: this.config.marker.colors.default}
+        ).addTo(map);
 
-        marker.addTo(map);
-
-        this.instances.set(mapElement, map);
-
-        requestAnimationFrame(() => {
-            map.invalidateSize();
-        });
+        this.invalidateMap(mapElement);
     },
 
-    /* =========================================================
-     * CARTE MULTIPOINT
-     * ========================================================= */
-
     initMultipoint(mapElement) {
-
         const pointElements = Array.from(
                 mapElement.querySelectorAll('[data-map-point]')
                 );
 
         const map = L.map(mapElement);
+        this.instances.set(mapElement, map);
 
         L.tileLayer(
                 this.config.tileLayer.url,
@@ -223,26 +198,15 @@ const CentralMaps = {
 
         const markers = [];
 
-        pointElements.forEach(pointElement => {
+        pointElements.forEach((pointElement) => {
+            const latitude = parseFloat(pointElement.dataset.latitude);
+            const longitude = parseFloat(pointElement.dataset.longitude);
 
-            const latitude = parseFloat(
-                    pointElement.dataset.latitude
-                    );
-
-            const longitude = parseFloat(
-                    pointElement.dataset.longitude
-                    );
-
-            if (
-                    !Number.isFinite(latitude) ||
-                    !Number.isFinite(longitude)
-                    ) {
-
-                CentralMaps.log(
+            if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                this.log(
                         'Point multipoint ignoré : coordonnées invalides',
                         pointElement.dataset
                         );
-
                 return;
             }
 
@@ -259,84 +223,40 @@ const CentralMaps = {
                     }
             );
 
-            marker.addTo(map);
+            const name = pointElement.dataset.name || '';
 
+            marker.bindPopup(`
+                <div>
+                    <strong class="${this.config.popup.titleClass}">
+                        ${this.escapeHtml(name)}
+                    </strong>
+
+                    <div class="${this.config.popup.metaClass}">
+                        ${
+                    isPrincipale
+                    ? this.config.popup.texts.principale
+                    : this.config.popup.texts.secondaire
+                    }
+                    </div>
+                </div>
+            `);
+
+            marker.addTo(map);
             markers.push(marker);
         });
 
-        if (markers.length === 0) {
+        this.setMapView(map, markers);
 
-            map.setView(
-                    [
-                        this.config.defaultView.latitude,
-                        this.config.defaultView.longitude
-                    ],
-                    this.config.defaultView.zoom
-                    );
-
-        } else if (markers.length === 1) {
-
-            map.setView(
-                    markers[0].getLatLng(),
-                    this.config.singlePointZoom
-                    );
-
-        } else {
-
-            const bounds = L.latLngBounds(
-                    markers.map(marker => marker.getLatLng())
-                    );
-
-            map.fitBounds(
-                    bounds.pad(this.config.bounds.padding)
-                    );
-        }
-
-        this.instances.set(mapElement, map);
-
-        requestAnimationFrame(() => {
-
-            map.invalidateSize();
-
-            if (markers.length > 1) {
-
-                const bounds = L.latLngBounds(
-                        markers.map(marker => marker.getLatLng())
-                        );
-
-                map.fitBounds(
-                        bounds.pad(this.config.bounds.padding)
-                        );
-            }
-        });
+        this.invalidateMap(mapElement);
     },
 
-
-    /* =========================================================
-     * CARTE HIÉRARCHIQUE
-     * =========================================================
-     *
-     * Le PHP fournit :
-     *
-     * current
-     * zones[]
-     *   └── points[]
-     *
-     * Le JS ne recherche donc rien dans la hiérarchie.
-     *
-     * Il affiche :
-     *
-     * - le point courant
-     * - les points des rues
-     * - une zone visuelle autour de chaque groupe
-     * ========================================================= */
-
     initHierarchical(mapElement) {
-
-        const currentElement =
-                mapElement.querySelector('[data-map-current]');
+        const currentElement = mapElement.querySelector(
+                '[data-map-current]'
+                );
 
         const map = L.map(mapElement);
+        this.instances.set(mapElement, map);
 
         L.tileLayer(
                 this.config.tileLayer.url,
@@ -346,85 +266,21 @@ const CentralMaps = {
         const markers = [];
         const zoneLayers = [];
 
-        /* =====================================================
-         * POINT COURANT
-         * ===================================================== */
-
-        if (currentElement) {
-
-            const latitude = parseFloat(
-                    currentElement.dataset.latitude
-                    );
-
-            const longitude = parseFloat(
-                    currentElement.dataset.longitude
-                    );
-
-            if (
-                    Number.isFinite(latitude) &&
-                    Number.isFinite(longitude)
-                    ) {
-
-                const marker = this.createMarker(
-                        latitude,
-                        longitude,
-                        {
-                            color: this.config.marker.colors.current
-                        }
+        this.addCurrentMarker(
+                map,
+                currentElement,
+                markers
                 );
-
-                const name =
-                        currentElement.dataset.name || '';
-
-                const url =
-                        currentElement.dataset.url || '';
-
-                marker.bindPopup(`
-                        <div>
-                            <strong class="${this.config.popup.titleClass}">
-                                ${this.escapeHtml(name)}
-                            </strong>
-
-                            ${
-                        url
-                        ? `
-                                        <div>
-                                            <a
-                                                href="${this.escapeAttribute(url)}"
-                                                class="${this.config.popup.linkClass}"
-                                            >
-                                                ${this.config.popup.texts.voirAdresse}
-                                            </a>
-                                        </div>
-                                      `
-                        : ''
-                        }
-                        </div>
-                    `);
-
-                marker.addTo(map);
-
-                markers.push(marker);
-            }
-        }
-
-        /* =====================================================
-         * ZONES
-         * ===================================================== */
 
         const zones = Array.from(
                 mapElement.querySelectorAll('[data-map-zone]')
                 );
 
-        const colors =
-                this.getHierarchicalColors(zones.length);
+        const colors = this.getHierarchicalColors(zones.length);
 
         zones.forEach((zoneElement, zoneIndex) => {
-
             const color = colors[zoneIndex];
-
-            const zoneName =
-                    zoneElement.dataset.zoneName || '';
+            const zoneName = zoneElement.dataset.zoneName || '';
 
             const pointElements = Array.from(
                     zoneElement.querySelectorAll('[data-map-point]')
@@ -432,12 +288,7 @@ const CentralMaps = {
 
             const points = [];
 
-            /* =================================================
-             * POINTS DE LA ZONE
-             * ================================================= */
-
-            pointElements.forEach(pointElement => {
-
+            pointElements.forEach((pointElement) => {
                 const latitude = parseFloat(
                         pointElement.dataset.latitude
                         );
@@ -453,90 +304,129 @@ const CentralMaps = {
                     return;
                 }
 
-                points.push([
-                    latitude,
-                    longitude
-                ]);
+                points.push([latitude, longitude]);
 
                 const marker = this.createMarker(
                         latitude,
                         longitude,
-                        {
-                            color
-                        }
+                        {color}
                 );
 
-                const name =
-                        pointElement.dataset.name || '';
+                const name = pointElement.dataset.name || '';
+                const url = pointElement.dataset.url || '';
 
-                const url =
-                        pointElement.dataset.url || '';
-
-                marker.bindPopup(`
-                        <div>
-
-                            <strong class="${this.config.popup.titleClass}">
-                                ${this.escapeHtml(name)}
-                            </strong>
-
-                            ${
-                        zoneName
-                        ? `
-                                        <div class="${this.config.popup.metaClass}">
-                                            ${this.escapeHtml(zoneName)}
-                                        </div>
-                                      `
-                        : ''
-                        }
-
-                            ${
-                        url
-                        ? `
-                                        <div>
-                                            <a
-                                                href="${this.escapeAttribute(url)}"
-                                                class="${this.config.popup.linkClass}"
-                                            >
-                                                ${this.config.popup.texts.voirAdresse}
-                                            </a>
-                                        </div>
-                                      `
-                        : ''
-                        }
-
-                        </div>
-                    `);
+                marker.bindPopup(
+                        this.createPointPopup(name, url, zoneName)
+                        );
 
                 marker.addTo(map);
-
                 markers.push(marker);
             });
 
-            /* =================================================
-             * ZONE VISUELLE
-             * ================================================= */
-
-            if (points.length > 0) {
-
-                const zone = this.createZonePolygon(
-                        points,
-                        color,
-                        zoneName
-                        );
-
-                if (zone) {
-                    zone.addTo(map);
-                    zoneLayers.push(zone);
-                }
+            if (points.length === 0) {
+                return;
             }
+
+            const zone = this.createZonePolygon(
+                    points,
+                    color,
+                    zoneName
+                    );
+
+            if (!zone) {
+                return;
+            }
+
+            zone.addTo(map);
+
+            this.log('Zone : ajoutée à la carte', {
+                name: zoneName,
+                mapExists: !!zone._map,
+                boundsValid: zone.getBounds().isValid()
+            });
+
+            zoneLayers.push(zone);
         });
 
-        /* =====================================================
-         * VUE DE LA CARTE
-         * ===================================================== */
+        this.setMapView(map, markers, zoneLayers);
+        this.invalidateMap(mapElement);
+    },
 
-        if (markers.length === 0) {
+    addCurrentMarker(map, element, markers) {
+        if (!element) {
+            return;
+        }
 
+        const latitude = parseFloat(element.dataset.latitude);
+        const longitude = parseFloat(element.dataset.longitude);
+
+        if (
+                !Number.isFinite(latitude) ||
+                !Number.isFinite(longitude)
+                ) {
+            return;
+        }
+
+        const marker = this.createMarker(
+                latitude,
+                longitude,
+                {
+                    color: this.config.marker.colors.current
+                }
+        );
+
+        const name = element.dataset.name || '';
+        const url = element.dataset.url || '';
+
+        marker.bindPopup(
+                this.createPointPopup(name, url)
+                );
+
+        marker.addTo(map);
+        markers.push(marker);
+    },
+
+    createPointPopup(name, url = '', zoneName = '') {
+        return `
+            <div>
+                <strong class="${this.config.popup.titleClass}">
+                    ${this.escapeHtml(name)}
+                </strong>
+
+                ${
+                zoneName
+                ? `
+                            <div class="${this.config.popup.metaClass}">
+                                ${this.escapeHtml(zoneName)}
+                            </div>
+                        `
+                : ''
+                }
+
+                ${
+                url
+                ? `
+                            <div>
+                                <a
+                                    href="${this.escapeAttribute(url)}"
+                                    class="${this.config.popup.linkClass}"
+                                >
+                                    ${this.config.popup.texts.voirAdresse}
+                                </a>
+                            </div>
+                        `
+                : ''
+                }
+            </div>
+        `;
+    },
+
+    setMapView(map, markers = [], zoneLayers = []) {
+        if (!map) {
+            return;
+        }
+
+        if (markers.length === 0 && zoneLayers.length === 0) {
             map.setView(
                     [
                         this.config.defaultView.latitude,
@@ -545,180 +435,287 @@ const CentralMaps = {
                     this.config.defaultView.zoom
                     );
 
-        } else if (markers.length === 1) {
+            return;
+        }
 
+        if (markers.length === 1 && zoneLayers.length === 0) {
             map.setView(
                     markers[0].getLatLng(),
                     this.config.singlePointZoom
                     );
 
-        } else {
-
-            const bounds = L.latLngBounds(
-                    markers.map(marker => marker.getLatLng())
-                    );
-
-            map.fitBounds(
-                    bounds.pad(this.config.bounds.padding)
-                    );
+            return;
         }
 
-        this.instances.set(mapElement, map);
+        const bounds = this.getLayersBounds(
+                markers,
+                zoneLayers
+                );
 
-        requestAnimationFrame(() => {
+        if (!bounds.isValid()) {
+            map.setView(
+                    [
+                        this.config.defaultView.latitude,
+                        this.config.defaultView.longitude
+                    ],
+                    this.config.defaultView.zoom
+                    );
 
-            map.invalidateSize();
+            return;
+        }
 
-            if (markers.length > 1) {
-
-                const bounds = L.latLngBounds(
-                        markers.map(marker => marker.getLatLng())
-                        );
-
-                map.fitBounds(
-                        bounds.pad(this.config.bounds.padding)
-                        );
-            }
-        });
+        map.fitBounds(
+                bounds.pad(this.config.bounds.padding)
+                );
     },
 
-    /* =========================================================
-     * CRÉATION D'UNE ZONE VISUELLE
-     * =========================================================
-     *
-     * 1 point
-     *     → cercle autour du point
-     *
-     * 2 points
-     *     → rectangle autour du segment
-     *
-     * 3+ points
-     *     → enveloppe convexe
-     *
-     * Attention :
-     * ces zones sont des zones de visualisation.
-     * Elles ne représentent pas les limites géographiques
-     * officielles du quartier.
-     * ========================================================= */
+    getLayersBounds(markers = [], zoneLayers = []) {
+        const bounds = L.latLngBounds([]);
+
+        markers.forEach((marker) => {
+            if (!marker || typeof marker.getLatLng !== 'function') {
+                return;
+            }
+
+            const latLng = marker.getLatLng();
+
+            if (latLng) {
+                bounds.extend(latLng);
+            }
+        });
+
+        zoneLayers.forEach((zone) => {
+            if (!zone || typeof zone.getBounds !== 'function') {
+                return;
+            }
+
+            const zoneBounds = zone.getBounds();
+
+            if (zoneBounds && zoneBounds.isValid()) {
+                bounds.extend(zoneBounds);
+            }
+        });
+
+        return bounds;
+    },
 
     createZonePolygon(points, color, zoneName) {
-
         if (!points || points.length === 0) {
             return null;
         }
 
         const config = this.config.zone;
 
-        /* =====================================================
-         * UN SEUL POINT
-         * ===================================================== */
+        this.log('Zone : début création', {
+            name: zoneName,
+            points: points.length
+        });
+
+        let zone = null;
 
         if (points.length === 1) {
+            const radius =
+                    config.singlePointRadiusMeters +
+                    config.marginMeters;
 
-            const center = points[0];
+            const circlePoints =
+                    this.createCirclePolygon(
+                            points[0],
+                            radius,
+                            48
+                            );
 
-            const zone = L.circle(
-                    center,
-                    {
-                        radius: 350,
-                        color: color,
-                        weight: config.borderWeight,
-                        opacity: config.borderOpacity,
-                        fillColor: color,
-                        fillOpacity: config.fillOpacity
-                    }
-            );
+            zone = L.polygon(circlePoints, {
+                color,
+                weight: config.borderWeight,
+                opacity: config.borderOpacity,
+                fillColor: color,
+                fillOpacity: config.fillOpacity
+            });
+        } else if (points.length === 2) {
+            const rectangle = this.createTwoPointZone(
+                    points,
+                    config.marginMeters
+                    );
 
-            if (zoneName) {
+            zone = L.polygon(rectangle, {
+                color,
+                weight: config.borderWeight,
+                opacity: config.borderOpacity,
+                fillColor: color,
+                fillOpacity: config.fillOpacity
+            });
+        } else {
+            const hull = this.convexHull(points);
 
-                zone.bindPopup(`
-                        <strong class="${this.config.popup.titleClass}">
-                            ${this.escapeHtml(zoneName)}
-                        </strong>
-                    `);
+            if (hull.length < 3) {
+                return null;
             }
 
-            return zone;
+            const expandedHull = this.expandPolygon(
+                    hull,
+                    config.marginMeters
+                    );
+
+            zone = L.polygon(expandedHull, {
+                color,
+                weight: config.borderWeight,
+                opacity: config.borderOpacity,
+                fillColor: color,
+                fillOpacity: config.fillOpacity
+            });
         }
 
-        /* =====================================================
-         * DEUX POINTS
-         * ===================================================== */
-
-        if (points.length === 2) {
-
-            const rectangle =
-                    this.createTwoPointZone(points);
-
-            const zone = L.polygon(
-                    rectangle,
-                    {
-                        color: color,
-                        weight: config.borderWeight,
-                        opacity: config.borderOpacity,
-                        fillColor: color,
-                        fillOpacity: config.fillOpacity
-                    }
-            );
-
-            if (zoneName) {
-
-                zone.bindPopup(`
-                        <strong class="${this.config.popup.titleClass}">
-                            ${this.escapeHtml(zoneName)}
-                        </strong>
-                    `);
-            }
-
-            return zone;
-        }
-
-        /* =====================================================
-         * TROIS POINTS OU PLUS
-         * ===================================================== */
-
-        const hull = this.convexHull(points);
-
-        if (hull.length < 3) {
+        if (!zone) {
             return null;
         }
 
-        const zone = L.polygon(
-                hull,
-                {
-                    color: color,
-                    weight: config.borderWeight,
-                    opacity: config.borderOpacity,
-                    fillColor: color,
-                    fillOpacity: config.fillOpacity
-                }
-        );
+        this.log('Zone : layer créé', {
+            name: zoneName,
+            type: zone.constructor?.name || 'unknown'
+        });
+
+        const surfaceM2 =
+                this.calculateZoneSurface(zone);
+
+        const surfaceHa =
+                surfaceM2 / 10000;
+
+        zone.centralSurfaceM2 = surfaceM2;
+        zone.centralSurfaceHa = surfaceHa;
+        zone.centralMarginMeters =
+                config.marginMeters;
 
         if (zoneName) {
-
             zone.bindPopup(`
-                    <strong class="${this.config.popup.titleClass}">
-                        ${this.escapeHtml(zoneName)}
-                    </strong>
-                `);
+            <div>
+                <strong class="${this.config.popup.titleClass}">
+                    ${this.escapeHtml(zoneName)}
+                </strong>
+
+                <div class="${this.config.popup.metaClass}">
+                    Surface approximative :
+                    ${this.formatSurface(surfaceM2)}
+                </div>
+
+                <div class="${this.config.popup.metaClass}">
+                    Marge :
+                    ${this.formatDistance(config.marginMeters)}
+                </div>
+            </div>
+        `);
         }
+
+        this.log('Zone créée', {
+            name: zoneName,
+            points: points.length,
+            marginMeters: config.marginMeters,
+            surfaceM2: Math.round(surfaceM2),
+            surfaceHa: Number(surfaceHa.toFixed(2))
+        });
 
         return zone;
     },
+    createCirclePolygon(center, radiusMeters, segments = 48) {
+        const [latitude, longitude] = center;
+        const points = [];
 
-    /* =========================================================
-     * ENVELOPPE CONVEXE
-     * ========================================================= */
+        const metersPerDegreeLat = 111320;
+
+        const metersPerDegreeLng =
+                111320 *
+                Math.cos(latitude * Math.PI / 180);
+
+        const radiusLat =
+                radiusMeters / metersPerDegreeLat;
+
+        const radiusLng =
+                radiusMeters / metersPerDegreeLng;
+
+        for (let index = 0; index < segments; index++) {
+            const angle =
+                    (index / segments) * Math.PI * 2;
+
+            points.push([
+                latitude + Math.sin(angle) * radiusLat,
+                longitude + Math.cos(angle) * radiusLng
+            ]);
+        }
+
+        return points;
+    },
+
+    createTwoPointZone(points, marginMeters = 0) {
+        const [pointA, pointB] = points;
+
+        const lat1 = pointA[0];
+        const lng1 = pointA[1];
+        const lat2 = pointB[0];
+        const lng2 = pointB[1];
+
+        const latDiff = lat2 - lat1;
+        const lngDiff = lng2 - lng1;
+
+        const length = Math.sqrt(
+                latDiff * latDiff +
+                lngDiff * lngDiff
+                );
+
+        const baseOffset = Math.max(
+                length * 0.15,
+                0.002
+                );
+
+        const centerLat = (lat1 + lat2) / 2;
+
+        const marginLat = marginMeters / 111320;
+
+        const marginLng =
+                marginMeters /
+                (
+                        111320 *
+                        Math.cos(centerLat * Math.PI / 180)
+                        );
+
+        const perpLat =
+                -lngDiff / (length || 1) * baseOffset;
+
+        const perpLng =
+                latDiff / (length || 1) * baseOffset;
+
+        const finalPerpLat =
+                Math.abs(perpLat) + marginLat;
+
+        const finalPerpLng =
+                Math.abs(perpLng) + marginLng;
+
+        return [
+            [
+                lat1 - finalPerpLat,
+                lng1 - finalPerpLng
+            ],
+            [
+                lat2 - finalPerpLat,
+                lng2 - finalPerpLng
+            ],
+            [
+                lat2 + finalPerpLat,
+                lng2 + finalPerpLng
+            ],
+            [
+                lat1 + finalPerpLat,
+                lng1 + finalPerpLng
+            ]
+        ];
+    },
 
     convexHull(points) {
-
         const sorted = points
-                .map(point => [
-                        Number(point[0]),
-                        Number(point[1])
+                .map(([lat, lng]) => [
+                        Number(lat),
+                        Number(lng)
                     ])
                 .sort((a, b) => {
-
                     if (a[1] === b[1]) {
                         return a[0] - b[0];
                     }
@@ -730,18 +727,14 @@ const CentralMaps = {
             return sorted;
         }
 
-        const cross = (o, a, b) => {
-
-            return (
+        const cross = (o, a, b) => (
                     (a[1] - o[1]) * (b[0] - o[0]) -
                     (a[0] - o[0]) * (b[1] - o[1])
                     );
-        };
 
         const lower = [];
 
         for (const point of sorted) {
-
             while (
                     lower.length >= 2 &&
                     cross(
@@ -758,12 +751,7 @@ const CentralMaps = {
 
         const upper = [];
 
-        for (
-                let i = sorted.length - 1;
-                i >= 0;
-                i--
-                ) {
-
+        for (let i = sorted.length - 1; i >= 0; i--) {
             const point = sorted[i];
 
             while (
@@ -786,127 +774,185 @@ const CentralMaps = {
         return lower.concat(upper);
     },
 
-    /* =========================================================
-     * ZONE POUR DEUX POINTS
-     * ========================================================= */
+    expandPolygon(points, marginMeters) {
+        if (
+                !points ||
+                points.length < 3 ||
+                marginMeters <= 0
+                ) {
+            return points;
+        }
 
-    createTwoPointZone(points) {
+        let centerLat = 0;
+        let centerLng = 0;
 
-        const [pointA, pointB] = points;
+        points.forEach(([lat, lng]) => {
+            centerLat += lat;
+            centerLng += lng;
+        });
 
-        const lat1 = pointA[0];
-        const lng1 = pointA[1];
+        centerLat /= points.length;
+        centerLng /= points.length;
 
-        const lat2 = pointB[0];
-        const lng2 = pointB[1];
+        const marginLat = marginMeters / 111320;
 
-        const latDiff = lat2 - lat1;
-        const lngDiff = lng2 - lng1;
-
-        const length =
-                Math.sqrt(
-                        (latDiff * latDiff) +
-                        (lngDiff * lngDiff)
+        const marginLng =
+                marginMeters /
+                (
+                        111320 *
+                        Math.cos(centerLat * Math.PI / 180)
                         );
 
-        /*
-         * Petit décalage perpendiculaire.
-         *
-         * Cette valeur sert uniquement à donner une zone
-         * visuelle autour des deux points.
-         */
+        return points.map(([lat, lng]) => {
+            const deltaLat = lat - centerLat;
+            const deltaLng = lng - centerLng;
 
-        const offset = Math.max(
-                length * 0.15,
-                0.002
-                );
+            const distance = Math.sqrt(
+                    deltaLat * deltaLat +
+                    deltaLng * deltaLng
+                    );
 
-        const perpLat =
-                -lngDiff / (length || 1) * offset;
+            if (distance === 0) {
+                return [
+                    lat + marginLat,
+                    lng
+                ];
+            }
 
-        const perpLng =
-                latDiff / (length || 1) * offset;
+            const directionLat = deltaLat / distance;
+            const directionLng = deltaLng / distance;
 
-        return [
-            [
-                lat1 + perpLat,
-                lng1 + perpLng
-            ],
-            [
-                lat2 + perpLat,
-                lng2 + perpLng
-            ],
-            [
-                lat2 - perpLat,
-                lng2 - perpLng
-            ],
-            [
-                lat1 - perpLat,
-                lng1 - perpLng
-            ]
-        ];
+            return [
+                lat + directionLat * marginLat,
+                lng + directionLng * marginLng
+            ];
+        });
     },
 
-    /* =========================================================
-     * COULEURS DES ZONES
-     * =========================================================
-     *
-     * Une seule zone :
-     *     → bleu Central
-     *
-     * Plusieurs zones :
-     *     → rotation des teintes HSL
-     *
-     * La rotation > 360° permet d'éviter que les couleurs
-     * voisines soient toujours trop proches lorsqu'il y a
-     * beaucoup de zones.
-     * ========================================================= */
+    calculateZoneSurface(layer) {
+        if (!layer) {
+            return 0;
+        }
+
+        if (typeof layer.getRadius === 'function') {
+            const radius = layer.getRadius();
+
+            return Math.PI * radius * radius;
+        }
+
+        if (typeof layer.getLatLngs === 'function') {
+            const latLngs = layer.getLatLngs();
+
+            if (!latLngs || latLngs.length === 0) {
+                return 0;
+            }
+
+            const ring = Array.isArray(latLngs[0])
+                    ? latLngs[0]
+                    : latLngs;
+
+            if (ring.length < 3) {
+                return 0;
+            }
+
+            return this.calculatePolygonSurface(ring);
+        }
+
+        return 0;
+    },
+
+    calculatePolygonSurface(latLngs) {
+        if (!latLngs || latLngs.length < 3) {
+            return 0;
+        }
+
+        const earthRadius = 6371000;
+
+        const meanLatitude =
+                latLngs.reduce(
+                        (sum, point) => sum + point.lat,
+                        0
+                        ) / latLngs.length;
+
+        const degreesToRadians = Math.PI / 180;
+
+        const metersPerDegreeLat =
+                earthRadius * degreesToRadians;
+
+        const metersPerDegreeLng =
+                earthRadius *
+                Math.cos(meanLatitude * degreesToRadians) *
+                degreesToRadians;
+
+        const points = latLngs.map((point) => ({
+                x: point.lng * metersPerDegreeLng,
+                y: point.lat * metersPerDegreeLat
+            }));
+
+        let area = 0;
+
+        for (let index = 0; index < points.length; index++) {
+            const current = points[index];
+            const next = points[(index + 1) % points.length];
+
+            area +=
+                    current.x * next.y -
+                    next.x * current.y;
+        }
+
+        return Math.abs(area) / 2;
+    },
+
+    formatSurface(surfaceM2) {
+        if (
+                !Number.isFinite(surfaceM2) ||
+                surfaceM2 <= 0
+                ) {
+            return '0 m²';
+        }
+
+        if (surfaceM2 < 10000) {
+            return `${Math.round(surfaceM2).toLocaleString('fr-FR')} m²`;
+        }
+
+        return `${(surfaceM2 / 10000).toLocaleString('fr-FR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })} ha`;
+    },
+
+    formatDistance(meters) {
+        if (
+                !Number.isFinite(meters) ||
+                meters < 0
+                ) {
+            return '0 m';
+        }
+
+        if (meters < 1000) {
+            return `${Math.round(meters).toLocaleString('fr-FR')} m`;
+        }
+
+        return `${(meters / 1000).toLocaleString('fr-FR', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 2
+        })} km`;
+    },
 
     getHierarchicalColors(count) {
-
         if (count <= 0) {
             return [];
         }
 
-        /*
-         * Une seule zone :
-         * couleur Central par défaut.
-         */
-
         if (count === 1) {
-            return [
-                this.config.marker.colors.default
-            ];
+            return [this.config.marker.colors.default];
         }
 
         const colors = [];
+        const saturationLevels = [70, 75, 65];
+        const lightnessLevels = [50, 45, 55];
 
-        const saturationLevels = [
-            70,
-            75,
-            65
-        ];
-
-        const lightnessLevels = [
-            50,
-            45,
-            55
-        ];
-
-        for (
-                let index = 0;
-                index < count;
-                index++
-                ) {
-
-            /*
-             * Rotation sur plusieurs tours.
-             *
-             * Exemple :
-             * 20 zones → couleurs fortement espacées
-             * 30 zones → toujours une bonne variété
-             */
-
+        for (let index = 0; index < count; index++) {
             const hue = Math.round(
                     (index * 360 * 1.7) / count
                     ) % 360;
@@ -914,26 +960,15 @@ const CentralMaps = {
             const level =
                     index % saturationLevels.length;
 
-            const saturation =
-                    saturationLevels[level];
-
-            const lightness =
-                    lightnessLevels[level];
-
             colors.push(
-                    `hsl(${hue}, ${saturation}%, ${lightness}%)`
+                    `hsl(${hue}, ${saturationLevels[level]}%, ${lightnessLevels[level]}%)`
                     );
         }
 
         return colors;
     },
 
-    /* =========================================================
-     * SÉCURITÉ HTML
-     * ========================================================= */
-
     escapeHtml(value) {
-
         return String(value)
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
@@ -946,33 +981,32 @@ const CentralMaps = {
         return this.escapeHtml(value);
     },
 
-    /* =========================================================
-     * INVALIDATION DES CARTES
-     * ========================================================= */
+    invalidateMap(mapElement) {
+        if (!mapElement) {
+            return;
+        }
 
-    invalidateMaps(scope = document) {
-
-        scope.querySelectorAll('[data-map]').forEach(mapElement => {
-
+        requestAnimationFrame(() => {
             const map = this.instances.get(mapElement);
 
-            if (!map)
+            if (!map || !mapElement.isConnected) {
                 return;
+            }
 
-            requestAnimationFrame(() => {
-                map.invalidateSize();
-            });
+            map.invalidateSize();
         });
     },
 
-    /* =========================================================
-     * VISIBILITÉ
-     * ========================================================= */
+    invalidateMaps(scope = document) {
+        scope.querySelectorAll('[data-map]').forEach((mapElement) => {
+            this.invalidateMap(mapElement);
+        });
+    },
 
     isVisible(element) {
-
-        if (!element)
+        if (!element) {
             return false;
+        }
 
         let current = element;
 
@@ -980,7 +1014,6 @@ const CentralMaps = {
                 current &&
                 current !== document.body
                 ) {
-
             if (
                     current.classList &&
                     current.classList.contains('hidden')
@@ -996,4 +1029,4 @@ const CentralMaps = {
                 element.offsetHeight > 0
                 );
     }
-}
+};
