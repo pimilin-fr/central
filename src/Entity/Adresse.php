@@ -278,49 +278,93 @@ class Adresse {
     public function getVilleCourte(): string {
         $ville = trim($this->ville);
 
-        // Normaliser les tirets spéciaux
-        $ville = str_replace(['-', '–', '—'], '-', $ville);
+        // Normaliser les tirets
+        $ville = str_replace(['–', '—'], '-', $ville);
 
-        // Remplacer systématiquement "Saint" par "St"
-        $ville = preg_replace('/\bSaint\b/ui', 'St', $ville);
+        // Découper sur tirets
+        $parts = array_filter(array_map('trim', explode('-', $ville)));
 
         // Mots à ignorer s'ils sont seuls
-        $ignore = ['les', 'en', 'lès'];
+        $ignore = ['les', 'en', 'lès', 'sur', 'sous', 'de', 'du', 'des'];
 
-        // Découper d'abord sur tiret
-        $parts = explode('-', $ville);
+        // Articles courts
+        $articles = ['le', 'la', 'l\'', 'les'];
 
-        foreach ($parts as $part) {
-            $part = trim($part);
+        $count = count($parts);
 
-            if ($part === '') {
+        for ($i = 0; $i < $count; $i++) {
+            $part = $parts[$i];
+
+            // Découper sur espaces
+            $words = preg_split('/\s+/', $part);
+
+            if (!$words || $words[0] === '') {
                 continue;
             }
 
-            // Découper ce morceau sur espace
-            $subParts = preg_split('/\s+/', $part);
+            $first = mb_strtolower($words[0]);
 
-            $result = '';
-            $firstWord = $subParts[0] ?? '';
-            $secondWord = $subParts[1] ?? '';
+            // --- CAS SAINT / SAINTE ---
+            if ($first === 'saint' || $first === 'sainte') {
 
-            /*
-             * Si le premier mot est court (Le, La, St, etc.),
-             * on le garde avec le suivant.
-             */
-            if (mb_strlen($firstWord) <= 3 && $secondWord !== '') {
-                $result = $firstWord . ' ' . $secondWord;
-            } else {
-                $result = $firstWord;
+                $abbr = ($first === 'saint') ? 'St' : 'Ste';
+
+                // Mot suivant dans le même segment ?
+                if (isset($words[1])) {
+                    return $abbr . ' ' . $words[1];
+                }
+
+                // Sinon : mot suivant dans le segment suivant
+                if (isset($parts[$i + 1])) {
+                    $nextWords = preg_split('/\s+/', $parts[$i + 1]);
+                    $next = $nextWords[0] ?? null;
+
+                    if ($next) {
+                        return $abbr . ' ' . $next;
+                    }
+                }
+
+                // Fallback
+                return $abbr;
             }
 
-            // Vérifie que ce n'est pas un mot à ignorer
-            if (!in_array(mb_strtolower($result), $ignore, true)) {
-                return $result;
+            // --- CAS APOSTROPHE (L'Isle-Adam, L'Aigle, etc.) ---
+            if (preg_match('/^(l\')(.+)/ui', $part, $m)) {
+                return "L'" . $m[2];
+            }
+
+            // --- CAS ARTICLE COURT (Le, La, Les, L') ---
+            if (in_array($first, $articles, true)) {
+
+                // Mot suivant dans le même segment
+                if (isset($words[1])) {
+                    return $words[0] . ' ' . $words[1];
+                }
+
+                // Mot suivant dans le segment suivant
+                if (isset($parts[$i + 1])) {
+                    $nextWords = preg_split('/\s+/', $parts[$i + 1]);
+                    $next = $nextWords[0] ?? null;
+
+                    if ($next) {
+                        return $words[0] . ' ' . $next;
+                    }
+                }
+
+                // Fallback
+                return $words[0];
+            }
+
+            // --- CAS NORMAL ---
+            $candidate = $words[0];
+
+            // Ignorer certains mots s'ils sont seuls
+            if (!in_array(mb_strtolower($candidate), $ignore, true)) {
+                return $candidate;
             }
         }
 
-        // Fallback
+        // Fallback : premier mot de la ville
         return explode(' ', $ville)[0];
     }
 
