@@ -3,7 +3,7 @@ const CentralMaps = {
 
     config: {
         debug: true,
-        version: 'v1.3.1',
+        version: 'v1.3.5',
         appName: 'Central-ModuleMap',
 
         marker: {
@@ -23,8 +23,8 @@ const CentralMaps = {
             fillOpacity: 0.12,
             borderOpacity: 0.85,
             borderWeight: 2,
-            marginMeters: 250,
-            singlePointRadiusMeters: 350
+            marginMeters: 100,
+            singlePointRadiusMeters: 150
         },
 
         popup: {
@@ -184,17 +184,11 @@ const CentralMaps = {
     },
 
     initMultipoint(mapElement) {
-        const pointElements = Array.from(
-                mapElement.querySelectorAll('[data-map-point]')
-                );
-
+        const pointElements = Array.from(mapElement.querySelectorAll('[data-map-point]'));
         const map = L.map(mapElement);
         this.instances.set(mapElement, map);
 
-        L.tileLayer(
-                this.config.tileLayer.url,
-                this.config.tileLayer.options
-                ).addTo(map);
+        L.tileLayer(this.config.tileLayer.url, this.config.tileLayer.options).addTo(map);
 
         const markers = [];
 
@@ -203,117 +197,85 @@ const CentralMaps = {
             const longitude = parseFloat(pointElement.dataset.longitude);
 
             if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-                this.log(
-                        'Point multipoint ignoré : coordonnées invalides',
-                        pointElement.dataset
-                        );
+                this.log('Point multipoint ignoré : coordonnées invalides', pointElement.dataset);
                 return;
             }
 
-            const isPrincipale =
-                    pointElement.dataset.principale === '1';
-
-            const marker = this.createMarker(
-                    latitude,
-                    longitude,
-                    {
-                        color: isPrincipale
-                                ? this.config.marker.colors.principale
-                                : this.config.marker.colors.secondaire
-                    }
-            );
-
+            const isPrincipale = pointElement.dataset.principale === '1';
             const name = pointElement.dataset.name || '';
-
-            marker.bindPopup(`
-                <div>
-                    <strong class="${this.config.popup.titleClass}">
-                        ${this.escapeHtml(name)}
-                    </strong>
-
-                    <div class="${this.config.popup.metaClass}">
-                        ${
-                    isPrincipale
+            const url = pointElement.dataset.url || '';
+            const meta = isPrincipale
                     ? this.config.popup.texts.principale
-                    : this.config.popup.texts.secondaire
-                    }
-                    </div>
-                </div>
-            `);
+                    : this.config.popup.texts.secondaire;
 
+            this.log('Point multipoint', {
+                id: pointElement.dataset.id,
+                name,
+                url,
+                principale: isPrincipale,
+                latitude,
+                longitude
+            });
+
+            const marker = this.createMarker(latitude, longitude, {
+                color: isPrincipale
+                        ? this.config.marker.colors.principale
+                        : this.config.marker.colors.secondaire
+            });
+
+            marker.bindPopup(this.createPointPopup(name, url, meta));
             marker.addTo(map);
             markers.push(marker);
         });
 
         this.setMapView(map, markers);
-
         this.invalidateMap(mapElement);
     },
 
     initHierarchical(mapElement) {
-        const currentElement = mapElement.querySelector(
-                '[data-map-current]'
-                );
-
+        const currentElement = mapElement.querySelector('[data-map-current]');
         const map = L.map(mapElement);
         this.instances.set(mapElement, map);
 
-        L.tileLayer(
-                this.config.tileLayer.url,
-                this.config.tileLayer.options
-                ).addTo(map);
+        L.tileLayer(this.config.tileLayer.url, this.config.tileLayer.options).addTo(map);
 
         const markers = [];
         const zoneLayers = [];
 
-        this.addCurrentMarker(
-                map,
-                currentElement,
-                markers
-                );
+        this.addCurrentMarker(map, currentElement, markers);
 
-        const zones = Array.from(
-                mapElement.querySelectorAll('[data-map-zone]')
-                );
-
+        const zones = Array.from(mapElement.querySelectorAll('[data-map-zone]'));
         const colors = this.getHierarchicalColors(zones.length);
 
         zones.forEach((zoneElement, zoneIndex) => {
             const color = colors[zoneIndex];
             const zoneName = zoneElement.dataset.zoneName || '';
-
-            const pointElements = Array.from(
-                    zoneElement.querySelectorAll('[data-map-point]')
-                    );
-
+            const pointElements = Array.from(zoneElement.querySelectorAll('[data-map-point]'));
             const points = [];
 
             pointElements.forEach((pointElement) => {
-                const latitude = parseFloat(
-                        pointElement.dataset.latitude
-                        );
+                const latitude = parseFloat(pointElement.dataset.latitude);
+                const longitude = parseFloat(pointElement.dataset.longitude);
 
-                const longitude = parseFloat(
-                        pointElement.dataset.longitude
-                        );
-
-                if (
-                        !Number.isFinite(latitude) ||
-                        !Number.isFinite(longitude)
-                        ) {
+                if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                    this.log('Point hiérarchique ignoré : coordonnées invalides', pointElement.dataset);
                     return;
                 }
 
                 points.push([latitude, longitude]);
 
-                const marker = this.createMarker(
-                        latitude,
-                        longitude,
-                        {color}
-                );
-
+                const marker = this.createMarker(latitude, longitude, {color});
                 const name = pointElement.dataset.name || '';
                 const url = pointElement.dataset.url || '';
+
+                this.log('Point hiérarchique', {
+                    id: pointElement.dataset.id,
+                    name,
+                    url,
+                    zoneName,
+                    latitude,
+                    longitude
+                });
 
                 marker.bindPopup(
                         this.createPointPopup(name, url, zoneName)
@@ -324,6 +286,10 @@ const CentralMaps = {
             });
 
             if (points.length === 0) {
+                this.log('Zone sans point géolocalisé', {
+                    name: zoneName
+                });
+
                 return;
             }
 
@@ -334,6 +300,11 @@ const CentralMaps = {
                     );
 
             if (!zone) {
+                this.log('Zone non créée', {
+                    name: zoneName,
+                    points: points.length
+                });
+
                 return;
             }
 
@@ -341,14 +312,20 @@ const CentralMaps = {
 
             this.log('Zone : ajoutée à la carte', {
                 name: zoneName,
-                mapExists: !!zone._map,
-                boundsValid: zone.getBounds().isValid()
+                mapHasLayer: map.hasLayer(zone),
+                boundsValid: zone.getBounds().isValid(),
+                markersCount: markers.length
             });
 
             zoneLayers.push(zone);
         });
 
-        this.setMapView(map, markers, zoneLayers);
+        this.setMapView(
+                map,
+                markers,
+                zoneLayers
+                );
+
         this.invalidateMap(mapElement);
     },
 
@@ -387,38 +364,36 @@ const CentralMaps = {
     },
 
     createPointPopup(name, url = '', zoneName = '') {
+        const safeName = this.escapeHtml(name || 'Adresse');
+        const safeZoneName = this.escapeHtml(zoneName || '');
+        const safeUrl = url ? this.escapeAttribute(url) : '';
+
+        this.log('Popup point', {
+            name,
+            url,
+            zoneName,
+            safeUrl
+        });
+
         return `
-            <div>
-                <strong class="${this.config.popup.titleClass}">
-                    ${this.escapeHtml(name)}
-                </strong>
-
-                ${
-                zoneName
-                ? `
-                            <div class="${this.config.popup.metaClass}">
-                                ${this.escapeHtml(zoneName)}
-                            </div>
-                        `
-                : ''
-                }
-
-                ${
-                url
-                ? `
-                            <div>
-                                <a
-                                    href="${this.escapeAttribute(url)}"
-                                    class="${this.config.popup.linkClass}"
-                                >
-                                    ${this.config.popup.texts.voirAdresse}
-                                </a>
-                            </div>
-                        `
-                : ''
-                }
-            </div>
-        `;
+        <div>
+            <strong class="${this.config.popup.titleClass}">
+                ${safeName}
+            </strong>
+            ${safeZoneName ? `
+                <div class="${this.config.popup.metaClass}">
+                    ${safeZoneName}
+                </div>
+            ` : ''}
+            ${safeUrl ? `
+                <div>
+                    <a href="${safeUrl}" class="${this.config.popup.linkClass}">
+                        ${this.config.popup.texts.voirAdresse}
+                    </a>
+                </div>
+            ` : ''}
+        </div>
+    `;
     },
 
     setMapView(map, markers = [], zoneLayers = []) {
@@ -511,6 +486,15 @@ const CentralMaps = {
             points: points.length
         });
 
+        const polygonOptions = {
+            color,
+            weight: config.borderWeight,
+            opacity: config.borderOpacity,
+            fillColor: color,
+            fillOpacity: config.fillOpacity,
+            interactive: false
+        };
+
         let zone = null;
 
         if (points.length === 1) {
@@ -518,33 +502,26 @@ const CentralMaps = {
                     config.singlePointRadiusMeters +
                     config.marginMeters;
 
-            const circlePoints =
-                    this.createCirclePolygon(
-                            points[0],
-                            radius,
-                            48
-                            );
+            const circlePoints = this.createCirclePolygon(
+                    points[0],
+                    radius,
+                    48
+                    );
 
-            zone = L.polygon(circlePoints, {
-                color,
-                weight: config.borderWeight,
-                opacity: config.borderOpacity,
-                fillColor: color,
-                fillOpacity: config.fillOpacity
-            });
+            zone = L.polygon(
+                    circlePoints,
+                    polygonOptions
+                    );
         } else if (points.length === 2) {
             const rectangle = this.createTwoPointZone(
                     points,
                     config.marginMeters
                     );
 
-            zone = L.polygon(rectangle, {
-                color,
-                weight: config.borderWeight,
-                opacity: config.borderOpacity,
-                fillColor: color,
-                fillOpacity: config.fillOpacity
-            });
+            zone = L.polygon(
+                    rectangle,
+                    polygonOptions
+                    );
         } else {
             const hull = this.convexHull(points);
 
@@ -557,13 +534,10 @@ const CentralMaps = {
                     config.marginMeters
                     );
 
-            zone = L.polygon(expandedHull, {
-                color,
-                weight: config.borderWeight,
-                opacity: config.borderOpacity,
-                fillColor: color,
-                fillOpacity: config.fillOpacity
-            });
+            zone = L.polygon(
+                    expandedHull,
+                    polygonOptions
+                    );
         }
 
         if (!zone) {
@@ -575,36 +549,12 @@ const CentralMaps = {
             type: zone.constructor?.name || 'unknown'
         });
 
-        const surfaceM2 =
-                this.calculateZoneSurface(zone);
-
-        const surfaceHa =
-                surfaceM2 / 10000;
+        const surfaceM2 = this.calculateZoneSurface(zone);
+        const surfaceHa = surfaceM2 / 10000;
 
         zone.centralSurfaceM2 = surfaceM2;
         zone.centralSurfaceHa = surfaceHa;
-        zone.centralMarginMeters =
-                config.marginMeters;
-
-        if (zoneName) {
-            zone.bindPopup(`
-            <div>
-                <strong class="${this.config.popup.titleClass}">
-                    ${this.escapeHtml(zoneName)}
-                </strong>
-
-                <div class="${this.config.popup.metaClass}">
-                    Surface approximative :
-                    ${this.formatSurface(surfaceM2)}
-                </div>
-
-                <div class="${this.config.popup.metaClass}">
-                    Marge :
-                    ${this.formatDistance(config.marginMeters)}
-                </div>
-            </div>
-        `);
-        }
+        zone.centralMarginMeters = config.marginMeters;
 
         this.log('Zone créée', {
             name: zoneName,
@@ -616,6 +566,7 @@ const CentralMaps = {
 
         return zone;
     },
+
     createCirclePolygon(center, radiusMeters, segments = 48) {
         const [latitude, longitude] = center;
         const points = [];
