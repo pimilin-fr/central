@@ -3,7 +3,7 @@ const CentralMaps = {
 
     config: {
         debug: true,
-        version: 'v1.3.5',
+        version: 'v1.3.8',
         appName: 'Central-ModuleMap',
 
         marker: {
@@ -237,34 +237,54 @@ const CentralMaps = {
         const map = L.map(mapElement);
         this.instances.set(mapElement, map);
 
-        L.tileLayer(this.config.tileLayer.url, this.config.tileLayer.options).addTo(map);
+        L.tileLayer(
+                this.config.tileLayer.url,
+                this.config.tileLayer.options
+                ).addTo(map);
 
         const markers = [];
         const zoneLayers = [];
-
-        this.addCurrentMarker(map, currentElement, markers);
-
-        const zones = Array.from(mapElement.querySelectorAll('[data-map-zone]'));
+        const zones = Array.from(
+                mapElement.querySelectorAll('[data-map-zone]')
+                );
         const colors = this.getHierarchicalColors(zones.length);
 
         zones.forEach((zoneElement, zoneIndex) => {
             const color = colors[zoneIndex];
             const zoneName = zoneElement.dataset.zoneName || '';
-            const pointElements = Array.from(zoneElement.querySelectorAll('[data-map-point]'));
+            const pointElements = Array.from(
+                    zoneElement.querySelectorAll('[data-map-point]')
+                    );
             const points = [];
 
             pointElements.forEach((pointElement) => {
-                const latitude = parseFloat(pointElement.dataset.latitude);
-                const longitude = parseFloat(pointElement.dataset.longitude);
+                const latitude = parseFloat(
+                        pointElement.dataset.latitude
+                        );
+                const longitude = parseFloat(
+                        pointElement.dataset.longitude
+                        );
 
-                if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-                    this.log('Point hiérarchique ignoré : coordonnées invalides', pointElement.dataset);
+                if (
+                        !Number.isFinite(latitude) ||
+                        !Number.isFinite(longitude)
+                        ) {
+                    this.log(
+                            'Point hiérarchique ignoré : coordonnées invalides',
+                            pointElement.dataset
+                            );
+
                     return;
                 }
 
                 points.push([latitude, longitude]);
 
-                const marker = this.createMarker(latitude, longitude, {color});
+                const marker = this.createMarker(
+                        latitude,
+                        longitude,
+                        {color}
+                );
+
                 const name = pointElement.dataset.name || '';
                 const url = pointElement.dataset.url || '';
 
@@ -278,7 +298,11 @@ const CentralMaps = {
                 });
 
                 marker.bindPopup(
-                        this.createPointPopup(name, url, zoneName)
+                        this.createPointPopup(
+                                name,
+                                url,
+                                zoneName
+                                )
                         );
 
                 marker.addTo(map);
@@ -286,9 +310,10 @@ const CentralMaps = {
             });
 
             if (points.length === 0) {
-                this.log('Zone sans point géolocalisé', {
-                    name: zoneName
-                });
+                this.log(
+                        'Zone sans point géolocalisé',
+                        {name: zoneName}
+                );
 
                 return;
             }
@@ -317,19 +342,81 @@ const CentralMaps = {
                 markersCount: markers.length
             });
 
-            zoneLayers.push(zone);
+            zoneLayers.push({
+                layer: zone,
+                color,
+                name: zoneName
+            });
         });
+
+        if (currentElement) {
+            const latitude = parseFloat(
+                    currentElement.dataset.latitude
+                    );
+            const longitude = parseFloat(
+                    currentElement.dataset.longitude
+                    );
+
+            if (
+                    Number.isFinite(latitude) &&
+                    Number.isFinite(longitude)
+                    ) {
+                let currentZone = null;
+
+                for (const zone of zoneLayers) {
+                    const latLngs = zone.layer.getLatLngs();
+                    if (!latLngs || latLngs.length === 0) {
+                        continue;
+                    }
+
+                    const polygon = Array.isArray(latLngs[0])
+                            ? latLngs[0]
+                            : latLngs;
+
+                    if (
+                            this.isPointInPolygon(
+                                    [latitude, longitude],
+                                    polygon
+                                    )
+                            ) {
+                        currentZone = zone;
+                        break;
+                    }
+                }
+
+                if (currentZone) {
+                    this.log(
+                            'Adresse courante située dans sa zone : marqueur masqué',
+                            {
+                                name: currentElement.dataset.name || '',
+                                zoneName: currentZone.name
+                            }
+                    );
+                } else {
+                    this.addCurrentMarker(
+                            map,
+                            currentElement,
+                            markers,
+                            currentZone
+                            );
+                }
+            }
+        }
+
+        const layers = zoneLayers.map(
+                (zone) => zone.layer
+        );
 
         this.setMapView(
                 map,
                 markers,
-                zoneLayers
+                layers
                 );
 
         this.invalidateMap(mapElement);
     },
 
-    addCurrentMarker(map, element, markers) {
+    addCurrentMarker(map, element, markers, currentZone = null) {
         if (!element) {
             return;
         }
@@ -337,30 +424,43 @@ const CentralMaps = {
         const latitude = parseFloat(element.dataset.latitude);
         const longitude = parseFloat(element.dataset.longitude);
 
-        if (
-                !Number.isFinite(latitude) ||
-                !Number.isFinite(longitude)
-                ) {
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
             return;
         }
 
-        const marker = this.createMarker(
-                latitude,
-                longitude,
-                {
-                    color: this.config.marker.colors.current
-                }
-        );
+        // Toujours utiliser la couleur de la zone
+        const color = currentZone
+                ? currentZone.color
+                : this.config.marker.colors.default;
+
+        // Forme différente pour le point du groupe
+        const marker = L.circleMarker([latitude, longitude], {
+            radius: this.config.marker.radius + 4, // plus gros
+            color: '#000000', // bordure noire pour le distinguer
+            weight: 3,
+            fillColor: color,
+            fillOpacity: 1
+        });
 
         const name = element.dataset.name || '';
         const url = element.dataset.url || '';
 
         marker.bindPopup(
-                this.createPointPopup(name, url)
+                this.createPointPopup(
+                        name,
+                        url
+                        )
                 );
 
         marker.addTo(map);
         markers.push(marker);
+
+        this.log('Adresse courante : marqueur ajouté', {
+            name,
+            latitude,
+            longitude,
+            color
+        });
     },
 
     createPointPopup(name, url = '', zoneName = '') {
@@ -549,19 +649,10 @@ const CentralMaps = {
             type: zone.constructor?.name || 'unknown'
         });
 
-        const surfaceM2 = this.calculateZoneSurface(zone);
-        const surfaceHa = surfaceM2 / 10000;
-
-        zone.centralSurfaceM2 = surfaceM2;
-        zone.centralSurfaceHa = surfaceHa;
-        zone.centralMarginMeters = config.marginMeters;
-
         this.log('Zone créée', {
             name: zoneName,
             points: points.length,
-            marginMeters: config.marginMeters,
-            surfaceM2: Math.round(surfaceM2),
-            surfaceHa: Number(surfaceHa.toFixed(2))
+            marginMeters: config.marginMeters
         });
 
         return zone;
@@ -891,29 +982,38 @@ const CentralMaps = {
     },
 
     getHierarchicalColors(count) {
-        if (count <= 0) {
+        const MAX = 30;
+        const total = Math.min(count, MAX);
+
+        if (total <= 0) {
             return [];
         }
 
-        if (count === 1) {
-            return [this.config.marker.colors.default];
-        }
-
         const colors = [];
-        const saturationLevels = [70, 75, 65];
-        const lightnessLevels = [50, 45, 55];
+        const step = 360 / total;
 
-        for (let index = 0; index < count; index++) {
-            const hue = Math.round(
-                    (index * 360 * 1.7) / count
-                    ) % 360;
+        for (let i = 0; i < total; i++) {
+            const hue = (i * step) % 360;
 
-            const level =
-                    index % saturationLevels.length;
+            let saturation, lightness;
 
-            colors.push(
-                    `hsl(${hue}, ${saturationLevels[level]}%, ${lightnessLevels[level]}%)`
-                    );
+            // 1/3 normales
+            if (i < total / 3) {
+                saturation = 70;
+                lightness = 50;
+            }
+            // 1/3 sombres
+            else if (i < (2 * total) / 3) {
+                saturation = 70;
+                lightness = 35;
+            }
+            // 1/3 pastel
+            else {
+                saturation = 40;
+                lightness = 75;
+            }
+
+            colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
         }
 
         return colors;
@@ -979,5 +1079,58 @@ const CentralMaps = {
                 element.offsetWidth > 0 &&
                 element.offsetHeight > 0
                 );
-    }
+    },
+
+    isPointInPolygon(point, polygon) {
+        if (!point || !polygon || polygon.length < 3) {
+            return false;
+        }
+
+        const [latitude, longitude] = point;
+        let inside = false;
+
+        for (
+                let index = 0, previous = polygon.length - 1;
+                index < polygon.length;
+                previous = index++
+                ) {
+            const currentPoint = polygon[index];
+            const previousPoint = polygon[previous];
+
+            const currentLatitude = currentPoint.lat;
+            const currentLongitude = currentPoint.lng;
+            const previousLatitude = previousPoint.lat;
+            const previousLongitude = previousPoint.lng;
+
+            const intersects =
+                    (
+                            currentLongitude > longitude
+                            ) !== (
+                    previousLongitude > longitude
+                    ) &&
+                    latitude <
+                    (
+                            (
+                                    previousLatitude -
+                                    currentLatitude
+                                    ) *
+                            (
+                                    longitude -
+                                    currentLongitude
+                                    ) /
+                            (
+                                    previousLongitude -
+                                    currentLongitude
+                                    ) +
+                            currentLatitude
+                            );
+
+            if (intersects) {
+                inside = !inside;
+            }
+        }
+
+        return inside;
+    },
+
 };

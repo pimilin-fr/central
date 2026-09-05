@@ -23,8 +23,8 @@ class Geocoder {
 
     private function generateBuilders(Adresse $adresse): array {
         return [
-            new StructuredGeoQueryBuilder($adresse),
             new AdresseForceeGeoQueryBuilder($adresse),
+            new StructuredGeoQueryBuilder($adresse),
             new AdresseGeoQueryBuilder($adresse),
             new AdresseGeoQueryBuilder($adresse),
             new AdresseExactGeoQueryBuilder($adresse),
