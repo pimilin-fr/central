@@ -34,10 +34,6 @@ class AddDepensesType extends AbstractType {
                     'required' => false,
                     'attr' => ['rows' => 3],
                 ])
-
-                /* =========================
-                  PORTEFEUILLE
-                  ========================= */
                 ->add('portefeuille', EntityType::class, [
                     'class' => Portefeuille::class,
                     'choice_label' => 'name',
@@ -47,12 +43,6 @@ class AddDepensesType extends AbstractType {
                         return $repository->findAllOrdered();
                     },
                 ])
-
-
-
-                /* =========================
-                  CATEGORIE
-                  ========================= */
                 ->add('categorie', TextType::class, [
                     'mapped' => false,
                     'required' => true,
@@ -66,10 +56,6 @@ class AddDepensesType extends AbstractType {
                     'mapped' => false,
                     'data' => $options['categorie_id'],
                 ])
-
-                /* =========================
-                  PROJET
-                  ========================= */
                 ->add('projet', TextType::class, [
                     'mapped' => false,
                     'required' => false,
@@ -83,10 +69,6 @@ class AddDepensesType extends AbstractType {
                     'mapped' => false,
                     'data' => $options['projet_id'],
                 ])
-
-                /* =========================
-                  TIERS
-                  ========================= */
                 ->add('tiers', TextType::class, [
                     'mapped' => false,
                     'required' => true,
@@ -100,9 +82,6 @@ class AddDepensesType extends AbstractType {
                     'mapped' => false,
                     'data' => $options['tiers_id'],
                 ])
-                /* =========================
-                  Adresse
-                  ========================= */
                 ->add('adresse', TextType::class, [
                     'mapped' => false,
                     'required' => false,
@@ -111,9 +90,7 @@ class AddDepensesType extends AbstractType {
                 ->add('adresse_id', HiddenType::class, [
                     'mapped' => false,
                     'data' => $options['adresse_id'],
-                ])
-
-        ;
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void {
@@ -125,10 +102,11 @@ class AddDepensesType extends AbstractType {
             'categorie_label' => null,
             'projet_id' => null,
             'projet_label' => null,
+            'tiers_entity' => null,
             'tiers_id' => null,
             'tiers_label' => null,
             'adresse_label' => null,
-            'adresse_id' => null
+            'adresse_id' => null,
         ]);
     }
 }

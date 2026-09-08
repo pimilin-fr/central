@@ -151,7 +151,6 @@ final class AdresseController extends AbstractController {
         return $this->json(array_map(static fn(Adresse $adresse) => [
                             'id' => $adresse->getId(),
                             'label' => $adresse->getAdresse() . ' (' . $adresse->getName() . ')',
-                                ], $adresses
-                        ));
+                                ], $adresses));
     }
 }
