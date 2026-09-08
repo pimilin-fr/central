@@ -17,8 +17,19 @@ final class TypeTiersController extends AbstractController {
 
     #[Route('', name: 'app_type_tiers_index', methods: ['GET'])]
     public function index(TypeTiersRepository $repo): Response {
+        $types = $repo->findAllOrdered();
+
+        $grouped = [];
+
+        foreach ($types as $type) {
+            $n1 = $type->getTypeN1();
+            $n2 = $type->getTypeN2();
+
+            $grouped[$n1][$n2][] = $type;
+        }
+
         return $this->render('type_tiers/index.html.twig', [
-                    'types' => $repo->findAllOrdered(),
+                    'grouped' => $grouped
         ]);
     }
 
