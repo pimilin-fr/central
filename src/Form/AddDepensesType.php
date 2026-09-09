@@ -15,85 +15,89 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AddDepensesType extends AbstractType {
-
-    public function buildForm(FormBuilderInterface $builder, array $options): void {
+class AddDepensesType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
         $builder
-                ->add('date', DateType::class, [
-                    'widget' => 'single_text',
-                    'label' => 'Date',
-                ])
-                ->add('montant', MoneyType::class, [
-                    'currency' => 'EUR',
-                    'scale' => 2,
-                ])
-                ->add('numCommande', TextType::class, [
-                    'required' => false,
-                ])
-                ->add('note', TextareaType::class, [
-                    'required' => false,
-                    'attr' => ['rows' => 3],
-                ])
-                ->add('portefeuille', EntityType::class, [
-                    'class' => Portefeuille::class,
-                    'choice_label' => 'name',
-                    'expanded' => true,
-                    'data' => $options['portefeuille_entity'],
-                    'query_builder' => function (PortefeuilleRepository $repository) {
-                        return $repository->findAllOrdered();
-                    },
-                ])
-                ->add('categorie', TextType::class, [
-                    'mapped' => false,
-                    'required' => true,
-                    'data' => $options['categorie_label'],
-                    'attr' => [
-                        'class' => 'autocomplete',
-                        'data-endpoint' => '/categories/search',
-                    ],
-                ])
-                ->add('categorie_id', HiddenType::class, [
-                    'mapped' => false,
-                    'data' => $options['categorie_id'],
-                ])
-                ->add('projet', TextType::class, [
-                    'mapped' => false,
-                    'required' => false,
-                    'data' => $options['projet_label'],
-                    'attr' => [
-                        'class' => 'autocomplete',
-                        'data-endpoint' => '/projet/search',
-                    ],
-                ])
-                ->add('projet_id', HiddenType::class, [
-                    'mapped' => false,
-                    'data' => $options['projet_id'],
-                ])
-                ->add('tiers', TextType::class, [
-                    'mapped' => false,
-                    'required' => true,
-                    'data' => $options['tiers_label'],
-                    'attr' => [
-                        'class' => 'autocomplete',
-                        'data-endpoint' => '/tiers/search',
-                    ],
-                ])
-                ->add('tiers_id', HiddenType::class, [
-                    'mapped' => false,
-                    'data' => $options['tiers_id'],
-                ])
-                ->add('adresse', TextType::class, [
-                    'mapped' => false,
-                    'required' => false,
-                    'data' => $options['adresse_label'],
-                ])
-                ->add('adresse_id', HiddenType::class, [
-                    'mapped' => false,
-                    'data' => $options['adresse_id'],
-        ]);
+            ->add('date', DateType::class, [
+                'widget' => 'single_text',
+                'label' => 'Date',
+            ])
+            ->add('montant', MoneyType::class, [
+                'currency' => 'EUR',
+                'scale' => 2,
+            ])
+            ->add('numCommande', TextType::class, [
+                'required' => false,
+            ])
+            ->add('note', TextareaType::class, [
+                'required' => false,
+                'attr' => [
+                    'rows' => 3,
+                ],
+            ])
+            ->add('portefeuille', EntityType::class, [
+                'class' => Portefeuille::class,
+                'choice_label' => 'name',
+                'expanded' => true,
+                'data' => $options['portefeuille_entity'],
+                'query_builder' => function (PortefeuilleRepository $repository) {
+                    return $repository->findAllOrdered();
+                },
+            ])
+            ->add('categorie', TextType::class, [
+                'mapped' => false,
+                'required' => true,
+                'data' => $options['categorie_label'],
+                'attr' => [
+                    'class' => 'autocomplete',
+                    'data-endpoint' => '/categories/search',
+                ],
+            ])
+            ->add('categorie_id', HiddenType::class, [
+                'mapped' => false,
+                'data' => $options['categorie_id'],
+            ])
+            ->add('projet', TextType::class, [
+                'mapped' => false,
+                'required' => false,
+                'data' => $options['projet_label'],
+                'attr' => [
+                    'class' => 'autocomplete',
+                    'data-endpoint' => '/projet/search',
+                ],
+            ])
+            ->add('projet_id', HiddenType::class, [
+                'mapped' => false,
+                'data' => $options['projet_id'],
+            ])
+            ->add('tiers', TextType::class, [
+                'mapped' => false,
+                'required' => true,
+                'data' => $options['tiers_label'],
+                'attr' => [
+                    'class' => 'autocomplete',
+                    'data-endpoint' => '/tiers/search',
+                ],
+            ])
+            ->add('tiers_id', HiddenType::class, [
+                'mapped' => false,
+                'data' => $options['tiers_id'],
+            ])
+            ->add('adresse', TextType::class, [
+                'mapped' => false,
+                'required' => false,
+                'data' => $options['adresse_label'],
+            ])
+            ->add('adresse_id', HiddenType::class, [
+                'mapped' => false,
+                'data' => $options['adresse_id'],
+            ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver): void {
+    public function configureOptions(OptionsResolver $resolver): void
+    {
         $resolver->setDefaults([
             'data_class' => Depenses::class,
             'csrf_protection' => false,

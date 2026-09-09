@@ -104,26 +104,23 @@
 
         {{ form_errors(form.tiers) }}
     </div>
+
     {# adresse #}
     <div class="relative">
         {{ form_label(form.adresse, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
+        label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
+    }) }}
 
-        {#{{ form_widget(form.adresse, {
-            attr: {
-                class: 'autocomplete w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}#}
         <select id="{{ form.adresse.vars.id }}"
                 name="{{ form.adresse.vars.full_name }}"
-                class="autocomplete w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500">
+                class="w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500">
             <option value="">Adresse</option>
         </select>
-                
-        {{ form_errors(form.adresse) }}  {# 👈 ajoute cette ligne #}
 
+        {{ form_widget(form.adresse_id) }}
+        {{ form_errors(form.adresse) }}
     </div>
+
     {# projet #}
     <div class="relative">
         {{ form_label(form.projet, null, {
@@ -168,4 +165,4 @@
     </button>
 </div>
 {{ form_errors(form) }}
-{{ form_end(form) }}
+{{ form_end(form, { render_rest: false }) }}

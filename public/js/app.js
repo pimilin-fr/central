@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.5.7.0",
+        version: "v1.5.7.1",
         appName: "Central"
     },
 
@@ -42,7 +42,7 @@ const App = {
         this.selectAll.init();
         this.adresse.init();
         this.depenseForm.init();
-        
+
         CentralMaps.init();
     },
 
@@ -685,7 +685,23 @@ const App = {
                     return;
                 }
 
-                const select =
+                if (!item || !item.id) {
+                    return;
+                }
+
+                await loadTiersAdresses(
+                        form,
+                        item.id
+                        );
+            });
+
+            async function loadTiersAdresses(form, tiersId) {
+
+                if (!form || !tiersId) {
+                    return;
+                }
+
+                const adresseField =
                         form.querySelector(
                                 '[name$="[adresse]"]'
                                 );
@@ -695,70 +711,105 @@ const App = {
                                 '[name$="[adresse_id]"]'
                                 );
 
-                if (!select)
+                if (!adresseField) {
                     return;
+                }
 
-                select.innerHTML =
+                adresseField.innerHTML =
                         '<option>Chargement...</option>';
 
-                const response =
-                        await fetch(
-                                `/tiers/js/adresses/${item.id}`
-                                );
+                try {
 
-                const adresses =
-                        await response.json();
-
-                select.innerHTML =
-                        '<option value="">Adresse</option>';
-
-                adresses.forEach(adresse => {
-
-                    const option =
-                            document.createElement(
-                                    'option'
+                    const response =
+                            await fetch(
+                                    `/tiers/js/adresses/${tiersId}`
                                     );
 
-                    option.value =
-                            adresse.id;
-
-                    option.textContent =
-                            adresse.label;
-
-                    if (
-                            adresse.principale
-                            ) {
-                        option.selected =
-                                true;
+                    if (!response.ok) {
+                        throw new Error(
+                                `Erreur HTTP ${response.status}`
+                                );
                     }
 
-                    select.appendChild(
-                            option
-                            );
-                });
+                    const adresses =
+                            await response.json();
 
-                if (hiddenAdresseId) {
+                    adresseField.innerHTML =
+                            '<option value="">Adresse</option>';
 
-                    hiddenAdresseId.value =
-                            select.value;
-                }
+                    adresses.forEach(adresse => {
 
-                select.addEventListener(
-                        'change',
-                        () => {
+                        const option =
+                                document.createElement(
+                                        'option'
+                                        );
 
-                    if (
-                            hiddenAdresseId
-                            ) {
+                        option.value =
+                                adresse.id;
 
+                        option.textContent =
+                                adresse.label;
+
+                        if (adresse.principale) {
+                            option.selected =
+                                    true;
+                        }
+
+                        adresseField.appendChild(
+                                option
+                                );
+                    });
+
+                    if (hiddenAdresseId) {
                         hiddenAdresseId.value =
-                                select.value;
+                                adresseField.value;
+                    }
+
+                } catch (error) {
+
+                    App.log(
+                            'Erreur chargement adresses du Tiers',
+                            error
+                            );
+
+                    adresseField.innerHTML =
+                            '<option value="">Impossible de charger les adresses</option>';
+
+                    if (hiddenAdresseId) {
+                        hiddenAdresseId.value = '';
                     }
                 }
-                );
             }
-            );
+
+            document.querySelectorAll(
+                    '#depense-form'
+                    ).forEach(form => {
+
+                const tiersInput =
+                        form.querySelector(
+                                '[name$="[tiers]"]'
+                                );
+
+                const tiersIdInput =
+                        form.querySelector(
+                                '[name$="[tiers_id]"]'
+                                );
+
+                if (
+                        !tiersInput ||
+                        !tiersIdInput ||
+                        !tiersIdInput.value
+                        ) {
+                    return;
+                }
+
+                loadTiersAdresses(
+                        form,
+                        tiersIdInput.value
+                        );
+            });
         }
+
     },
 
     /* =========================================================
