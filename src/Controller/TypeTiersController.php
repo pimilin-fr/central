@@ -104,27 +104,27 @@ final class TypeTiersController extends AbstractController {
     }
     
     #[Route('/edit/{id}', name: 'app_type_tiers_edit', methods: ['GET', 'POST'])]
-    public function edit(TypeTiers $tiers, Request $request, EntityManagerInterface $em): Response {
-        $form = $this->createForm(TypeTiersType::class, $tiers);
+    public function edit(TypeTiers $tiersType, Request $request, EntityManagerInterface $em): Response {
+        $form = $this->createForm(TypeTiersType::class, $tiersType);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             
-            $em->persist($tiers);
+            $em->persist($tiersType);
             $em->flush();
 
             $this->addFlash('success', 'Type Tiers modifié avec succès');
 
             return $this->redirectToRoute('app_type_tiers_show', [
-                        'id' => $tiers->getId(),
+                        'id' => $tiersType->getId(),
                         'tab' => 'edit',
             ]);
         }
 
         return $this->render('type_tiers/_form.html.twig', [
                     'form' => $form->createView(),
-                    'tiers' => $tiers,
+                    'typeTiers' => $tiersType,
         ]);
     }
 

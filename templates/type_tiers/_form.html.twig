@@ -1,9 +1,13 @@
 <div class="max-w-xl">
 
     {{ form_start(form, {
-        attr: { class: 'space-y-6' }
+        action: path('app_type_tiers_edit', {
+            id: typeTiers.id
+        }),
+        attr: {
+            class: 'space-y-6'
+        }
     }) }}
-
     {# Nom #}
     <div>
         {{ form_label(form.name, null, {

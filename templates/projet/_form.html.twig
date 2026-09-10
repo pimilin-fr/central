@@ -1,4 +1,8 @@
-{{ form_start(form) }}
+{{ form_start(form, {
+    action: path('app_projet_edit', {
+        id: projet.id
+    }),
+}) }}
 {# =========================
 CHAMPS
 ========================= #}
