@@ -13,7 +13,7 @@
             {# Titre & meta #}
             <div>
                 <h1 class="text-2xl font-semibold text-gray-800 leading-tight">
-                    {{ typeTiers.name }}
+                    {{ entity.name }}
                 </h1>
 
             </div>
@@ -25,8 +25,8 @@
                 <span class="inline-flex items-center px-2 py-0.5 rounded-md
                       bg-gray-200 text-gray-600 text-xs font-mono border
                       cursor-default select-none"
-                      title="{{ typeTiers.code }}">
-                    #{{ typeTiers.code|slice(0, 30) }}
+                      title="{{ entity.code }}">
+                    #{{ entity.code|slice(0, 30) }}
                 </span>
 
                 {# Boutons #}
@@ -45,9 +45,7 @@
             </div>
         </div>
 
-        {# =========================
-           ONGLETS FONCTIONNELS
-           ========================= #}
+
         {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
 
         {% set tabs = [
@@ -55,22 +53,52 @@
                 id: 'summary',
                 label: 'Résumé',
                 content: include('type_tiers/_resume.html.twig')
-            },
-            {
+            },{
                 id: 'tiers',
                 label: 'Tiers',
                 badge: tiers|length,
                 content: include('tiers/_table.html.twig')
-            },
-            {
+            },{
                 id: 'edit',
                 label: 'Modifier',
                 icon: 'mdi:pencil',
-                content: include('type_tiers/_form.html.twig', {
-                    form: form
-                })
+                content: render(controller(
+                        'App\\Controller\\TypeTiersController::edit',
+                        {
+                            id: entity.id
+                        }
+                    ))
             }
-        ] %}
+        ]
+
+        %}
+        {# =========================
+           ONGLETS FONCTIONNELS
+           ========================= 
+        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+
+        {% set tabs = [
+            {
+                id: 'summary',
+                label: 'Résumé',
+                content: include('type_tiers/_resume.html.twig')
+            },{
+                id: 'tiers',
+                label: 'Tiers',
+                badge: tiers|length,
+                content: include('tiers/_table.html.twig')
+            },{
+                id: 'edit',
+                label: 'Modifier',
+                icon: 'mdi:pencil',
+                content: render(controller(
+                        'App\\Controller\\TypeTiersController::edit',
+                        {
+                            id: entity.id
+                        }
+                    ))
+            }
+        ] %}#}
 
         {% include 'partials/tabs.html.twig' with {
             tabs: tabs,

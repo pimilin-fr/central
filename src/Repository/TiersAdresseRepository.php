@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Tiers;
 use App\Entity\TiersAdresse;
+use App\Entity\TypeTiers;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -22,6 +23,21 @@ class TiersAdresseRepository extends ServiceEntityRepository {
                         ->addSelect('a')
                         ->where('ta.tiers = :tiers')
                         ->setParameter('tiers', $tiers)
+                        ->orderBy('ta.isPrincipale', 'DESC')
+                        ->addOrderBy('a.name', 'ASC')
+//                        ->addOrderBy('a.id', 'ASC')
+                        ->getQuery()
+                        ->getResult();
+    }
+    
+    public function findByTypeTiersOrdered(TypeTiers $typeTiers): array {
+        return $this->createQueryBuilder('ta')
+                        ->leftJoin('ta.adresse', 'a')
+                        ->innerJoin('ta.tiers', 't')
+                        ->addSelect('a')
+                        ->addSelect('t')
+                        ->where('t.tiersType = :typetiers')
+                        ->setParameter('typetiers', $typeTiers)
                         ->orderBy('ta.isPrincipale', 'DESC')
                         ->addOrderBy('a.name', 'ASC')
 //                        ->addOrderBy('a.id', 'ASC')

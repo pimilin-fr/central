@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\TiersAdresseRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: TiersAdresseRepository::class)]
 #[ORM\UniqueConstraint(columns: ['tiers_id', 'adresse_id'])]
+
 class TiersAdresse {
 
     #[ORM\Id]

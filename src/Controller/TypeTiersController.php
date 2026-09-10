@@ -2,10 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Depenses;
+use App\Entity\Tiers;
+use App\Entity\TiersAdresse;
 use App\Entity\TypeTiers;
+use App\Form\TiersType;
 use App\Form\TypeTiersType;
 use App\Repository\TiersRepository;
 use App\Repository\TypeTiersRepository;
+use App\Service\DepenseGrouper\DepenseGroupManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,32 +58,34 @@ final class TypeTiersController extends AbstractController {
     }
 
     #[Route('/show/{id}', name: 'app_type_tiers_show', methods: ['GET', 'POST'])]
-    public function show(
-            Request $request,
-            TypeTiers $typeTiers,
-            TiersRepository $tiersRepo,
-            EntityManagerInterface $em
-    ): Response {
-        // Form d’édition (intégré)
-        $form = $this->createForm(TypeTiersType::class, $typeTiers);
-        $form->handleRequest($request);
+    public function show(Request $request, TypeTiers $typeTiers, TiersRepository $tiersRepo, EntityManagerInterface $em): Response {
+        $depRepo = $em->getRepository(Depenses::class);
+        $tiersAdresseRepo = $em->getRepository(TiersAdresse::class);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($request->request->get('recompute_code')) {
-                $typeTiers->computeFields();
-            }
-            $em->flush();
+        $depenses = $depRepo->createQueryBuilder('d')
+                ->join('d.portefeuille', 'p')
+                ->join('d.tiers','t')
+                ->andWhere('t.tiersType = :typetiers')
+                ->andWhere('p.isReal = :isReal')
+                ->setParameter('typetiers', $typeTiers)
+                ->setParameter('isReal', true)
+                ->orderBy('d.date', 'DESC')
+                ->addOrderBy('d.id', 'DESC')
+                ->getQuery()
+                ->getResult();
+        
+        $groupManager = new DepenseGroupManager($request);
+        $groups = $groupManager->build($depenses, 0);
 
-            // retour sur l’onglet Modifier
-            return $this->redirectToRoute('app_type_tiers_show', [
-                        'id' => $typeTiers->getId(),
-            ]);
-        }
+        $adresses = $tiersAdresseRepo->findByTypeTiersOrdered($typeTiers);
 
         return $this->render('type_tiers/show.html.twig', [
-                    'typeTiers' => $typeTiers,
+                    'entity' => $typeTiers,
+                    'entityType' => 'tiers',
                     'tiers' => $tiersRepo->findByTiersType($typeTiers),
-                    'form' => $form->createView(),
+                    'groups' => $groups,
+                    'groupBy' => $groupManager->getGroupBy(),
+                    'adresses' => $adresses
         ]);
     }
 
@@ -95,4 +102,30 @@ final class TypeTiersController extends AbstractController {
 
         return $this->redirectToRoute('app_type_tiers_index');
     }
+    
+    #[Route('/edit/{id}', name: 'app_type_tiers_edit', methods: ['GET', 'POST'])]
+    public function edit(TypeTiers $tiers, Request $request, EntityManagerInterface $em): Response {
+        $form = $this->createForm(TypeTiersType::class, $tiers);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            
+            $em->persist($tiers);
+            $em->flush();
+
+            $this->addFlash('success', 'Type Tiers modifié avec succès');
+
+            return $this->redirectToRoute('app_type_tiers_show', [
+                        'id' => $tiers->getId(),
+                        'tab' => 'edit',
+            ]);
+        }
+
+        return $this->render('type_tiers/_form.html.twig', [
+                    'form' => $form->createView(),
+                    'tiers' => $tiers,
+        ]);
+    }
+
 }
