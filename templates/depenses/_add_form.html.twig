@@ -120,6 +120,7 @@
         {{ form_widget(form.adresse_id) }}
         {{ form_errors(form.adresse) }}
     </div>
+    <div class="hidden"> {{ form_widget(form.adresse) }} </div>
 
     {# projet #}
     <div class="relative">
@@ -165,4 +166,4 @@
     </button>
 </div>
 {{ form_errors(form) }}
-{{ form_end(form, { render_rest: false }) }}
+{{ form_end(form) }}

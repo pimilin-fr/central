@@ -1,5 +1,5 @@
 {% set formAction =  path('app_projet_new') %}
-{% if projet is defined %}
+{% if projet.id is not null %}
     {% set formAction =  path('app_projet_edit', {
         id: projet.id
     })
