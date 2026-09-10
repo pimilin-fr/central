@@ -1,8 +1,17 @@
-{{ form_start(form, {
-    action: path('app_projet_edit', {
+{% set formAction =  path('app_projet_new') %}
+{% if projet is defined %}
+    {% set formAction =  path('app_projet_edit', {
         id: projet.id
-    }),
+    })
+    %}
+{% endif %}
+{{ form_start(form, {
+    action: formAction ,
+    attr: {
+        class: 'space-y-6'
+    }
 }) }}
+
 {# =========================
 CHAMPS
 ========================= #}

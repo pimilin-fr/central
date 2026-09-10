@@ -1,9 +1,12 @@
 <div class="max-w-xl">
-
+    {% set formAction =  path('app_type_tiers_new') %}
+    {% if typeTiers is defined %}
+        {% set formAction =  path('app_type_tiers_edit', {
+                id: typeTiers.id
+        })%}
+    {% endif %}
     {{ form_start(form, {
-        action: path('app_type_tiers_edit', {
-            id: typeTiers.id
-        }),
+        action: formAction ,
         attr: {
             class: 'space-y-6'
         }
@@ -66,8 +69,8 @@
         </button>
         <button type="submit" name="recompute_code" value="1"
                 class="inline-flex items-center px-4 py-2 rounded-lg
-            bg-orange-600 text-white text-sm font-medium
-            hover:bg-orange-700 transition">
+                bg-orange-600 text-white text-sm font-medium
+                hover:bg-orange-700 transition">
             🔄 Recalculer le code
         </button>
     </div>

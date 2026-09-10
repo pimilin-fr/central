@@ -58,6 +58,33 @@ final class AdresseController extends AbstractController {
                 );
     }
 
+    #[Route('/edit/{id}', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
+    public function edit(Adresse $adresse, Request $request, EntityManagerInterface $em): Response {
+
+        $form = $this->createForm(AdresseFormType::class, $adresse);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            $this->addFlash('success', 'Adresse modifié avec succès');
+
+            return $this->redirectToRoute(
+                            'app_adresse_show',
+                            [
+                                'id' => $adresse->getId(),
+                                'tab' => 'edit',
+                            ]
+                    );
+        }
+
+        return $this->render('adresse/_form.html.twig', [
+                    'form' => $form->createView(),
+                    'portefeuille' => $adresse,
+        ]);
+    }
+
     #[Route('/show/{id}', name: 'app_adresse_show', methods: ['GET', 'POST'])]
     public function show(Adresse $adresse, Request $request, EntityManagerInterface $entityManager, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder): Response {
         return $this->handleForm(

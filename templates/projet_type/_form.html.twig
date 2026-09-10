@@ -1,5 +1,16 @@
-{{ form_start(form, { attr: { class: 'space-y-6' } }) }}
-
+{% set formAction =  path('app_projet_type_new') %}
+{% if tiers is defined %}
+    {% set formAction =  path('app_projet_type_edit', {
+        id: tiers.id
+    })
+    %}
+{% endif %}
+{{ form_start(form, {
+    action: formAction ,
+    attr: {
+        class: 'space-y-6'
+    }
+}) }}
 {# =========================
    CHAMPS
    ========================= #}

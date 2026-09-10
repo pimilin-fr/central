@@ -1,7 +1,12 @@
-{{ form_start(form, {
-    action: path('app_portefeuille_edit', {
+{% set formAction =  path('app_portefeuille_new') %}
+{% if portefeuille is defined %}
+    {% set formAction =  path('app_portefeuille_edit', {
         id: portefeuille.id
-    }),
+    })
+    %}
+{% endif %}
+{{ form_start(form, {
+    action: formAction ,
     attr: {
         class: 'space-y-6'
     }
