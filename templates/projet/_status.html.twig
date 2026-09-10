@@ -1,7 +1,7 @@
 {# ===== LOGIQUE DATES ROBUSTE ===== #}
 {% set nowTs = "now"|date("U") %}
-{% set beginTs = projet.beginAt ? projet.beginAt|date("U") : null %}
-{% set endTs = projet.endAt ? projet.endAt|date("U") : null %}
+{% set beginTs = entity.beginAt ? entity.beginAt|date("U") : null %}
+{% set endTs = entity.endAt ? entity.endAt|date("U") : null %}
 {% set threeMonthsTs = "now"|date_modify("+3 months")|date("U") %}
 
 {% set isEnded = endTs and endTs < nowTs %}
@@ -11,40 +11,41 @@
 
 {# ===== PRIORITÉ LOGIQUE ===== #}
 {% if isEnded %}
-    {% set badgeClass = "bg-red-100 text-red-600" %}
+    {% set color= "bg-red-500 text-white" %}
     {% set badgeLabel = "Terminé" %}
     {% set icon = 'mdi:close-circle-outline' %}
-    {% set iconColor = 'text-red-500' %}
 {% elseif isFuture %}
-    {% set badgeClass = "bg-yellow-100 text-yellow-700" %}
+    {% set color = "bg-orange-500 text-white" %}
     {% set badgeLabel = "À venir" %}
     {% set icon = 'mdi:clock-outline' %}
-    {% set iconColor = 'text-yellow-500' %}
 {% elseif isEndingSoon %}
-    {% set badgeClass = "bg-orange-100 text-orange-600" %}
+    {% set color = "bg-blue-400 text-white" %}
     {% set badgeLabel = "Fin proche" %}
     {% set icon = 'mdi:alert-circle-outline' %}
-    {% set iconColor = 'text-orange-500' %}
 {% elseif isActive %}
-    {% set badgeClass = "bg-green-100 text-green-600" %}
+    {% set color = "bg-green-600 text-white" %}
     {% set badgeLabel = "En cours" %}
     {% set icon = 'pajamas:status-active' %}
-    {% set iconColor = 'text-green-500' %}
 {% else %}
-    {% set badgeClass = "bg-gray-100 text-gray-600" %}
+    {% set color = "bg-gray-300 text-gray-700" %}
     {% set badgeLabel = "Indéfini" %}
     {% set icon = 'mdi:help-circle-outline' %}
-    {% set iconColor = 'text-gray-500' %}
 {% endif %}
 {# ===== STATUT (ALIGNÉ HORIZONTAL) ===== #}
-<div class="flex items-center gap-2">
-    <span class="{{ iconColor }}">
-        {{ ux_icon(icon, { class: 'w-4 h-4' }) }}
-    </span>
-    <span class="px-2 py-1 text-xs font-semibold rounded {{ badgeClass }}">
-        {{ badgeLabel }}
-    </span>
+
+{#class="absolute right-0 top-0 h-full w-6 flex items-center justify-center {{ borderColor }} text-white font-bold uppercase whitespace-nowrap"
+
+>
 
 
+
+</div>#}
+
+<div class="absolute right-0 top-0 h-full w-6 flex items-center justify-center {{ color }} rounded-r-xl">
+
+    <div class="flex items-center rotate-90 origin-center uppercase whitespace-nowrap">
+        {{ ux_icon(icon, { class: 'w-4 h-4 mr-1' }) }}
+        <span class="font-semibold">{{ badgeLabel }}</span>
+    </div>
 
 </div>

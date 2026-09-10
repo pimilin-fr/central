@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Depenses;
 use App\Entity\Projet;
 use App\Form\ProjetFormType;
 use App\Repository\ProjetRepository;
+use App\Service\DepenseGrouper\DepenseGroupManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -44,11 +46,38 @@ final class ProjetController extends AbstractController {
     }
 
     #[Route('/show/{id}', name: 'app_projet_show', methods: ['GET', 'POST'])]
-    public function show(Projet $projet, Request $request, EntityManagerInterface $entityManager): Response {
-        $form = $this->createForm(ProjetFormType::class, $projet);
+    public function show(Projet $projet, Request $request, EntityManagerInterface $em): Response {
+        $depRepo = $em->getRepository(Depenses::class);
+//        $tiersAdresseRepo = $em->getRepository(TiersAdresse::class);
+
+        $depenses = $depRepo->createQueryBuilder('d')
+                ->join('d.portefeuille', 'p')
+                ->andWhere('d.projet = :prj')
+                ->andWhere('p.isReal = :isReal')
+                ->setParameter('prj', $projet)
+                ->setParameter('isReal', true)
+                ->orderBy('d.date', 'DESC')
+                ->addOrderBy('d.id', 'DESC')
+                ->getQuery()
+                ->getResult();
+        $groupManager = new DepenseGroupManager($request);
+        $groups = $groupManager->build(
+                $depenses,
+                0
+        );
+
+        return $this->render('projet/show.html.twig', [
+                    'entity' => $projet,
+                    'entityType' => 'projet',
+                    'groups' => $groups,
+                    'groupBy' => $groupManager->getGroupBy(),
+        ]);
+        
+        
+        /*$form = $this->createForm(ProjetFormType::class, $projet);
         $form->handleRequest($request);
         
-        $depRepo = $entityManager->getRepository(\App\Entity\Depenses::class);
+        $depRepo = $entityManager->getRepository(Depenses::class);
         $lignes = $depRepo->findByProjet($projet);
         
         if ($form->isSubmitted() && $form->isValid()) {
@@ -76,7 +105,7 @@ final class ProjetController extends AbstractController {
                     'form' => $form,
                     'lignes' => $lignes,
                     'releves' => $groups
-        ]);
+        ]);*/
     }
 
     #[Route('/search', name: 'json_projet_search')]
@@ -89,5 +118,30 @@ final class ProjetController extends AbstractController {
         }
 //        var_dump($results);die;
         return $this->json($results);
+    }
+    
+      #[Route('/edit/{id}', name: 'app_projet_edit', methods: ['GET', 'POST'])]
+    public function edit(Projet $projet, Request $request, EntityManagerInterface $em): Response {
+        $form = $this->createForm(ProjetFormType::class, $projet);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            
+            $em->persist($projet);
+            $em->flush();
+
+            $this->addFlash('success', 'Projet modifié avec succès');
+
+            return $this->redirectToRoute('app_projet_show', [
+                        'id' => $projet->getId(),
+                        'tab' => 'edit',
+            ]);
+        }
+
+        return $this->render('projet/_form.html.twig', [
+                    'form' => $form->createView(),
+                    'tiers' => $projet,
+        ]);
     }
 }
