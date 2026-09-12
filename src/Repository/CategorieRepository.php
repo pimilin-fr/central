@@ -16,10 +16,38 @@ class CategorieRepository extends ServiceEntityRepository {
     }
 
     public function findTree(): array {
+        $categories = $this->findAllOrdered();
+
+        $tree = [];
+        $children = [];
+
+        foreach ($categories as $category) {
+            $parentId = $category->getParent()?->getId();
+
+            if ($parentId === null) {
+                $tree[] = $category;
+            } else {
+                $children[$parentId][] = $category;
+            }
+        }
+
+        return $this->attachChildren($tree, $children);
+    }
+
+    private function attachChildren(array $nodes, array $children): array {
+        foreach ($nodes as $node) {
+            $node->viewChildren = $this->attachChildren(
+                    $children[$node->getId()] ?? [],
+                    $children
+            );
+        }
+
+        return $nodes;
+    }
+
+    public function findAllOrdered(): array {
         return $this->createQueryBuilder('c')
-                        ->leftJoin('c.children', 'ch')
-                        ->addSelect('ch')
-                        ->andWhere('c.parent IS NULL')
+                        //->andWhere('c.deletedAt IS NULL')
                         ->orderBy('c.name', 'ASC')
                         ->getQuery()
                         ->getResult();

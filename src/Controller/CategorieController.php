@@ -16,9 +16,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class CategorieController extends AbstractController {
 
     #[Route('', name: 'app_categorie_index')]
-    public function index(CategorieRepository $repo) {
+    public function index(CategorieRepository $repo, \App\Service\CategorieTreeBuilder $treeBuilder) {
         return $this->render('categorie/index.html.twig', [
-                    'categories' => $repo->findTree(),
+                    'categories' => $treeBuilder->build($repo->findAllOrdered())
         ]);
     }
 

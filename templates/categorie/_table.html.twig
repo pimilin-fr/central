@@ -1,9 +1,13 @@
-<ul class="space-y-1">
-    {% for categorie in categories %}
-        {% include 'categorie/_node.html.twig' with { node: categorie, level: 0 } %}
+<div class="p-6 space-y-10">
+
+    {% for node in categories %}
+        {% include 'categorie/_node.html.twig' with {
+            node: node
+        } %}
     {% else %}
-        <li>
-            Pas d'enfant
-        </li>
+        <p class="text-gray-500">
+            Aucune catégorie.
+        </p>
     {% endfor %}
-</ul>
+
+</div>

@@ -1,55 +1,107 @@
-<li>
-    <a href="{{ path('app_categorie_show', {id: node.id}) }}"
+{% set hasChildren = node.children|length > 0 %}
+{% set isLeaf = not hasChildren %}
+{% set level = node.level %}
+
+{# Couleur du liserai #}
+{% if hasChildren %}
+    {% set bgColor = 'bg-gray-500' %}
+    {% set textColor = 'text-white' %}
+{% elseif node.categorie.isDepense() %}
+    {% set bgColor = 'bg-red-400' %}
+    {% set textColor = 'text-white' %}
+{% else %}
+    {% set bgColor = 'bg-green-400' %}
+    {% set textColor = 'text-white' %}
+{% endif %}
+
+{# Couleur selon le niveau #}
+{% if level <= 1 %}
+    {% set cardClass = 'bg-gray-50 border-gray-300' %}
+{% else %}
+    {% set cardClass = 'bg-white border-gray-200' %}
+{% endif %}
+
+<div class="space-y-3">
+
+    <a href="{{ path('app_categorie_show', { id: node.categorie.id }) }}"
        class="
-            group block rounded-lg
+            relative block
+            rounded-lg
+            border
+            shadow-sm
+            hover:shadow-md
             transition
-            hover:bg-gray-100
-            focus:outline-none focus:ring-2 focus:ring-blue-500
+            overflow-hidden
+            {{ cardClass }}
        "
-       style="margin-left: {{ level * 24 }}px"
+       style="min-height: {{ level <= 1 ? '82px' : '72px' }};"
     >
-        <div class="flex items-center justify-between px-4 py-2">
 
-            <div class="flex items-center gap-3">
-                {% if node.children|length > 0 %}
-                    <span class="text-gray-400 group-hover:text-gray-600">
-                        ▸
-                    </span>
-                {% else %}
-                    <span class="text-gray-300">
-                        •
-                    </span>
-                {% endif %}
+        {# LISERAI #}
+        <div class="
+                absolute top-0 right-0 h-full w-6
+                flex items-center justify-center
+                rounded-r-lg  {{ bgColor }} {{ textColor }}
+            ">
 
-                <span class="font-medium text-gray-900">
-                    {{ node.libelle }}
+            {% if isLeaf %}
+                <span class="text-[12px] font-bold tracking-wider rotate-90 whitespace-nowrap">
+                    {{ node.categorie.natureLibelle }}
                 </span>
-            </div>
-
-            {% if node.children|length == 0 %}
-                <span class="
-                    text-xs font-semibold
-                    px-2 py-1 rounded-full
-                    {%  if node.natureLibelle == "Revenu" %}
-                    bg-green-100 text-green-700
-                    {% else %}
-                    bg-red-100 text-red-700    
-                    {% endif %}
-                ">
-                    {{ node.natureLibelle }}
+            {% else %}
+                <span class="text-[12px] font-bold tracking-wider rotate-90 whitespace-nowrap">
+                    Niveau : {{ level+1 }}
                 </span>
             {% endif %}
+
         </div>
+
+        {# CONTENU #}
+        <div class="
+                p-3 pr-9
+                {{ level == 0 ? 'py-4' : '' }}
+            ">
+
+            <div class="
+                    truncate
+                    {{ level <= 1
+                        ? 'text-base font-bold text-gray-900'
+                        : 'text-sm font-semibold text-gray-800'
+                    }}
+                ">
+                {{ node.categorie.libelle }}
+            </div>
+
+            {% if hasChildren %}
+                <div class="text-xs text-gray-400 mt-1">
+                    {{ node.children|length }}
+                    sous-catégorie{{ node.children|length > 1 ? 's' : '' }}
+                </div>
+            {% endif %}
+
+        </div>
+
     </a>
 
-    {% if node.children|length > 0 %}
-        <ul class="mt-1 space-y-1">
+
+    {% if hasChildren %}
+
+        <div class="
+                grid
+                grid-cols-1
+                md:grid-cols-2
+                xl:grid-cols-3
+                gap-4
+            ">
+
             {% for child in node.children %}
                 {% include 'categorie/_node.html.twig' with {
-                    node: child,
-                    level: level + 1
+                    node: child
                 } %}
             {% endfor %}
-        </ul>
+
+        </div>
+
     {% endif %}
-</li>
+
+</div>
