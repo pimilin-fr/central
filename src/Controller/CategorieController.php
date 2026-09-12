@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Categorie;
 use App\Form\CategorieType;
 use App\Repository\CategorieRepository;
+use App\Service\CategorieTreeBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class CategorieController extends AbstractController {
 
     #[Route('', name: 'app_categorie_index')]
-    public function index(CategorieRepository $repo, \App\Service\CategorieTreeBuilder $treeBuilder) {
+    public function index(CategorieRepository $repo, CategorieTreeBuilder $treeBuilder) {
         return $this->render('categorie/index.html.twig', [
                     'categories' => $treeBuilder->build($repo->findAllOrdered())
         ]);
@@ -42,52 +43,16 @@ class CategorieController extends AbstractController {
     }
 
     #[Route('/show/{id}', name: 'app_categorie_show', methods: ['GET', 'POST'])]
-    public function show(Request $request, Categorie $categorie, EntityManagerInterface $em): Response {
-        $form = $this->createForm(CategorieType::class, $categorie);
-        $form->handleRequest($request);
+    public function show(Categorie $categorie, CategorieRepository $repo, CategorieTreeBuilder $treeBuilder): Response {
+        $childs = $treeBuilder->build($repo->findHierarchy($categorie), $categorie);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($request->request->get('recompute_code')) {
-                $categorie->computeFields();
-            }
-            $em->flush();
-
-            // retour sur l’onglet Modifier
-            return $this->redirectToRoute('app_categorie_show', [
-                        'id' => $categorie->getId(),
-                        'tab' => "edit"
-            ]);
-        }
         return $this->render('categorie/show.html.twig', [
                     'categorie' => $categorie,
-                    'form' => $form->createView(),
+                    'categories' => $childs
         ]);
     }
 
     #[Route('/edit/{id}', name: 'app_categorie_edit', methods: ['GET', 'POST'])]
-//    public function edit(Categorie $category, Request $request, EntityManagerInterface $em): Response {
-//        $form = $this->createForm(CategorieType::class, $category);
-//
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            
-//            $em->persist($category);
-//            $em->flush();
-//
-//            $this->addFlash('success', 'Categorie modifié avec succès');
-//
-//            return $this->redirectToRoute('app_categorie_show', [
-//                        'id' => $category->getId(),
-//                        'tab' => 'edit',
-//            ]);
-//        }
-//
-//        return $this->render('categorie/_form.html.twig', [
-//                    'form' => $form->createView(),
-//                    'categorie' => $category,
-//        ]);
-//    }
     public function edit(Categorie $category, Request $request, EntityManagerInterface $em): Response {
         $form = $this->createForm(CategorieType::class, $category);
 
