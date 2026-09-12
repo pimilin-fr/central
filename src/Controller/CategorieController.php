@@ -24,7 +24,7 @@ class CategorieController extends AbstractController {
 
     #[Route('/new', name: 'app_categorie_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response {
-        die('NOT IMPLEMENTED YET !');//--- TODO ?
+        die('NOT IMPLEMENTED YET !'); //--- TODO ?
     }
 
     #[Route('/search', name: 'json_categories_search')]
@@ -63,19 +63,42 @@ class CategorieController extends AbstractController {
                     'form' => $form->createView(),
         ]);
     }
-    
+
     #[Route('/edit/{id}', name: 'app_categorie_edit', methods: ['GET', 'POST'])]
+//    public function edit(Categorie $category, Request $request, EntityManagerInterface $em): Response {
+//        $form = $this->createForm(CategorieType::class, $category);
+//
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            
+//            $em->persist($category);
+//            $em->flush();
+//
+//            $this->addFlash('success', 'Categorie modifié avec succès');
+//
+//            return $this->redirectToRoute('app_categorie_show', [
+//                        'id' => $category->getId(),
+//                        'tab' => 'edit',
+//            ]);
+//        }
+//
+//        return $this->render('categorie/_form.html.twig', [
+//                    'form' => $form->createView(),
+//                    'categorie' => $category,
+//        ]);
+//    }
     public function edit(Categorie $category, Request $request, EntityManagerInterface $em): Response {
         $form = $this->createForm(CategorieType::class, $category);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
+
             $em->persist($category);
             $em->flush();
 
-            $this->addFlash('success', 'Categorie modifié avec succès');
+            $this->addFlash('success', 'Categorie modifiée avec succès');
 
             return $this->redirectToRoute('app_categorie_show', [
                         'id' => $category->getId(),
@@ -88,5 +111,4 @@ class CategorieController extends AbstractController {
                     'categorie' => $category,
         ]);
     }
-
 }
