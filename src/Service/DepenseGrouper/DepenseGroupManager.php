@@ -2,6 +2,7 @@
 
 namespace App\Service\DepenseGrouper;
 
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByAdresse;
 use App\Service\DepenseGrouper\GrouperStrategy\GroupByCategorie;
 use App\Service\DepenseGrouper\GrouperStrategy\GroupByMonth;
 use App\Service\DepenseGrouper\GrouperStrategy\GroupByPortefeuille;
@@ -164,6 +165,7 @@ class DepenseGroupManager {
             'categorie' => new GroupByCategorie(),
             'projet' => new GroupByProjet(),
             'tiers' => new GroupByTiers(),
+            'adresse' => new GroupByAdresse(),
             'annee' => new GroupByYear(),
             'trimestre' => new GroupByQuarter(),
             'mois' => new GroupByMonth(),
