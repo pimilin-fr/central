@@ -2,15 +2,14 @@
 
 namespace App\Form;
 
-use App\Entity\Adresse;
 use App\Entity\Tiers;
 use App\Entity\TypeTiers;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TiersType extends AbstractType {
@@ -31,6 +30,10 @@ class TiersType extends AbstractType {
                 ->add('tiersType', EntityType::class, [
                     'class' => TypeTiers::class,
                     'choice_label' => 'name',
+                    'query_builder' => function (EntityRepository $er) {
+                        return $er->createQueryBuilder('t')
+                                ->orderBy('t.name', 'ASC');
+                    }
         ]);
     }
 

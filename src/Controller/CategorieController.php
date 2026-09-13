@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Categorie;
+use App\Entity\Depenses;
 use App\Form\CategorieType;
 use App\Repository\CategorieRepository;
 use App\Service\CategorieTreeBuilder;
+use App\Service\DepenseGrouper\DepenseGroupManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,12 +45,28 @@ class CategorieController extends AbstractController {
     }
 
     #[Route('/show/{id}', name: 'app_categorie_show', methods: ['GET', 'POST'])]
-    public function show(Categorie $categorie, CategorieRepository $repo, CategorieTreeBuilder $treeBuilder): Response {
-        $childs = $treeBuilder->build($repo->findHierarchy($categorie), $categorie);
+    public function show(Categorie $categorie,Request $request, EntityManagerInterface $em, CategorieTreeBuilder $treeBuilder): Response {
+        $depRepo = $em->getRepository(Depenses::class);
+        $catRepo = $em->getRepository(Categorie::class);
+        
+        $hierarchy = $catRepo->findHierarchy($categorie);
+
+        $childs = $treeBuilder->build($hierarchy, $categorie);
+
+        $depenses = $depRepo->findByCategories($hierarchy);
+        
+        $groupManager = new DepenseGroupManager($request);
+        $groups = $groupManager->build(
+                $depenses,
+                0
+        );
 
         return $this->render('categorie/show.html.twig', [
-                    'categorie' => $categorie,
-                    'categories' => $childs
+                    'entity' => $categorie,
+                    'childs' => $childs,
+                    'entityType' => 'categorie',
+                    'groups' => $groups,
+                    'groupBy' => $groupManager->getGroupBy(),
         ]);
     }
 

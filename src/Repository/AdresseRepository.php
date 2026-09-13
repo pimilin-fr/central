@@ -34,12 +34,13 @@ class AdresseRepository extends ServiceEntityRepository {
 
     public function findAllOrdreredQueryBuilder($inclureRue = false): QueryBuilder {
         $qb = $this->createQueryBuilder('a')
+                ->addOrderBy('a.adresseType', 'ASC')
+                ->addOrderBy('a.name', 'ASC')
                 ->addOrderBy(
                         'CASE WHEN a.deletedAt IS NULL THEN 0 ELSE 1 END',
                         'ASC'
-                )
-                ->addOrderBy('a.adresseType', 'ASC')
-                ->addOrderBy('a.name', 'ASC');
+                );
+                
 
         if (!$inclureRue) {
             $qb

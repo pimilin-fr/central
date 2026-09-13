@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Depenses;
-use App\Entity\Tiers;
 use App\Entity\TiersAdresse;
 use App\Entity\TypeTiers;
-use App\Form\TiersType;
 use App\Form\TypeTiersType;
 use App\Repository\TiersRepository;
 use App\Repository\TypeTiersRepository;
@@ -100,7 +98,9 @@ final class TypeTiersController extends AbstractController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
+             if ($request->request->get('recompute_code')) {
+                $tiersType->computeFields();
+            }
             $em->persist($tiersType);
             $em->flush();
 

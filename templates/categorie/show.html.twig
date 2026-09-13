@@ -8,11 +8,11 @@
             HEADER : Titre + actions (modernisé)
             ========================= #}
         {% set btns = [] %}
-        {% if categorie.parent %}
+        {% if entity.parent %}
             {% set btns = btns|merge([
                 {
                     label: "Parent",
-                    path: path('app_categorie_show', { id: categorie.parent.id }),
+                    path: path('app_categorie_show', { id: entity.parent.id }),
                     color: 'green',
                     icon: 'icon-park-solid:up-c',
                 }
@@ -28,8 +28,8 @@
 
         {% include 'partials/header.html.twig' with {
             btns: btns,
-            title: 'Catégorie : '~categorie,
-            item: categorie
+            title: 'Catégorie : '~entity,
+            item: entity
         } %}
         
         {# =========================
@@ -45,8 +45,10 @@
             },{
                 id: 'childs',
                 label: 'Enfants',
-                badge: categorie.children|length,
-                content: include('categorie/_table.html.twig')
+                badge: entity.children|length,
+                content: include('categorie/_table.html.twig',{
+                    categories: childs,
+                })
             },{
                 id: 'edit',
                 label: 'Modifier',
@@ -54,7 +56,7 @@
                 content: render(controller(
                     'App\\Controller\\CategorieController::edit',
                     {
-                        id: categorie.id
+                        id: entity.id
                     }
                 ))
             }

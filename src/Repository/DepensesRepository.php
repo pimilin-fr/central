@@ -2,12 +2,13 @@
 
 namespace App\Repository;
 
+use App\Entity\Categorie;
 use App\Entity\Depenses;
 use App\Entity\Projet;
 use App\Entity\Tiers;
 use App\Entity\TypeTiers;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -18,8 +19,8 @@ class DepensesRepository extends ServiceEntityRepository {
     public function __construct(ManagerRegistry $registry) {
         parent::__construct($registry, Depenses::class);
     }
-    
-    private function findRealQueryBuilder($alias = "d") : QueryBuilder {
+
+    private function findRealQueryBuilder($alias = "d"): QueryBuilder {
         return $this->createQueryBuilder($alias)
                         ->join($alias . ".portefeuille", "p")
                         ->andWhere('p.isReal = :isReal')
@@ -28,30 +29,41 @@ class DepensesRepository extends ServiceEntityRepository {
                         ->addOrderBy($alias . '.id', 'DESC');
     }
 
+    public function findByCategories(array $categories): array {
+        $categoryIds = array_map(
+                fn(Categorie $categorie) => $categorie->getId(),
+                $categories
+        );
 
-    public function findByTiers(Tiers $tiers){
         return $this->findRealQueryBuilder()
-                ->andWhere('d.tiers = :tiers')
-                ->setParameter('tiers', $tiers)
-                ->getQuery()
-                ->getResult();
+                        ->andWhere('d.categorie IN (:categories)')
+                        ->setParameter('categories', $categoryIds)
+                        ->getQuery()
+                        ->getResult();
     }
-    
+
+    public function findByTiers(Tiers $tiers) {
+        return $this->findRealQueryBuilder()
+                        ->andWhere('d.tiers = :tiers')
+                        ->setParameter('tiers', $tiers)
+                        ->getQuery()
+                        ->getResult();
+    }
+
     public function findByTypeTiers(TypeTiers $typeTiers) {
-        return $this->findRealQueryBuilder()   
-                ->join('d.tiers','t')
-                ->andWhere('t.tiersType = :typetiers')
-                ->setParameter('typetiers', $typeTiers)
-                ->getQuery()
-                ->getResult();
+        return $this->findRealQueryBuilder()
+                        ->join('d.tiers', 't')
+                        ->andWhere('t.tiersType = :typetiers')
+                        ->setParameter('typetiers', $typeTiers)
+                        ->getQuery()
+                        ->getResult();
     }
 
-
-    public function findByProjet(Projet $projet){
+    public function findByProjet(Projet $projet) {
         return $this->findRealQueryBuilder()
-                ->andWhere('d.projet = :prj') 
-                ->setParameter('prj', $projet)
-                ->getQuery()
-                ->getResult();
+                        ->andWhere('d.projet = :prj')
+                        ->setParameter('prj', $projet)
+                        ->getQuery()
+                        ->getResult();
     }
 }
