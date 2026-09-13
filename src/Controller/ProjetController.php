@@ -50,16 +50,7 @@ final class ProjetController extends AbstractController {
         $depRepo = $em->getRepository(Depenses::class);
 //        $tiersAdresseRepo = $em->getRepository(TiersAdresse::class);
 
-        $depenses = $depRepo->createQueryBuilder('d')
-                ->join('d.portefeuille', 'p')
-                ->andWhere('d.projet = :prj')
-                ->andWhere('p.isReal = :isReal')
-                ->setParameter('prj', $projet)
-                ->setParameter('isReal', true)
-                ->orderBy('d.date', 'DESC')
-                ->addOrderBy('d.id', 'DESC')
-                ->getQuery()
-                ->getResult();
+        $depenses = $depRepo->findByProjet($projet);
         $groupManager = new DepenseGroupManager($request);
         $groups = $groupManager->build(
                 $depenses,
@@ -72,40 +63,6 @@ final class ProjetController extends AbstractController {
                     'groups' => $groups,
                     'groupBy' => $groupManager->getGroupBy(),
         ]);
-        
-        
-        /*$form = $this->createForm(ProjetFormType::class, $projet);
-        $form->handleRequest($request);
-        
-        $depRepo = $entityManager->getRepository(Depenses::class);
-        $lignes = $depRepo->findByProjet($projet);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($projet);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Tiers modifié avec succès');
-
-            return $this->redirectToRoute('app_projet_show', [
-                        'id' => $projet->getId(),
-                        'tab' => "edit"
-                            ], Response::HTTP_SEE_OTHER);
-        }
-        
-        $groupManager = new \App\Services\DepenseGrouper\DepenseGroupManager();
-
-        $groups = $groupManager->build(
-                $lignes,
-                new \App\Services\DepenseGrouper\GrouperStrategy\GroupByProjet(), // interchangeable
-                0
-        );
-
-        return $this->render('projet/show.html.twig', [
-                    'projet' => $projet,
-                    'form' => $form,
-                    'lignes' => $lignes,
-                    'releves' => $groups
-        ]);*/
     }
 
     #[Route('/search', name: 'json_projet_search')]
@@ -120,7 +77,7 @@ final class ProjetController extends AbstractController {
         return $this->json($results);
     }
     
-      #[Route('/edit/{id}', name: 'app_projet_edit', methods: ['GET', 'POST'])]
+    #[Route('/edit/{id}', name: 'app_projet_edit', methods: ['GET', 'POST'])]
     public function edit(Projet $projet, Request $request, EntityManagerInterface $em): Response {
         $form = $this->createForm(ProjetFormType::class, $projet);
 

@@ -57,16 +57,7 @@ final class TiersController extends AbstractController {
         $depRepo = $em->getRepository(Depenses::class);
 //        $tiersAdresseRepo = $em->getRepository(TiersAdresse::class);
 
-        $depenses = $depRepo->createQueryBuilder('d')
-                ->join('d.portefeuille', 'p')
-                ->andWhere('d.tiers = :tiers')
-                ->andWhere('p.isReal = :isReal')
-                ->setParameter('tiers', $tiers)
-                ->setParameter('isReal', true)
-                ->orderBy('d.date', 'DESC')
-                ->addOrderBy('d.id', 'DESC')
-                ->getQuery()
-                ->getResult();
+        $depenses = $depRepo->findByTiers($tiers);
         $groupManager = new DepenseGroupManager($request);
         $groups = $groupManager->build(
                 $depenses,

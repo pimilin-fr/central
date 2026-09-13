@@ -5,7 +5,9 @@ namespace App\Repository;
 use App\Entity\Depenses;
 use App\Entity\Projet;
 use App\Entity\Tiers;
+use App\Entity\TypeTiers;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,29 +19,38 @@ class DepensesRepository extends ServiceEntityRepository {
         parent::__construct($registry, Depenses::class);
     }
     
+    private function findRealQueryBuilder($alias = "d") : QueryBuilder {
+        return $this->createQueryBuilder($alias)
+                        ->join($alias . ".portefeuille", "p")
+                        ->andWhere('p.isReal = :isReal')
+                        ->setParameter('isReal', true)
+                        ->orderBy($alias . '.date', 'DESC')
+                        ->addOrderBy($alias . '.id', 'DESC');
+    }
+
+
     public function findByTiers(Tiers $tiers){
-//        $depRepo->findBy(['tiers'=>$tiers],["date"=>"DESC"])
-        return $this->createQueryBuilder('d')
-                //->innerJoin('d.Tiers', 't')
-                ->innerJoin('d.portefeuille', 'p')
-                ->andWhere('p.isReal = :reel')
+        return $this->findRealQueryBuilder()
                 ->andWhere('d.tiers = :tiers')
-                ->addOrderBy('d.date',"DESC")
-                ->setParameter('reel', true)
                 ->setParameter('tiers', $tiers)
                 ->getQuery()
                 ->getResult();
     }
     
+    public function findByTypeTiers(TypeTiers $typeTiers) {
+        return $this->findRealQueryBuilder()   
+                ->join('d.tiers','t')
+                ->andWhere('t.tiersType = :typetiers')
+                ->setParameter('typetiers', $typeTiers)
+                ->getQuery()
+                ->getResult();
+    }
+
+
     public function findByProjet(Projet $projet){
-        return $this->createQueryBuilder('d')
-                //->innerJoin('d.Tiers', 't')
-                ->innerJoin('d.portefeuille', 'p')
-                ->andWhere('p.isReal = :reel')
-                ->andWhere('d.projet = :projet')
-                ->addOrderBy('d.date',"DESC")
-                ->setParameter('reel', true)
-                ->setParameter('projet', $projet)
+        return $this->findRealQueryBuilder()
+                ->andWhere('d.projet = :prj') 
+                ->setParameter('prj', $projet)
                 ->getQuery()
                 ->getResult();
     }

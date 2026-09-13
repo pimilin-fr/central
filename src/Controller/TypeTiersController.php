@@ -62,17 +62,7 @@ final class TypeTiersController extends AbstractController {
         $depRepo = $em->getRepository(Depenses::class);
         $tiersAdresseRepo = $em->getRepository(TiersAdresse::class);
 
-        $depenses = $depRepo->createQueryBuilder('d')
-                ->join('d.portefeuille', 'p')
-                ->join('d.tiers','t')
-                ->andWhere('t.tiersType = :typetiers')
-                ->andWhere('p.isReal = :isReal')
-                ->setParameter('typetiers', $typeTiers)
-                ->setParameter('isReal', true)
-                ->orderBy('d.date', 'DESC')
-                ->addOrderBy('d.id', 'DESC')
-                ->getQuery()
-                ->getResult();
+        $depenses = $depRepo->findByTypeTiers($typeTiers);
         
         $groupManager = new DepenseGroupManager($request);
         $groups = $groupManager->build($depenses, 0);
