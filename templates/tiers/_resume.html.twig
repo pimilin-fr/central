@@ -72,14 +72,21 @@
             {# =========================
                LIGNE 3
                ========================= #}
-
-            {# Type - pleine largeur #}
-            <div class="md:col-span-2">
+            {# Demo #}
+            <div>
+                <p class="text-gray-500">Demo</p>
+                <p class="text-gray-800 font-medium">
+                    {% include 'tiers/_demo.html.twig' with {entity:tiers}  %}
+                </p>
+            </div>
+            {# Type #}
+            <div>
                 <p class="text-gray-500">Type</p>
                 <p class="text-gray-800 font-medium">
                     {{ tiers.tiersType.name ?? '—' }}
                 </p>
             </div>
+
 
         </div>
 

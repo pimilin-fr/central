@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Service\DepenseGrouper\GrouperStrategy;
 
 use App\Entity\Depenses;
 use Override;
 
-class GroupByReleve implements GroupStrategyInterface {
+class GroupByReleve implements GroupStrategyInterface{
 
     #[Override]
     public function getKey(Depenses $depense): string {

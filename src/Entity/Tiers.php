@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoStrategy;
 use App\Repository\TiersRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -37,6 +38,9 @@ class Tiers {
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $deletedAt = null;
+
+    #[ORM\Column(enumType: DemoStrategy::class)]
+    private DemoStrategy $demoStrategy = DemoStrategy::COPY;
 
     public function __construct() {
         $this->id = Uuid::v7()->toRfc4122();
@@ -80,6 +84,10 @@ class Tiers {
         return $this->tiersAdresses;
     }
 
+    public function getDemoStrategy(): DemoStrategy {
+        return $this->demoStrategy;
+    }
+
     // ======================
     // SETTERS
     // ======================
@@ -106,6 +114,11 @@ class Tiers {
 
     public function setDeletedAt(?DateTimeImmutable $deletedAt): self {
         $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    public function setDemoStrategy(DemoStrategy $demoStrategy) {
+        $this->demoStrategy = $demoStrategy;
         return $this;
     }
 

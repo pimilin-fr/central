@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Demo\DemoStrategy;
 use App\Entity\Tiers;
 use App\Entity\TypeTiers;
 use Doctrine\ORM\EntityRepository;
@@ -9,6 +10,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -26,6 +28,19 @@ class TiersType extends AbstractType {
                         'rows' => 4,
                         'placeholder' => 'Saisir le texte.'
                     ]
+                ])
+                ->add('demoStrategy', EnumType::class, [
+                    'class' => DemoStrategy::class,
+                    'label' => 'Traitement pour la démo',
+                    'placeholder' => 'Utiliser la règle par défaut',
+                    'required' => false,
+                    'choice_label' => static function (DemoStrategy $strategy): string {
+                        return match ($strategy) {
+                            DemoStrategy::COPY => 'Copier',
+                            DemoStrategy::ANONYMIZE => 'Anonymiser',
+                            DemoStrategy::EXCLUDE => 'Exclure',
+                        };
+                    },
                 ])
                 ->add('tiersType', EntityType::class, [
                     'class' => TypeTiers::class,

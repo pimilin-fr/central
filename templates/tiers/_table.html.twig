@@ -32,7 +32,7 @@
                      flex flex-col items-center justify-center
                      text-white font-bold text-xs shadow"
                      style="background-color: {{ bgColor }}; color: {{ textColor }};">
-                    
+
                     <span class="leading-none">{{ month_fr }}</span>
                     <span class="w-8 border-t border-white my-1"></span>
                     <span class="text-lg leading-none">{{ year }}</span>
@@ -44,7 +44,7 @@
                      flex items-center justify-center
                      rounded-r-xl" 
                      style="background-color: {{ bgColor }}; color: {{ textColor }};">
-                    
+
                     <span class=" text-xs font-bold tracking-wider
                           rotate-90 whitespace-nowrap">
                         {{ tiers.tiersType.libelleLiserai|upper}}
@@ -77,7 +77,7 @@
                                 {% endif %}
                             {% endfor %}
                         </span>
-
+                        {#% include 'tiers/_demo.html.twig' with {entity:tiers}  %#} {#Demo#}
                         {% if isDeleted %}
                             <span class="inline-flex items-center text-xs text-red-500 font-bold">
                                 {{ ux_icon('pajamas:status-active', { class: 'w-3 h-3 mr-1' }) }}
