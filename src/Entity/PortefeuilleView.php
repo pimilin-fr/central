@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoStrategy;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 
 #[ORM\Entity(readOnly: true)]
 #[ORM\Table(name: 'v_portefeuille')]
@@ -60,6 +62,9 @@ class PortefeuilleView extends ColorableEntity {
 
     #[ORM\Column(name: 'ptf_deleted_at',type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $deletedAt;
+    
+    #[ORM\Column(name:'ptf_demo_strategy',enumType: DemoStrategy::class)]
+    private DemoStrategy $demoStrategy = DemoStrategy::COPY;
 
     // ========================
     // 🔸 MÉTHODES MÉTIER
@@ -105,7 +110,7 @@ class PortefeuilleView extends ColorableEntity {
         return $this->isDefault;
     }
 
-    #[\Override]
+    #[Override]
     public function getCouleur(): ?string {
         return $this->couleur;
     }
@@ -146,13 +151,9 @@ class PortefeuilleView extends ColorableEntity {
         return $this->deletedAt;
     }
 
-    public function setIsDefault(bool $isDefault) {
-        $this->isDefault = $isDefault;
-        return $this;
+    public function getDemoStrategy(): DemoStrategy {
+        return $this->demoStrategy;
     }
 
-    public function setIsReal(bool $isReal) {
-        $this->isReal = $isReal;
-        return $this;
-    }
+
 }

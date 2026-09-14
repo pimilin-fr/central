@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
 use App\Demo\DemoStrategy;
 use App\Repository\TiersRepository;
 use DateTimeImmutable;
@@ -11,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: TiersRepository::class)]
-class Tiers {
+class Tiers implements DemoEntityInterface {
 
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 36, unique: true)]
@@ -84,6 +85,7 @@ class Tiers {
         return $this->tiersAdresses;
     }
 
+    #[\Override]
     public function getDemoStrategy(): DemoStrategy {
         return $this->demoStrategy;
     }

@@ -2,15 +2,18 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Repository\CategorieRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 
 #[ORM\Entity(repositoryClass: CategorieRepository::class)]
 #[ORM\Table(name: 'categorie')]
-class Categorie {
+class Categorie implements DemoEntityInterface {
 
     private const NATURE_DEP = 'N.DEP';
     public const NATURE_MAP = [
@@ -54,20 +57,10 @@ class Categorie {
         $this->createdAt = new DateTimeImmutable();
     }
 
-    public function __toString(): string {
-        return $this->fullName();
-    }
-    
-    public function fullName(string $separateur="/"){
-        if ($this->parent) {
-            return $this->parent->fullName($separateur). $separateur . $this->name;
-        }
-        return $this->name;
-    }
+    // ======================
+    // getter
+    // ======================
 
-    // --------------------
-    // Getters / setters
-    // --------------------
 
     public function getId(): ?int {
         return $this->id;
@@ -86,37 +79,8 @@ class Categorie {
         return $this->libelle;
     }
 
-    public function setLibelle(string $libelle) {
-        $this->libelle = $libelle;
-        return $this;
-    }
-
     public function getParent(): ?self {
         return $this->parent;
-    }
-
-    public function setParent(?self $parent): self {
-        $this->parent = $parent;
-        return $this;
-    }
-
-    public function getChildren(): Collection {
-        return $this->children;
-    }
-
-    public function isLeaf(): bool {
-        return $this->children->isEmpty();
-    }
-
-    public function isDepense(): bool {
-        return self::NATURE_DEP == $this->getNature();
-    }
-
-    public function setNature(?string $nature): self {
-//        var_dump(self::NATURE_MAP,$nature);die;
-        $this->natureLibelle = array_flip(self::NATURE_MAP)[$nature];
-        $this->natureCode = $nature;
-        return $this;
     }
 
     public function getNature(): ?string {
@@ -131,11 +95,10 @@ class Categorie {
         return $this->natureCode;
     }
 
-    public function setNatureCode(?string $natureCode): self {
-        $this->natureCode = $natureCode;
-        return $this;
+    public function getChildren(): Collection {
+        return $this->children;
     }
-
+    
     public function getDeletedAt(): ?DateTimeImmutable {
         return $this->deletedAt;
     }
@@ -143,9 +106,57 @@ class Categorie {
     public function getCreatedAt(): DateTimeImmutable {
         return $this->createdAt;
     }
+    
+    #[Override]
+    public function getDemoStrategy(): DemoStrategy {
+        return DemoStrategy::COPY;
+    }
 
-    public function softDelete(): self {
-        $this->deletedAt = new DateTimeImmutable();
+        // ======================
+    // Setters
+    // ======================
+    public function setLibelle(string $libelle) {
+        $this->libelle = $libelle;
         return $this;
+    }
+
+    public function setParent(?self $parent): self {
+        $this->parent = $parent;
+        return $this;
+    }
+
+    public function setNature(?string $nature): self {
+        $this->natureLibelle = array_flip(self::NATURE_MAP)[$nature];
+        $this->natureCode = $nature;
+        return $this;
+    }
+
+    public function setNatureCode(?string $natureCode): self {
+        $this->natureCode = $natureCode;
+        return $this;
+    }
+
+    // ======================
+    // Metier
+    // ======================
+
+
+    public function __toString(): string {
+        return $this->fullName();
+    }
+
+    public function fullName(string $separateur = "/") {
+        if ($this->parent) {
+            return $this->parent->fullName($separateur) . $separateur . $this->name;
+        }
+        return $this->name;
+    }
+
+    public function isLeaf(): bool {
+        return $this->children->isEmpty();
+    }
+
+    public function isDepense(): bool {
+        return self::NATURE_DEP == $this->getNature();
     }
 }

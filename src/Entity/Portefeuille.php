@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Repository\PortefeuilleRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 
 #[ORM\Entity(repositoryClass: PortefeuilleRepository::class)]
-class Portefeuille extends ColorableEntity {
+class Portefeuille extends ColorableEntity implements DemoEntityInterface {
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -41,6 +44,9 @@ class Portefeuille extends ColorableEntity {
     #[ORM\Column]
     private bool $isReal = false;
 
+    #[ORM\Column(enumType: DemoStrategy::class)]
+    private DemoStrategy $demoStrategy = DemoStrategy::COPY;
+
     #[ORM\Column(length: 7, nullable: true)]
     private ?string $couleur = null;
 
@@ -52,6 +58,10 @@ class Portefeuille extends ColorableEntity {
         "PRET" => "Prêt",
         "SPEC" => "Spécifique"
     ];
+
+    // ======================
+    // GETTERS
+    // ======================
 
     public function getId(): int {
         return $this->id;
@@ -77,27 +87,38 @@ class Portefeuille extends ColorableEntity {
         return $this->libelle;
     }
 
+    public function getOrdre(): int {
+        return $this->ordre;
+    }
+
+    public function getIsDefault(): bool {
+        return $this->isDefault;
+    }
+
+    #[Override]
+    public function getCouleur(): ?string {
+        return $this->couleur;
+    }
+
+    public function getDeleted(): ?DateTimeImmutable {
+        return $this->deleted;
+    }
+
+    public function getIsReal(): bool {
+        return $this->isReal;
+    }
+
+    #[\Override]
+    public function getDemoStrategy(): DemoStrategy {
+        return $this->demoStrategy;
+    }
+
+    // ======================
+    // SETTER
+    // ======================
     public function setId(int $id) {
         $this->id = $id;
         return $this;
-    }
-
-    public function regenerateCode() {
-        $this->code = "PTF-" .
-                array_flip(self::TYPE_PTF)[$this->type] . '-' .
-                $this->makeCode($this->name);
-    }
-
-    private function makeCode(?string $value, int $length = 10): ?string {
-        if (!$value) {
-            return null;
-        }
-
-        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT', $value);
-        $lettersOnly = preg_replace('/[^A-Za-z ]/', '', $normalized);
-        $underscored = preg_replace('/\s+/', '_', trim($lettersOnly));
-
-        return strtoupper(substr($underscored, 0, $length));
     }
 
     public function setCode(?string $code) {
@@ -125,17 +146,9 @@ class Portefeuille extends ColorableEntity {
         return $this;
     }
 
-    public function getOrdre(): int {
-        return $this->ordre;
-    }
-
     public function setOrdre(int $ordre) {
         $this->ordre = $ordre;
         return $this;
-    }
-
-    public function getIsDefault(): bool {
-        return $this->isDefault;
     }
 
     public function setIsDefault(bool $isDefault) {
@@ -143,23 +156,9 @@ class Portefeuille extends ColorableEntity {
         return $this;
     }
 
-    #[\Override]
-    public function getCouleur(): ?string {
-        return $this->couleur;
-    }
-
-    public function isEspece(): bool {
-        return(self::TYPE_PTF["ESP."] === $this->type);
-//        var_dump($this->type);die;
-    }
-
     public function setCouleur(?string $couleur) {
         $this->couleur = $couleur;
         return $this;
-    }
-
-    public function getDeleted(): ?DateTimeImmutable {
-        return $this->deleted;
     }
 
     public function setDeleted(?DateTimeImmutable $deleted) {
@@ -167,12 +166,39 @@ class Portefeuille extends ColorableEntity {
         return $this;
     }
 
-    public function getIsReal(): bool {
-        return $this->isReal;
-    }
-
     public function setIsReal(bool $isReal) {
         $this->isReal = $isReal;
         return $this;
+    }
+
+    public function setDemoStrategy(DemoStrategy $demoStrategy) {
+        $this->demoStrategy = $demoStrategy;
+        return $this;
+    }
+
+    // ======================
+    // Metier
+    // ======================
+    public function regenerateCode() {
+        $this->code = "PTF-" .
+                array_flip(self::TYPE_PTF)[$this->type] . '-' .
+                $this->makeCode($this->name);
+    }
+
+    private function makeCode(?string $value, int $length = 10): ?string {
+        if (!$value) {
+            return null;
+        }
+
+        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT', $value);
+        $lettersOnly = preg_replace('/[^A-Za-z ]/', '', $normalized);
+        $underscored = preg_replace('/\s+/', '_', trim($lettersOnly));
+
+        return strtoupper(substr($underscored, 0, $length));
+    }
+
+    public function isEspece(): bool {
+        return(self::TYPE_PTF["ESP."] === $this->type);
+//        var_dump($this->type);die;
     }
 }
