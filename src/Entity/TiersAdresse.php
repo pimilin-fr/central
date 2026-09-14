@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
 use App\Repository\TiersAdresseRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TiersAdresseRepository::class)]
 #[ORM\UniqueConstraint(columns: ['tiers_id', 'adresse_id'])]
-
-class TiersAdresse {
+class TiersAdresse implements DemoEntityInterface {
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,6 +26,7 @@ class TiersAdresse {
     #[ORM\Column]
     private bool $isPrincipale = false;
 
+    //-- getter
     public function getId(): ?int {
         return $this->id;
     }
@@ -50,6 +51,12 @@ class TiersAdresse {
         return $this->type;
     }
 
+    #[\Override]
+    public function getDemoStrategy(): \App\Demo\DemoStrategy {
+        return \App\Demo\DemoStrategy::COPY;
+    }
+
+    //-- setter
     public function setId(?int $id) {
         $this->id = $id;
         return $this;

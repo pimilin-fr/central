@@ -2,18 +2,21 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Repository\ProjetRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 
 #[ORM\Entity(repositoryClass: ProjetRepository::class)]
 #[ORM\Table(name: 'projet')]
-class Projet extends ColorableEntity {
+class Projet extends ColorableEntity implements DemoEntityInterface {
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id=null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
@@ -32,9 +35,14 @@ class Projet extends ColorableEntity {
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $endAt = null;
 
+    #[ORM\Column(enumType: DemoStrategy::class)]
+    private DemoStrategy $demoStrategy = DemoStrategy::COPY;
+
     public function __construct() {
         $this->beginAt = new DateTimeImmutable();
     }
+
+    // ----- GETTER
 
     public function getId(): ?int {
         return $this->id;
@@ -56,11 +64,17 @@ class Projet extends ColorableEntity {
         return $this->endAt;
     }
 
-    #[\Override]
+    #[Override]
     public function getCouleur(): ?string {
         return $this->couleur;
     }
 
+    #[\Override]
+    public function getDemoStrategy(): DemoStrategy {
+        return $this->demoStrategy;
+    }
+
+    // --- Setters
     public function setCouleur(?string $couleur) {
         $this->couleur = $couleur;
         return $this;
@@ -90,9 +104,15 @@ class Projet extends ColorableEntity {
         $this->endAt = $endAt;
         return $this;
     }
-    
+
+    public function setDemoStrategy(DemoStrategy $demoStrategy) {
+        $this->demoStrategy = $demoStrategy;
+        return $this;
+    }
+
+    //--- Metier
     public function __toString(): string {
-        return $this->name." (".$this->getBeginAt()->format('Y').")";
+        return $this->name . " (" . $this->getBeginAt()->format('Y') . ")";
 //        return "Projet[id=" . $this->id
 //                . ", name=" . $this->name
 //                . ", couleur=" . $this->couleur

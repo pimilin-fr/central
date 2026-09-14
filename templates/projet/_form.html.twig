@@ -84,7 +84,23 @@ CHAMPS
 
         {{ form_errors(form.endAt) }}
     </div>
+    {# Demo  #}
+    <div>
+        {{ form_label(form.demoStrategy, null, {
+            label_attr: {
+                class: 'block text-sm font-medium text-gray-700 mb-1'
+            }
+        }) }}
 
+        {{ form_widget(form.demoStrategy, {
+            attr: {
+                class: 'w-full rounded-lg border-gray-300 bg-white
+                       focus:border-orange-500 focus:ring-orange-500'
+            }
+        }) }}
+
+        {{ form_errors(form.demoStrategy) }}
+    </div>
 </div>
 {# =========================
 ACTIONS

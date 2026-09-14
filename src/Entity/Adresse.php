@@ -2,15 +2,20 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Entity\AdresseType;
 use App\Repository\AdresseRepository;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Override;
+use function mb_strtolower;
 
 #[ORM\Entity(repositoryClass: AdresseRepository::class)]
-class Adresse {
+class Adresse implements DemoEntityInterface {
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -76,7 +81,7 @@ class Adresse {
     private ?float $longitude = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $deletedAt = null;
+    private ?DateTimeImmutable $deletedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'adresse', targetEntity: TiersAdresse::class)]
     private Collection $tiersAdresses;
@@ -164,8 +169,20 @@ class Adresse {
         return $this->longitude;
     }
 
-    public function getDeletedAt(): ?\DateTimeImmutable {
+    public function getDeletedAt(): ?DateTimeImmutable {
         return $this->deletedAt;
+    }
+
+    public function getTiersAdresses(): Collection {
+        return $this->tiersAdresses;
+    }
+
+    #[Override]
+    public function getDemoStrategy(): DemoStrategy {
+        if($this->getAdresseType()->getDemoStrategy() !== DemoStrategy::COPY){
+            return $this->getAdresseType()->getDemoStrategy();
+        }
+        return DemoStrategy::COPY;
     }
 
     /* ---- SETTER ---- */
@@ -260,7 +277,7 @@ class Adresse {
         return $this;
     }
 
-    public function setDeletedAt(?\DateTimeImmutable $deletedAt) {
+    public function setDeletedAt(?DateTimeImmutable $deletedAt) {
         $this->deletedAt = $deletedAt;
         return $this;
     }
@@ -366,10 +383,6 @@ class Adresse {
 
         // Fallback : premier mot de la ville
         return explode(' ', $ville)[0];
-    }
-
-    public function getTiersAdresses(): Collection {
-        return $this->tiersAdresses;
     }
 
     public function getTiers(): array {

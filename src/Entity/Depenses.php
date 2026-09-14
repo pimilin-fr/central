@@ -2,13 +2,16 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Repository\DepensesRepository;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 
 #[ORM\Entity(repositoryClass: DepensesRepository::class)]
-class Depenses {
+class Depenses implements DemoEntityInterface {
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -54,6 +57,7 @@ class Depenses {
     #[ORM\JoinColumn(nullable: true)]
     private ?Releve $releve = null;
 
+    // -- getter
     public function getId(): ?int {
         return $this->id;
     }
@@ -62,50 +66,20 @@ class Depenses {
         return $this->date;
     }
 
-    public function setDate(DateTime $date): static {
-        $this->date = $date;
-
-        return $this;
-    }
-
     public function getNumCommande(): ?string {
         return $this->numCommande;
-    }
-
-    public function setNumCommande(?string $numCommande): static {
-        $this->numCommande = $numCommande;
-
-        return $this;
     }
 
     public function getMontant(): ?string {
         return $this->montant;
     }
 
-    public function setMontant(string $montant): static {
-        $this->montant = $montant;
-
-        return $this;
-    }
-
     public function getDateReleve(): ?DateTime {
         return $this->dateReleve;
     }
 
-    public function setDateReleve(?DateTime $dateReleve): static {
-        $this->dateReleve = $dateReleve;
-
-        return $this;
-    }
-
     public function getNote(): ?string {
         return $this->note;
-    }
-
-    public function setNote(?string $note): static {
-        $this->note = $note;
-
-        return $this;
     }
 
     public function getCategorie(): Categorie {
@@ -128,6 +102,69 @@ class Depenses {
         return $this->adresse;
     }
 
+    public function getReleve(): ?Releve {
+        return $this->releve;
+    }
+
+    #[Override]
+    public function getDemoStrategy(): DemoStrategy {
+        if ($this->getTiers()->getDemoStrategy() === DemoStrategy::EXCLUDE ||
+                $this->getCategorie()->getDemoStrategy() === DemoStrategy::EXCLUDE ||
+                $this->getPortefeuille()->getDemoStrategy() === DemoStrategy::EXCLUDE ||
+                $this->getProjet()->getDemoStrategy() === DemoStrategy::EXCLUDE) {
+            return DemoStrategy::EXCLUDE;
+        } elseif ($this->getTiers()->getDemoStrategy() === DemoStrategy::ANONYMIZE ||
+                $this->getCategorie()->getDemoStrategy() === DemoStrategy::ANONYMIZE ||
+                $this->getPortefeuille()->getDemoStrategy() === DemoStrategy::ANONYMIZE ||
+                $this->getProjet()->getDemoStrategy() === DemoStrategy::ANONYMIZE) {
+            return DemoStrategy::ANONYMIZE;
+        } else {
+            return DemoStrategy::COPY;
+        }
+    }
+
+    //-- setter
+
+    public function setDateReleve(?DateTime $dateReleve): static {
+        $this->dateReleve = $dateReleve;
+
+        return $this;
+    }
+
+    public function setMontant(string $montant): static {
+        $this->montant = $montant;
+
+        return $this;
+    }
+
+    public function setNumCommande(?string $numCommande): static {
+        $this->numCommande = $numCommande;
+
+        return $this;
+    }
+
+    public function setDate(DateTime $date): static {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function setReleve(?Releve $releve) {
+        $this->releve = $releve;
+        return $this;
+    }
+
+    public function setAdresse(?Adresse $adresse) {
+        $this->adresse = $adresse;
+        return $this;
+    }
+
+    public function setNote(?string $note): static {
+        $this->note = $note;
+
+        return $this;
+    }
+
     public function setCategorie(Categorie $categorie) {
         $this->categorie = $categorie;
         return $this;
@@ -145,20 +182,6 @@ class Depenses {
 
     public function setPortefeuille(Portefeuille $portefeuille) {
         $this->portefeuille = $portefeuille;
-        return $this;
-    }
-
-    public function getReleve(): ?Releve {
-        return $this->releve;
-    }
-
-    public function setReleve(?Releve $releve) {
-        $this->releve = $releve;
-        return $this;
-    }
-
-    public function setAdresse(?Adresse $adresse) {
-        $this->adresse = $adresse;
         return $this;
     }
 }

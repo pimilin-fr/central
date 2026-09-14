@@ -5,16 +5,19 @@ namespace App\Entity;
 //use Doctrine\Common\Collections\ArrayCollection;
 
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Repository\ReleveRepository;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 
 #[ORM\Entity(repositoryClass: ReleveRepository::class)]
 #[ORM\Table(name: 'releve')]
-class Releve {
+class Releve implements DemoEntityInterface {
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -40,6 +43,7 @@ class Releve {
         $this->depenses = new ArrayCollection();
     }
 
+    //-- getter
     public function getId(): ?int {
         return $this->id;
     }
@@ -59,6 +63,13 @@ class Releve {
     public function getLabel(): ?string {
         return $this->label;
     }
+    
+    #[Override]
+    public function getDemoStrategy(): DemoStrategy {
+        return DemoStrategy::COPY;
+    }
+
+        //-- setters
 
     public function setLabel(?string $label) {
         $this->label = $label;

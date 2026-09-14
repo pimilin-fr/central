@@ -2,15 +2,17 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Repository\ProjetTypeRepository;
-use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 
 #[ORM\Entity(repositoryClass: ProjetTypeRepository::class)]
 #[ORM\Table(name: 'projet_type')]
-class ProjetType {
+class ProjetType implements DemoEntityInterface {
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -85,6 +87,12 @@ class ProjetType {
         return $this->children;
     }
 
+    #[Override]
+    public function getDemoStrategy(): DemoStrategy {
+        return DemoStrategy::COPY;
+    }
+
+    //--- Métier
     public function isLeaf(): bool {
         return $this->children->isEmpty();
     }

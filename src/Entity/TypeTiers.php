@@ -2,13 +2,17 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Repository\TypeTiersRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
+use Override;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: TypeTiersRepository::class)]
 #[ORM\Table(name: 'tiers_type')]
-class TypeTiers extends ColorableEntity{
+class TypeTiers extends ColorableEntity implements DemoEntityInterface{
 
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 36, unique: true)]
@@ -64,7 +68,7 @@ class TypeTiers extends ColorableEntity{
         return $this->name;
     }
 
-    #[\Override]
+    #[Override]
     public function getCouleur(): ?string {
         return $this->couleur;
     }
@@ -96,8 +100,13 @@ class TypeTiers extends ColorableEntity{
     public function getCodeN3(): string {
         return $this->codeN3;
     }
+    
+    #[\Override]
+    public function getDemoStrategy(): DemoStrategy {
+        return DemoStrategy::COPY;
+    }
 
-    // ======================
+        // ======================
     // SETTERS
     // ======================
 
@@ -153,7 +162,7 @@ class TypeTiers extends ColorableEntity{
     public function computeFields(): void {
         $types = explode('/', $this->getName());
         if (sizeof($types) < 3) {
-            throw new \Exception("invalidName");
+            throw new Exception("invalidName");
         }
         $this->setTypeN1($types[0]);
         $this->setCodeN1($this->makeCode($types[0]));

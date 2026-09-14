@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
+use App\Demo\DemoEntityInterface;
+use App\Demo\DemoStrategy;
 use App\Repository\AdresseTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 
 #[ORM\Entity(repositoryClass: AdresseTypeRepository::class)]
-class AdresseType extends ColorableEntity
+class AdresseType extends ColorableEntity implements DemoEntityInterface 
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -36,7 +39,7 @@ class AdresseType extends ColorableEntity
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function getColor(): ?string
     {
         return $this->color;
@@ -49,8 +52,13 @@ class AdresseType extends ColorableEntity
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function getCouleur(): ?string {
         return $this->color;
+    }
+
+    #[\Override]
+    public function getDemoStrategy(): DemoStrategy {
+        return DemoStrategy::COPY;
     }
 }
