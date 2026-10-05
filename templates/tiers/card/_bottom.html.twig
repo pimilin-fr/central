@@ -1,4 +1,4 @@
-<div class="mt-auto flex items-center justify-between gap-2">
+<div class="mt-auto flex items-center justify-between gap-3">
 
     {% set adressesActives = tiers.tiersAdresses|filter(ta => not ta.adresse.isDeleted) %}
 
@@ -10,51 +10,66 @@
     {% endif %}
 
 
-    {# --- ADRESSES --- #}
-    <div class="flex flex-wrap items-center gap-1.5">
+    {# ============================================================
+       ADRESSES
+       ============================================================ #}
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
 
-        {# Adresses principales en premier #}
+        {# --------------------------------------------------------
+           Adresse principale
+           -------------------------------------------------------- #}
         {% for ta in adressesAffichees %}
 
             {% if ta.isPrincipale %}
 
-                <span class="inline-flex items-center gap-1
-                             text-xs font-semibold
-                             px-2.5 py-1 rounded-full
-                             bg-green-50 text-green-700
-                             border border-green-100
-                             transition-all duration-200
-                             group-hover:shadow-sm">
+                <div class="inline-flex items-center gap-1.5
+                            text-xs font-semibold text-gray-700
+                            transition-all duration-200
+                            group-hover:-translate-y-0.5">
 
-                    {{ ux_icon('bxs:map', { class: 'w-3.5 h-3.5' }) }}
+                    <span class="flex items-center justify-center
+                                 w-5 h-5 rounded-full
+                                 bg-gray-50
+                                 border border-gray-100">
 
-                    {{ ta.adresse.villeCourte }}
+                        {{ ux_icon('lucide:star', {
+                            class: 'w-3 h-3'
+                        }) }}
 
-                </span>
+                    </span>
+
+                    <span>
+                        {{ ta.adresse.villeCourte }}
+                    </span>
+
+                </div>
 
             {% endif %}
 
         {% endfor %}
 
 
-        {# Puis les autres adresses #}
+        {# --------------------------------------------------------
+           Autres adresses
+           -------------------------------------------------------- #}
         {% for ta in adressesAffichees %}
 
             {% if not ta.isPrincipale %}
 
-                <span class="inline-flex items-center gap-1
-                             text-xs font-medium
-                             px-2.5 py-1 rounded-full
-                             bg-gray-50 text-gray-600
-                             border border-gray-100
-                             transition-all duration-200
-                             group-hover:bg-gray-100">
+                <div class="inline-flex items-center gap-1
+                            text-xs text-gray-400
+                            transition-colors duration-200
+                            group-hover:text-gray-500">
 
-                    {{ ux_icon('bxs:map', { class: 'w-3.5 h-3.5' }) }}
+                    {{ ux_icon('lucide:map-pin', {
+                        class: 'w-3.5 h-3.5'
+                    }) }}
 
-                    {{ ta.adresse.villeCourte }}
+                    <span>
+                        {{ ta.adresse.villeCourte }}
+                    </span>
 
-                </span>
+                </div>
 
             {% endif %}
 
@@ -63,19 +78,20 @@
     </div>
 
 
-    {# --- STATUT ARCHIVÉ --- #}
+    {# ============================================================
+       STATUT ARCHIVÉ
+       ============================================================ #}
     {% if isDeleted %}
 
         <span class="shrink-0 inline-flex items-center gap-1.5
                      text-xs font-semibold
-                     text-red-800
-                     bg-red-50
-                     border border-red-100
-                     px-2.5 py-1 rounded-full
+                     text-red-700
                      transition-all duration-200
-                     group-hover:bg-red-100">
+                     group-hover:text-red-800">
 
-            {{ ux_icon('lucide:archive-x', { class: 'w-3.5 h-3.5' }) }}
+            {{ ux_icon('lucide:archive-x', {
+                class: 'w-3.5 h-3.5'
+            }) }}
 
             Archivé
 

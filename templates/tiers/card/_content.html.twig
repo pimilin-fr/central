@@ -1,24 +1,34 @@
 <div class="flex flex-col h-full">
 
-    {# --- TITRE --- #}
-    <div class="flex items-center mb-3 pl-14 -mt-2">
+    {# ============================================================
+       TITRE
+       ============================================================ #}
+    <div class="flex items-center pl-14 -mt-2 mb-4">
 
-        <h3 class="text-lg font-semibold text-gray-900 truncate
-                   transition-colors duration-200
+        <h3 class="text-lg font-bold text-gray-900 truncate
+                   transition-all duration-200
+                   group-hover:translate-x-0.5
                    group-hover:text-gray-700">
+
             {{ tiers.name }}
+
         </h3>
 
     </div>
 
 
-    {# --- SÉPARATION --- #}
-    <div class="flex items-center gap-2 mb-3">
+    {# ============================================================
+       SÉPARATION
+       ============================================================ #}
+    <div class="flex items-center gap-2 mb-4">
 
-        <span class="w-1.5 h-1.5 rounded-full shrink-0
-                     transition-transform duration-300
-                     group-hover:scale-125"
-              style="background-color: {{ bgColor }};">
+        <span class="w-2 h-2 rounded-full shrink-0
+                     transition-all duration-300
+                     group-hover:scale-150"
+              style="
+                  background-color: {{ bgColor }};
+                  box-shadow: 0 0 0 3px {{ bgColor }}1A;
+              ">
         </span>
 
         <div class="h-px flex-1 bg-gray-100
@@ -29,25 +39,33 @@
     </div>
 
 
-    {# --- TYPE --- #}
-    <p class="text-sm text-gray-500 mb-4 flex items-center gap-1.5">
+    {# ============================================================
+       TYPE
+       ============================================================ #}
+    <div class="mb-5">
 
-        <span class="font-medium">
-            {{ tiers.tiersType.typeN1 }}
-        </span>
+        <div class="flex items-center gap-2 text-sm">
 
-        <span class="text-gray-300">
-            /
-        </span>
+            <span class="font-semibold text-gray-700">
+                {{ tiers.tiersType.typeN1 }}
+            </span>
 
-        <span>
-            {{ tiers.tiersType.typeN2 }}
-        </span>
+            <span class="text-gray-300">
+                /
+            </span>
 
-    </p>
+            <span class="text-gray-500">
+                {{ tiers.tiersType.typeN2 }}
+            </span>
+
+        </div>
+
+    </div>
 
 
-    {# --- BAS DE CARTE --- #}
+    {# ============================================================
+       BAS DE CARTE
+       ============================================================ #}
     {% include 'tiers/card/_bottom.html.twig' %}
 
 </div>
