@@ -19,17 +19,12 @@ class TiersRepository extends ServiceEntityRepository {
     public function findAllWithAdresses() {
         return $this->createQueryBuilder('t')
                         // jointure vers la table pivot
-                        ->leftJoin(
-                                't.tiersAdresses',
-                                'ta',
-                                'WITH',
-                                'ta.isPrincipale = true'
-                        )
+                        ->leftJoin('t.tiersAdresses','ta')
                         // jointure vers l'adresse réelle
                         ->leftJoin('ta.adresse', 'a')
                         ->addSelect('ta', 'a')
                         // tri par nom de tiers
-                        ->addOrderBy('CASE WHEN t.deletedAt IS NULL THEN 0 ELSE 1 END', 'ASC')
+                        //->addOrderBy('CASE WHEN t.deletedAt IS NULL THEN 0 ELSE 1 END', 'ASC')
                         ->addOrderBy('t.name', 'ASC')
                         ->getQuery()
                         ->getResult();

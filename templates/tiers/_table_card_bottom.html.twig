@@ -1,0 +1,44 @@
+<div class="mt-auto flex items-center justify-start gap-1">
+
+    {% set adressesActives = tiers.tiersAdresses|filter(ta => not ta.adresse.isDeleted) %}
+
+    {# S'il n'y a aucune adresse active, on prend toutes les adresses #}
+    {% if adressesActives|length == 0 %}
+        {% set adressesAffichees = tiers.tiersAdresses %}
+    {% else %}
+        {% set adressesAffichees = adressesActives %}
+    {% endif %}
+
+    {# Adresses principales en premier #}
+    {% for ta in adressesAffichees %}
+        {% if ta.isPrincipale %}
+            <span class="inline-flex items-center text-xs font-bold text-white bg-green-600 px-2 py-0.5 rounded">
+                {{ ux_icon('bxs:map', { class: 'mr-1' }) }}
+                {{ ta.adresse.villeCourte }}
+            </span>
+        {% endif %}
+    {% endfor %}
+
+    {# Puis les autres adresses #}
+    {% for ta in adressesAffichees %}
+        {% if not ta.isPrincipale %}
+            <span class="inline-flex items-center text-xs font-bold text-white bg-gray-800 px-2 py-0.5 rounded">
+                {{ ux_icon('bxs:map', { class: 'mr-1' }) }}
+                {{ ta.adresse.villeCourte }}
+            </span>
+        {% endif %}
+    {% endfor %}
+
+    {#% include 'detail/v2/_demo.html.twig' with {entity:tiers}  %#} {#Demo#}
+
+    {% if isDeleted %}
+        <span class="inline-flex items-center text-xs text-red-500 font-bold">
+            {{ ux_icon('pajamas:status-active', { class: 'w-3 h-3 mr-1' }) }}
+        </span>
+    {% else %}
+        <span class="inline-flex items-center text-xs text-green-500 font-bold">
+            {{ ux_icon('pajamas:status-active', { class: 'w-3 h-3 mr-1' }) }}
+        </span>
+    {% endif %}
+
+</div>
