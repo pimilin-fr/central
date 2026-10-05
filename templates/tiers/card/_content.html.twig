@@ -1,0 +1,53 @@
+<div class="flex flex-col h-full">
+
+    {# --- TITRE --- #}
+    <div class="flex items-center mb-3 pl-14 -mt-2">
+
+        <h3 class="text-lg font-semibold text-gray-900 truncate
+                   transition-colors duration-200
+                   group-hover:text-gray-700">
+            {{ tiers.name }}
+        </h3>
+
+    </div>
+
+
+    {# --- SÉPARATION --- #}
+    <div class="flex items-center gap-2 mb-3">
+
+        <span class="w-1.5 h-1.5 rounded-full shrink-0
+                     transition-transform duration-300
+                     group-hover:scale-125"
+              style="background-color: {{ bgColor }};">
+        </span>
+
+        <div class="h-px flex-1 bg-gray-100
+                    transition-colors duration-300
+                    group-hover:bg-gray-200">
+        </div>
+
+    </div>
+
+
+    {# --- TYPE --- #}
+    <p class="text-sm text-gray-500 mb-4 flex items-center gap-1.5">
+
+        <span class="font-medium">
+            {{ tiers.tiersType.typeN1 }}
+        </span>
+
+        <span class="text-gray-300">
+            /
+        </span>
+
+        <span>
+            {{ tiers.tiersType.typeN2 }}
+        </span>
+
+    </p>
+
+
+    {# --- BAS DE CARTE --- #}
+    {% include 'tiers/card/_bottom.html.twig' %}
+
+</div>

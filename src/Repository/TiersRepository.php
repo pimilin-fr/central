@@ -24,7 +24,7 @@ class TiersRepository extends ServiceEntityRepository {
                         ->leftJoin('ta.adresse', 'a')
                         ->addSelect('ta', 'a')
                         // tri par nom de tiers
-                        //->addOrderBy('CASE WHEN t.deletedAt IS NULL THEN 0 ELSE 1 END', 'ASC')
+                        ->addOrderBy('CASE WHEN t.deletedAt IS NULL THEN 0 ELSE 1 END', 'ASC')
                         ->addOrderBy('t.name', 'ASC')
                         ->getQuery()
                         ->getResult();

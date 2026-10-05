@@ -1,77 +1,41 @@
 <div class="p-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6">
+
         {% for tiers in tiers %}
+
             {% set bgColor = tiers.tiersType.couleur ?? '#F97316' %}
             {% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
-
-
             {% set isDeleted = tiers.deletedAt is not null %}
 
             <a href="{{ path('app_tiers_show', {id: tiers.id}) }}"
-               class="block bg-white rounded-xl shadow hover:shadow-lg transition relative
-               p-6 pr-10 border
-               {{ isDeleted ? 'opacity-40' : '' }}">
+               class="group block bg-white rounded-2xl
+                      shadow-sm hover:shadow-xl
+                      hover:-translate-y-1
+                      transition-all duration-300 ease-out
+                      relative
+                      p-6 pr-10
+                      border border-gray-100 hover:border-gray-200
+                      {{ isDeleted ? 'opacity-50' : '' }}">
 
                 {# --- Cercle année / mois --- #}
-                {% include 'tiers/_table_card_circle.html.twig' %}
-                
-                {# --- LISERAI DROIT --- #}
-                <div class="absolute top-0 right-0 h-full w-8
-                     bg-orange-500
-                     flex items-center justify-center
-                     rounded-r-xl" 
-                     style="background-color: {{ bgColor }}; color: {{ textColor }};">
+                {% include 'tiers/card/_circle.html.twig' %}
 
-                    <span class=" text-xs font-bold tracking-wider
-                          rotate-90 whitespace-nowrap">
-                        {{ tiers.tiersType.libelleLiserai|upper}}
-                    </span>
-                </div>
+                {# --- LISERAI DROIT --- #}
+                {% include 'tiers/card/_liserai.html.twig' %}
 
                 {# --- CONTENU --- #}
-                <div class="flex flex-col h-full">
+                {% include 'tiers/card/_content.html.twig' %}
 
-                    {# Ligne titre (remontée) #}
-                    <div class="flex items-center mb-2 pl-14 -mt-2">
-                        <h3 class="text-lg font-semibold text-gray-900 truncate">
-                            {{ tiers.name }}
-                        </h3>
-                    </div>
-
-                    <hr class="mb-2 mt-2"/>
-
-                    {# Type #}
-                    <p class="text-sm text-gray-500 mb-4">
-                        {{ tiers.tiersType.typeN1 ~ " / " ~ tiers.tiersType.typeN2  }}
-                    </p>
-
-                    {# Bas de carte #}
-                    {% include 'tiers/_table_card_bottom.html.twig' %}
-                    {#<div class="mt-auto flex items-center justify-between">
-                        <span class="inline-flex items-center text-xs font-bold text-white bg-gray-800 px-2 py-0.5 rounded">
-                            {% for ta in tiers.tiersAdresses %}
-                                {% if ta.isPrincipale %}
-                                    {{ ux_icon('bxs:map', { class: 'mr-1' }) }} {{ ta.adresse.villeCourte }}
-                                {% endif %}
-                            {% endfor %}
-                        </span>
-                        {#% include 'detail/v2/_demo.html.twig' with {entity:tiers}  %#} {#Demo#}
-                        {#% if isDeleted %}
-                            <span class="inline-flex items-center text-xs text-red-500 font-bold">
-                                {{ ux_icon('pajamas:status-active', { class: 'w-3 h-3 mr-1' }) }}
-                            </span>
-                        {% else %}
-                            <span class="inline-flex items-center text-xs text-green-500 font-bold">
-                                {{ ux_icon('pajamas:status-active', { class: 'w-3 h-3 mr-1' }) }}
-                            </span>
-                        {% endif %}
-                    </div>#}
-                </div>
             </a>
+
         {% else %}
+
             <div class="col-span-full text-center text-gray-500 py-12">
                 Aucun tiers trouvé
             </div>
+
         {% endfor %}
+
     </div>
 </div>
+
