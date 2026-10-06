@@ -1,3 +1,5 @@
+{% set route = app.request.attributes.get('_route') %}
+
 <aside id="central-sidebar" class="central-sidebar" data-sidebar>
     <div class="sidebar-header">
         <div class="sidebar-context">
@@ -8,117 +10,146 @@
                 <span class="sidebar-context-name">Central</span>
             </div>
         </div>
-
-        <button type="button" class="sidebar-collapse-button" 
-                data-sidebar-toggle 
-                aria-label="Réduire le menu"
-                title="Réduire le menu"
+        <button
+            type="button"
+            class="sidebar-collapse-button"
+            data-sidebar-toggle
+            aria-label="Réduire ou agrandir le menu"
+            title="Mode compact"
         >
-            <twig:ux:icon name="lucide:panel-left-close" />
+            <twig:ux:icon name="lucide:panel-left-close"/>
         </button>
     </div>
 
     <div class="sidebar-separator"></div>
 
-    <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Gestion</div>
+    <nav class="sidebar-nav" aria-label="Navigation Central">
 
-        {# ____ Menu Tiers ____ #}
-        <a href="{{ path('app_tiers_index') }}"
-            class="sidebar-link {{ app.request.attributes.get('_route') starts with 'app_tiers_' or app.request.attributes.get('_route') starts with 'app_type_tiers_' ? 'is-active' : '' }}"
-            title="Tiers"
+        <div class="sidebar-section-label">
+            Gestion
+        </div>
+
+        {# =========================================================
+           TIERS
+           ========================================================= #}
+        <a
+            href="{{ path('app_tiers_index') }}"
+            class="sidebar-link {{
+                route starts with 'app_tiers_'
+                or route starts with 'app_type_tiers_'
+                    ? 'is-active'
+                    : ''
+            }}"
         >
             <span class="sidebar-link-icon">
-                <twig:ux:icon name="mage:users-fill" />
+                <twig:ux:icon name="mage:user-fill"/>
             </span>
-
-            <span class="sidebar-link-label">
-                Tiers
-            </span>
-
-            {% if app.request.attributes.get('_route') starts with 'app_tiers_' or app.request.attributes.get('_route') starts with 'app_type_tiers_' %}
+            <span class="sidebar-link-label">Tiers</span>
+            {% if route starts with 'app_tiers_' or route starts with 'app_type_tiers_' %}
                 <span class="sidebar-link-active"></span>
             {% endif %}
         </a>
 
-        {# ____ Menu Categories ____ #}
-        <a href="{{ path('app_categorie_index') }}"
-            class="sidebar-link {{ app.request.attributes.get('_route') starts with 'app_categorie_' ? 'is-active' : '' }}"
-            title="Catégories"
+        {# =========================================================
+           CATÉGORIES
+           ========================================================= #}
+        <a
+            href="{{ path('app_categorie_index') }}"
+            class="sidebar-link {{
+                route starts with 'app_categorie_'
+                    ? 'is-active'
+                    : ''
+            }}"
         >
             <span class="sidebar-link-icon">
-                <twig:ux:icon name="streamline-flex:search-category-solid" />
+                <twig:ux:icon name="streamline-flex:search-category-solid"/>
             </span>
-            <span class="sidebar-link-label">
-                Catégories
-            </span>
-
-            {% if app.request.attributes.get('_route') starts with 'app_categorie_' %}
+            <span class="sidebar-link-label">Catégories</span>
+            {% if route starts with 'app_categorie_' %}
                 <span class="sidebar-link-active"></span>
             {% endif %}
         </a>
 
-        {# ____ Menu Portefeuilles ____ #}
-        <a href="{{ path('app_portefeuille_index') }}"
-            class="sidebar-link {{ app.request.attributes.get('_route') starts with 'app_portefeuille_' ? 'is-active' : '' }}"
-            title="Portefeuilles"
+        {# =========================================================
+           PORTEFEUILLES
+           ========================================================= #}
+        <a
+            href="{{ path('app_portefeuille_index') }}"
+            class="sidebar-link {{
+                route starts with 'app_portefeuille_'
+                    ? 'is-active'
+                    : ''
+            }}"
         >
             <span class="sidebar-link-icon">
-                <twig:ux:icon name="solar:wallet-money-bold" />
+                <twig:ux:icon name="solar:wallet-money-bold"/>
             </span>
             <span class="sidebar-link-label">Portefeuilles</span>
-
-            {% if app.request.attributes.get('_route') starts with 'app_portefeuille_' %}
+            {% if route starts with 'app_portefeuille_' %}
                 <span class="sidebar-link-active"></span>
             {% endif %}
         </a>
 
-        {# ____ Menu Adresses ____ #}
+        {# =========================================================
+           ADRESSES
+           ========================================================= #}
         <a
             href="{{ path('app_adresse_index') }}"
-            class="sidebar-link {{ app.request.attributes.get('_route') starts with 'app_adresse_' ? 'is-active' : '' }}"
-            title="Adresses"
+            class="sidebar-link {{
+                route starts with 'app_adresse_'
+                    ? 'is-active'
+                    : ''
+            }}"
         >
             <span class="sidebar-link-icon">
-                <twig:ux:icon name="entypo:address" />
+                <twig:ux:icon name="entypo:address"/>
             </span>
             <span class="sidebar-link-label">Adresses</span>
-
-            {% if app.request.attributes.get('_route') starts with 'app_adresse_' %}
+            {% if route starts with 'app_adresse_' %}
                 <span class="sidebar-link-active"></span>
             {% endif %}
         </a>
 
-        {# ____ Menu Projets ____ #}
-        <a href="{{ path('app_projet_index') }}"
-            class="sidebar-link {{ app.request.attributes.get('_route') starts with 'app_projet_' ? 'is-active' : '' }}"
-            title="Projets"
+        {# =========================================================
+           PROJETS
+           ========================================================= #}
+        <a
+            href="{{ path('app_projet_index') }}"
+            class="sidebar-link {{
+                route starts with 'app_projet_'
+                    ? 'is-active'
+                    : ''
+            }}"
         >
             <span class="sidebar-link-icon">
-                <twig:ux:icon name="ix:project" />
+                <twig:ux:icon name="ix:project"/>
             </span>
+
             <span class="sidebar-link-label">
                 Projets
             </span>
 
-            {% if app.request.attributes.get('_route') starts with 'app_projet_' %}
+            {% if route starts with 'app_projet_' %}
                 <span class="sidebar-link-active"></span>
             {% endif %}
         </a>
 
-        {# ____ Menu Depenses ____ #}
-        <a href="{{ path('app_depenses_index') }}"
-            class="sidebar-link {{ app.request.attributes.get('_route') starts with 'app_depenses_' ? 'is-active' : '' }}"
-            title="Dépenses"
+        {# =========================================================
+           DÉPENSES
+           ========================================================= #}
+        <a
+            href="{{ path('app_depenses_index') }}"
+            class="sidebar-link {{
+                route starts with 'app_depenses_'
+                    ? 'is-active'
+                    : ''
+            }}"
         >
             <span class="sidebar-link-icon">
-                <twig:ux:icon name="healthicons:money-bag" />
+                <twig:ux:icon name="healthicons:money-bag"/>
             </span>
-            <span class="sidebar-link-label">
-                Dépenses
-            </span>
-
-            {% if app.request.attributes.get('_route') starts with 'app_depenses_' %}
+            <span class="sidebar-link-label">Dépenses</span>
+            {% if route starts with 'app_depenses_' %}
                 <span class="sidebar-link-active"></span>
             {% endif %}
         </a>
@@ -126,15 +157,13 @@
 
     <div class="sidebar-bottom">
         <div class="sidebar-bottom-card">
-            <div class="sidebar-bottom-icon">
-                <twig:ux:icon name="lucide:zap" />
-            </div>
-
-            <div class="sidebar-bottom-copy">
+            <span class="sidebar-bottom-icon">
+                <twig:ux:icon name="lucide:orbit"/>
+            </span>
+            <span class="sidebar-bottom-copy">
                 <span>Central</span>
-                <small>Finance</small>
-            </div>
-
+                <small>Gestion financière</small>
+            </span>
             <span class="sidebar-bottom-status"></span>
         </div>
     </div>

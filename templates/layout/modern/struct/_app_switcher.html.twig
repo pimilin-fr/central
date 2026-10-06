@@ -1,74 +1,105 @@
-<div id="app-switcher" class="app-switcher"  data-app-switcher>
-    <div class="app-switcher-inner">
-        <div class="app-switcher-brand">
-            <div class="app-logo">
-                <span class="app-logo-core"></span>
-            </div>
+<div class="app-switcher" data-app-switcher>
+    <button
+        type="button"
+        class="app-switcher-trigger"
+        data-app-switcher-toggle
+        aria-expanded="false"
+        aria-controls="application-switcher-panel"
+        title="Changer d'application"
+        >
+        <span class="app-switcher-trigger-icon">
+            <span class="app-logo-core"></span>
+        </span>
 
-            <div class="app-switcher-brand-text">
-                <span class="app-switcher-kicker">Applications</span>
-                <span class="app-switcher-title">MON HUB</span>
+        <span class="app-switcher-trigger-copy">
+            <span class="app-switcher-trigger-label">Application</span>
+            <span class="app-switcher-trigger-name">Central</span>
+        </span>
+        <twig:ux:icon
+            name="lucide:chevrons-up-down"
+            class="app-switcher-trigger-chevron"
+            />
+    </button>
+
+    <div
+        id="application-switcher-panel"
+        class="app-switcher-panel"
+        data-app-switcher-panel
+        hidden
+        >
+        <div class="app-switcher-panel-header">
+            <div>
+                <span class="app-switcher-panel-kicker">Applications </span>
+                <span class="app-switcher-panel-title">Mon environnement</span>
             </div>
+            <span class="app-switcher-panel-count">1 / 4</span>
         </div>
 
         <div class="app-switcher-list">
+
+            {# =====================================================
+               CENTRAL
+               ===================================================== #}
             <a href="{{ path('app_tiers_index') }}" class="app-switcher-item is-active">
                 <span class="app-switcher-icon">
-                    <twig:ux:icon name="solar:wallet-money-bold" />
+                    <twig:ux:icon name="solar:wallet-money-bold"/>
                 </span>
-
                 <span class="app-switcher-copy">
                     <span class="app-switcher-name">Central</span>
-                    <span class="app-switcher-status">Gestion financière</span>
+                    <span class="app-switcher-status">Mes Finances</span>
                 </span>
-
-                <span class="app-switcher-active"></span>
+                <span class="app-switcher-active">
+                    <twig:ux:icon name="lucide:check"/>
+                </span>
             </a>
 
-            <a href="#" class="app-switcher-item" title="Application Domotique">
+            {# =====================================================
+               DOMINIQUE
+               ===================================================== #}
+            <button  type="button" class="app-switcher-item" disabled title="Application actuellement indisponible">
                 <span class="app-switcher-icon">
-                    <twig:ux:icon name="mdi:home-automation" />
+                    <twig:ux:icon name="mdi:home-automation"/>
                 </span>
-
                 <span class="app-switcher-copy">
                     <span class="app-switcher-name">Dominique</span>
-                    <span class="app-switcher-status">Domotique</span>
+                    <span class="app-switcher-status">Domotique </span>
                 </span>
-
                 <span class="app-switcher-off">OFF</span>
-            </a>
+            </button>
 
-            <a href="#" class="app-switcher-item" title="Sauvegardes Raspberry Pi">
+            {# =====================================================
+               SAUVEGARDES
+               ===================================================== #}
+            <button type="button" class="app-switcher-item" disabled title="Application actuellement indisponible">
                 <span class="app-switcher-icon">
-                    <twig:ux:icon name="mdi:backup-restore" />
+                    <twig:ux:icon name="mdi:backup-restore"/>
                 </span>
-
                 <span class="app-switcher-copy">
                     <span class="app-switcher-name">Sauvegardes</span>
                     <span class="app-switcher-status">Raspberry Pi</span>
                 </span>
-                
                 <span class="app-switcher-off">OFF</span>
-            </a>
+            </button>
 
-            <a href="#" class="app-switcher-item" title="Base de données">
+            {# =====================================================
+               BASE
+               ===================================================== #}
+            <button type="button" class="app-switcher-item" disabled title="Application actuellement indisponible">
                 <span class="app-switcher-icon">
-                    <twig:ux:icon name="mdi:database-outline" />
+                    <twig:ux:icon name="mdi:database-outline"/>
                 </span>
-
                 <span class="app-switcher-copy">
                     <span class="app-switcher-name">Base</span>
                     <span class="app-switcher-status">phpMyAdmin</span>
                 </span>
-                
                 <span class="app-switcher-off">OFF</span>
-            </a>
+            </button>
+
         </div>
 
-        <div class="app-switcher-footer">
+        <div class="app-switcher-panel-footer">
             <span class="app-switcher-footer-dot"></span>
-            <span>Système opérationnel</span>
+            <span>Les applications indisponibles apparaissent grisées.</span>
         </div>
     </div>
 </div>
-

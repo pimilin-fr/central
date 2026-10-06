@@ -1,63 +1,67 @@
 <div
     class="tiers-grid"
     data-tier-grid
->
+    >
     {% for tiers in tiers %}
         {% set bgColor = tiers.tiersType.couleur ?? '#22D3EE' %}
         {% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
         {% set isDeleted = tiers.deletedAt is not null %}
 
 
-    <article
-        class="tier-card {{ isDeleted ? 'is-archived' : '' }}"
-        data-tier-card
-        data-tier-search-value="{{ (
+        <article
+            class="tier-card {{ isDeleted ? 'is-archived' : '' }}"
+            data-tier-card
+            data-tier-search-value="{{ (
             (tiers.nom ?? '') ~ ' ' ~
             (tiers.prenom ?? '') ~ ' ' ~
             (tiers.raisonSociale ?? '') ~ ' ' ~
             (tiers.code ?? '') ~ ' ' ~
             (tiers.tiersType.libelle ?? '')
         )|lower }}"
-    >
-        <a
-            href="{{ path('app_tiers_show', {'id': tiers.id}) }}"
-            class="tier-card-link"
-        >
-            {% include 'tiers/card/_circle.html.twig' %}
+            >
+            <a
+                href="{{ path('app_tiers_show', {'id': tiers.id}) }}"
+                class="tier-card-link"
+                >
+                {% include 'tiers/card/_circle.html.twig' %}
 
-            {% include 'tiers/card/_liserai.html.twig' %}
+                <div class="tier-ribbon" style="--tier-color: {{ bgColor }}; --tier-text: {{ textColor }};">
+                    <span>
+                        {{ tiers.tiersType.libelleLiserai ?? tiers.tiersType.libelle ?? 'TYPE' }}
+                    </span>
+                </div>
 
-            <div class="tier-card-body">
-                {% include 'tiers/card/_content.html.twig' %}
+                <div class="tier-card-body">
+                    {% include 'tiers/card/_content.html.twig' %}
+                </div>
+            </a>
+        </article>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <twig:ux:icon name="lucide:users-round" />
             </div>
-        </a>
-    </article>
-{% else %}
-    <div class="empty-state">
-        <div class="empty-state-icon">
-            <twig:ux:icon name="lucide:users-round" />
+
+            <div>
+                <h2>
+                    Aucun tiers
+                </h2>
+
+                <p>
+                    Aucun tiers ne correspond actuellement à votre liste.
+                </p>
+            </div>
+
+            <a
+                href="{{ path('app_tiers_new') }}"
+                class="ui-button ui-button-primary"
+                >
+                <twig:ux:icon name="ic:round-add" />
+
+                Ajouter un tiers
+            </a>
         </div>
-
-        <div>
-            <h2>
-                Aucun tiers
-            </h2>
-
-            <p>
-                Aucun tiers ne correspond actuellement à votre liste.
-            </p>
-        </div>
-
-        <a
-            href="{{ path('app_tiers_new') }}"
-            class="ui-button ui-button-primary"
-        >
-            <twig:ux:icon name="ic:round-add" />
-
-            Ajouter un tiers
-        </a>
-    </div>
-{% endfor %}
+    {% endfor %}
 
 </div>
 
@@ -65,21 +69,21 @@
     class="tier-search-empty"
     data-tier-search-empty
     hidden
->
+    >
     <div class="empty-state-icon">
         <twig:ux:icon name="lucide:search-x" />
     </div>
 
 
-<div>
-    <h2>
-        Aucun résultat
-    </h2>
+    <div>
+        <h2>
+            Aucun résultat
+        </h2>
 
-    <p>
-        Aucun tiers ne correspond à votre recherche.
-    </p>
-</div>
+        <p>
+            Aucun tiers ne correspond à votre recherche.
+        </p>
+    </div>
 
 
 </div>
