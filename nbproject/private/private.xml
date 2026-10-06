@@ -3,16 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/index.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/_table.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/_table.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/Portefeuille.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/PortefeuilleView.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/PortefeuilleType.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/Depenses.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/AddDepensesType.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/PortefeuilleRepository.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/PortefeuilleViewRepository.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/modern.html.twig.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/base.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/layout/modern/struct/_head.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/layout/modern/struct/_app_switcher.html.twig</file>
         </group>
     </open-files>
 </project-private>

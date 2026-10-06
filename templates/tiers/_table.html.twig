@@ -1,41 +1,86 @@
-<div class="p-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6">
+<div
+    class="tiers-grid"
+    data-tier-grid
+>
+    {% for tiers in tiers %}
+        {% set bgColor = tiers.tiersType.couleur ?? '#22D3EE' %}
+        {% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
+        {% set isDeleted = tiers.deletedAt is not null %}
 
-        {% for tiers in tiers %}
 
-            {% set bgColor = tiers.tiersType.couleur ?? '#F97316' %}
-            {% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
-            {% set isDeleted = tiers.deletedAt is not null %}
+    <article
+        class="tier-card {{ isDeleted ? 'is-archived' : '' }}"
+        data-tier-card
+        data-tier-search-value="{{ (
+            (tiers.nom ?? '') ~ ' ' ~
+            (tiers.prenom ?? '') ~ ' ' ~
+            (tiers.raisonSociale ?? '') ~ ' ' ~
+            (tiers.code ?? '') ~ ' ' ~
+            (tiers.tiersType.libelle ?? '')
+        )|lower }}"
+    >
+        <a
+            href="{{ path('app_tiers_show', {'id': tiers.id}) }}"
+            class="tier-card-link"
+        >
+            {% include 'tiers/card/_circle.html.twig' %}
 
-            <a href="{{ path('app_tiers_show', {id: tiers.id}) }}"
-               class="group block bg-white rounded-2xl
-                      shadow-sm hover:shadow-xl
-                      hover:-translate-y-1
-                      transition-all duration-300 ease-out
-                      relative
-                      p-6 pr-10
-                      border border-gray-100 hover:border-gray-200
-                      {{ isDeleted ? 'opacity-50' : '' }}">
+            {% include 'tiers/card/_liserai.html.twig' %}
 
-                {# --- Cercle année / mois --- #}
-                {% include 'tiers/card/_circle.html.twig' %}
-
-                {# --- LISERAI DROIT --- #}
-                {% include 'tiers/card/_liserai.html.twig' %}
-
-                {# --- CONTENU --- #}
+            <div class="tier-card-body">
                 {% include 'tiers/card/_content.html.twig' %}
-
-            </a>
-
-        {% else %}
-
-            <div class="col-span-full text-center text-gray-500 py-12">
-                Aucun tiers trouvé
             </div>
+        </a>
+    </article>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <twig:ux:icon name="lucide:users-round" />
+        </div>
 
-        {% endfor %}
+        <div>
+            <h2>
+                Aucun tiers
+            </h2>
 
+            <p>
+                Aucun tiers ne correspond actuellement à votre liste.
+            </p>
+        </div>
+
+        <a
+            href="{{ path('app_tiers_new') }}"
+            class="ui-button ui-button-primary"
+        >
+            <twig:ux:icon name="ic:round-add" />
+
+            Ajouter un tiers
+        </a>
     </div>
+{% endfor %}
+
+</div>
+
+<div
+    class="tier-search-empty"
+    data-tier-search-empty
+    hidden
+>
+    <div class="empty-state-icon">
+        <twig:ux:icon name="lucide:search-x" />
+    </div>
+
+
+<div>
+    <h2>
+        Aucun résultat
+    </h2>
+
+    <p>
+        Aucun tiers ne correspond à votre recherche.
+    </p>
+</div>
+
+
 </div>
 

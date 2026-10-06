@@ -1,0 +1,41 @@
+{% set flashStyles = {
+    success: {
+        icon: 'lucide:check-circle-2',
+        label: 'Succès',
+        class: 'flash-success'
+    },
+    error: {
+        icon: 'lucide:circle-x',
+        label: 'Erreur',
+        class: 'flash-error'
+    },
+    warning: {
+        icon: 'lucide:triangle-alert',
+        label: 'Attention',
+        class: 'flash-warning'
+    },
+    info: {
+        icon: 'lucide:info',
+        label: 'Information',
+        class: 'flash-info'
+    }
+} %}
+
+{% for type, messages in app.flashes %}
+    {% set style = flashStyles[type] ?? flashStyles.info %}
+
+    {% for message in messages %}
+        <div class="flash-message {{ style.class }}" data-flash>
+            <div class="flash-icon"><twig:ux:icon name="{{ style.icon }}" /></div>
+
+            <div class="flash-content">
+                <span class="flash-label">{{ style.label }}</span>
+                <span class="flash-text">{{ message }}</span>
+            </div>
+
+            <button type="button" class="flash-close" data-flash-close aria-label="Fermer">
+                <twig:ux:icon name="lucide:x" />
+            </button>
+        </div>
+    {% endfor %}
+{% endfor %}

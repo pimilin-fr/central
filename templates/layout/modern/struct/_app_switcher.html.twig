@@ -1,0 +1,74 @@
+<div id="app-switcher" class="app-switcher"  data-app-switcher>
+    <div class="app-switcher-inner">
+        <div class="app-switcher-brand">
+            <div class="app-logo">
+                <span class="app-logo-core"></span>
+            </div>
+
+            <div class="app-switcher-brand-text">
+                <span class="app-switcher-kicker">Applications</span>
+                <span class="app-switcher-title">MON HUB</span>
+            </div>
+        </div>
+
+        <div class="app-switcher-list">
+            <a href="{{ path('app_tiers_index') }}" class="app-switcher-item is-active">
+                <span class="app-switcher-icon">
+                    <twig:ux:icon name="solar:wallet-money-bold" />
+                </span>
+
+                <span class="app-switcher-copy">
+                    <span class="app-switcher-name">Central</span>
+                    <span class="app-switcher-status">Gestion financière</span>
+                </span>
+
+                <span class="app-switcher-active"></span>
+            </a>
+
+            <a href="#" class="app-switcher-item" title="Application Domotique">
+                <span class="app-switcher-icon">
+                    <twig:ux:icon name="mdi:home-automation" />
+                </span>
+
+                <span class="app-switcher-copy">
+                    <span class="app-switcher-name">Dominique</span>
+                    <span class="app-switcher-status">Domotique</span>
+                </span>
+
+                <span class="app-switcher-off">OFF</span>
+            </a>
+
+            <a href="#" class="app-switcher-item" title="Sauvegardes Raspberry Pi">
+                <span class="app-switcher-icon">
+                    <twig:ux:icon name="mdi:backup-restore" />
+                </span>
+
+                <span class="app-switcher-copy">
+                    <span class="app-switcher-name">Sauvegardes</span>
+                    <span class="app-switcher-status">Raspberry Pi</span>
+                </span>
+                
+                <span class="app-switcher-off">OFF</span>
+            </a>
+
+            <a href="#" class="app-switcher-item" title="Base de données">
+                <span class="app-switcher-icon">
+                    <twig:ux:icon name="mdi:database-outline" />
+                </span>
+
+                <span class="app-switcher-copy">
+                    <span class="app-switcher-name">Base</span>
+                    <span class="app-switcher-status">phpMyAdmin</span>
+                </span>
+                
+                <span class="app-switcher-off">OFF</span>
+            </a>
+        </div>
+
+        <div class="app-switcher-footer">
+            <span class="app-switcher-footer-dot"></span>
+            <span>Système opérationnel</span>
+        </div>
+    </div>
+</div>
+
