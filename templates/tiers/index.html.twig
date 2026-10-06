@@ -1,48 +1,42 @@
 {% extends 'modern.html.twig' %}
 
-{% block title %}
-    Tiers
-{% endblock %}
+{% block title %}Tiers{% endblock %}
 
 {% block body %}
     <div class="page-container">
         <div class="page-heading">
             <div class="page-heading-copy">
-                <div class="page-eyebrow">
-                    Central / Gestion
-                </div>
-
-                <h1 class="page-title">
-                    Tiers
-                </h1>
-
+                <div class="page-eyebrow">Central / Gestion</div>
+                <h1 class="page-title">Tiers</h1>
                 <p class="page-subtitle">
                     Gérez vos personnes, entreprises et autres interlocuteurs.
                 </p>
             </div>
 
-            <div class="page-actions">
-                <a href="{{ path('app_type_tiers_index') }}" class="ui-button ui-button-secondary">
+            <div class="page-heading-actions">
+                <a href="{{ path('app_type_tiers_index') }}" class="page-action">
                     <twig:ux:icon name="mage:users-fill" />
                     <span>Types de tiers</span>
                 </a>
-
-                <a href="{{ path('app_tiers_new') }}" class="ui-button ui-button-primary">
+                <a href="{{ path('app_tiers_new') }}" class="page-action page-action-primary">
                     <twig:ux:icon name="ic:round-add" />
                     <span>Ajouter</span>
                 </a>
             </div>
         </div>
 
-        <div class="page-toolbar">
-            <div class="page-toolbar-search">
-                <twig:ux:icon name="lucide:search" />
-                <input type="search" placeholder="Rechercher un tiers..." aria-label="Rechercher un tiers" data-tier-search />
-            </div>
+        <div class="toolbar">
+            {% include 'layout/modern/components/_search.html.twig' with {
+                target: '#tiers-list',
+                placeholder: 'Rechercher un tiers...',
+                aria_label: 'Rechercher un tiers',
+                empty: '#tiers-search-empty',
+                count: '#tiers-visible-count'
+            } %}
 
-            <div class="page-toolbar-info">
+            <div class="toolbar-info">
                 <span class="toolbar-dot"></span>
-                <span> {{ tiers|length }} {{ tiers|length > 1 ? 'tiers' : 'tiers' }}</span>
+                <span><strong id="tiers-visible-count">{{ tiers|length }}</strong> tiers</span>
             </div>
         </div>
 

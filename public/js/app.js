@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.5.7.1",
+        version: "v1.6.0",
         appName: "Central"
     },
 
@@ -33,6 +33,7 @@ const App = {
         this.log('🚀 Init app');
         this.log('config', this.config);
 
+        this.search.init();
         this.autocomplete.init();
         this.tabs.init();
         this.bulk.init();
@@ -44,6 +45,116 @@ const App = {
         this.depenseForm.init();
 
         CentralMaps.init();
+    },
+
+    /* =========================================================
+     * GENERIC SEARCH
+     * ========================================================= */
+
+    search: {
+
+        init(scope = document) {
+
+            App.log('Init generic search');
+
+            scope.querySelectorAll('[data-search]').forEach(searchBox => {
+
+                if (searchBox.dataset.initialized)
+                    return;
+
+                searchBox.dataset.initialized = '1';
+
+                const input =
+                        searchBox.querySelector('[data-search-input]');
+
+                if (!input)
+                    return;
+
+                const targetSelector =
+                        input.dataset.searchTarget;
+
+                const target = targetSelector
+                        ? document.querySelector(targetSelector)
+                        : searchBox.parentElement;
+
+                if (!target)
+                    return;
+
+                const itemSelector =
+                        input.dataset.searchItem ||
+                        '[data-search-item]';
+
+                const items = Array.from(
+                        target.querySelectorAll(itemSelector)
+                        );
+
+                const emptySelector =
+                        input.dataset.searchEmpty;
+
+                const emptyState = emptySelector
+                        ? document.querySelector(emptySelector)
+                        : null;
+
+                const countSelector =
+                        input.dataset.searchCount;
+
+                const countElement = countSelector
+                        ? document.querySelector(countSelector)
+                        : null;
+
+                const normalize = value =>
+                        value
+                                .normalize('NFD')
+                                .replace(/[\u0300-\u036f]/g, '')
+                                .toLowerCase()
+                                .trim();
+
+                const filter = () => {
+
+                    const query = normalize(input.value);
+                    let visibleCount = 0;
+
+                    items.forEach(item => {
+
+                        const value = normalize(
+                                item.dataset.searchValue ||
+                                item.textContent ||
+                                ''
+                                );
+
+                        const visible =
+                                query === '' ||
+                                value.includes(query);
+
+                        item.hidden = !visible;
+
+                        if (visible)
+                            visibleCount += 1;
+                    });
+
+                    if (emptyState) {
+                        emptyState.hidden = visibleCount !== 0;
+                    }
+
+                    if (countElement) {
+                        countElement.textContent = visibleCount;
+                    }
+
+                    App.events.emit('search:filtered', {
+                        searchBox,
+                        input,
+                        target,
+                        query,
+                        visibleCount,
+                        totalCount: items.length
+                    });
+                };
+
+                input.addEventListener('input', filter);
+
+                filter();
+            });
+        }
     },
 
     /* =========================================================

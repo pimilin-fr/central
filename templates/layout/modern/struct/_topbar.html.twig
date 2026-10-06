@@ -1,34 +1,28 @@
 <header class="app-topbar">
     <div class="topbar-left">
-
-        <button type="button" class="topbar-menu-button" data-mobile-sidebar-toggle aria-label="Ouvrir le menu" title="Menu">
-            <twig:ux:icon name="lucide:menu"/>
+        <button type="button" class="topbar-menu-button" data-mobile-sidebar-toggle aria-label="Ouvrir le menu">
+            <twig:ux:icon name="lucide:menu" />
         </button>
 
-        {# =========================================================
-           APPLICATION SWITCHER
-           ========================================================= #}
         {% include 'layout/modern/struct/_app_switcher.html.twig' %}
 
         <div class="topbar-breadcrumb">
             <span class="topbar-breadcrumb-root">Central</span>
-            <span class="topbar-breadcrumb-separator"> / </span>
-
+            <span class="topbar-breadcrumb-separator">/</span>
             <span class="topbar-breadcrumb-current">
                 {% block topbar_title %}
-                    {% if app.request.attributes.get('_route') starts with 'app_tiers_' %}
+                    {% set route = app.request.attributes.get('_route') %}
+                    {% if route starts with 'app_tiers_' or route starts with 'app_type_tiers_' %}
                         Tiers
-                    {% elseif app.request.attributes.get('_route') starts with 'app_type_tiers_' %}
-                        Types de tiers
-                    {% elseif app.request.attributes.get('_route') starts with 'app_categorie_' %}
+                    {% elseif route starts with 'app_categorie_' %}
                         Catégories
-                    {% elseif app.request.attributes.get('_route') starts with 'app_portefeuille_' %}
+                    {% elseif route starts with 'app_portefeuille_' %}
                         Portefeuilles
-                    {% elseif app.request.attributes.get('_route') starts with 'app_adresse_' %}
+                    {% elseif route starts with 'app_adresse_' %}
                         Adresses
-                    {% elseif app.request.attributes.get('_route') starts with 'app_projet_' %}
+                    {% elseif route starts with 'app_projet_' %}
                         Projets
-                    {% elseif app.request.attributes.get('_route') starts with 'app_depenses_' %}
+                    {% elseif route starts with 'app_depenses_' %}
                         Dépenses
                     {% else %}
                         Tableau de bord
@@ -39,35 +33,54 @@
     </div>
 
     <div class="topbar-right">
+        <div class="theme-switcher" data-theme-switcher>
+            <button type="button" class="topbar-icon-button theme-switcher-trigger" data-theme-menu-toggle aria-expanded="false" aria-haspopup="true" aria-label="Changer de thème" title="Changer de thème">
+                <span class="theme-current-mark" aria-hidden="true"></span>
+                <span class="theme-current-name" data-theme-current-name>Clair</span>
+                <twig:ux:icon name="lucide:chevron-down" class="theme-switcher-chevron" />
+            </button>
 
-        {# =========================================================
-           THÈME
-           ========================================================= #}
-        <button type="button" class="topbar-icon-button" data-theme-toggle aria-label="Changer de thème"title="Changer de thème">
-            <twig:ux:icon name="lucide:sun" class="theme-icon-light"/>
-            <twig:ux:icon name="lucide:moon" class="theme-icon-dark"/>
-        </button>
+            <div class="theme-menu" data-theme-menu aria-hidden="true" role="menu">
+                <div class="theme-menu-header">
+                    <span class="theme-menu-title">Apparence</span>
+                    <span class="theme-menu-subtitle">Choisissez votre ambiance</span>
+                </div>
+
+                <button type="button" class="theme-option" data-theme-option="light-orange" aria-checked="false">
+                    <span class="theme-option-preview theme-preview-orange"><span></span></span>
+                    <span class="theme-option-copy"><strong>Clair</strong><small>Accent orange</small></span>
+                    <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
+                </button>
+
+                <button type="button" class="theme-option" data-theme-option="gray-green" aria-checked="false">
+                    <span class="theme-option-preview theme-preview-green"><span></span></span>
+                    <span class="theme-option-copy"><strong>Gris</strong><small>Accent vert</small></span>
+                    <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
+                </button>
+
+                <button type="button" class="theme-option" data-theme-option="dark-electric" aria-checked="false">
+                    <span class="theme-option-preview theme-preview-electric"><span></span></span>
+                    <span class="theme-option-copy"><strong>Sombre</strong><small>Bleu électrique</small></span>
+                    <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
+                </button>
+
+                <button type="button" class="theme-option" data-theme-option="oldschool" aria-checked="false">
+                    <span class="theme-option-preview theme-preview-oldschool"><span></span></span>
+                    <span class="theme-option-copy"><strong>Old School</strong><small>Beige &amp; marron</small></span>
+                    <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
+                </button>
+            </div>
+        </div>
 
         <div class="topbar-divider"></div>
 
-        {# =========================================================
-           PROFIL
-           ========================================================= #}
         <button type="button" class="topbar-user" title="Profil">
             <span class="topbar-user-avatar">C</span>
-
             <span class="topbar-user-copy">
                 <span class="topbar-user-name">Central</span>
                 <span class="topbar-user-status">Connecté</span>
             </span>
-
-            <twig:ux:icon
-                name="lucide:chevron-down"
-                class="topbar-user-chevron"
-                />
+            <twig:ux:icon name="lucide:chevron-down" class="topbar-user-chevron" />
         </button>
     </div>
-
-
 </header>
-

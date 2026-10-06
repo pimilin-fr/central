@@ -1,170 +1,73 @@
 {% set route = app.request.attributes.get('_route') %}
 
-<aside id="central-sidebar" class="central-sidebar" data-sidebar>
+<aside id="sidebar" class="central-sidebar" data-sidebar>
     <div class="sidebar-header">
         <div class="sidebar-context">
             <span class="sidebar-context-indicator"></span>
-
-            <div class="sidebar-context-copy">
+            <span class="sidebar-context-copy">
                 <span class="sidebar-context-label">Application</span>
                 <span class="sidebar-context-name">Central</span>
-            </div>
+            </span>
         </div>
+
         <button
             type="button"
             class="sidebar-collapse-button"
             data-sidebar-toggle
             aria-label="Réduire ou agrandir le menu"
-            title="Mode compact"
-        >
-            <twig:ux:icon name="lucide:panel-left-close"/>
+            title="Réduire ou agrandir le menu"
+            >
+            <twig:ux:icon name="lucide:panel-left-close" />
         </button>
     </div>
 
     <div class="sidebar-separator"></div>
 
     <nav class="sidebar-nav" aria-label="Navigation Central">
+        <div class="sidebar-section-label">Gestion</div>
 
-        <div class="sidebar-section-label">
-            Gestion
-        </div>
-
-        {# =========================================================
-           TIERS
-           ========================================================= #}
-        <a
-            href="{{ path('app_tiers_index') }}"
-            class="sidebar-link {{
-                route starts with 'app_tiers_'
-                or route starts with 'app_type_tiers_'
-                    ? 'is-active'
-                    : ''
-            }}"
-        >
-            <span class="sidebar-link-icon">
-                <twig:ux:icon name="mage:user-fill"/>
-            </span>
-            <span class="sidebar-link-label">Tiers</span>
-            {% if route starts with 'app_tiers_' or route starts with 'app_type_tiers_' %}
-                <span class="sidebar-link-active"></span>
-            {% endif %}
+        <a href="{{ path('app_tiers_index') }}"
+           class="sidebar-link {{ route starts with 'app_tiers_' or route starts with 'app_type_tiers_' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="mage:user-fill" /></span>
+            <span class="sidebar-link-copy">Tiers</span>
         </a>
 
-        {# =========================================================
-           CATÉGORIES
-           ========================================================= #}
-        <a
-            href="{{ path('app_categorie_index') }}"
-            class="sidebar-link {{
-                route starts with 'app_categorie_'
-                    ? 'is-active'
-                    : ''
-            }}"
-        >
-            <span class="sidebar-link-icon">
-                <twig:ux:icon name="streamline-flex:search-category-solid"/>
-            </span>
-            <span class="sidebar-link-label">Catégories</span>
-            {% if route starts with 'app_categorie_' %}
-                <span class="sidebar-link-active"></span>
-            {% endif %}
+        <a href="{{ path('app_categorie_index') }}"
+           class="sidebar-link {{ route starts with 'app_categorie_' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="streamline-flex:search-category-solid" /></span>
+            <span class="sidebar-link-copy">Catégories</span>
         </a>
 
-        {# =========================================================
-           PORTEFEUILLES
-           ========================================================= #}
-        <a
-            href="{{ path('app_portefeuille_index') }}"
-            class="sidebar-link {{
-                route starts with 'app_portefeuille_'
-                    ? 'is-active'
-                    : ''
-            }}"
-        >
-            <span class="sidebar-link-icon">
-                <twig:ux:icon name="solar:wallet-money-bold"/>
-            </span>
-            <span class="sidebar-link-label">Portefeuilles</span>
-            {% if route starts with 'app_portefeuille_' %}
-                <span class="sidebar-link-active"></span>
-            {% endif %}
+        <a href="{{ path('app_portefeuille_index') }}"
+           class="sidebar-link {{ route starts with 'app_portefeuille_' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="solar:wallet-money-bold" /></span>
+            <span class="sidebar-link-copy">Portefeuilles</span>
         </a>
 
-        {# =========================================================
-           ADRESSES
-           ========================================================= #}
-        <a
-            href="{{ path('app_adresse_index') }}"
-            class="sidebar-link {{
-                route starts with 'app_adresse_'
-                    ? 'is-active'
-                    : ''
-            }}"
-        >
-            <span class="sidebar-link-icon">
-                <twig:ux:icon name="entypo:address"/>
-            </span>
-            <span class="sidebar-link-label">Adresses</span>
-            {% if route starts with 'app_adresse_' %}
-                <span class="sidebar-link-active"></span>
-            {% endif %}
+        <a href="{{ path('app_adresse_index') }}"
+           class="sidebar-link {{ route starts with 'app_adresse_' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="entypo:address" /></span>
+            <span class="sidebar-link-copy">Adresses</span>
         </a>
 
-        {# =========================================================
-           PROJETS
-           ========================================================= #}
-        <a
-            href="{{ path('app_projet_index') }}"
-            class="sidebar-link {{
-                route starts with 'app_projet_'
-                    ? 'is-active'
-                    : ''
-            }}"
-        >
-            <span class="sidebar-link-icon">
-                <twig:ux:icon name="ix:project"/>
-            </span>
-
-            <span class="sidebar-link-label">
-                Projets
-            </span>
-
-            {% if route starts with 'app_projet_' %}
-                <span class="sidebar-link-active"></span>
-            {% endif %}
+        <a href="{{ path('app_projet_index') }}"
+           class="sidebar-link {{ route starts with 'app_projet_' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="ix:project" /></span>
+            <span class="sidebar-link-copy">Projets</span>
         </a>
 
-        {# =========================================================
-           DÉPENSES
-           ========================================================= #}
-        <a
-            href="{{ path('app_depenses_index') }}"
-            class="sidebar-link {{
-                route starts with 'app_depenses_'
-                    ? 'is-active'
-                    : ''
-            }}"
-        >
-            <span class="sidebar-link-icon">
-                <twig:ux:icon name="healthicons:money-bag"/>
-            </span>
-            <span class="sidebar-link-label">Dépenses</span>
-            {% if route starts with 'app_depenses_' %}
-                <span class="sidebar-link-active"></span>
-            {% endif %}
+        <a href="{{ path('app_depenses_index') }}"
+           class="sidebar-link {{ route starts with 'app_depenses_' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="healthicons:money-bag" /></span>
+            <span class="sidebar-link-copy">Dépenses</span>
         </a>
     </nav>
 
-    <div class="sidebar-bottom">
-        <div class="sidebar-bottom-card">
-            <span class="sidebar-bottom-icon">
-                <twig:ux:icon name="lucide:orbit"/>
-            </span>
-            <span class="sidebar-bottom-copy">
-                <span>Central</span>
-                <small>Gestion financière</small>
-            </span>
-            <span class="sidebar-bottom-status"></span>
-        </div>
+    <div class="sidebar-bottom-card">
+        <twig:ux:icon name="lucide:wallet-cards" />
+        <span class="sidebar-bottom-copy">
+            <span class="sidebar-bottom-title">Central</span>
+            <span class="sidebar-bottom-text">Gestion financière</span>
+        </span>
     </div>
 </aside>

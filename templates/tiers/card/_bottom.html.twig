@@ -1,54 +1,55 @@
 <div class="tier-card-footer">
+    {#
+        On privilégie les adresses non supprimées.
+        Si aucune adresse active n'existe, on affiche les supprimées.
+    #}
     {% set activeAddresses = tiers.tiersAdresses|filter(ta => ta.adresse and not ta.adresse.isDeleted) %}
-    {% set principalAddress = activeAddresses|filter(ta => ta.principale)|first %}
+    {% set displayedAddresses = activeAddresses|length > 0
+        ? activeAddresses
+        : tiers.tiersAdresses|filter(ta => ta.adresse)
+    %}
 
-    {% if principalAddress %}
-        <div class="tier-address tier-address-primary">
-            <span class="tier-address-icon">
-                <twig:ux:icon name="lucide:star" />
-            </span>
-
-            <span class="tier-address-content">
-                <span class="tier-address-label">Principale</span>
-                <span class="tier-address-city">
-                    {{ principalAddress.adresse.ville ?? 'Ville inconnue' }}
+    {# ============================================================
+       ADRESSES PRINCIPALES EN PREMIER
+       ============================================================ #}
+    {% for tierAddress in displayedAddresses %}
+        {% if tierAddress.isPrincipale %}
+            <div class="tier-address tier-address-primary">
+                <span class="tier-address-icon">
+                    <twig:ux:icon name="lucide:star" />
                 </span>
-            </span>
-        </div>
-        {% set otherAddresses = activeAddresses|filter(ta => ta != principalAddress) %}
-    {% else %}
-        {% set otherAddresses = activeAddresses %}
-    {% endif %}
 
-    {% for tierAddress in otherAddresses|slice(0, 2) %}
-        <div class="tier-address">
-            <span class="tier-address-icon">
-                <twig:ux:icon name="lucide:map-pin" />
-            </span>
-
-            <span class="tier-address-content">
-                <span class="tier-address-label">
-                    Adresse
+                <span class="tier-address-content">
+                    <span class="tier-address-label">Principale</span>
+                    <span class="tier-address-city">
+                        {{ tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' }}
+                    </span>
                 </span>
-                <span class="tier-address-city">
-                    {{ tierAddress.adresse.ville ?? 'Ville inconnue' }}
-                </span>
-            </span>
-        </div>
+            </div>
+        {% endif %}
     {% endfor %}
 
-    {% if isDeleted %}
-        <div class="tier-address tier-address-archived">
-            <span class="tier-address-icon">
-                <twig:ux:icon name="lucide:archive-x" />
-            </span>
+    {# ============================================================
+       AUTRES ADRESSES
+       ============================================================ #}
+    {% for tierAddress in displayedAddresses %}
+        {% if not tierAddress.isPrincipale %}
+            <div class="tier-address">
+                <span class="tier-address-icon">
+                    <twig:ux:icon name="lucide:map-pin" />
+                </span>
 
-            <span class="tier-address-content">
-                <span class="tier-address-label">Statut</span>
-                <span class="tier-address-city">Archivé</span>
-            </span>
-        </div>
-    {% elseif not principalAddress and activeAddresses is empty %}
+                <span class="tier-address-content">
+                    <span class="tier-address-label">Adresse</span>
+                    <span class="tier-address-city">
+                        {{ tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' }}
+                    </span>
+                </span>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    {% if displayedAddresses is empty %}
         <div class="tier-address tier-address-muted">
             <span class="tier-address-icon">
                 <twig:ux:icon name="lucide:map-pin-off" />
