@@ -1,124 +1,67 @@
-<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+<div class="resume-layout">
 
-    {# OPTIONS DE GROUPEMENT #}
-    <div class="md:col-span-2 bg-gray-100 p-5 rounded-xl border shadow">
-        {% include 'detail/v2/_grouping.html.twig' with {
-            groupBy: groupBy,
-            route: 'app_tiers_show',
-            routeParams: {
-                id: tiers.id,
-                tab: 'summary'
-            }
-        } %}
-    </div>
+    {# REGROUPEMENT #}
+    {% include 'detail/v2/_grouping.html.twig' with {
+        groupBy: groupBy,
+        route: 'app_tiers_show',
+        routeParams: {
+            id: tiers.id,
+            tab: 'summary'
+        }
+    } %}
 
-    {# INFOS Tiers #}
+    {# CARTE RESUME : cercle stratégie | identité (nom + type) + infos | liseré statut #}
+    <section class="summary-card {{ tiers.deletedAt ? 'is-inactive' : '' }}">
 
+        {% include 'detail/v2/_demo_circle.html.twig' with { entity: tiers } %}
 
-    <div class="md:col-span-3 bg-gray-100 p-5 rounded-xl shadow border relative overflow-hidden">
+        <div class="summary-body">
 
-        {# Liseré couleur #}
-        <div
-            class="absolute right-0 top-0 h-full w-5"
-            style="background-color: {{ tiers.deletedAt ? '#eb4034' : '#45d161' }}"
-            ></div>
+            <div class="summary-head">
+                <h2 class="summary-name" title="{{ tiers.name }}">{{ tiers.name }}</h2>
 
-        <div class="pr-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-sm">
-
-            {# =========================
-               LIGNE 1
-               ========================= #}
-
-            {# Nom #}
-            <div>
-                <p class="text-gray-500">Nom</p>
-                <p class="text-gray-800 font-medium">
-                    {{ tiers.name }}
-                </p>
+                {% if tiers.tiersType %}
+                    <span class="tier-type-pill"
+                          style="--tier-color: {{ tiers.tiersType.couleur ?? '#cbd5e1' }};">
+                        <span class="tier-type-pill-dot"></span>
+                        <span>{{ tiers.tiersType.name }}</span>
+                    </span>
+                {% endif %}
             </div>
 
-            {# Texte de recherche #}
-            <div>
-                <p class="text-gray-500">Texte de recherche</p>
-                <p class="text-gray-800 font-medium">
-                    {{ tiers.searchText ?? '—' }}
-                </p>
-            </div>
-
-
-            {# =========================
-               LIGNE 2
-               ========================= #}
-
-            {# Créé le #}
-            <div>
-                <p class="text-gray-500">Créé le</p>
-                <p class="text-gray-800 font-medium">
-                    {{ tiers.createdAt|date('d/m/Y') }}
-                </p>
-            </div>
-
-            {# Supprimé le #}
-            {% if tiers.deletedAt %}
-                <div>
-                    <p class="text-gray-500">Supprimé le</p>
-                    <p class="text-gray-800 font-medium">
-                        {{ tiers.deletedAt|date('d/m/Y') }}
-                    </p>
+            <div class="summary-grid-2-cols">
+                <div class="summary-field">
+                    <p class="summary-label">Texte de recherche</p>
+                    <p class="summary-value" title="{{ tiers.searchText ?? '' }}">{{ tiers.searchText ?? '—' }}</p>
                 </div>
-            {% endif %}
 
+                <div class="summary-field">
+                    <p class="summary-label">Créé le</p>
+                    <p class="summary-value">{{ tiers.createdAt ? tiers.createdAt|date('d/m/Y') : '—' }}</p>
+                </div>
 
-            {# =========================
-               LIGNE 3
-               ========================= #}
-            {# Demo #}
-            <div>
-                <p class="text-gray-500">Demo</p>
-                <p class="text-gray-800 font-medium">
-                    {% include 'detail/v2/_demo.html.twig' with {entity:tiers}  %}
-                </p>
+                {% if tiers.deletedAt %}
+                    <div class="summary-field">
+                        <p class="summary-label">Supprimé le</p>
+                        <p class="summary-value">{{ tiers.deletedAt|date('d/m/Y') }}</p>
+                    </div>
+                {% endif %}
             </div>
-            {# Type #}
-            <div>
-                <p class="text-gray-500">Type</p>
-                <p class="text-gray-800 font-medium">
-                    {{ tiers.tiersType.name ?? '—' }}
-                </p>
-            </div>
-
-
         </div>
 
-        {# =========================
-           STATUT - LISERÉ VERTICAL
-           ========================= #}
-
-        <div
-            class="absolute right-0 top-0 h-full w-6 flex items-center justify-center"
-            style="background-color: {{ tiers.deletedAt ? '#eb4034' : '#45d161' }}"
-            >
-            <span
-                class="text-white font-bold uppercase whitespace-nowrap"
-                style="transform: rotate(90deg);"
-                >
-                {{ tiers.deletedAt ? 'Inactif' : 'Actif' }}
-            </span>
+        <div class="summary-ribbon">
+            <span class="summary-ribbon-label">{{ tiers.deletedAt ? 'Inactif' : 'Actif' }}</span>
         </div>
+    </section>
 
-    </div>
-
-</div>
-
-<div>
-    <form method="post" action="{{ path('app_depenses_bulk_update') }}" class="mb-4"  data-bulk-form>
-        <div class="flex flex-wrap items-end gap-4 bg-gray-100 p-4 rounded-lg border shadow-sm space-y-3 mb-4">
+    {# MODIFICATION EN MASSE + RELEVES #}
+    <form method="post" action="{{ path('app_depenses_bulk_update') }}" class="bulk-form" data-bulk-form>
+        <div class="bulk-bar" data-bulk-bar>
             {{ include('depenses/_bulk_components.html.twig') }}
         </div>
 
         <div id="releves-container">
-            {% include('detail/v2/_releve.html.twig')%}
+            {% include 'detail/v2/_releve.html.twig' %}
         </div>
     </form>
 </div>
-

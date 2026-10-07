@@ -29,8 +29,9 @@
             id="tab-{{ tab.id }}"
             class="tab-content modern-tabs-content {{ activeTab == tab.id ? '' : 'hidden' }}"
             role="tabpanel"
+            {% if tab.url is defined %}data-url="{{ tab.url }}" data-loaded="0"{% endif %}
         >
-            {{ tab.content|raw }}
+            {{ (tab.content ?? '')|raw }}
         </div>
     {% endfor %}
 </div>

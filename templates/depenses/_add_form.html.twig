@@ -1,169 +1,120 @@
-
+{#
+    Formulaire « Nouvelle opération » — briques du design system, multi-thème.
+    On conserve tous les ids / names attendus par app.js (#depense-form, [tiers], [adresse], [adresse_id]).
+#}
 {{ form_start(form, {
     action: path('app_depenses_new', { portefeuille: form.vars.value.portefeuille ? form.vars.value.portefeuille.id : null }),
-    attr: { id: 'depense-form', class:'space-y-6' },
+    attr: { id: 'depense-form', class: 'modern-form' },
 }) }}
-{# =========================
-   CHAMPS
-   ========================= #}
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
-    {# Date #}
+<div class="modern-form-intro">
     <div>
-        {{ form_label(form.date, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
+        <span class="modern-form-kicker">NOUVELLE OPÉRATION</span>
+        <h2 class="modern-form-title">Saisir une dépense ou un revenu</h2>
+    </div>
+</div>
 
-        {{ form_widget(form.date, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
+<div class="form-section-grid form-section-grid-3">
 
-        {{ form_errors(form.date) }}
+    {# ---- Opération ---- #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">01</span>
+            <h3>Opération</h3>
+        </div>
+        <div class="form-stack">
+            <div>
+                {{ form_label(form.date, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.date, { attr: { class: 'modern-form-control' } }) }}
+                {{ form_errors(form.date) }}
+            </div>
+            <div>
+                {{ form_label(form.montant, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.montant, { attr: { class: 'modern-form-control' } }) }}
+                {{ form_errors(form.montant) }}
+            </div>
+            <div>
+                {{ form_label(form.numCommande, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.numCommande, { attr: { class: 'modern-form-control' } }) }}
+                {{ form_errors(form.numCommande) }}
+            </div>
+        </div>
     </div>
 
-    {# montant #}
-    <div>
-        {{ form_label(form.montant, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.montant, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.montant) }}
+    {# ---- Imputation ---- #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">02</span>
+            <h3>Imputation</h3>
+        </div>
+        <div class="form-stack">
+            <div>
+                {{ form_label(form.categorie, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.categorie, { attr: { class: 'modern-form-control autocomplete' } }) }}
+                {{ form_errors(form.categorie) }}
+            </div>
+            <div>
+                {{ form_label(form.tiers, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.tiers, { attr: { class: 'modern-form-control autocomplete' } }) }}
+                {{ form_errors(form.tiers) }}
+            </div>
+            <div>
+                {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
+                <select id="{{ form.adresse.vars.id }}"
+                        name="{{ form.adresse.vars.full_name }}"
+                        class="modern-form-control">
+                    <option value="">Adresse</option>
+                </select>
+                {{ form_widget(form.adresse_id) }}
+                {{ form_errors(form.adresse) }}
+            </div>
+            <div>
+                {{ form_label(form.projet, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.projet, { attr: { class: 'modern-form-control autocomplete' } }) }}
+                {{ form_errors(form.projet) }}
+            </div>
+        </div>
     </div>
-    {# numCommande #}
-    <div>
-        {{ form_label(form.numCommande, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
 
-        {{ form_widget(form.numCommande, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.numCommande) }}
-    </div>
-    {# ptf #}
-    <div class="md:row-span-3">
-        {{ form_label(form.portefeuille, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-2' }
-        }) }}
-
-        <div class="space-y-2">
+    {# ---- Portefeuille ---- #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">03</span>
+            <h3>Portefeuille</h3>
+        </div>
+        <div class="choice-list">
             {% for choice in form.portefeuille %}
-                <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                    {{ form_widget(choice, {
-                    attr: {
-                        class: 'h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500'
-                    }
-                }) }}
-                    <span class="text-sm text-gray-700">
-                        {{ choice.vars.label }}
-                    </span>
+                <label class="choice-card">
+                    {{ form_widget(choice) }}
+                    <span>{{ choice.vars.label }}</span>
                 </label>
             {% endfor %}
         </div>
-
         {{ form_errors(form.portefeuille) }}
     </div>
 
-
-    {# categorie #}
-    <div>
-        {{ form_label(form.categorie, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.categorie, {
-            attr: {
-                class: 'autocomplete w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.categorie) }}
-    </div>
-    {# tiers #}
-    <div class="relative">
-        {{ form_label(form.tiers, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.tiers, {
-            attr: {
-                class: 'autocomplete w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.tiers) }}
-    </div>
-
-    {# adresse #}
-    <div class="relative">
-        {{ form_label(form.adresse, null, {
-        label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-    }) }}
-
-        <select id="{{ form.adresse.vars.id }}"
-                name="{{ form.adresse.vars.full_name }}"
-                class="w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500">
-            <option value="">Adresse</option>
-        </select>
-
-        {{ form_widget(form.adresse_id) }}
-        {{ form_errors(form.adresse) }}
-    </div>
-    <div class="hidden"> {{ form_widget(form.adresse) }} </div>
-
-    {# projet #}
-    <div class="relative">
-        {{ form_label(form.projet, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.projet, {
-            attr: {
-                class: 'autocomplete w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.projet) }}
-    </div>
-    {# note #}
-    <div class="md:col-span-3">
-        {{ form_label(form.note, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.note, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
+    {# ---- Note ---- #}
+    <div class="form-field-card form-field-card-wide">
+        <div class="form-field-heading">
+            <span class="form-field-index">04</span>
+            <h3>Note</h3>
+        </div>
+        {{ form_label(form.note, null, { label_attr: { class: 'modern-form-label' } }) }}
+        {{ form_widget(form.note, { attr: { class: 'modern-form-control' } }) }}
         {{ form_errors(form.note) }}
     </div>
-
 </div>
 
-{# =========================
-   ACTIONS
-   ========================= #}
-<div class="flex justify-end gap-3 pt-4">
-    <button type="submit"
-            class="inline-flex items-center gap-2 px-4 py-2
-            text-sm font-medium rounded-lg
-            bg-orange-500 hover:bg-orange-600 text-white transition">
-        {{ ux_icon('mdi:content-save-outline', { class: 'w-4 h-4' }) }}
-        Enregistrer
+{# Champ technique conservé tel quel (rempli par le JS) #}
+<div hidden>{{ form_widget(form.adresse) }}</div>
+
+<div class="modern-form-footer">
+    <span class="modern-form-footer-copy">{{ form_errors(form) }}</span>
+
+    <button type="submit" class="page-action page-action-primary">
+        <twig:ux:icon name="mdi:content-save-outline" />
+        <span>Enregistrer</span>
     </button>
 </div>
-{{ form_errors(form) }}
+
 {{ form_end(form) }}

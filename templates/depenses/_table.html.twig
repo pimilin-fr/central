@@ -1,6 +1,6 @@
 {% set releveId = depense.releveId ?? 0 %}
-<table class="min-w-full divide-y divide-gray-200 text-sm" data-releve="{{ releveId }}">
-    <thead class="bg-gray-50">
+<table class="ops-table" data-releve="{{ releveId }}">
+    <thead>
         <tr>
             <th><input type="checkbox" class="select-all"/></th>
             <th class="px-4 py-3 text-left">Date</th>
@@ -11,10 +11,10 @@
         </tr>
     </thead>
 
-    <tbody class="divide-y">
+    <tbody>
 
         {% for depense in depenses %}
-            <tr class="hover:bg-gray-50 cursor-pointer depense-row"
+            <tr class="ops-row depense-row"
                 data-id="{{ depense.id }}">
 
                 <td onclick="event.stopPropagation()">
@@ -71,7 +71,7 @@
 
                 {% if depense.categorie.isDepense %}
                     {% if  depense.montant < 0 %}
-                        <td class="px-4 py-2 text-right text-blue-500 font-medium">
+                        <td class="px-4 py-2 text-right amount-refund font-medium">
                             + {{ 
                             (
                                 (depense.montant|default('0')|replace({' ': '', ',': '.'})) * -1
@@ -80,20 +80,20 @@
                             }} €
                         </td>
                     {% else %}
-                        <td class="px-4 py-2 text-right text-red-500 font-medium">
+                        <td class="px-4 py-2 text-right amount-expense font-medium">
                             - {{ depense.montant|number_format(2, ',', ' ') }} €
                         </td>
                     {% endif %}
                 {% else %}
-                    <td class="px-4 py-2 text-right text-green-500 font-medium">
+                    <td class="px-4 py-2 text-right amount-income font-medium">
                         + {{ depense.montant|number_format(2, ',', ' ') }} €
                     </td>
                 {% endif %}
             </tr>
 
             {# DETAILS (hidden) #}
-            <tr class="hidden bg-gray-50 detail-row" id="detail-{{ depense.id }}">
-                <td colspan="6" class="px-4 py-3 text-xs text-gray-600">
+            <tr class="hidden ops-detail-row detail-row" id="detail-{{ depense.id }}">
+                <td colspan="6" class="ops-detail-cell">
 
                     <div class="grid grid-cols-3 gap-4">
 
@@ -120,7 +120,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">Pas de dépenses</td>
+                <td colspan="6" class="ops-empty">Pas de dépenses</td>
             </tr>
         {% endfor %}
 

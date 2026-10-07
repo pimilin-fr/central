@@ -7,16 +7,17 @@
 
 .modern-tabs {
     overflow: visible;
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
+    background: color-mix(in srgb, var(--surface-soft) 70%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
 }
 
 .modern-tabs-nav-wrap {
-    padding: 0;
-    background: transparent;
+    padding: 0 12px;
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
     border-bottom: 1px solid var(--border);
+    border-radius: 15px 15px 0 0;
 }
 
 .modern-tabs-nav {
@@ -83,12 +84,129 @@
 }
 
 .modern-tabs-content {
-    padding: 18px 0 0;
+    padding: 18px;
     color: var(--text-soft);
 }
 
 @media (max-width: 640px) {
     .modern-tabs-content {
-        padding: 14px;
+        padding: 12px;
     }
+}
+
+
+/* =========================================================
+   UTILITAIRES DE BASE (indépendants du build Tailwind)
+   ========================================================= */
+
+[hidden] {
+    display: none !important;
+}
+
+.hidden {
+    display: none;
+}
+
+/* =========================================================
+   EN-TETE DE PAGE — SURTITRE / SOUS-TITRE
+   ========================================================= */
+
+.page-eyebrow {
+    margin-bottom: 5px;
+    color: var(--accent-strong);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+}
+
+.page-subline {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Pastille « type de tiers » : contour + point dans la couleur métier */
+.tier-type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 100%;
+    padding: 3px 12px 3px 9px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--tier-color, var(--border-strong)) 12%, transparent);
+    border: 1.5px solid var(--tier-color, var(--border-strong));
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.tier-type-pill-dot {
+    flex: 0 0 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--tier-color, var(--border-strong));
+    border-radius: 50%;
+}
+
+/* =========================================================
+   SEGMENTED — GROUPE DE BOUTONS (actif = accent du thème)
+   ========================================================= */
+
+.segmented {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+}
+
+.segmented-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0 11px;
+    color: var(--text-soft);
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+    transition: color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.segmented-item:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+}
+
+.segmented-item.is-active,
+.segmented-item.is-active:hover {
+    color: var(--accent-contrast);
+    background: var(--accent);
+    box-shadow: var(--shadow-sm);
+}
+
+/* =========================================================
+   MONTANTS
+   ========================================================= */
+
+.amount-income {
+    color: var(--amount-income);
+}
+
+.amount-expense {
+    color: var(--amount-expense);
+}
+
+.amount-refund {
+    color: var(--amount-refund);
 }

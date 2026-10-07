@@ -6,26 +6,24 @@
     <div class="page-container tiers-form-page">
         <div class="page-heading">
             <div class="page-heading-copy">
-                <h1 class="page-title">{{entity.name}}</h1>
-                <p class="page-subtitle">
-                <div class="w-1.5 h-6 rounded-sm mr-3"
-                     style="background-color: {{ entity.tiersType.couleur ?? '#e5e7eb' }};">
-                </div>
+                <div class="page-eyebrow">Central / Tiers</div>
+                <h1 class="page-title">{{ entity.name }}</h1>
 
-                <span class="text-sm font-medium text-gray-600 whitespace-nowrap">
-                    {{ entity.tiersType.name ?? '_' }}
-                </span>
-                </p>
+                {# Sous-titre : une seule ligne, contour + point dans la couleur du type #}
+                <div class="page-subline">
+                    <span class="tier-type-pill"
+                          style="--tier-color: {{ entity.tiersType.couleur ?? '#cbd5e1' }};">
+                        <span class="tier-type-pill-dot"></span>
+                        <span>{{ entity.tiersType.name ?? '—' }}</span>
+                    </span>
+                </div>
             </div>
-            {# =========================
-             Boutons actions lié au tiers
-             ========================= #}
-            {% include 'tiers/show/_btns.html.twig'%}
+
+            {# Boutons actions liés au tiers #}
+            {% include 'tiers/show/_btns.html.twig' %}
         </div>
 
-        {# =========================
-        ONGLETS FONCTIONNELS
-        ========================= #}
-        {% include 'tiers/show/_tabs.html.twig'%}
+        {# Onglets fonctionnels #}
+        {% include 'tiers/show/_tabs.html.twig' %}
     </div>
 {% endblock %}

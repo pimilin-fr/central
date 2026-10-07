@@ -199,3 +199,22 @@ THEME 4 — OLD SCHOOL / BEIGE / MARRON
     --category-refund-soft: rgba(201, 154, 82, .14);
 }
                                              
+
+/* =========================================================
+   MONTANTS — VERT REVENU / ROUGE DEPENSE / BLEU REMBOURSEMENT
+   Les verts/rouges viennent des couleurs métier (categories).
+   ========================================================= */
+
+:root {
+    --amount-income: var(--category-income-strong);
+    --amount-expense: var(--category-expense-strong);
+    --amount-refund: #2f7bbf;
+}
+
+[data-theme="oldschool"] {
+    --amount-refund: #3a6f9f;
+}
+
+[data-theme="dark-electric"] {
+    --amount-refund: #6cb4f2;
+}

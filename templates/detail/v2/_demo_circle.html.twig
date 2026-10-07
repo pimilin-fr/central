@@ -1,0 +1,25 @@
+{#
+    Cercle « stratégie de démo » : couleur + icône (plus de texte).
+    Paramètre : entity (doit exposer demoStrategy).
+    Couleurs = tokens de thème (--info / --warning / --danger), pas de classes Tailwind.
+#}
+{% set strategy = entity.demoStrategy.value ?? null %}
+
+{% set mapping = {
+    'copy':      { label: 'Copie',     icon: 'lucide:copy',          color: 'var(--info)',       ink: '#ffffff' },
+    'anonymize': { label: 'Anonymisé', icon: 'lucide:venetian-mask', color: 'var(--warning)',    ink: '#2b1d02' },
+    'exclude':   { label: 'Exclue',    icon: 'lucide:eye-off',       color: 'var(--danger)',     ink: '#ffffff' }
+} %}
+
+{% set item = mapping[strategy] ?? { label: 'Erreur', icon: 'lucide:circle-help', color: 'var(--text-muted)', ink: '#ffffff' } %}
+
+<div class="summary-circle-wrap">
+    <div class="summary-circle"
+         style="--demo-color: {{ item.color }}; --demo-ink: {{ item.ink }};"
+         title="Stratégie de démo : {{ item.label }}"
+         role="img"
+         aria-label="Stratégie de démo : {{ item.label }}">
+        <twig:ux:icon name="{{ item.icon }}" />
+    </div>
+    <span class="summary-circle-caption">{{ item.label }}</span>
+</div>

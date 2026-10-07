@@ -1,113 +1,44 @@
-<div class="grid grid-cols-1 lg:grid-cols-[3fr_7fr] gap-6 mt-6">
+<div class="geo-layout">
 
-    {# =========================================================
-       LISTE DES ADRESSES
-       ========================================================= #}
-
-    <div class="space-y-4">
-
+    {# LISTE DES ADRESSES #}
+    <div class="geo-list">
         {% for ta in adresses %}
-
-            {% set adresse = ta.adresse %}
-
             {% include 'adresse/_adresse_disp.html.twig' with {
-                adresse: adresse,
+                adresse: ta.adresse,
                 tierAdresse: ta
             } only %}
-
         {% else %}
-
-            <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-
-                {{ ux_icon('mdi:map-marker-off-outline', {
-                    class: 'w-8 h-8 mx-auto text-gray-400 mb-2'
-                }) }}
-
-                <p class="text-sm text-gray-500">
-                    Aucune adresse liée
-                </p>
-
+            <div class="geo-empty">
+                <twig:ux:icon name="lucide:map-pin-off" />
+                <p>Aucune adresse liée</p>
             </div>
-
         {% endfor %}
-
     </div>
 
+    {# CARTE MULTIPOINT #}
+    <section class="geo-card">
+        <div class="geo-card-ribbon"></div>
 
-    {# =========================================================
-       CARTE MULTIPOINT
-       ========================================================= #}
-
-    <div class="relative bg-white rounded-xl shadow-sm border overflow-hidden lg:sticky lg:top-6 h-fit">
-
-        {# Liseré géographique #}
-
-        <div class="absolute top-0 left-0 z-20 h-full w-2 bg-green-500">
-        </div>
-
-
-        <div class="p-4 pl-6">
-
-            {# =================================================
-               EN-TÊTE
-               ================================================= #}
-
-            <div class="flex items-center justify-between mb-4">
-
+        <div class="geo-card-body">
+            <div class="geo-card-head">
                 <div>
-
-                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                        Localisation
+                    <p class="summary-label">Localisation</p>
+                    <p class="geo-card-count">
+                        <twig:ux:icon name="lucide:map-pinned" />
+                        {{ adresses|length }} adresse{{ adresses|length > 1 ? 's' : '' }}
                     </p>
-
-                    <p class="mt-1 text-sm font-medium text-gray-700 flex items-center gap-1.5">
-
-                        {{ ux_icon('mdi:map-marker-multiple', {
-                            class: 'w-4 h-4 text-green-600'
-                        }) }}
-
-                        {{ adresses|length }}
-                        adresse{{ adresses|length > 1 ? 's' : '' }}
-
-                    </p>
-
                 </div>
-
-
-                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-green-50 text-green-600">
-
-                    {{ ux_icon('mdi:map-outline', {
-                        class: 'w-5 h-5'
-                    }) }}
-
-                </span>
-
             </div>
 
-
-            {# =================================================
-               CARTE
-
-               Les points sont transmis au JS.
-               Le JS pourra ensuite gérer :
-               - point
-               - multipoint
-               - polygon
-               - zoning
-               ================================================= #}
-
+            {# Les points sont transmis au JS (point, multipoint, polygon, zoning). #}
             <div id="tiers-map"
                  data-map
                  data-map-type="multipoint"
-                 class="w-full rounded-lg overflow-hidden border"
-                 style="height: 650px;">
+                 class="geo-map">
 
                 {% for ta in adresses %}
-
                     {% set adresse = ta.adresse %}
-
                     {% if adresse.latitude is not null and adresse.longitude is not null %}
-
                         <span data-map-point
                               data-latitude="{{ adresse.latitude }}"
                               data-longitude="{{ adresse.longitude }}"
@@ -116,16 +47,9 @@
                               data-principale="{{ ta.isPrincipale ? '1' : '0' }}"
                               data-url="{{ path('app_adresse_show', {id: adresse.id}) }}">
                         </span>
-
                     {% endif %}
-
                 {% endfor %}
-
             </div>
-
         </div>
-
-    </div>
-
+    </section>
 </div>
-
