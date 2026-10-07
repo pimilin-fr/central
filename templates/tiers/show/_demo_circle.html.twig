@@ -1,8 +1,3 @@
-{#
-    Cercle « stratégie de démo » : couleur + icône (plus de texte).
-    Paramètre : entity (doit exposer demoStrategy).
-    Générique : ne dépend que de --entity-color / --entity-text.
-#}
 {% set strategy = entity.demoStrategy.value ?? null %}
 
 {% set mapping = {

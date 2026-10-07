@@ -6,15 +6,17 @@
     info: 'page-action-info',
     warning: 'page-action-warning'
 } %}
+{% if removeContainer is not defined or (not removeContainer) %}
+    <div class="page-heading-actions">
+    {% endif %}
 
-<div class="page-heading-actions">
     {% for btn in btns %}
         {% set color = btn.color|default('neutral') %}
 
         {% if btn.type is not defined or btn.type == 'link' %}
             <a
                 href="{{ btn.path }}"
-                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }}"
+                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }} {{ btn.class ??"" }}"
                 {% if btn.attr is defined %}
                     {% for at in btn.attr %}
                         {{ at.label }}="{{ at.value }}"
@@ -29,7 +31,7 @@
         {% elseif btn.type == 'submit' %}
             <button
                 type="submit"
-                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }}"
+                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }} {{ btn.class ??"" }}"
                 >
                 {% if btn.icon is defined %}
                     <twig:ux:icon name="{{ btn.icon }}" />
@@ -40,4 +42,6 @@
             </button>
         {% endif %}
     {% endfor %}
-</div>
+    {% if removecontainer is not defined  %}
+    </div>
+{% endif %}

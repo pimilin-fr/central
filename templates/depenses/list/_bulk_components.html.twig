@@ -29,7 +29,17 @@
     <input type="hidden" name="projet_id">
 </div>
 
-<button type="submit" class="page-action page-action-primary bulk-submit">
-    <twig:ux:icon name="lucide:check" />
+{#<button type="submit" class="page-action page-action-primary bulk-submit">
+    <twig:ux:icon name="material-symbols:check-circle" />
     <span>Appliquer</span>
-</button>
+</button>#}
+{% include 'layout/modern/components/_btns.html.twig' with {
+        removeContainer:true,
+        btns: [
+            {
+                type: 'submit',
+                color: 'primary',
+                class:"page-action page-action-primary bulk-submit"
+            }
+        ]
+} %}

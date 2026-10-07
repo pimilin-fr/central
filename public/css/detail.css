@@ -216,6 +216,7 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 8px 10px;
+    margin-bottom: 16px;
     padding: 8px 12px;
     background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft));
     border: 1px solid var(--border);
@@ -346,7 +347,9 @@
    --------------------------------------------------------- */
 
 .ops-group {
-    border-bottom: 1px solid var(--border);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
 }
 
 .ops-group-header {
@@ -356,7 +359,7 @@
     flex-wrap: wrap;
     gap: 8px 24px;
     padding: 12px 14px;
-    border-radius: 10px;
+    
     cursor: pointer;
     transition: background 150ms ease;
 }
@@ -394,7 +397,6 @@
 }
 
 .ops-balance {
-    color: var(--text);
     font-weight: 800;
 }
 
@@ -420,12 +422,32 @@
 .ops-table thead,
 .ops-table thead tr,
 .ops-table thead th {
-    background: color-mix(in srgb, var(--accent) 7%, var(--surface-soft));
+    /*    background: var(--accent-soft);*/
+
+}
+
+.ops-table thead {
+    position: relative;
+    background: var(--surface-hover);
+}
+
+.ops-table thead::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--sep-color, var(--accent)) 65%, var(--border)),
+        var(--border)
+        );
 }
 
 .ops-table thead th {
     color: var(--text-soft);
-    border-bottom: 1px solid var(--border);
     font-size: 9px;
     font-weight: 900;
     letter-spacing: .1em;
