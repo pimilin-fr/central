@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Adresse{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        {# =========================
+            HEADER : Titre + actions (modernisé)
+            ========================= #}
+        {% set btns = [] %}
+        {% if entity.parent %}
+            {% set btns = btns|merge([
+                {
+                    label: "Parent",
+                    path: path('app_categorie_show', { id: entity.parent.id }),
+                    color: 'green',
+                    icon: 'icon-park-solid:up-c',
+                }
+            ]) %}
+        {% endif %}
+        {% set btns = btns|merge([{
+                label: "Retour",
+                path: path('app_categorie_index'),
+                color: 'gray',
+                icon: 'mdi:arrow-left',
+            }]) %}
+
+
+        {% include 'partials/header.html.twig' with {
+            btns: btns,
+            title: 'Catégorie : '~entity,
+            item: entity
+        } %}
+        
+        {# =========================
+           ONGLETS FONCTIONNELS
+           ========================= #}
+        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+
+        {% set tabs = [
+            {
+                id: 'summary',
+                label: 'Résumé',
+                content: include('categorie/_resume.html.twig')
+            },{
+                id: 'childs',
+                label: 'Enfants',
+                badge: entity.children|length,
+                content: include('categorie/_table.html.twig',{
+                    categories: childs,
+                })
+            },{
+                id: 'edit',
+                label: 'Modifier',
+                icon: 'mdi:pencil',
+                content: render(controller(
+                    'App\\Controller\\CategorieController::edit',
+                    {
+                        id: entity.id
+                    }
+                ))
+            }
+        ] %}
+
+        {% include 'partials/tabs.html.twig' with {
+            tabs: tabs,
+            activeTab: activeTab
+        } %}
+
+    </div>
+
+
+
+
+{% endblock %}

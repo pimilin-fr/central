@@ -132,6 +132,18 @@ const App = {
                             visibleCount += 1;
                     });
 
+                    // Les éléments filtrables peuvent être contenus dans des
+                    // branches hiérarchiques. Une branche reste visible uniquement
+                    // si elle contient au moins une feuille visible. Cela rend le
+                    // composant de recherche réutilisable pour les arbres.
+                    target.querySelectorAll('[data-search-group]').forEach(group => {
+                        const visibleChildren = group.querySelectorAll(
+                                `${itemSelector}:not([hidden])`
+                                );
+
+                        group.hidden = visibleChildren.length === 0;
+                    });
+
                     if (emptyState) {
                         emptyState.hidden = visibleCount !== 0;
                     }

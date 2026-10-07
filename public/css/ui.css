@@ -1,0 +1,117 @@
+/* =========================================================
+   UI — BOUTONS / ONGLETS / COMPOSANTS PARTAGES
+   ========================================================= */
+
+.page-action-neutral {
+    color: var(--text);
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+.page-action-neutral:hover {
+    color: var(--accent-strong);
+    background: var(--surface-soft);
+}
+
+.page-action-danger:hover {
+    color: var(--danger);
+    border-color: color-mix(in srgb, var(--danger) 42%, var(--border));
+}
+
+.page-action-success:hover {
+    color: var(--success);
+    border-color: color-mix(in srgb, var(--success) 42%, var(--border));
+}
+
+.page-action-warning:hover {
+    color: var(--warning);
+    border-color: color-mix(in srgb, var(--warning) 42%, var(--border));
+}
+
+.modern-tabs {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+.modern-tabs-nav-wrap {
+    padding: 0 10px;
+    background: var(--surface-soft);
+    border-bottom: 1px solid var(--border);
+}
+
+.modern-tabs-nav {
+    display: flex;
+    align-items: stretch;
+    gap: 3px;
+    overflow-x: auto;
+}
+
+.tab-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 48px;
+    padding: 0 13px;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 800;
+    transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.tab-button:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+}
+
+.tab-button.is-active {
+    color: var(--accent-strong);
+    border-bottom-color: var(--accent);
+}
+
+.tab-button svg {
+    width: 15px;
+    height: 15px;
+}
+
+.tab-button.is-active svg {
+    color: var(--accent);
+}
+
+.tab-badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    color: var(--text-soft);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 8px;
+    font-weight: 850;
+}
+
+.tab-button.is-active .tab-badge {
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
+}
+
+.modern-tabs-content {
+    padding: 22px;
+    color: var(--text-soft);
+}
+
+@media (max-width: 640px) {
+    .modern-tabs-content {
+        padding: 14px;
+    }
+}

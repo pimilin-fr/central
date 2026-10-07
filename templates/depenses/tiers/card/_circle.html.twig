@@ -1,0 +1,27 @@
+{% set months = {
+    '01': 'JAN',
+    '02': 'FÉV',
+    '03': 'MAR',
+    '04': 'AVR',
+    '05': 'MAI',
+    '06': 'JUN',
+    '07': 'JUI',
+    '08': 'AOÛ',
+    '09': 'SEP',
+    '10': 'OCT',
+    '11': 'NOV',
+    '12': 'DÉC'
+} %}
+
+<div
+    class="tier-date-circle"
+    style="--tier-color: {{ bgColor }}; --tier-text: {{ textColor }};"
+>
+    {% if tiers.createdAt %}
+        <span class="tier-date-circle-month">{{ months[tiers.createdAt|date('m')] }}</span>
+        <span class="tier-date-circle-year">{{ tiers.createdAt|date('y') }}</span>
+    {% else %}
+        <span class="tier-date-circle-month">—</span>
+        <span class="tier-date-circle-year">N/A</span>
+    {% endif %}
+</div>

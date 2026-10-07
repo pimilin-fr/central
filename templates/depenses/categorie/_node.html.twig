@@ -1,0 +1,107 @@
+{% set hasChildren = node.children|length > 0 %}
+{% set isLeaf = not hasChildren %}
+{% set level = node.level %}
+
+{# Couleur du liserai #}
+{% if hasChildren %}
+    {% set bgColor = 'bg-gray-500' %}
+    {% set textColor = 'text-white' %}
+{% elseif node.categorie.isDepense() %}
+    {% set bgColor = 'bg-red-400' %}
+    {% set textColor = 'text-white' %}
+{% else %}
+    {% set bgColor = 'bg-green-400' %}
+    {% set textColor = 'text-white' %}
+{% endif %}
+
+{# Couleur selon le niveau #}
+{% if level <= 1 %}
+    {% set cardClass = 'bg-gray-50 border-gray-300' %}
+{% else %}
+    {% set cardClass = 'bg-white border-gray-200' %}
+{% endif %}
+
+<div class="space-y-3">
+
+    <a href="{{ path('app_categorie_show', { id: node.categorie.id }) }}"
+       class="
+            relative block
+            rounded-lg
+            border
+            shadow-sm
+            hover:shadow-md
+            transition
+            overflow-hidden
+            {{ cardClass }}
+       "
+       style="min-height: {{ level <= 1 ? '82px' : '72px' }};"
+    >
+
+        {# LISERAI #}
+        <div class="
+                absolute top-0 right-0 h-full w-6
+                flex items-center justify-center
+                rounded-r-lg  {{ bgColor }} {{ textColor }}
+            ">
+
+            {% if isLeaf %}
+                <span class="text-[12px] font-bold tracking-wider rotate-90 whitespace-nowrap">
+                    {{ node.categorie.natureLibelle }}
+                </span>
+            {% else %}
+                <span class="text-[12px] font-bold tracking-wider rotate-90 whitespace-nowrap">
+                    Niveau : {{ level+1 }}
+                </span>
+            {% endif %}
+
+        </div>
+
+        {# CONTENU #}
+        <div class="
+                p-3 pr-9
+                {{ level == 0 ? 'py-4' : '' }}
+            ">
+
+            <div class="
+                    truncate
+                    {{ level <= 1
+                        ? 'text-base font-bold text-gray-900'
+                        : 'text-sm font-semibold text-gray-800'
+                    }}
+                ">
+                {{ node.categorie.libelle }}
+            </div>
+
+            {% if hasChildren %}
+                <div class="text-xs text-gray-400 mt-1">
+                    {{ node.children|length }}
+                    sous-catégorie{{ node.children|length > 1 ? 's' : '' }}
+                </div>
+            {% endif %}
+
+        </div>
+
+    </a>
+
+
+    {% if hasChildren %}
+
+        <div class="
+                grid
+                grid-cols-1
+                md:grid-cols-2
+                xl:grid-cols-3
+                gap-4
+            ">
+
+            {% for child in node.children %}
+                {% include 'categorie/_node.html.twig' with {
+                    node: child
+                } %}
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+</div>

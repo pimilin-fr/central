@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tiers{% endblock %}
+{% block title %}Catégorie - Liste{% endblock %}
 
 {% block body %}
     <div class="space-y-6">
@@ -11,25 +11,23 @@
             set btns = [
                 {
                     label: "Ajouter",
-                    path: path('app_tiers_new'),
+                    path: path('app_categorie_new'),
                     color: 'green',
                     icon: 'ic:round-add',
-                },{
-                    label: "Type Tiers",
-                    icon: "mage:users-fill",
-                    color: "blue",
-                    path: path('app_type_tiers_index')
+
                 }
             ]
         
         %}
         {% include 'partials/header.html.twig' with {
             btns: btns,
-            title: "Tiers - Liste",
+            title: "Catégories - Liste",
             item: null
         } %}
+        
         {# Table #}
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            {% include 'tiers/_table.html.twig' %}
+            {% include 'categorie/_table.html.twig' %}
         </div>
-    {% endblock %}
+    </div>
+{% endblock %}

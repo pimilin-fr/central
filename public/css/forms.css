@@ -1,0 +1,206 @@
+/* =========================================================
+   FORMS — TIERS / FORMS MODERNES
+   ========================================================= */
+
+.modern-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 100% 0%, var(--accent-soft), transparent 34%),
+        var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+}
+
+.form-hero::after {
+    position: absolute;
+    right: 18px;
+    bottom: 0;
+    width: 140px;
+    height: 1px;
+    content: "";
+    background: linear-gradient(90deg, transparent, var(--accent));
+    opacity: .7;
+}
+
+.form-hero-icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+    border-radius: 15px;
+    box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.form-hero-icon svg {
+    width: 25px;
+    height: 25px;
+}
+
+.form-hero-kicker,
+.form-field-kicker {
+    color: var(--accent-strong);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .15em;
+}
+
+.form-hero-title {
+    margin: 3px 0 4px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 850;
+    letter-spacing: -.02em;
+}
+
+.form-hero-text {
+    max-width: 680px;
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.form-section-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.form-field-card {
+    min-width: 0;
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.form-field-card-wide {
+    grid-column: 1 / -1;
+}
+
+.form-field-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.form-field-index {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+    border-radius: 8px;
+    font-size: 8px;
+    font-weight: 900;
+}
+
+.form-field-heading h3 {
+    margin: 2px 0 0;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.modern-form-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-soft);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .03em;
+}
+
+.modern-form-control {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 11px;
+    color: var(--text);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.modern-form-control:hover {
+    background: var(--surface-hover);
+}
+
+.modern-form-control:focus {
+    background: var(--surface);
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.modern-form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.modern-form .form-error-message,
+.modern-form .invalid-feedback {
+    display: block;
+    margin-top: 6px;
+    color: var(--danger);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.modern-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding-top: 4px;
+}
+
+.modern-form-footer-copy {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.modern-form-footer-copy svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+    color: var(--accent);
+}
+
+@media (max-width: 760px) {
+    .form-section-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .form-field-card-wide {
+        grid-column: auto;
+    }
+
+    .modern-form-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

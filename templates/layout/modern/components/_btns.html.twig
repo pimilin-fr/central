@@ -1,0 +1,42 @@
+{% set buttonColors = {
+    primary: 'page-action-primary',
+    neutral: 'page-action-neutral',
+    danger: 'page-action-danger',
+    success: 'page-action-success',
+    warning: 'page-action-warning'
+} %}
+
+<div class="page-heading-actions">
+    {% for btn in btns %}
+        {% set color = btn.color|default('neutral') %}
+
+        {% if btn.type is not defined or btn.type == 'link' %}
+            <a
+                href="{{ btn.path }}"
+                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }}"
+                {% if btn.attr is defined %}
+                    {% for at in btn.attr %}
+                        {{ at.label }}="{{ at.value }}"
+                    {% endfor %}
+                {% endif %}
+            >
+                {% if btn.icon is defined %}
+                    <twig:ux:icon name="{{ btn.icon }}" />
+                {% endif %}
+                <span>{{ btn.label }}</span>
+            </a>
+        {% elseif btn.type == 'submit' %}
+            <button
+                type="submit"
+                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }}"
+            >
+                {% if btn.icon is defined %}
+                    <twig:ux:icon name="{{ btn.icon }}" />
+                {% else %}
+                    <twig:ux:icon name="mdi:content-save-outline" />
+                {% endif %}
+                <span>{{ btn.label|default('Enregistrer') }}</span>
+            </button>
+        {% endif %}
+    {% endfor %}
+</div>
