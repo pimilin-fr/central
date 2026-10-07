@@ -237,7 +237,7 @@
 
 .summary-aside {
     flex: 0 0 auto;
-    min-width: 230px;
+    min-width: 300px;
     padding-left: 22px;
     border-left: 1px solid var(--border);
 }

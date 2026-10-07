@@ -6,17 +6,15 @@
     <div class="page-container">
         <div class="page-heading">
             <div class="page-heading-copy">
-                <div class="page-eyebrow">Central / Portefeuilles</div>
-                <h1 class="page-title">{{ entity.name }}</h1>
+
+                <h1 class="page-title">{{ entity.libelle }}</h1>
 
                 <div class="page-subline">
                     <span class="entity-pill" style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }};">
                         <span class="entity-pill-dot"></span>
-                        <span>{{ entity.type ?? '—' }}</span>
+                        <span>{{ entity.type ?? '—' }} {% if entity.origine %}- {{ entity.origine }}{%endif%}</span>
                     </span>
-                    {% if entity.origine %}
-                        <span class="entity-sub">{{ entity.origine }}</span>
-                    {% endif %}
+                    
                 </div>
             </div>
 
