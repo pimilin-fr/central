@@ -2017,6 +2017,17 @@ html[data-theme="oldschool"] .app-content {
     border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
 }
 
+.page-action-neutral {
+    color: var(--text);
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+.page-action-neutral:hover {
+    color: var(--accent-strong);
+    background: var(--surface-soft);
+}
+
 .page-action-primary {
     color: var(--accent-contrast);
     background: var(--accent);
@@ -2029,6 +2040,27 @@ html[data-theme="oldschool"] .app-content {
     border-color: var(--accent-strong);
 }
 
+.page-action-info{
+    color: var(--accent-contrast);
+    background: var(--info);
+    border-color: var(--info-soft);
+}
+.page-action-info:hover{
+    color: var(--accent-contrast);
+    background: var(--info-strong);
+    border-color: var(--info-soft);
+}
+
+.page-action-danger{
+    color: var(--accent-contrast);
+    background: var(--danger);
+    border-color: var(--danger-soft);
+}
+.page-action-danger:hover{
+    color: var(--accent-contrast);
+    background: var(--danger-strong);
+    border-color: var(--danger-soft);
+}
 /* ---------------------------------------------------------
    CARTE — ENTÊTE EN 2 PARTIES
    --------------------------------------------------------- */
@@ -2183,8 +2215,8 @@ html[data-theme="oldschool"] .app-content {
     width: 30px;
 }
 .tier-card:hover .tier-ribbon-label {
-     transform: translateY(-50%) translateX(-30%) rotate(180deg); 
-     font-size: 11px;
+    transform: translateY(-50%) translateX(-30%) rotate(180deg);
+    font-size: 11px;
 }
 .tier-ribbon-label {
     top: 50%;

@@ -3,6 +3,7 @@
     neutral: 'page-action-neutral',
     danger: 'page-action-danger',
     success: 'page-action-success',
+    info: 'page-action-info',
     warning: 'page-action-warning'
 } %}
 
@@ -19,7 +20,7 @@
                         {{ at.label }}="{{ at.value }}"
                     {% endfor %}
                 {% endif %}
-            >
+                >
                 {% if btn.icon is defined %}
                     <twig:ux:icon name="{{ btn.icon }}" />
                 {% endif %}
@@ -29,7 +30,7 @@
             <button
                 type="submit"
                 class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }}"
-            >
+                >
                 {% if btn.icon is defined %}
                     <twig:ux:icon name="{{ btn.icon }}" />
                 {% else %}

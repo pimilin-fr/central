@@ -1,32 +1,9 @@
 /* =========================================================
-   UI — BOUTONS / ONGLETS / COMPOSANTS PARTAGES
+   UI — ONGLETS / COMPOSANTS PARTAGES
    ========================================================= */
 
-.page-action-neutral {
-    color: var(--text);
-    background: var(--surface);
-    border-color: var(--border);
-}
 
-.page-action-neutral:hover {
-    color: var(--accent-strong);
-    background: var(--surface-soft);
-}
 
-.page-action-danger:hover {
-    color: var(--danger);
-    border-color: color-mix(in srgb, var(--danger) 42%, var(--border));
-}
-
-.page-action-success:hover {
-    color: var(--success);
-    border-color: color-mix(in srgb, var(--success) 42%, var(--border));
-}
-
-.page-action-warning:hover {
-    color: var(--warning);
-    border-color: color-mix(in srgb, var(--warning) 42%, var(--border));
-}
 
 .modern-tabs {
     overflow: visible;

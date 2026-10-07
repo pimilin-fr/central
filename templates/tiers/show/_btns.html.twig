@@ -1,0 +1,37 @@
+{% set btns = [
+    {
+        label: 'Retour',
+        path: path('app_tiers_index'),
+        icon: 'mdi:arrow-left',
+        color: 'neutral'
+    }
+] %}
+
+{% if entity.tiersType %}
+    {% set btns = btns|merge([
+        {
+            label: "Type",
+            path: path('app_type_tiers_show', { id: entity.tiersType.id }),
+            color: 'primary',
+            icon: 'icon-park-solid:up-c',
+        }
+    ]) %}
+{% endif %}
+
+{% if entity.deletedAt is null %}
+    {% set btns = btns|merge([ {
+        label: "Suppr.",
+        path: path('app_tiers_delete', {id:entity.id}),
+        color: 'danger',
+        icon: 'gridicons:trash'
+    }])%}
+{% else %}
+    {% set btns = btns|merge([ {
+        label: "Retaure",
+        path: path('app_tiers_restore', {id:entity.id}),
+        color: 'info',
+        icon: 'fa-solid:trash-restore-alt'
+    }])%}
+{% endif %}
+
+{% include 'layout/modern/components/_btns.html.twig'%}
