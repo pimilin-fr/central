@@ -271,3 +271,8 @@
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+input[type="color"].modern-form-control {
+    padding: 4px;
+    cursor: pointer;
+}

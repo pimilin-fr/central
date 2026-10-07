@@ -1,7 +1,7 @@
 {#
     Cercle « stratégie de démo » : couleur + icône (plus de texte).
     Paramètre : entity (doit exposer demoStrategy).
-    Couleurs = tokens de thème (--info / --warning / --danger), pas de classes Tailwind.
+    Générique : ne dépend que de --entity-color / --entity-text.
 #}
 {% set strategy = entity.demoStrategy.value ?? null %}
 
@@ -14,8 +14,8 @@
 {% set item = mapping[strategy] ?? { label: 'Erreur', icon: 'lucide:circle-help', color: 'var(--text-muted)', ink: '#ffffff' } %}
 
 <div class="summary-circle-wrap">
-    <div class="summary-circle"
-         style="--demo-color: {{ item.color }}; --demo-ink: {{ item.ink }};"
+    <div class="entity-circle"
+         style="--entity-color: {{ item.color }}; --entity-text: {{ item.ink }};"
          title="Stratégie de démo : {{ item.label }}"
          role="img"
          aria-label="Stratégie de démo : {{ item.label }}">

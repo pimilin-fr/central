@@ -65,7 +65,7 @@
    --------------------------------------------------------- */
 
 .summary-card {
-    --status-color: var(--category-income);
+    --status-color: var(--entity-color, var(--category-income));
     position: relative;
     display: flex;
     align-items: center;
@@ -98,34 +98,6 @@
     align-items: center;
     gap: 7px;
     width: 76px;
-}
-
-.summary-circle {
-    display: grid;
-    place-items: center;
-    width: 64px;
-    height: 64px;
-    color: var(--demo-ink, #fff);
-    background: var(--demo-color, var(--text-muted));
-    border: 3px solid var(--surface);
-    border-radius: 50%;
-    box-shadow: var(--shadow-sm);
-    transform-origin: center;
-    transition:
-        transform 220ms cubic-bezier(.2, .8, .2, 1),
-        box-shadow 220ms ease;
-}
-
-.summary-circle svg {
-    width: 28px;
-    height: 28px;
-}
-
-.summary-card:hover .summary-circle {
-    transform: scale(1.07) rotate(-40deg);
-    box-shadow:
-        0 10px 24px rgba(15, 23, 42, .16),
-        0 0 14px color-mix(in srgb, var(--demo-color, var(--accent)) 28%, transparent);
 }
 
 .summary-circle-caption {
@@ -196,7 +168,7 @@
     position: absolute;
     top: 50%;
     right: 50%;
-    color: #fff;
+    color: var(--entity-text, #fff);
     font-size: 9px;
     font-weight: 900;
     letter-spacing: .12em;
@@ -438,9 +410,21 @@
     padding: 9px 14px;
 }
 
+.ops-table,
+.ops-table thead,
+.ops-table tbody,
+.ops-table tr {
+    background: transparent;
+}
+
+.ops-table thead,
+.ops-table thead tr,
 .ops-table thead th {
-    color: var(--text-muted);
-    background: var(--surface-soft);
+    background: color-mix(in srgb, var(--accent) 7%, var(--surface-soft));
+}
+
+.ops-table thead th {
+    color: var(--text-soft);
     border-bottom: 1px solid var(--border);
     font-size: 9px;
     font-weight: 900;

@@ -1,0 +1,267 @@
+/* =========================================================
+   ENTITES — cartes génériques (liste) + bloc chiffre clé
+   Aucune notion de « type » ici : tout passe par deux variables
+   posées en inline sur le conteneur :
+       --entity-color  (couleur de l'entité)
+       --entity-text   (couleur du texte sur cette couleur)
+   ========================================================= */
+
+.entity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.entity-card {
+    --entity-color: var(--accent);
+    --entity-text: #fff;
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        border-color 180ms ease,
+        opacity 180ms ease;
+}
+
+.entity-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--entity-color) 35%, var(--border));
+    box-shadow: var(--shadow-md);
+}
+
+.entity-card.is-archived {
+    opacity: .5;
+}
+
+.entity-card.is-archived:hover {
+    opacity: .68;
+}
+
+.entity-card-link {
+    display: block;
+    height: 100%;
+    color: inherit;
+}
+
+/* Cercle (icône ou texte) — utilisé aussi dans les résumés */
+
+.entity-circle {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    color: var(--entity-text, #fff);
+    background: var(--entity-color, var(--accent));
+    border: 3px solid var(--surface);
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+    transform-origin: center;
+    transition:
+        transform 220ms cubic-bezier(.2, .8, .2, 1),
+        box-shadow 220ms ease;
+}
+
+.entity-circle svg {
+    width: 26px;
+    height: 26px;
+}
+
+.entity-card .entity-circle {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+}
+
+.entity-card:hover .entity-circle,
+.summary-card:hover .entity-circle {
+    transform: scale(1.07) rotate(-40deg);
+    box-shadow:
+        0 10px 24px rgba(15, 23, 42, .18),
+        0 0 14px color-mix(in srgb, var(--entity-color, var(--accent)) 30%, transparent);
+}
+
+/* Liseré vertical + libellé */
+
+.entity-ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    background: var(--entity-color);
+    transition: width 180ms ease;
+}
+
+.entity-card:hover .entity-ribbon {
+    width: 30px;
+}
+
+.entity-ribbon-label {
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    max-height: 90%;
+    overflow: hidden;
+    color: var(--entity-text);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .09em;
+    line-height: 1;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .28);
+    text-transform: uppercase;
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+    transform: translate(50%, -50%) rotate(180deg);
+    transition: font-size 180ms ease;
+}
+
+.entity-card:hover .entity-ribbon-label {
+    font-size: 11px;
+}
+
+/* Corps */
+
+.entity-body {
+    --sep-color: var(--entity-color);
+    --sep-inset: 22px;
+    padding: 22px 36px 18px 0;
+}
+
+.entity-head {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    min-height: 58px;
+    padding: 0 4px 0 82px;
+}
+
+.entity-title {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 850;
+    letter-spacing: -.02em;
+    line-height: 1.18;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.entity-sub {
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .06em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------
+   CHIFFRE CLE (solde…) + lignes de détail
+   Couleur du montant : .amount-income / .amount-expense
+   --------------------------------------------------------- */
+
+.kpi {
+    padding-left: 22px;
+}
+
+.kpi-label {
+    margin: 0 0 3px;
+    color: var(--text-muted);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.kpi-value {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.kpi-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 12px;
+}
+
+.kpi-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--text-soft);
+    font-size: 11px;
+}
+
+.kpi-line strong {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.kpi-line .is-neutral {
+    color: var(--text);
+}
+
+/* ---------------------------------------------------------
+   Cercle dans une carte résumé
+   --------------------------------------------------------- */
+
+.summary-card > .entity-circle,
+.summary-circle-wrap > .entity-circle {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+}
+
+.summary-card .entity-circle svg {
+    width: 28px;
+    height: 28px;
+}
+
+.summary-aside {
+    flex: 0 0 auto;
+    min-width: 230px;
+    padding-left: 22px;
+    border-left: 1px solid var(--border);
+}
+
+.summary-aside .kpi {
+    padding-left: 0;
+}
+
+@media (max-width: 1100px) {
+    .entity-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .entity-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .summary-aside {
+        min-width: 0;
+        padding-top: 14px;
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+    }
+}

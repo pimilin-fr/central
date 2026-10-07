@@ -1,0 +1,24 @@
+{#
+    Icône selon le type du portefeuille (Banque / Espèce / Épargne / spécifique).
+    Paramètre : portefeuille
+#}
+{% set typeKey = (portefeuille.type ??  '')|lower %}
+
+
+{% if 'banque' in typeKey or 'bank' in typeKey or 'compte' in typeKey %}
+    <twig:ux:icon name="bxs:bank" />
+{% elseif 'espèce' in typeKey or 'cash' in typeKey or 'liquide' in typeKey %}
+    <twig:ux:icon name="pinhead:banknote" />
+{% elseif 'epargne' in typeKey or 'saving' in typeKey %}
+    <twig:ux:icon name="streamline-plump:piggy-bank-solid" />
+{% else%}
+    {% set origin = portefeuille.origine|lower  %}
+    {% if "fictif" in origin%}
+        <twig:ux:icon name="thesvg:icon" />
+    {% elseif "personnel" in origin %}
+        <twig:ux:icon name="fa-solid:user-secret" />
+    {% else %}
+        {{ typeKey }}
+        <twig:ux:icon name="tdesign:file-icon-filled" />
+    {% endif %}
+{% endif %}

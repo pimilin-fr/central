@@ -50,9 +50,9 @@
                     <span class="ops-balance-prev">
                         {{ group.previousBalance|number_format(2, ',', ' ') }} €
                     </span>
-                    → 
-                    <span class="font-medium {{ group.currentBalance < 0 ? 'amount-expense' : 'amount-income' }}">
-                        {{ group.currentBalance|number_format(2, ',', ' ') }} €
+
+                    <span class="ops-balance {{ group.currentBalance < 0 ? 'amount-expense' : '' }}">
+                        → {{ group.currentBalance|number_format(2, ',', ' ') }} €
                     </span>
                 {% endif %}
             </div>

@@ -1,0 +1,29 @@
+{#
+    Bloc chiffre clé (liste + résumé). Montants : vert / rouge.
+    Paramètre : portefeuille
+#}
+{% set soldeActuel = portefeuille.balanceActuelle %}
+
+<div class="kpi">
+    <p class="kpi-label">Solde actuel</p>
+    <p class="kpi-value {{ soldeActuel >= 0 ? 'amount-income' : 'amount-expense' }}">
+        {{ soldeActuel|number_format(2, ',', ' ') }} €
+    </p>
+
+    <div class="kpi-lines">
+        <div class="kpi-line">
+            <span>Dernier relevé</span>
+            <strong class="is-neutral">
+                {{ portefeuille.lastSolde is not null ? portefeuille.lastSolde|number_format(2, ',', ' ') ~ ' €' : '—' }}
+            </strong>
+        </div>
+        <div class="kpi-line">
+            <span>Revenus non relevés</span>
+            <strong class="amount-income">+ {{ portefeuille.revenuNonCompta|number_format(2, ',', ' ') }} €</strong>
+        </div>
+        <div class="kpi-line">
+            <span>Dépenses non relevées</span>
+            <strong class="amount-expense">- {{ portefeuille.depensesNonCompta|number_format(2, ',', ' ') }} €</strong>
+        </div>
+    </div>
+</div>

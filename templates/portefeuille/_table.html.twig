@@ -1,93 +1,63 @@
-<div class="p-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6">
-        {% for item in items %}
-            {% set portefeuille = item.portefeuille %}
-            {% set bgColor = portefeuille.couleur ?? '#F97316' %}
-            {% set textColor = portefeuille.textColor ?? '#FFFFFF' %}
+<div id="portefeuilles-list" class="entity-grid" data-search-target>
+    {% for item in items %}
+        {% set portefeuille = item.portefeuille %}
+        {% set isDeleted = portefeuille.deletedAt is not null %}
 
-            {# 🔹 Calculs #}
-            {% set soldeActuel = portefeuille.balanceActuelle %}
-            {% set lastSolde = portefeuille.lastSolde ?? 0 %}
-            {% set revenuNC = portefeuille.revenuNonCompta %}
-            {% set depenseNC = portefeuille.depensesNonCompta %}
+        <article class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
+                 style="--entity-color: {{ portefeuille.couleur ?? 'var(--accent)' }}; --entity-text: {{ portefeuille.textColor ?? '#FFFFFF' }};"
+                 data-search-item
+                 data-search-value="{{ (
+                    (portefeuille.name ?? '') ~ ' ' ~
+                    (portefeuille.libelle ?? '') ~ ' ' ~
+                    (portefeuille.origine ?? '') ~ ' ' ~
+                    (portefeuille.type ?? '')
+                 )|lower }}">
+            <a href="{{ path('app_portefeuille_show', { id: portefeuille.id }) }}" class="entity-card-link">
 
-            {# 🔹 Vérification cohérence #}
-            {% set soldeGlobal = portefeuille.totalRevenu - portefeuille.totalDepenses %}
-            {% set soldeRecalcule = lastSolde + revenuNC - depenseNC %}
-            
-            {% set isDeleted = portefeuille.deletedAt is not null %}
-
-            <a href="{{ path('app_portefeuille_show', {id: portefeuille.id}) }}"
-               class="block bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden border {{ isDeleted ? 'opacity-40' : '' }}">
-
-                {# HEADER COLORÉ #}
-                <div class="px-4 py-3 flex justify-between items-center" data-color="{{ portefeuille.textColor }}"
-                     style="background-color: {{ bgColor }}; color: {{ textColor }};">
-
-                    <span class="font-semibold">
-                        {{ portefeuille.name }}
-                    </span>
-
-                    <span class="text-xs opacity-80">
-                        {{ portefeuille.type }}
-                    </span>
+                <div class="entity-circle">
+                    {% include 'portefeuille/_type_icon.html.twig' with { portefeuille: portefeuille } only %}
                 </div>
 
-                {# CONTENU #}
-                <div class="p-5">
-
-                    {# 🔹 SOLDE ACTUEL #}
-                    <div class="mb-4">
-                        <div class="text-xs text-gray-400">Solde actuel</div>
-
-                        <div class="text-2xl font-bold
-                             {{ soldeActuel >= 0 ? 'text-green-600' : 'text-red-500' }}">
-                            {{ soldeActuel|number_format(2, ',', ' ') }} €
-                        </div>
-                    </div>
-
-                    {# 🔹 INFOS #}
-                    <div class="text-sm space-y-2">
-
-                        {# Dernier relevé #}
-                        <div class="flex justify-between text-gray-500">
-                            <span>Dernier relevé</span>
-                            <span>
-                                {% if portefeuille.lastSolde is not null %}
-                                    {{ portefeuille.lastSolde|number_format(2, ',', ' ') }} €
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </span>
-                        </div>
-
-                        {# Revenus non comptabilisés #}
-                        <div class="flex justify-between text-green-600">
-                            <span>Revenus non relevés</span>
-                            <span>+ {{ revenuNC|number_format(2, ',', ' ') }} €</span>
-                        </div>
-
-                        {# Dépenses non comptabilisées #}
-                        <div class="flex justify-between text-red-500">
-                            <span>Dépenses non relevées</span>
-                            <span>- {{ depenseNC|number_format(2, ',', ' ') }} €</span>
-                        </div>
-
-                        {# 🔴 Alerte incohérence #}
-                        {#{% if showWarning %}
-                            <div class="mt-3 text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded p-2">
-                                ℹ Des opérations ne sont pas encore intégrées au relevé.
-                            </div>
-                        {% endif %}#}
-                    </div>
-
+                <div class="entity-ribbon">
+                    <span class="entity-ribbon-label">{{ portefeuille.libelle ?? portefeuille.name }}</span>
                 </div>
 
+                <div class="entity-body">
+                    <div class="entity-head">
+                        <h2 class="entity-title" title="{{ portefeuille.name }}">{{ portefeuille.name }}</h2>
+                        <span class="entity-sub">
+                            {{ portefeuille.type }}{% if portefeuille.origine %} · {{ portefeuille.origine }}{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="sep sep-inset">
+                        <span class="sep-dot"></span>
+                        <span class="sep-line"></span>
+                    </div>
+
+                    {% include 'portefeuille/_balance.html.twig' with { portefeuille: portefeuille } only %}
+                </div>
             </a>
-        {% else %}
-            <div class="col-span-full text-center text-gray-500 py-12">
-                Aucun portefeuille trouvé
+        </article>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><twig:ux:icon name="lucide:wallet" /></div>
+            <div>
+                <h2>Aucun portefeuille</h2>
+                <p>Aucun portefeuille ne correspond actuellement à votre liste.</p>
             </div>
-        {% endfor %}
+            <a href="{{ path('app_portefeuille_new') }}" class="page-action page-action-primary">
+                <twig:ux:icon name="ic:round-add" />
+                Ajouter un portefeuille
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+<div id="portefeuilles-search-empty" class="empty-state tier-search-empty" hidden>
+    <div class="empty-state-icon"><twig:ux:icon name="lucide:search-x" /></div>
+    <div>
+        <h2>Aucun résultat</h2>
+        <p>Aucun portefeuille ne correspond à votre recherche.</p>
     </div>
 </div>

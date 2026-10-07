@@ -1,58 +1,41 @@
-{#{% extends 'base.html.twig' %}
+{% extends 'modern.html.twig' %}
 
-{% block title %}New Portefeuille{% endblock %}
-
-{% block body %}
-    <h1>Create new Portefeuille</h1>
-
-    {{ include('portefeuille/_form.html.twig') }}
-
-    <a href="{{ path('app_portefeuille_index') }}">back to list</a>
-{% endblock %}
-#}
-{% extends 'base.html.twig' %}
-
-{% block title %}Portefeuille{% endblock %}
+{% block title %}Nouveau portefeuille{% endblock %}
 
 {% block body %}
-    <div class="space-y-6">
-        {# =========================
-            HEADER : Titre + actions (modernisé)
-            ========================= #}
-        {% set btns = [] %}
-        {% set btns = btns|merge([{
-                label: "Retour",
-                path: path('app_portefeuille_index'),
-                color: 'gray',
-                icon: 'mdi:arrow-left',
-            }]) %}
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <div class="page-eyebrow">Central / Portefeuilles</div>
+                <h1 class="page-title">Nouveau portefeuille</h1>
+                <p class="page-subtitle">Définissez le type, la couleur et le comportement de votre portefeuille.</p>
+            </div>
 
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                btns: [
+                    {
+                        label: 'Retour',
+                        path: path('app_portefeuille_index'),
+                        icon: 'mdi:arrow-left',
+                        color: 'neutral'
+                    }
+                ]
+            } %}
+        </div>
 
-        {% include 'partials/header.html.twig' with {
-            btns: btns,
-            title: 'Nouveau portefeuille',
-            item: null
-        } %}
-
-
-        {# =========================
-          ONGLETS FONCTIONNELS
-          ========================= #}
         {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
-
         {% set tabs = [
             {
-                id: 'summary', 
+                id: 'summary',
                 content: include('portefeuille/_form.html.twig'),
-                label: 'Ajout',
-                icon: 'ic:round-add'
+                label: 'Informations',
+                icon: 'lucide:wallet'
             }
         ] %}
 
-        {% include 'partials/tabs.html.twig' with {
+        {% include 'layout/modern/components/_tabs.html.twig' with {
             tabs: tabs,
             activeTab: activeTab
         } %}
-
     </div>
 {% endblock %}

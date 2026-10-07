@@ -21,9 +21,9 @@
                 <h2 class="summary-name" title="{{ tiers.name }}">{{ tiers.name }}</h2>
 
                 {% if tiers.tiersType %}
-                    <span class="tier-type-pill"
-                          style="--tier-color: {{ tiers.tiersType.couleur ?? '#cbd5e1' }};">
-                        <span class="tier-type-pill-dot"></span>
+                    <span class="entity-pill"
+                          style="--entity-color: {{ tiers.tiersType.couleur ?? '#cbd5e1' }};">
+                        <span class="entity-pill-dot"></span>
                         <span>{{ tiers.tiersType.name }}</span>
                     </span>
                 {% endif %}

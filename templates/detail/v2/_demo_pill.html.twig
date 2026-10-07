@@ -1,0 +1,15 @@
+{# Pastille « stratégie de démo » (texte + icône), tokens de thème. Paramètre : entity #}
+{% set strategy = entity.demoStrategy.value ?? null %}
+
+{% set mapping = {
+    'copy':      { label: 'Copie',     icon: 'lucide:copy',          color: 'var(--info)' },
+    'anonymize': { label: 'Anonymisé', icon: 'lucide:venetian-mask', color: 'var(--warning)' },
+    'exclude':   { label: 'Exclue',    icon: 'lucide:eye-off',       color: 'var(--danger)' }
+} %}
+
+{% set item = mapping[strategy] ?? { label: 'Erreur', icon: 'lucide:circle-help', color: 'var(--text-muted)' } %}
+
+<span class="demo-pill" style="--entity-color: {{ item.color }};">
+    <twig:ux:icon name="{{ item.icon }}" />
+    {{ item.label }}
+</span>
