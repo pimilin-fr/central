@@ -69,7 +69,7 @@
                 label: 'Tiers liés',
                 badge: adresse.tiers|length,
                 icon: 'mage:user-fill',
-                content: include('tiers/_table.html.twig', {tiers: adresse.tiers}),
+                content: include('tiers/list/_table.html.twig', {tiers: adresse.tiers}),
             },{
                 id:'edit',
                 content: include('adresse/_form.html.twig'),

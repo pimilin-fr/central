@@ -3,15 +3,24 @@
 {% block title %}Catégories{% endblock %}
 
 {% block body %}
-    <div class="page-container categorie-page">
-
-        <div class="page-heading categorie-page-heading">
+    <div class="page-container">
+        <div class="page-heading">
             <div class="page-heading-copy">
-                <div class="page-eyebrow">Central / Organisation</div>
-                <h1 class="page-title">Catégories</h1>
-                <p class="page-subtitle">Organisez vos catégories par niveaux, tout en conservant une hiérarchie lisible.</p>
-            </div>
+                <div class="toolbar">
+                    {% include 'layout/modern/components/_search.html.twig' with {
+                        target: '#categorie-list',
+                        placeholder: 'Rechercher une catégorie dans la hiérarchie...',
+                        aria_label: 'Rechercher dans les catégories',
+                        empty: '#categorie-search-empty',
+                        count: '#categorie-visible-count'
+                    } %}
 
+                    <div class="toolbar-info">
+                        <span class="toolbar-dot"></span>
+                         <span><strong id="categorie-visible-count">0</strong> catégories</span>
+                    </div>
+                </div>
+            </div>
             {% include 'layout/modern/components/_btns.html.twig' with {
                 btns: [
                     {
@@ -22,25 +31,9 @@
                     }
                 ]
             } %}
-        </div>
-
-        <div class="categorie-toolbar toolbar">
-            {% include 'layout/modern/components/_search.html.twig' with {
-                target: '#categorie-list',
-                placeholder: 'Rechercher dans la hiérarchie...',
-                aria_label: 'Rechercher dans les catégories',
-                empty: '#categorie-search-empty',
-                count: '#categorie-visible-count'
-            } %}
-
-            <div class="toolbar-info">
-                <span class="toolbar-dot"></span>
-                <span><strong id="categorie-visible-count">0</strong> catégories</span>
+                </div>
+                <section class="categorie-grid-wrapper">
+                    {% include 'categorie/list/_table.html.twig' %}
+                </section>
             </div>
-        </div>
-
-        <section class="categorie-grid-wrapper">
-            {% include 'categorie/list/_table.html.twig' %}
-        </section>
-    </div>
-{% endblock %}
+        {% endblock %}

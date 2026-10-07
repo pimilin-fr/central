@@ -426,15 +426,16 @@ const App = {
                             );
 
                             buttons.forEach(b => {
+                                const isActive = b.dataset.tab === tab;
 
-                                b.classList.remove(
-                                        'border-orange-500',
-                                        'text-orange-600'
+                                b.classList.toggle(
+                                        'is-active',
+                                        isActive
                                         );
 
-                                b.classList.add(
-                                        'border-transparent',
-                                        'text-gray-500'
+                                b.setAttribute(
+                                        'aria-selected',
+                                        isActive ? 'true' : 'false'
                                         );
                             });
 
@@ -456,16 +457,8 @@ const App = {
                                             );
 
                             if (btn) {
-
-                                btn.classList.add(
-                                        'border-orange-500',
-                                        'text-orange-600'
-                                        );
-
-                                btn.classList.remove(
-                                        'border-transparent',
-                                        'text-gray-500'
-                                        );
+                                btn.classList.add('is-active');
+                                btn.setAttribute('aria-selected', 'true');
                             }
 
                             const url =
