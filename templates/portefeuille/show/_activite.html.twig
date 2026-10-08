@@ -14,9 +14,7 @@
     <section class="summary-card {{ portefeuille.deletedAt ? 'is-archived' : '' }}"
              style="--entity-color: {{ portefeuille.couleur ?? 'var(--accent)' }}; --entity-text: {{ portefeuille.textColor ?? '#FFFFFF' }};">
 
-        <div class="entity-circle" title="{{ portefeuille.type }}">
-            {% include 'portefeuille/_type_icon.html.twig' with { portefeuille: portefeuille } only %}
-        </div>
+        {% include 'portefeuille/card/_circle.html.twig' %}
 
         <div class="summary-body">
 
@@ -72,7 +70,7 @@
         </div>
 
         <div class="summary-aside">
-            {% include 'portefeuille/_balance.html.twig' with { portefeuille: portefeuille } only %}
+            {% include 'portefeuille/card/_balance.html.twig' with { portefeuille: portefeuille } only %}
         </div>
 
         <div class="summary-ribbon">

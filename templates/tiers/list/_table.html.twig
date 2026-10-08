@@ -4,35 +4,7 @@
     data-search-target
     >
     {% for tiers in tiers %}
-        {% set bgColor = tiers.tiersType.couleur ?? 'var(--accent)' %}
-        {% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
-        {% set isDeleted = tiers.deletedAt is not null %}
-
-        <article
-            class="tier-card {{ isDeleted ? 'is-archived' : '' }}"
-            data-search-item
-            data-search-value="{{ (
-                (tiers.name ?? '') ~ ' ' ~
-                (tiers.tiersType.libelle ?? '') ~ ' ' ~
-                (tiers.tiersType.typeN1 ?? '') ~ ' ' ~
-                (tiers.tiersType.typeN2 ?? '')
-            )|lower }}"
-            >
-            <a href="{{ path('app_tiers_show', {'id': tiers.id}) }}" class="tier-card-link">
-                {% include 'tiers/card/_circle.html.twig' %}
-
-                <div
-                    class="tier-ribbon"
-                    style="--tier-color: {{ bgColor }}; --tier-text: {{ textColor }};"
-                    >
-                    <span class="tier-ribbon-label">{{ tiers.tiersType.libelleLiserai ?? tiers.tiersType.libelle ?? 'TYPE' }}</span>
-                </div>
-
-                <div class="tier-card-body">
-                    {% include 'tiers/card/_content.html.twig' %}
-                </div>
-            </a>
-        </article>
+        {% include 'tiers/card/_card.html.twig'%}
     {% else %}
         <div class="empty-state">
             <div class="empty-state-icon"><twig:ux:icon name="lucide:users-round" /></div>

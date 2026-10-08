@@ -1,0 +1,27 @@
+<div id="portefeuilles-list" class="entity-grid" data-search-target>
+    {% for item in items %}
+        {% set portefeuille = item.portefeuille %}
+
+        {% include 'portefeuille/card/_card.html.twig' %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><twig:ux:icon name="lucide:wallet" /></div>
+            <div>
+                <h2>Aucun portefeuille</h2>
+                <p>Aucun portefeuille ne correspond actuellement à votre liste.</p>
+            </div>
+            <a href="{{ path('app_portefeuille_new') }}" class="page-action page-action-primary">
+                <twig:ux:icon name="ic:round-add" />
+                Ajouter un portefeuille
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+<div id="portefeuilles-search-empty" class="empty-state tier-search-empty" hidden>
+    <div class="empty-state-icon"><twig:ux:icon name="lucide:search-x" /></div>
+    <div>
+        <h2>Aucun résultat</h2>
+        <p>Aucun portefeuille ne correspond à votre recherche.</p>
+    </div>
+</div>
