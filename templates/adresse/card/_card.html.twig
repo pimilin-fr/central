@@ -8,13 +8,16 @@
 {% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
 {% set isDeleted = adresse.deletedAt is not null %}
 {% set hasGeolocation = adresse.latitude is not null and adresse.longitude is not null %}
-{% set adresseType = adresse.adresseType.name|lower %}
+{% set adresseType = (adresse.adresseType.name ?? '')|lower %}
+{% set preview = preview is defined and preview %}
+{% set linkTag = preview ? 'div' : 'a' %}
 
 {% set isAdresseTiers = tierAdresse is defined and tierAdresse is not null %}
 {% set isPrincipale = isAdresseTiers and tierAdresse.isPrincipale %}
 
 <article
     class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
+    data-live-color="adresseType"
     style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};"
     data-search-item
     data-search-value="{{ (
@@ -24,7 +27,7 @@
         (adresse.adresseType.name ?? '')
     )|lower|e('html_attr') }}"
     >
-    <a href="{{ path('app_adresse_show', { id: adresse.id }) }}" class="entity-card-link">
+    <{{ linkTag }} class="entity-card-link"{% if not preview %} href="{{ path('app_adresse_show', { id: adresse.id }) }}"{% endif %}>
 
         <div class="entity-circle"
              title="{{ hasGeolocation ? 'Adresse géolocalisée' : 'Adresse non géolocalisée' }}">
@@ -46,18 +49,18 @@
             {% elseif 'planète' in adresseType %}
                 <twig:ux:icon name="fluent-mdl2:world" />
             {% else %}
-                ET ?
+                <twig:ux:icon name="lucide:map-pin" />
             {% endif %}
         </div>
 
         <div class="entity-ribbon">
-            <span class="entity-ribbon-label">{{ adresse.villeCourte ?? adresse.ville }}</span>
+            <span class="entity-ribbon-label" data-live="city" data-live-empty="···">{{ adresse.villeCourte ?? adresse.ville }}</span>
         </div>
 
         <div class="entity-body">
             <div class="entity-head">
-                <h2 class="entity-title" title="{{ adresse.name }}">{{ adresse.name }}</h2>
-                <span class="entity-sub">{{ adresse.adresseType.name }}</span>
+                <h2 class="entity-title" title="{{ adresse.name }}" data-live="name" data-live-empty="Nom de l’adresse">{{ adresse.name }}</h2>
+                <span class="entity-sub" data-live="adresseType" data-live-empty="Type non choisi">{{ adresse.adresseType.name ?? '' }}</span>
             </div>
 
             <div class="sep sep-inset">
@@ -80,12 +83,12 @@
                     <span class="entity-line-icon"><twig:ux:icon name="lucide:map" /></span>
                     <span class="entity-line-body">
                         <span class="entity-line-label">Adresse</span>
-                        <span class="entity-line-value is-wrap">{{ adresse.adresse ?: '—' }}</span>
+                        <span class="entity-line-value is-wrap" data-live="address" data-live-empty="—">{{ adresse.adresse ?: '—' }}</span>
                     </span>
                 </div>
             </div>
         </div>
-    </a>
+    </{{ linkTag }}>
 
     {% if isAdresseTiers %}
         <div class="entity-actions">

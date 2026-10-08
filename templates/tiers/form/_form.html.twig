@@ -1,70 +1,97 @@
-{% set formAction = path('app_tiers_new') %}
-{% if tiers is defined %}
-    {% set formAction = path('app_tiers_edit', { id: tiers.id }) %}
-{% endif %}
+{% set isEdit = tiers is defined and tiers.id is not null %}
+{% set formAction = isEdit ? path('app_tiers_edit', { id: tiers.id }) : path('app_tiers_new') %}
 
 {{ form_start(form, {
     action: formAction,
-    attr: { class: 'modern-form' }
+    attr: { class: 'modern-form', 'data-live-form': '' }
 }) }}
 
-<div class="modern-form-intro">
-    <div>
-        <span class="modern-form-kicker">IDENTITÉ DU TIERS</span>
-        <h2 class="modern-form-title">Informations essentielles</h2>
-    </div>
-    <span class="modern-form-step">01 — 04</span>
-</div>
+<div class="form-layout" data-live-scope>
 
-<div class="form-section-grid">
-    <div class="form-field-card form-field-card-wide">
-        <div class="form-field-heading">
-            <span class="form-field-index">01</span>
-            <h3>Nom du tiers</h3>
+    <div class="form-timeline">
+
+        {# 01 — Identité #}
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">01</span>
+                <h3>Identité</h3>
+            </div>
+
+            <div class="form-row" style="--cols: minmax(0, 2fr) minmax(0, 1.4fr)">
+                <div>
+                    {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.name, { attr: { class: 'modern-form-control', placeholder: 'Ex. Jean Dupont ou Société Martin' } }) }}
+                    {{ form_errors(form.name) }}
+                </div>
+                <div>
+                    {{ form_label(form.tiersType, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.tiersType, { attr: { class: 'modern-form-control autocomplete', placeholder: 'Choisir un type' } }) }}
+                    {{ form_errors(form.tiersType) }}
+                </div>
+            </div>
+
         </div>
-        {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
-        {{ form_widget(form.name, { attr: { class: 'modern-form-control', placeholder: 'Ex. Jean Dupont ou Société Martin' } }) }}
-        {{ form_errors(form.name) }}
+
+        {# 02 — Recherche #}
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">02</span>
+                <h3>Recherche</h3>
+            </div>
+
+            <div class="form-row" style="--cols: 1fr">
+                <div>
+                    {{ form_label(form.searchText, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.searchText, { attr: { class: 'modern-form-control', placeholder: 'Alias, nom abrégé, repère...' } }) }}
+                    {{ form_errors(form.searchText) }}
+                    <p class="form-hint">Mots-clés supplémentaires retrouvés par la recherche (alias, enseigne, nom abrégé…).</p>
+                </div>
+            </div>
+        </div>
+
+        {# 03 — Démo #}
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">03</span>
+                <h3>Mode démo</h3>
+            </div>
+
+            <div class="form-row" style="--cols: minmax(0, 1fr)">
+                <div>
+                    {{ form_label(form.demoStrategy, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.demoStrategy, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.demoStrategy) }}
+                </div>
+            </div>
+
+            <div class="form-legend">
+                <span class="form-hint">Valeurs possibles :</span>
+                <span class="demo-pill" style="--entity-color: var(--info);"><twig:ux:icon name="lucide:copy" /> Copie</span>
+                <span class="demo-pill" style="--entity-color: var(--warning);"><twig:ux:icon name="lucide:venetian-mask" /> Anonymisé</span>
+                <span class="demo-pill" style="--entity-color: var(--danger);"><twig:ux:icon name="lucide:eye-off" /> Exclue</span>
+            </div>
+        </div>
     </div>
 
-    <div class="form-field-card">
-        <div class="form-field-heading">
-            <span class="form-field-index">02</span>
-            <h3>Type de tiers</h3>
-        </div>
-        {{ form_label(form.tiersType, null, { label_attr: { class: 'modern-form-label' } }) }}
-        {{ form_widget(form.tiersType, { attr: { class: 'modern-form-control autocomplete', placeholder: 'Choisir un type' } }) }}
-        {{ form_errors(form.tiersType) }}
-    </div>
-
-    <div class="form-field-card">
-        <div class="form-field-heading">
-            <span class="form-field-index">03</span>
-            <h3>Texte secondaire</h3>
-        </div>
-        {{ form_label(form.searchText, null, { label_attr: { class: 'modern-form-label' } }) }}
-        {{ form_widget(form.searchText, { attr: { class: 'modern-form-control', placeholder: 'Alias, nom abrégé, repère...' } }) }}
-        {{ form_errors(form.searchText) }}
-    </div>
-
-    <div class="form-field-card">
-        <div class="form-field-heading">
-            <span class="form-field-index">04</span>
-            <h3>Stratégie de démo</h3>
-        </div>
-        {{ form_label(form.demoStrategy, null, { label_attr: { class: 'modern-form-label' } }) }}
-        {{ form_widget(form.demoStrategy, { attr: { class: 'modern-form-control' } }) }}
-        {{ form_errors(form.demoStrategy) }}
-    </div>
+    <aside class="form-layout-aside">
+        {% include 'layout/modern/components/_form_preview.html.twig' with {
+            template: 'tiers/card/_card.html.twig',
+            vars: { tiers: form.vars.value }
+        } only %}
+    </aside>
 </div>
 
 <div class="modern-form-footer">
-    <span class="modern-form-footer-copy"><span class="required-legend">Champ obligatoire</span> — Vous pourrez compléter les adresses après création.</span>
+    <span class="modern-form-footer-copy">
+        <span class="required-legend">Champ obligatoire</span> — vous pourrez compléter les adresses après création.
+    </span>
 
     {% include 'layout/modern/components/_btns.html.twig' with {
         btns: [
             {
+                label: isEdit ? 'Enregistrer' : 'Créer le tiers',
                 type: 'submit',
+                icon: isEdit ? 'mdi:content-save-outline' : 'ic:round-add',
                 color: 'primary'
             }
         ]

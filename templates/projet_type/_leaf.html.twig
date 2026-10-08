@@ -1,0 +1,37 @@
+{#
+    Carte type de projet (feuille) — composants génériques entity-*.
+    Paramètres : node, level (défaut 0), preview (aperçu de formulaire)
+#}
+{% set level = level|default(0) %}
+{% set preview = preview is defined and preview %}
+{% set linkTag = preview ? 'div' : 'a' %}
+
+{% set pathParts = [node.libelle ?? ''] %}
+{% set current = node.parent %}
+{% for i in 1..50 %}
+    {% if current %}
+        {% set pathParts = [current.libelle]|merge(pathParts) %}
+        {% set current = current.parent %}
+    {% endif %}
+{% endfor %}
+{% set typePath = pathParts|filter(v => v)|join(' / ') %}
+
+<article class="entity-card is-compact"
+         style="--entity-color: var(--accent); --entity-text: var(--accent-contrast, #fff);"
+         data-search-item
+         data-search-value="{{ (typePath ~ ' ' ~ (node.name ?? ''))|lower|e('html_attr') }}">
+    <{{ linkTag }} class="entity-card-link"{% if not preview %} href="{{ path('app_projet_type_show', { id: node.id }) }}"{% endif %}>
+        <div class="entity-circle" aria-hidden="true"><twig:ux:icon name="lucide:folder-kanban" /></div>
+
+        <div class="entity-ribbon" aria-hidden="true">
+            <span class="entity-ribbon-label">{{ level == 0 ? 'Racine' : 'Type' }}</span>
+        </div>
+
+        <div class="entity-body">
+            <div class="entity-head">
+                <h3 class="entity-title" title="{{ node.libelle }}" data-live="libelle" data-live-empty="Libellé du type">{{ node.libelle }}</h3>
+                <span class="entity-sub is-plain" title="{{ typePath }}" data-live="parent" data-live-empty="Racine">{{ typePath ?: 'Racine' }}</span>
+            </div>
+        </div>
+    </{{ linkTag }}>
+</article>

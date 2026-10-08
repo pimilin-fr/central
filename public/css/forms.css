@@ -499,3 +499,166 @@ label.required::after,
     }
 }
 
+
+/* =========================================================
+   FORM ROW — champs sur une même ligne, largeurs explicites
+   <div class="form-row" style="--cols: 90px 90px 1fr">
+   ========================================================= */
+
+.form-row {
+    display: grid;
+    grid-template-columns: var(--cols, repeat(auto-fit, minmax(150px, 1fr)));
+    gap: 10px;
+    align-items: end;
+}
+
+.form-row + .form-row,
+.form-row + .form-more,
+.form-more + .form-row {
+    margin-top: 12px;
+}
+
+@media (max-width: 760px) {
+    .form-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-row > :last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Compléments repliables */
+.form-more {
+    border-top: 1px dashed var(--border);
+    padding-top: 10px;
+}
+
+.form-more > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.form-more > summary::-webkit-details-marker {
+    display: none;
+}
+
+.form-more > summary::before {
+    content: "+";
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.form-more[open] > summary::before {
+    content: "−";
+}
+
+.form-more > summary:hover {
+    color: var(--text);
+}
+
+.form-more > .form-row {
+    margin-top: 10px;
+}
+
+/* Petit bouton d'action dans un champ */
+.form-inline-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.form-inline-btn:hover {
+    border-color: var(--accent);
+}
+
+.form-inline-btn svg {
+    width: 13px;
+    height: 13px;
+}
+
+.form-label-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.form-label-line .modern-form-label {
+    margin: 0;
+}
+
+/* Champs plus légers dans les cartes de frise */
+.form-timeline .modern-form-control {
+    min-height: 38px;
+    background: transparent;
+    border-color: transparent;
+    border-bottom-color: var(--border-strong);
+    border-radius: 6px 6px 0 0;
+}
+
+.form-timeline .modern-form-control:hover {
+    background: var(--surface-soft);
+}
+
+.form-timeline .modern-form-control:focus {
+    background: var(--surface);
+    border-color: transparent;
+    border-bottom-color: var(--accent);
+    box-shadow: 0 2px 0 0 var(--accent);
+}
+
+.form-timeline textarea.modern-form-control {
+    border-color: var(--border);
+    border-radius: 9px;
+}
+
+
+
+/* Aperçu : la carte réelle, non cliquable */
+.form-preview .entity-card-link,
+.form-preview a {
+    pointer-events: none;
+}
+
+.form-preview .entity-card {
+    max-width: 360px;
+}
+
+/* Choix en grille (portefeuilles d'une opération…) */
+.choice-list.is-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    flex-direction: unset;
+}
+
+.form-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}

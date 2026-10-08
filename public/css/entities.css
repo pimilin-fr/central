@@ -28,6 +28,8 @@
     --entity-color: var(--accent);
     --entity-text: #fff;
     position: relative;
+    display: flex;
+    flex-direction: column;
     min-width: 0;
     overflow: hidden;
     background: var(--surface);
@@ -57,7 +59,7 @@
 
 .entity-card-link {
     display: block;
-    height: 100%;
+    flex: 1 1 auto;
     color: inherit;
 }
 
@@ -331,10 +333,14 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    padding: 5px 9px;
     color: var(--text-soft);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     font-size: 11px;
     font-weight: 750;
-    transition: color 150ms ease;
+    transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
 }
 
 .entity-action svg {
@@ -344,6 +350,8 @@
 
 .entity-action:hover {
     color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
 }
 
 .entity-action.is-active {
@@ -352,6 +360,8 @@
 
 .entity-action.is-danger:hover {
     color: var(--danger);
+    background: var(--danger-soft);
+    border-color: color-mix(in srgb, var(--danger) 30%, var(--border));
 }
 
 /* ---------------------------------------------------------

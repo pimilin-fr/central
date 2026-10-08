@@ -1,26 +1,29 @@
 {# Carte projet — composants génériques entity-*. Paramètre : projet #}
 {% set now = date() %}
+{% set preview = preview is defined and preview %}
+{% set linkTag = preview ? 'div' : 'a' %}
 {% set isDimmed = (projet.endAt and projet.endAt < now) or (projet.beginAt and projet.beginAt > now) %}
 
 <article class="entity-card {{ isDimmed ? 'is-archived' : '' }}"
+         data-live-color="couleur"
          style="--entity-color: {{ projet.couleur ?? 'var(--accent)' }}; --entity-text: {{ projet.textColor ?? '#FFFFFF' }};"
          data-search-item
          data-search-value="{{ (
              (projet.name ?? '') ~ ' ' ~
              (projet.type.fullname ?? projet.type ?? '')
          )|lower|e('html_attr') }}">
-    <a href="{{ path('app_projet_show', { id: projet.id }) }}" class="entity-card-link">
+    <{{ linkTag }} class="entity-card-link"{% if not preview %} href="{{ path('app_projet_show', { id: projet.id }) }}"{% endif %}>
 
         {% include 'projet/_circle.html.twig' with { projet: projet } only %}
 
         <div class="entity-ribbon">
-            <span class="entity-ribbon-label">{{ projet.type.name ?? '—' }}</span>
+            <span class="entity-ribbon-label" data-live="type" data-live-empty="···">{{ projet.type.name ?? '' }}</span>
         </div>
 
         <div class="entity-body">
             <div class="entity-head">
-                <h2 class="entity-title" title="{{ projet.name }}">{{ projet.name }}</h2>
-                <span class="entity-sub">{% include 'projet/_period.html.twig' with { projet: projet } only %}</span>
+                <h2 class="entity-title" title="{{ projet.name }}" data-live="name" data-live-empty="Nom du projet">{{ projet.name }}</h2>
+                <span class="entity-sub" data-live="period" data-live-empty="—">{% include 'projet/_period.html.twig' with { projet: projet } only %}</span>
             </div>
 
             <div class="sep sep-inset">
@@ -33,7 +36,7 @@
                     <span class="entity-line-icon"><twig:ux:icon name="lucide:folder-tree" /></span>
                     <span class="entity-line-body">
                         <span class="entity-line-label">Type</span>
-                        <span class="entity-line-value is-wrap">{{ projet.type.fullname ?? projet.type ?? '—' }}</span>
+                        <span class="entity-line-value is-wrap" data-live="type" data-live-empty="—">{{ projet.type.fullname ?? projet.type ?? '—' }}</span>
                     </span>
                 </div>
                 <div class="entity-line">
@@ -45,5 +48,5 @@
                 </div>
             </div>
         </div>
-    </a>
+    </{{ linkTag }}>
 </article>

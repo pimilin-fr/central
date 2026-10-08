@@ -1,11 +1,36 @@
-{% extends 'base.html.twig' %}
+{% extends 'modern.html.twig' %}
 
-{% block title %}New TypeTiers{% endblock %}
+{% set breadcrumb_trail = [{ label: 'Types de tiers', path: path('app_type_tiers_index') }] %}
+{% set breadcrumb_current = 'Nouveau' %}
+
+{% block title %}Nouveau type de tiers{% endblock %}
 
 {% block body %}
-    <h1>Create new TypeTiers</h1>
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">Nouveau type de tiers</h1>
+                <p class="page-subtitle">Définissez la hiérarchie, la couleur et le libellé du liseré.</p>
+            </div>
 
-    {{ include('type_tiers/_form.html.twig') }}
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                btns: [{
+                    label: 'Retour',
+                    path: path('app_type_tiers_index'),
+                    icon: 'mdi:arrow-left',
+                    color: 'neutral'
+                }]
+            } %}
+        </div>
 
-    <a href="{{ path('app_type_tiers_index') }}">back to list</a>
+        {% include 'layout/modern/components/_tabs.html.twig' with {
+            tabs: [{
+                id: 'summary',
+                label: 'Informations',
+                icon: 'lucide:tag',
+                content: include('type_tiers/_form.html.twig')
+            }],
+            activeTab: 'summary'
+        } %}
+    </div>
 {% endblock %}

@@ -1,41 +1,37 @@
-<li>
-    <a href="{{ path('app_projet_type_show', {id: node.id}) }}"
-       class="
-            group block rounded-lg
-            transition
-            hover:bg-gray-100
-            focus:outline-none focus:ring-2 focus:ring-blue-500
-       "
-       style="margin-left: {{ level * 24 }}px"
-    >
-        <div class="flex items-center justify-between px-4 py-2">
+{#
+    Nœud de la hiérarchie des types de projet.
+    Paramètres : node, level (défaut 0)
+#}
+{% set level = level|default(0) %}
+{% set hasChildren = node.children|length > 0 %}
 
-            <div class="flex items-center gap-3">
-                {% if node.children|length > 0 %}
-                    <span class="text-gray-400 group-hover:text-gray-600">
-                        ▸
-                    </span>
-                {% else %}
-                    <span class="text-gray-300">
-                        •
-                    </span>
-                {% endif %}
-
-                <span class="font-medium text-gray-900">
-                    {{ node.libelle }}
-                </span>
+{% if not hasChildren %}
+    {% include 'projet_type/_leaf.html.twig' with { node: node, level: level } only %}
+{% else %}
+    <section class="categorie-branch level-{{ level > 2 ? 2 : level }}" data-search-group>
+        <header class="categorie-branch-header">
+            <div class="categorie-branch-heading">
+                <span class="categorie-branch-index">{{ '%02d'|format(level + 1) }}</span>
+                <div class="categorie-branch-copy">
+                    <span class="categorie-branch-kicker">{{ level == 0 ? 'Racine' : 'Sous-niveau' }}</span>
+                    <h2 class="categorie-branch-title">
+                        <a href="{{ path('app_projet_type_show', { id: node.id }) }}">{{ node.libelle }}</a>
+                    </h2>
+                </div>
             </div>
-        </div>
-    </a>
 
-    {% if node.children|length > 0 %}
-        <ul class="mt-1 space-y-1">
+            <div class="categorie-branch-meta">
+                <span class="categorie-branch-count">
+                    {{ node.children|length }} {{ node.children|length == 1 ? 'enfant' : 'enfants' }}
+                </span>
+                <twig:ux:icon name="lucide:layers-3" />
+            </div>
+        </header>
+
+        <div class="categorie-branch-children">
             {% for child in node.children %}
-                {% include 'projet_type/_node.html.twig' with {
-                    node: child,
-                    level: level + 1
-                } %}
+                {% include 'projet_type/_node.html.twig' with { node: child, level: level + 1 } %}
             {% endfor %}
-        </ul>
-    {% endif %}
-</li>
+        </div>
+    </section>
+{% endif %}

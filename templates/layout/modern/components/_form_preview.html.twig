@@ -1,0 +1,15 @@
+{#
+    Aperçu en direct d'une entité : on rend le VRAI composant carte de la liste
+    (mêmes classes, mêmes variables) avec l'entité du formulaire ; les éléments
+    portant data-live / data-live-color dans la carte sont mis à jour par app.js
+    (liveForm) pendant la saisie.
+
+    Paramètres :
+      template : carte à rendre (ex. 'adresse/card/_card.html.twig')
+      vars     : variables de la carte (ex. { adresse: form.vars.value })
+#}
+<h3 class="form-aside-title">Aperçu</h3>
+
+<div class="form-preview">
+    {% include template with vars|merge({ preview: true }) only %}
+</div>

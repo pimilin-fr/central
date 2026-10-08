@@ -1,9 +1,6 @@
 {#
-    Formulaire adresse — frise verticale (3 étapes) + aperçu en direct.
-    - champs requis : astérisque automatique (label.required, forms.css)
-    - type : <select data-entity-select> ; la couleur vient des data-color
-      posées par choice_attr (aucun style généré côté PHP)
-    - aperçu : app.js liveForm (form[data-live-form], [data-live], [data-live-color])
+    Formulaire adresse — frise verticale + aperçu en direct.
+    Allégé : 3 étapes, champs regroupés sur 2 lignes, compléments repliables.
 #}
 {% set isEdit = adresse.id is not null %}
 {% set formAction = isEdit
@@ -25,34 +22,63 @@
                 <span class="form-field-index">01</span>
                 <h3>Identité</h3>
             </div>
-            <div class="form-grid-3">
+
+            <div class="form-row" style="--cols: minmax(160px, 1fr) minmax(0, 2fr)">
                 <div>
                     {{ form_label(form.adresseType, null, { label_attr: { class: 'modern-form-label' } }) }}
                     {{ form_widget(form.adresseType, { attr: { class: 'modern-form-control' } }) }}
                     {{ form_errors(form.adresseType) }}
                 </div>
-                <div class="form-span-2">
+                <div>
                     {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
                     {{ form_widget(form.name, { attr: { class: 'modern-form-control' } }) }}
                     {{ form_errors(form.name) }}
                 </div>
-                <div class="form-span-3">
-                    {{ form_label(form.adresseParent, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.adresseParent, { attr: { class: 'modern-form-control' } }) }}
-                    {{ form_errors(form.adresseParent) }}
-                </div>
             </div>
+
+            <details class="form-more" {{ form.adresseParent.vars.value ? 'open' : '' }}>
+                <summary>Rattacher à une adresse parente</summary>
+                <div class="form-row" style="--cols: 1fr">
+                    <div>
+                        {{ form_label(form.adresseParent, null, { label_attr: { class: 'modern-form-label' } }) }}
+                        {{ form_widget(form.adresseParent, { attr: { class: 'modern-form-control' } }) }}
+                        {{ form_errors(form.adresseParent) }}
+                    </div>
+                </div>
+            </details>
         </div>
 
-        {# 02 — Adresse (voie + localité) #}
+        {# 02 — Localisation #}
         <div class="form-field-card">
             <div class="form-field-heading">
                 <span class="form-field-index">02</span>
-                <h3>Adresse</h3>
+                <h3>Localisation</h3>
             </div>
-            <div class="form-stack">
-                <div class="form-grid-5">
-                    {% for field in [form.prefix, form.num, form.bisTer, form.typeVoie, form.nomVoie] %}
+
+            <div class="form-row" style="--cols: 84px 84px minmax(110px, 150px) minmax(0, 1fr)">
+                {% for field in [form.num, form.bisTer, form.typeVoie, form.nomVoie] %}
+                    <div>
+                        {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
+                        {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
+                        {{ form_errors(field) }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-row" style="--cols: 110px minmax(0, 1.4fr) minmax(0, 1fr)">
+                {% for field in [form.codePostal, form.ville, form.pays] %}
+                    <div>
+                        {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
+                        {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
+                        {{ form_errors(field) }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <details class="form-more" {{ (form.prefix.vars.value or form.cedex.vars.value) ? 'open' : '' }}>
+                <summary>Compléments (préfixe, cedex)</summary>
+                <div class="form-row" style="--cols: 1fr 1fr">
+                    {% for field in [form.prefix, form.cedex] %}
                         <div>
                             {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
                             {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
@@ -60,86 +86,50 @@
                         </div>
                     {% endfor %}
                 </div>
-                <div class="form-grid-4">
-                    {% for field in [form.codePostal, form.ville, form.cedex, form.pays] %}
-                        <div>
-                            {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
-                            {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
-                            {{ form_errors(field) }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <div>
-                    {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.adresse, { attr: { class: 'modern-form-control' } }) }}
-                    {{ form_errors(form.adresse) }}
-                </div>
-            </div>
+            </details>
         </div>
 
-        {# 03 — Géolocalisation #}
+        {# 03 — Adresse complète & position #}
         <div class="form-field-card">
             <div class="form-field-heading">
                 <span class="form-field-index">03</span>
-                <h3>Géolocalisation</h3>
+                <h3>Adresse complète &amp; position</h3>
             </div>
-            <div class="coords-field" data-coords-state>
-                {{ form_label(form.adresseForcee, 'Coordonnées forcées (latitude, longitude)', { label_attr: { class: 'modern-form-label' } }) }}
-                {{ form_widget(form.adresseForcee, { attr: {
-                    class: 'modern-form-control',
-                    'data-coords': '',
-                    placeholder: '48.8566, 2.3522',
-                    inputmode: 'text',
-                    autocomplete: 'off'
-                } }) }}
-                <p class="form-hint" data-coords-hint>Laisser vide pour une géolocalisation automatique.</p>
-                {{ form_errors(form.adresseForcee) }}
+
+            <div>
+                <div class="form-label-line">
+                    {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    <button type="button" class="form-inline-btn" data-fill-address>
+                        <twig:ux:icon name="lucide:wand-sparkles" />
+                        Remplir depuis les champs
+                    </button>
+                </div>
+                {{ form_widget(form.adresse, { attr: { class: 'modern-form-control', rows: 2 } }) }}
+                {{ form_errors(form.adresse) }}
             </div>
+
+            <details class="form-more" {{ form.adresseForcee.vars.value ? 'open' : '' }}>
+                <summary>Forcer la géolocalisation</summary>
+                <div class="coords-field" data-coords-state>
+                    {{ form_label(form.adresseForcee, 'Coordonnées (latitude, longitude)', { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.adresseForcee, { attr: {
+                        class: 'modern-form-control',
+                        'data-coords': '',
+                        placeholder: '48.8566, 2.3522',
+                        autocomplete: 'off'
+                    } }) }}
+                    <p class="form-hint" data-coords-hint>Laisser vide pour une géolocalisation automatique.</p>
+                    {{ form_errors(form.adresseForcee) }}
+                </div>
+            </details>
         </div>
     </div>
 
-    {# Aperçu en direct — mêmes composants entity-* que la liste #}
     <aside class="form-layout-aside">
-        <h3 class="form-aside-title">Aperçu</h3>
-
-        <article class="entity-card" data-live-color>
-            <div class="entity-card-link">
-                <div class="entity-circle"><twig:ux:icon name="lucide:map-pin" /></div>
-
-                <div class="entity-ribbon">
-                    <span class="entity-ribbon-label" data-live="city">···</span>
-                </div>
-
-                <div class="entity-body">
-                    <div class="entity-head">
-                        <h2 class="entity-title" data-live="name">Nom de l’adresse</h2>
-                        <span class="entity-sub" data-live="type">Type non choisi</span>
-                    </div>
-
-                    <div class="sep sep-inset">
-                        <span class="sep-dot"></span>
-                        <span class="sep-line"></span>
-                    </div>
-
-                    <div class="entity-lines">
-                        <div class="entity-line">
-                            <span class="entity-line-icon"><twig:ux:icon name="lucide:map" /></span>
-                            <span class="entity-line-body">
-                                <span class="entity-line-label">Adresse</span>
-                                <span class="entity-line-value is-wrap" data-live="address">—</span>
-                            </span>
-                        </div>
-                        <div class="entity-line is-muted">
-                            <span class="entity-line-icon"><twig:ux:icon name="lucide:crosshair" /></span>
-                            <span class="entity-line-body">
-                                <span class="entity-line-label">Coordonnées</span>
-                                <span class="entity-line-value is-wrap" data-live="coords">Calculées automatiquement</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </article>
+        {% include 'layout/modern/components/_form_preview.html.twig' with {
+            template: 'adresse/card/_card.html.twig',
+            vars: { adresse: form.vars.value }
+        } only %}
     </aside>
 </div>
 

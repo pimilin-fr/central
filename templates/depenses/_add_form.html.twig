@@ -1,28 +1,25 @@
 {#
     Formulaire « Nouvelle opération » — briques du design system, multi-thème.
     On conserve tous les ids / names attendus par app.js (#depense-form, [tiers], [adresse], [adresse_id]).
+    Disposition : Opération (3 champs sur une ligne) · Imputation (grille 2×2) ·
+    Portefeuille et Note côte à côte.
 #}
+{% set formAction = path('app_depenses_new', { portefeuille: form.vars.value.portefeuille ? form.vars.value.portefeuille.id : null }) %}
+
 {{ form_start(form, {
-    action: path('app_depenses_new', { portefeuille: form.vars.value.portefeuille ? form.vars.value.portefeuille.id : null }),
+    action: formAction,
     attr: { id: 'depense-form', class: 'modern-form' },
 }) }}
 
-<div class="modern-form-intro">
-    <div>
-        <span class="modern-form-kicker">NOUVELLE OPÉRATION</span>
-        <h2 class="modern-form-title">Saisir une dépense ou un revenu</h2>
-    </div>
-</div>
+<div class="form-section-grid">
 
-<div class="form-section-grid form-section-grid-3">
-
-    {# ---- Opération ---- #}
-    <div class="form-field-card">
+    {# ---- 01 Opération ---- #}
+    <div class="form-field-card form-field-card-wide">
         <div class="form-field-heading">
             <span class="form-field-index">01</span>
             <h3>Opération</h3>
         </div>
-        <div class="form-stack">
+        <div class="form-row" style="--cols: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)">
             <div>
                 {{ form_label(form.date, null, { label_attr: { class: 'modern-form-label' } }) }}
                 {{ form_widget(form.date, { attr: { class: 'modern-form-control' } }) }}
@@ -41,17 +38,22 @@
         </div>
     </div>
 
-    {# ---- Imputation ---- #}
-    <div class="form-field-card">
+    {# ---- 02 Imputation ---- #}
+    <div class="form-field-card form-field-card-wide">
         <div class="form-field-heading">
             <span class="form-field-index">02</span>
             <h3>Imputation</h3>
         </div>
-        <div class="form-stack">
+        <div class="form-row" style="--cols: minmax(0, 1fr) minmax(0, 1fr)">
             <div>
                 {{ form_label(form.categorie, null, { label_attr: { class: 'modern-form-label' } }) }}
                 {{ form_widget(form.categorie, { attr: { class: 'modern-form-control autocomplete' } }) }}
                 {{ form_errors(form.categorie) }}
+            </div>
+            <div>
+                {{ form_label(form.projet, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.projet, { attr: { class: 'modern-form-control autocomplete' } }) }}
+                {{ form_errors(form.projet) }}
             </div>
             <div>
                 {{ form_label(form.tiers, null, { label_attr: { class: 'modern-form-label' } }) }}
@@ -68,21 +70,16 @@
                 {{ form_widget(form.adresse_id) }}
                 {{ form_errors(form.adresse) }}
             </div>
-            <div>
-                {{ form_label(form.projet, null, { label_attr: { class: 'modern-form-label' } }) }}
-                {{ form_widget(form.projet, { attr: { class: 'modern-form-control autocomplete' } }) }}
-                {{ form_errors(form.projet) }}
-            </div>
         </div>
     </div>
 
-    {# ---- Portefeuille ---- #}
+    {# ---- 03 Portefeuille ---- #}
     <div class="form-field-card">
         <div class="form-field-heading">
             <span class="form-field-index">03</span>
             <h3>Portefeuille</h3>
         </div>
-        <div class="choice-list">
+        <div class="choice-list is-grid">
             {% for choice in form.portefeuille %}
                 <label class="choice-card">
                     {{ form_widget(choice) }}
@@ -93,14 +90,14 @@
         {{ form_errors(form.portefeuille) }}
     </div>
 
-    {# ---- Note ---- #}
-    <div class="form-field-card form-field-card-wide">
+    {# ---- 04 Note ---- #}
+    <div class="form-field-card">
         <div class="form-field-heading">
             <span class="form-field-index">04</span>
             <h3>Note</h3>
         </div>
         {{ form_label(form.note, null, { label_attr: { class: 'modern-form-label' } }) }}
-        {{ form_widget(form.note, { attr: { class: 'modern-form-control' } }) }}
+        {{ form_widget(form.note, { attr: { class: 'modern-form-control', rows: 3 } }) }}
         {{ form_errors(form.note) }}
     </div>
 </div>

@@ -1,21 +1,36 @@
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+<div class="resume-layout">
+    <section class="summary-card">
+        <div class="entity-circle"><twig:ux:icon name="lucide:folder-kanban" /></div>
 
-    {# Résumé #}
-    <div class="lg:col-span-3 bg-white p-5">
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-                <p class="text-gray-500">Nom</p>
-                <p class="text-gray-800 font-medium">{{ type.name }}</p>
+        <div class="summary-body">
+            <div class="summary-head">
+                <h2 class="summary-name" title="{{ type.libelle }}">{{ type.libelle }}</h2>
+                {% if type.parent %}
+                    <a class="entity-pill" href="{{ path('app_projet_type_show', { id: type.parent.id }) }}">
+                        <span class="entity-pill-dot"></span>
+                        <span>{{ type.parent.libelle }}</span>
+                    </a>
+                {% endif %}
             </div>
 
-            <div>
-                <p class="text-gray-500">Libelle</p>
-                <p class="text-gray-800 font-medium">
-                    {{ type.libelle }}
-                </p>
+            <div class="summary-grid-2-cols">
+                <div class="summary-field">
+                    <p class="summary-label">Nom</p>
+                    <p class="summary-value">{{ type.name ?: '—' }}</p>
+                </div>
+                <div class="summary-field">
+                    <p class="summary-label">Libellé</p>
+                    <p class="summary-value">{{ type.libelle ?: '—' }}</p>
+                </div>
+                <div class="summary-field">
+                    <p class="summary-label">Enfants</p>
+                    <p class="summary-value">{{ type.children|length }}</p>
+                </div>
             </div>
-
         </div>
-    </div>
+
+        <div class="summary-ribbon">
+            <span class="summary-ribbon-label">{{ type.parent ? 'Type' : 'Racine' }}</span>
+        </div>
+    </section>
 </div>

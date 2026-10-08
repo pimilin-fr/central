@@ -1,114 +1,58 @@
-{% extends 'base.html.twig' %}
+{% extends 'modern.html.twig' %}
 
-{% block title %}Type Tiers{% endblock %}
+{% set breadcrumb_trail = [{ label: 'Types de tiers', path: path('app_type_tiers_index') }] %}
+{% set breadcrumb_current = entity.name %}
+
+{% block title %}Type de tiers - {{ entity.name }}{% endblock %}
 
 {% block body %}
-    <div class="space-y-6">
-        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
-        {# =========================
-            HEADER : Titre + actions (modernisé)
-            ========================= #}
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">{{ entity.typeN3 }}</h1>
 
-            {# Titre & meta #}
-            <div>
-                <h1 class="text-2xl font-semibold text-gray-800 leading-tight">
-                    {{ entity.name }}
-                </h1>
-
-            </div>
-
-            {# Actions #}
-            <div class="flex flex-col items-end gap-2">
-
-                {# ID du tiers #}
-                <span class="inline-flex items-center px-2 py-0.5 rounded-md
-                      bg-gray-200 text-gray-600 text-xs font-mono border
-                      cursor-default select-none"
-                      title="{{ entity.code }}">
-                    #{{ entity.code|slice(0, 30) }}
-                </span>
-
-                {# Boutons #}
-                <div class="flex items-center gap-2 flex-wrap">
-
-                    <a href="{{ path('app_type_tiers_index') }}"
-                       class="inline-flex items-center gap-2 px-3 py-2
-                       text-sm font-medium rounded-lg
-                       bg-gray-600 hover:bg-gray-700 text-white transition">
-                        {{ ux_icon('mdi:arrow-left', {class: 'w-4 h-4'}) }}
-                        Retour
-                    </a>
-
-
+                <div class="page-subline">
+                    <span class="entity-pill" style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }};">
+                        <span class="entity-pill-dot"></span>
+                        <span>{{ [entity.typeN1, entity.typeN2]|filter(v => v)|join(' / ') ?: 'Type de tiers' }}</span>
+                    </span>
                 </div>
             </div>
+
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                btns: [{
+                    label: 'Retour',
+                    path: path('app_type_tiers_index'),
+                    icon: 'mdi:arrow-left',
+                    color: 'neutral'
+                }]
+            } %}
         </div>
 
-
         {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
-
-        {% set tabs = [
-            {
-                id: 'summary',
-                label: 'Résumé',
-                content: include('type_tiers/_resume.html.twig')
-            },{
-                id: 'tiers',
-                label: 'Tiers',
-                badge: tiers|length,
-                content: include('tiers/_table.html.twig')
-            },{
-                id: 'edit',
-                label: 'Modifier',
-                icon: 'mdi:pencil',
-                content: render(controller(
-                        'App\\Controller\\TypeTiersController::edit',
-                        {
-                            id: entity.id
-                        }
-                    ))
-            }
-        ]
-
-        %}
-        {# =========================
-           ONGLETS FONCTIONNELS
-           ========================= 
-        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
-
-        {% set tabs = [
-            {
-                id: 'summary',
-                label: 'Résumé',
-                content: include('type_tiers/_resume.html.twig')
-            },{
-                id: 'tiers',
-                label: 'Tiers',
-                badge: tiers|length,
-                content: include('tiers/_table.html.twig')
-            },{
-                id: 'edit',
-                label: 'Modifier',
-                icon: 'mdi:pencil',
-                content: render(controller(
-                        'App\\Controller\\TypeTiersController::edit',
-                        {
-                            id: entity.id
-                        }
-                    ))
-            }
-        ] %}#}
-
-        {% include 'partials/tabs.html.twig' with {
-            tabs: tabs,
+        {% include 'layout/modern/components/_tabs.html.twig' with {
+            tabs: [
+                {
+                    id: 'summary',
+                    label: 'Résumé',
+                    icon: 'ooui:info-filled',
+                    content: include('type_tiers/_resume.html.twig')
+                },
+                {
+                    id: 'tiers',
+                    label: 'Tiers',
+                    icon: 'mage:users-fill',
+                    badge: tiers|length,
+                    content: include('tiers/list/_table.html.twig', { tiers: tiers })
+                },
+                {
+                    id: 'edit',
+                    label: 'Modifier',
+                    icon: 'mingcute:edit-2-fill',
+                    content: render(controller('App\\Controller\\TypeTiersController::edit', { id: entity.id }))
+                }
+            ],
             activeTab: activeTab
         } %}
-
-
-
-
-
-
-
-    {% endblock %}
+    </div>
+{% endblock %}

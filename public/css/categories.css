@@ -198,3 +198,12 @@
     }
 
 }
+
+.categorie-branch-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.categorie-branch-title a:hover {
+    color: var(--accent-strong);
+}

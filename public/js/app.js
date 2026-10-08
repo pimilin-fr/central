@@ -698,10 +698,15 @@ const App = {
     },
 
     /* =========================================================
-     * LIVE FORM — aperçu en direct
-     * <form data-live-form> ... [data-live="name"] (texte)
-     * ... [data-live-color] (pose --entity-color du type choisi)
-     * Les champs sont retrouvés par name$="[propriété]".
+     * LIVE FORM — aperçu en direct (générique)
+     *   <form data-live-form>
+     *   [data-live="prop"] ou "propA,propB" : texte = valeur du champ
+     *        name$="[prop]" (select → libellé, case → Oui/Non, date → jj/mm/aaaa)
+     *        valeurs calculées : address, city, coords, period
+     *        si vide → contenu initial de l'élément (ou data-live-empty)
+     *   [data-live-color="champ"] : pose --entity-color (select → data-color
+     *        de l'option, input couleur → sa valeur)
+     *   [data-fill-address] : bouton qui compose le champ « adresse »
      * ========================================================= */
 
     liveForm: {
@@ -709,51 +714,150 @@ const App = {
             document.querySelectorAll('form[data-live-form]').forEach(form => {
                 const scope = form.closest('[data-live-scope]') || document;
                 const field = name => form.querySelector(`[name$="[${name}]"]`);
-                const value = name => (field(name)?.value || '').trim();
-                const typeLabel = () => {
-                    const select = field('adresseType');
-                    const option = select?.options?.[select.selectedIndex];
-                    return option && option.value ? option.textContent.trim() : '';
+
+                const fmtDate = raw => {
+                    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw || '');
+                    return m ? `${m[3]}/${m[2]}/${m[1]}` : '';
+                };
+
+                const read = name => {
+                    const el = field(name);
+
+                    if (!el) {
+                        return '';
+                    }
+
+                    if (el.tagName === 'SELECT') {
+                        const option = el.options[el.selectedIndex];
+                        return option && option.value ? option.textContent.trim() : '';
+                    }
+
+                    if (el.type === 'checkbox') {
+                        return el.checked ? 'Oui' : 'Non';
+                    }
+
+                    if (el.type === 'date' || el.type === 'datetime-local') {
+                        return fmtDate(el.value);
+                    }
+
+                    return (el.value || '').trim();
                 };
 
                 const compose = () => {
-                    const street = [value('prefix'), value('num'), value('bisTer'), value('typeVoie'), value('nomVoie')]
-                            .filter(Boolean).join(' ');
-                    const city = [value('codePostal'), value('ville'), value('cedex')]
-                            .filter(Boolean).join(' ');
+                    const street = ['prefix', 'num', 'bisTer', 'typeVoie', 'nomVoie'].map(read).filter(Boolean).join(' ');
+                    const city = ['codePostal', 'ville', 'cedex'].map(read).filter(Boolean).join(' ');
 
-                    return [street, city, value('pays')].filter(Boolean).join(', ');
+                    return [street, city, read('pays')].filter(Boolean).join(', ');
+                };
+
+                const MONTHS = ['JAN', 'FÉV', 'MAR', 'AVR', 'MAI', 'JUN', 'JUI', 'AOÛ', 'SEP', 'OCT', 'NOV', 'DÉC'];
+                const beginParts = () => {
+                    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(field('beginAt')?.value || '');
+                    return m ? {year: m[1].slice(2), month: MONTHS[parseInt(m[2], 10) - 1]} : null;
+                };
+
+                const computed = {
+                    beginMonth: () => beginParts()?.month || '',
+                    beginYear: () => beginParts()?.year || '',
+                    address: () => read('adresse') || compose(),
+                    city: () => read('ville'),
+                    coords: () => read('adresseForcee'),
+                    period: () => {
+                        const begin = read('beginAt');
+                        const end = read('endAt');
+
+                        return begin ? (end ? `${begin} → ${end}` : `Depuis le ${begin}`) : '';
+                    }
+                };
+
+                const resolve = key => {
+                    if (computed[key]) {
+                        return computed[key]();
+                    }
+
+                    return read(key === 'type' && field('adresseType') ? 'adresseType' : key);
+                };
+
+                const colorOf = name => {
+                    const el = field(name);
+
+                    if (!el) {
+                        return {};
+                    }
+
+                    if (el.tagName === 'SELECT') {
+                        const option = el.options[el.selectedIndex];
+                        return option ? {color: option.dataset.color, text: option.dataset.textColor} : {};
+                    }
+
+                    return /^#[0-9a-f]{3,8}$/i.test(el.value) ? {color: el.value} : {};
+                };
+
+                scope.querySelectorAll('[data-live]').forEach(el => {
+                    el.dataset.liveDefault = el.dataset.liveEmpty ?? el.textContent.trim();
+                });
+
+                // Couleurs d'origine (rendues côté serveur) restaurées si le champ est vidé.
+                scope.querySelectorAll('[data-live-color]').forEach(el => {
+                    el.dataset.baseColor = el.style.getPropertyValue('--entity-color');
+                    el.dataset.baseText = el.style.getPropertyValue('--entity-text');
+                });
+
+                const applyColor = (el, color, text) => {
+                    if (color) {
+                        el.style.setProperty('--entity-color', color);
+                        el.style.setProperty('--entity-text', text || '#fff');
+                    } else if (el.dataset.baseColor) {
+                        el.style.setProperty('--entity-color', el.dataset.baseColor);
+                        el.style.setProperty('--entity-text', el.dataset.baseText || '#fff');
+                    } else {
+                        el.style.removeProperty('--entity-color');
+                        el.style.removeProperty('--entity-text');
+                    }
                 };
 
                 const render = () => {
-                    const texts = {
-                        name: value('name') || 'Nom de l’adresse',
-                        type: typeLabel() || 'Type non choisi',
-                        address: value('adresse') || compose() || '—',
-                        coords: value('adresseForcee') || 'Calculées automatiquement',
-                        city: value('ville') || '···'
-                    };
-
                     scope.querySelectorAll('[data-live]').forEach(el => {
-                        el.textContent = texts[el.dataset.live] ?? '';
+                        const value = el.dataset.live.split(',')
+                                .map(key => resolve(key.trim()))
+                                .filter(Boolean)
+                                .join(' · ');
+
+                        el.textContent = value || el.dataset.liveDefault;
                     });
 
-                    const select = field('adresseType');
-                    const option = select?.options?.[select.selectedIndex];
-
                     scope.querySelectorAll('[data-live-color]').forEach(el => {
-                        if (option && option.dataset.color) {
-                            el.style.setProperty('--entity-color', option.dataset.color);
-                            el.style.setProperty('--entity-text', option.dataset.textColor || '#fff');
-                        } else {
-                            el.style.removeProperty('--entity-color');
-                            el.style.removeProperty('--entity-text');
-                        }
+                        const {color, text} = colorOf(el.dataset.liveColor);
+                        applyColor(el, color, text);
                     });
                 };
 
                 form.addEventListener('input', render);
                 form.addEventListener('change', render);
+
+                // Champ « autocomplete » : l'élément choisi peut porter une couleur.
+                App.events.on('autocomplete:selected', e => {
+                    const item = e.detail.item || {};
+                    const color = item.couleur || item.color;
+
+                    if (e.detail.form === form && color) {
+                        scope.querySelectorAll('[data-live-color]').forEach(el => applyColor(el, color, item.textColor));
+                    }
+
+                    render();
+                });
+
+                form.querySelectorAll('[data-fill-address]').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const target = field('adresse');
+
+                        if (target) {
+                            target.value = compose();
+                            target.dispatchEvent(new Event('input', {bubbles: true}));
+                        }
+                    });
+                });
+
                 render();
             });
         }

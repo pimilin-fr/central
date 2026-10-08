@@ -1,9 +1,22 @@
-<ul class="space-y-1">
+{# Hiérarchie des types de projet. Paramètre : types (racines ou enfants) #}
+<div id="projet-type-list" class="categorie-tree" data-search-target>
     {% for type in types %}
         {% include 'projet_type/_node.html.twig' with { node: type, level: 0 } %}
     {% else %}
-        <li>
-            Pas d'enfant
-        </li>
+        <div class="empty-state categorie-empty-state">
+            <div class="empty-state-icon"><twig:ux:icon name="lucide:folder-tree" /></div>
+            <div>
+                <h2>Aucun type</h2>
+                <p>Aucun type de projet n'est disponible ici.</p>
+            </div>
+        </div>
     {% endfor %}
-</ul>
+</div>
+
+<div id="projet-type-search-empty" class="empty-state search-empty" hidden>
+    <div class="empty-state-icon"><twig:ux:icon name="lucide:search-x" /></div>
+    <div>
+        <h2>Aucun résultat</h2>
+        <p>Aucun type ne correspond à votre recherche.</p>
+    </div>
+</div>

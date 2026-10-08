@@ -1,5 +1,5 @@
 <div class="entity-head">
-    <h2 class="entity-title" title="{{ tiers.name }}">{{ tiers.name }}</h2>
+    <h2 class="entity-title" title="{{ tiers.name }}" data-live="name" data-live-empty="Nom du tiers">{{ tiers.name }}</h2>
 
     {% if tiers.code %}
         <span class="entity-sub is-plain">{{ tiers.code }}</span>
@@ -13,15 +13,15 @@
 
 {# Type N1 / N2 #}
 <div class="entity-meta">
-    {% if tiers.tiersType.typeN1 %}
+    {% if tiers.tiersType.typeN1 ?? null %}
         <span class="entity-meta-main">{{ tiers.tiersType.typeN1 }}</span>
     {% endif %}
 
-    {% if tiers.tiersType.typeN1 and tiers.tiersType.typeN2 %}
+    {% if (tiers.tiersType.typeN1 ?? null) and (tiers.tiersType.typeN2 ?? null) %}
         <span class="entity-meta-sep">/</span>
     {% endif %}
 
-    {% if tiers.tiersType.typeN2 %}
+    {% if tiers.tiersType.typeN2 ?? null %}
         <span>{{ tiers.tiersType.typeN2 }}</span>
     {% endif %}
 </div>

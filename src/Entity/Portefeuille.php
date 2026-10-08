@@ -177,6 +177,13 @@ class Portefeuille extends ColorableEntity implements DemoEntityInterface {
     }
 
     // ======================
+    // Alias
+    // ======================
+    public function getDeletedAt(): ?DateTimeImmutable {
+        return $this->getDeleted();
+    }
+
+    // ======================
     // Metier
     // ======================
     public function regenerateCode() {
