@@ -68,9 +68,6 @@ class Adresse implements DemoEntityInterface {
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $adresseForcee = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $adresseExact = null;
-
     #[ORM\OneToMany(mappedBy: 'adresseParent', targetEntity: self::class)]
     private Collection $children;
 
