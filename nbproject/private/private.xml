@@ -3,10 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/modern.html.twig.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/base.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/layout/modern/struct/_head.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/layout/modern/struct/_app_switcher.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/_resume.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/_resume.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/list/_table.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/list/_node.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/_activite.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/depenses/list/_group.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/show/_btns.html.twig</file>
         </group>
     </open-files>
 </project-private>
