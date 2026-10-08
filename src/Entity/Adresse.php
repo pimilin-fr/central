@@ -145,10 +145,6 @@ class Adresse {
         return $this->adresseForcee;
     }
 
-    public function getAdresseExact(): ?string {
-        return $this->adresseExact;
-    }
-
     public function getChildren(): Collection {
         return $this->children;
     }
@@ -236,12 +232,7 @@ class Adresse {
         $this->adresseForcee = $adresseForcee;
         return $this;
     }
-
-    public function setAdresseExact(?string $adresseExact) {
-        $this->adresseExact = $adresseExact;
-        return $this;
-    }
-
+    
     public function setChildren(Collection $children) {
         $this->children = $children;
         return $this;
