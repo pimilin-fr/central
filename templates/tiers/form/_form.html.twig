@@ -3,96 +3,56 @@
 
 {{ form_start(form, {
     action: formAction,
-    attr: { class: 'modern-form', 'data-live-form': '' }
+    attr: { class: 'modern-form' }
 }) }}
 
-<div class="form-layout" data-live-scope>
+<div class="form-section-grid">
 
-    <div class="form-timeline">
-
-        {# 01 — Identité #}
-        <div class="form-field-card">
-            <div class="form-field-heading">
-                <span class="form-field-index">01</span>
-                <h3>Identité</h3>
-            </div>
-
-            <div class="form-row" style="--cols: minmax(0, 2fr) minmax(0, 1.4fr)">
-                <div>
-                    {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.name, { attr: { class: 'modern-form-control', placeholder: 'Ex. Jean Dupont ou Société Martin' } }) }}
-                    {{ form_errors(form.name) }}
-                </div>
-                <div>
-                    {{ form_label(form.tiersType, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.tiersType, { attr: { class: 'modern-form-control autocomplete', placeholder: 'Choisir un type' } }) }}
-                    {{ form_errors(form.tiersType) }}
-                </div>
-            </div>
-
+    {# 01 — Identité #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">01</span>
+            <h3>Identité</h3>
         </div>
-
-        {# 02 — Recherche #}
-        <div class="form-field-card">
-            <div class="form-field-heading">
-                <span class="form-field-index">02</span>
-                <h3>Recherche</h3>
+        <div class="form-stack">
+            <div>
+                {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.name, { attr: { class: 'modern-form-control', placeholder: 'Ex. Jean Dupont ou Société Martin' } }) }}
+                {{ form_errors(form.name) }}
             </div>
-
-            <div class="form-row" style="--cols: 1fr">
-                <div>
-                    {{ form_label(form.searchText, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.searchText, { attr: { class: 'modern-form-control', placeholder: 'Alias, nom abrégé, repère...' } }) }}
-                    {{ form_errors(form.searchText) }}
-                    <p class="form-hint">Mots-clés supplémentaires retrouvés par la recherche (alias, enseigne, nom abrégé…).</p>
-                </div>
-            </div>
-        </div>
-
-        {# 03 — Démo #}
-        <div class="form-field-card">
-            <div class="form-field-heading">
-                <span class="form-field-index">03</span>
-                <h3>Mode démo</h3>
-            </div>
-
-            <div class="form-row" style="--cols: minmax(0, 1fr)">
-                <div>
-                    {{ form_label(form.demoStrategy, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.demoStrategy, { attr: { class: 'modern-form-control' } }) }}
-                    {{ form_errors(form.demoStrategy) }}
-                </div>
-            </div>
-
-            <div class="form-legend">
-                <span class="form-hint">Valeurs possibles :</span>
-                <span class="demo-pill" style="--entity-color: var(--info);"><twig:ux:icon name="lucide:copy" /> Copie</span>
-                <span class="demo-pill" style="--entity-color: var(--warning);"><twig:ux:icon name="lucide:venetian-mask" /> Anonymisé</span>
-                <span class="demo-pill" style="--entity-color: var(--danger);"><twig:ux:icon name="lucide:eye-off" /> Exclue</span>
+            <div>
+                {{ form_label(form.searchText, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.searchText, { attr: { class: 'modern-form-control', rows: 3, placeholder: 'Alias, nom abrégé, repère…' } }) }}
+                {{ form_errors(form.searchText) }}
             </div>
         </div>
     </div>
 
-    <aside class="form-layout-aside">
-        {% include 'layout/modern/components/_form_preview.html.twig' with {
-            icon: 'lucide:user-round',
-            color: 'tiersType',
-            ribbon: 'tiersType',
-            title: 'name',
-            placeholder: 'Nom du tiers',
-            sub: 'tiersType',
-            lines: [
-                { icon: 'lucide:text-cursor-input', label: 'Recherche', live: 'searchText' },
-                { icon: 'lucide:flask-conical', label: 'Mode démo', live: 'demoStrategy' }
-            ]
-        } only %}
-    </aside>
+    {# 02 — Type de tiers (liste colorée) #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">02</span>
+            <h3>Type de tiers</h3>
+        </div>
+        <div>
+            {{ form_label(form.tiersType, null, { label_attr: { class: 'modern-form-label' } }) }}
+            {{ form_widget(form.tiersType, { attr: { class: 'modern-form-control', 'data-entity-select': '' } }) }}
+            {{ form_errors(form.tiersType) }}
+        </div>
+    </div>
+
+    {# 03 — Mode démo #}
+    <div class="form-field-card form-field-card-wide">
+        <div class="form-field-heading">
+            <span class="form-field-index">03</span>
+            <h3>Mode démo</h3>
+        </div>
+        {% include 'layout/modern/components/_demo_choices.html.twig' with { field: form.demoStrategy } only %}
+    </div>
 </div>
 
 <div class="modern-form-footer">
-    <span class="modern-form-footer-copy">
-        <span class="required-legend">Champ obligatoire</span> — vous pourrez compléter les adresses après création.
-    </span>
+    <span class="modern-form-footer-copy"><span class="required-legend">Champ obligatoire</span></span>
 
     {% include 'layout/modern/components/_btns.html.twig' with {
         btns: [

@@ -714,3 +714,16 @@ label.required::after,
     background: color-mix(in srgb, var(--entity-color) 14%, var(--surface));
     border-color: var(--entity-color);
 }
+
+
+/* =========================================================
+   FORM — variantes de mise en page
+   ========================================================= */
+
+.form-layout.is-single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.form-row.is-start {
+    justify-content: start;
+}

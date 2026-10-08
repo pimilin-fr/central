@@ -45,6 +45,12 @@ class TiersType extends AbstractType {
                 ->add('tiersType', EntityType::class, [
                     'class' => TypeTiers::class,
                     'choice_label' => 'name',
+                    'choice_attr' => static function (TypeTiers $type): array {
+                        return [
+                            'data-color' => $type->getCouleur(),
+                            'data-text-color' => $type->getTextColor(),
+                        ];
+                    },
                     'query_builder' => function (EntityRepository $er) {
                         return $er->createQueryBuilder('t')
                                 ->orderBy('t.name', 'ASC');

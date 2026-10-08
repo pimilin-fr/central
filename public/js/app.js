@@ -727,6 +727,12 @@ const App = {
                         return '';
                     }
 
+                    if (el.type === 'radio') {
+                        const checked = form.querySelector(`[name$="[${name}]"]:checked`);
+                        const label = checked && checked.value !== '' ? checked.closest('label') : null;
+                        return label ? label.textContent.trim() : '';
+                    }
+
                     if (el.tagName === 'SELECT') {
                         const option = el.options[el.selectedIndex];
                         return option && option.value ? option.textContent.trim() : '';

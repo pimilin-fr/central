@@ -4,7 +4,9 @@
     Disposition : Opération (3 champs sur une ligne) · Imputation (grille 2×2) ·
     Portefeuille et Note côte à côte.
 #}
-{% set formAction = path('app_depenses_new', { portefeuille: form.vars.value.portefeuille ? form.vars.value.portefeuille.id : null }) %}
+{% set formAction = use_current_action|default(false)
+    ? form.vars.action
+    : path('app_depenses_new', { portefeuille: form.vars.value.portefeuille ? form.vars.value.portefeuille.id : null }) %}
 
 {{ form_start(form, {
     action: formAction,
@@ -64,6 +66,7 @@
                         {{ form_widget(form.tiers, { attr: { class: 'modern-form-control autocomplete' } }) }}
                         {{ form_errors(form.tiers) }}
                     </div>
+                    {% if form.adresse is defined %}
                     <div>
                         {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
                         <select id="{{ form.adresse.vars.id }}"
@@ -71,9 +74,10 @@
                                 class="modern-form-control">
                             <option value="">Adresse</option>
                         </select>
-                        {{ form_widget(form.adresse_id) }}
+                        {% if form.adresse_id is defined %}{{ form_widget(form.adresse_id) }}{% endif %}
                         {{ form_errors(form.adresse) }}
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -112,7 +116,7 @@
 </div>
 
 {# Champ technique conservé tel quel (rempli par le JS) #}
-<div hidden>{{ form_widget(form.adresse) }}</div>
+{% if form.adresse is defined %}<div hidden>{{ form_widget(form.adresse) }}</div>{% endif %}
 
 <div class="modern-form-footer">
     <span class="modern-form-footer-copy"><span class="required-legend">Champ obligatoire</span>{{ form_errors(form) }}</span>

@@ -1,6 +1,6 @@
 {#
-    Formulaire adresse — frise verticale + aperçu en direct.
-    Allégé : 3 étapes, champs regroupés sur 2 lignes, compléments repliables.
+    Formulaire adresse — frise verticale, sans aperçu.
+    Localisation sur 3 lignes : préfixe/num/bis/type · voie · CP/ville/cedex/pays.
 #}
 {% set isEdit = adresse.id is not null %}
 {% set formAction = isEdit
@@ -9,10 +9,10 @@
 
 {{ form_start(form, {
     action: formAction,
-    attr: { class: 'modern-form', 'data-live-form': '' }
+    attr: { class: 'modern-form' }
 }) }}
 
-<div class="form-layout" data-live-scope>
+<div class="form-layout is-single">
 
     <div class="form-timeline">
 
@@ -55,8 +55,9 @@
                 <h3>Localisation</h3>
             </div>
 
-            <div class="form-row" style="--cols: 84px 84px minmax(110px, 150px) minmax(0, 1fr)">
-                {% for field in [form.num, form.bisTer, form.typeVoie, form.nomVoie] %}
+            {# Ligne 1 : préfixe · numéro · bis/ter · type de voie #}
+            <div class="form-row is-start" style="--cols: 110px 90px 100px 160px">
+                {% for field in [form.prefix, form.num, form.bisTer, form.typeVoie] %}
                     <div>
                         {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
                         {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
@@ -65,28 +66,25 @@
                 {% endfor %}
             </div>
 
-            <div class="form-row" style="--cols: 110px minmax(0, 1.4fr) minmax(0, 1fr)">
-                {% for field in [form.codePostal, form.ville, form.pays] %}
-                    <div>
-                        {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
-                        {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
-                        {{ form_errors(field) }}
-                    </div>
-                {% endfor %}
-            </div>
-
-            <details class="form-more" {{ (form.prefix.vars.value or form.cedex.vars.value) ? 'open' : '' }}>
-                <summary>Compléments (préfixe, cedex)</summary>
-                <div class="form-row" style="--cols: 1fr 1fr">
-                    {% for field in [form.prefix, form.cedex] %}
-                        <div>
-                            {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
-                            {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
-                            {{ form_errors(field) }}
-                        </div>
-                    {% endfor %}
+            {# Ligne 2 : la voie #}
+            <div class="form-row" style="--cols: 1fr">
+                <div>
+                    {{ form_label(form.nomVoie, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.nomVoie, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.nomVoie) }}
                 </div>
-            </details>
+            </div>
+
+            {# Ligne 3 : code postal · ville · cedex · pays #}
+            <div class="form-row" style="--cols: 110px minmax(0, 2fr) 110px minmax(0, 1.4fr)">
+                {% for field in [form.codePostal, form.ville, form.cedex, form.pays] %}
+                    <div>
+                        {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
+                        {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
+                        {{ form_errors(field) }}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
         {# 03 — Adresse complète & position #}
@@ -120,27 +118,11 @@
             </details>
         </div>
     </div>
-
-    <aside class="form-layout-aside">
-        {% include 'layout/modern/components/_form_preview.html.twig' with {
-            icon: 'lucide:map-pin',
-            color: 'adresseType',
-            ribbon: 'city',
-            title: 'name',
-            placeholder: 'Nom de l’adresse',
-            sub: 'adresseType',
-            lines: [
-                { icon: 'lucide:map', label: 'Adresse', live: 'address' },
-                { icon: 'lucide:crosshair', label: 'Coordonnées', live: 'coords', empty: 'Calculées automatiquement' }
-            ]
-        } only %}
-    </aside>
 </div>
 
 <div class="modern-form-footer">
     <span class="modern-form-footer-copy">
-        <span class="required-legend">Champ obligatoire</span> —
-        {{ isEdit ? 'les modifications s’appliquent immédiatement.' : 'la géolocalisation pourra être complétée ensuite.' }}
+        <span class="required-legend">Champ obligatoire</span>
     </span>
 
     {% include 'layout/modern/components/_btns.html.twig' with {
