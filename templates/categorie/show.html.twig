@@ -46,7 +46,7 @@
                 id: 'childs',
                 label: 'Enfants',
                 badge: entity.children|length,
-                content: include('categorie/_table.html.twig',{
+                content: include('categorie/list/_table.html.twig',{
                     categories: childs,
                 })
             },{

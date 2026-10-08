@@ -2,7 +2,7 @@
 
     {# OPTIONS DE GROUPEMENT #}
     <div class="md:col-span-3 bg-gray-100 p-5 rounded-xl border shadow">
-        {% include 'detail/v2/_grouping.html.twig' with {
+        {% include 'depenses/list/_grouping.html.twig' with {
             groupBy: groupBy,
             route: 'app_categorie_show',
             routeParams: {
@@ -94,11 +94,11 @@
           data-bulk-form>
 
         <div class="flex flex-wrap items-end gap-4 bg-gray-100 p-4 rounded-lg border shadow-sm space-y-3 mb-4">
-            {{ include('depenses/_bulk_components.html.twig') }}
+           {{ include('depenses/list/_bulk_components.html.twig') }}
         </div>
 
         <div id="releves-container">
-            {% include('detail/v2/_releve.html.twig') %}
+            {% include 'depenses/list/_group.html.twig' %}
         </div>
 
     </form>
