@@ -1728,4 +1728,26 @@ html[data-theme="oldschool"] .app-content {
     border-color: var(--danger-soft);
 }
 
+.page-action-success {
+    color: var(--accent-contrast);
+    background: var(--success);
+    border-color: var(--success-soft);
+}
+.page-action-success:hover {
+    color: var(--accent-contrast);
+    background: var(--success-strong);
+    border-color: var(--danger-soft);
+}
+
+.page-action-warning {
+    color: var(--accent-contrast);
+    background: var(--warning);
+    border-color: var(--warning-soft);
+}
+.page-action-warning:hover {
+    color: var(--accent-contrast);
+    background: var(--warning-strong);
+    border-color: var(--warning-soft);
+}
+
 

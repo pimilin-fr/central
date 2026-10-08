@@ -1,0 +1,142 @@
+/* Page temporaire « styleguide » — uniquement la mise en page de la page (préfixe sg-). */
+
+.sg-nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+    padding: 8px 0;
+    background: var(--bg);
+}
+
+.sg-nav a {
+    padding: 4px 10px;
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+}
+
+.sg-nav a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.sg-section {
+    margin-bottom: 22px;
+    padding: 18px 20px 22px;
+    scroll-margin-top: 56px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.sg-section > h2 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.sg-section > p.sg-lead {
+    margin: 0 0 14px;
+    color: var(--text-soft);
+    font-size: 12px;
+}
+
+.sg-sub {
+    margin: 20px 0 8px;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.sg-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.sg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--sg-min, 220px), 1fr));
+    gap: 14px;
+    align-items: start;
+}
+
+.sg-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.sg-caption {
+    color: var(--text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+}
+
+.sg-token {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.sg-swatch {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    background: var(--sg-c);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+}
+
+.sg-token b {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+}
+
+.sg-token small {
+    display: block;
+    color: var(--text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+    word-break: break-all;
+}
+
+.sg-shadow {
+    height: 64px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.sg-type > * {
+    margin: 0 0 6px;
+}
+
+.sg-stage {
+    padding: 16px;
+    background: var(--bg);
+    border: 1px dashed var(--border-strong);
+    border-radius: 12px;
+}
+
+.sg-stage .flash-message {
+    max-width: 380px;
+}

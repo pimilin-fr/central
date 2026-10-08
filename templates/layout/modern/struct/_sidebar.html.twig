@@ -61,6 +61,14 @@
             <span class="sidebar-link-icon"><twig:ux:icon name="healthicons:money-bag" /></span>
             <span class="sidebar-link-copy">Dépenses</span>
         </a>#}
+
+        {% if app.debug %}
+        <a href="{{ path('app_styleguide') }}"
+           class="sidebar-link {{ route starts with 'app_styleguide' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="lucide:palette" /></span>
+            <span class="sidebar-link-copy">Styleguide</span>
+        </a>
+        {% endif %}
     </nav>
 
     <div class="sidebar-bottom-card">

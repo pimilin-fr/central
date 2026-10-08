@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.7.0",
+        version: "v1.8.0",
         appName: "Central"
     },
 
