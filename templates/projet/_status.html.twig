@@ -1,43 +1,27 @@
-{# ===== LOGIQUE DATES ROBUSTE ===== #}
-{% set nowTs = "now"|date("U") %}
-{% set beginTs = entity.beginAt ? entity.beginAt|date("U") : null %}
-{% set endTs = entity.endAt ? entity.endAt|date("U") : null %}
-{% set threeMonthsTs = "now"|date_modify("+3 months")|date("U") %}
+{#
+    Statut d'un projet calculé à partir des dates (tokens de thème).
+    Paramètres : entity (projet), mode = 'pill' (défaut) | 'label' (texte seul)
+#}
+{% set now = date() %}
+{% set threeMonths = date('+3 months') %}
 
-{% set isEnded = endTs and endTs < nowTs %}
-{% set isFuture = beginTs and beginTs > nowTs %}
-{% set isEndingSoon = endTs and endTs > nowTs and endTs <= threeMonthsTs %}
-{% set isActive = beginTs and beginTs <= nowTs and (not endTs or endTs >= nowTs) %}
-
-{# ===== PRIORITÉ LOGIQUE ===== #}
-{% if isEnded %}
-    {% set color= "bg-red-500 text-white" %}
-    {% set badgeLabel = "Terminé" %}
-    {% set icon = 'mdi:close-circle-outline' %}
-{% elseif isFuture %}
-    {% set color = "bg-orange-500 text-white" %}
-    {% set badgeLabel = "À venir" %}
-    {% set icon = 'mdi:clock-outline' %}
-{% elseif isEndingSoon %}
-    {% set color = "bg-blue-400 text-white" %}
-    {% set badgeLabel = "Fin proche" %}
-    {% set icon = 'mdi:alert-circle-outline' %}
-{% elseif isActive %}
-    {% set color = "bg-green-600 text-white" %}
-    {% set badgeLabel = "En cours" %}
-    {% set icon = 'pajamas:status-active' %}
+{% if entity.endAt and entity.endAt < now %}
+    {% set st = { label: 'Terminé', icon: 'lucide:circle-x', color: 'var(--danger)' } %}
+{% elseif entity.beginAt and entity.beginAt > now %}
+    {% set st = { label: 'À venir', icon: 'lucide:clock', color: 'var(--info)' } %}
+{% elseif entity.endAt and entity.endAt <= threeMonths %}
+    {% set st = { label: 'Fin proche', icon: 'lucide:triangle-alert', color: 'var(--warning)' } %}
+{% elseif entity.beginAt %}
+    {% set st = { label: 'En cours', icon: 'lucide:circle-play', color: 'var(--success)' } %}
 {% else %}
-    {% set color = "bg-gray-300 text-gray-700" %}
-    {% set badgeLabel = "Indéfini" %}
-    {% set icon = 'mdi:help-circle-outline' %}
+    {% set st = { label: 'Indéfini', icon: 'lucide:circle-help', color: 'var(--text-muted)' } %}
 {% endif %}
-{# ===== STATUT (ALIGNÉ HORIZONTAL) ===== #}
 
-<div class="absolute right-0 top-0 h-full w-6 flex items-center justify-center {{ color }} rounded-r-xl">
-
-    <div class="flex items-center rotate-90 origin-center uppercase whitespace-nowrap">
-        {{ ux_icon(icon, { class: 'w-4 h-4 mr-1' }) }}
-        <span class="font-semibold">{{ badgeLabel }}</span>
-    </div>
-
-</div>
+{%- if mode is defined and mode == 'label' -%}
+    {{ st.label }}
+{%- else -%}
+    <span class="demo-pill" style="--entity-color: {{ st.color }};">
+        <twig:ux:icon name="{{ st.icon }}" />
+        {{ st.label }}
+    </span>
+{%- endif -%}

@@ -101,7 +101,7 @@
 
 <div class="modern-form-footer">
     <span class="modern-form-footer-copy">
-        {{ isEdit ? 'Les modifications s’appliquent immédiatement.' : 'Vous pourrez ajouter des opérations après la création.' }}
+        <span class="required-legend">Champ obligatoire</span> — {{ isEdit ? 'Les modifications s’appliquent immédiatement.' : 'Vous pourrez ajouter des opérations après la création.' }}
     </span>
 
     {% include 'layout/modern/components/_btns.html.twig' with {

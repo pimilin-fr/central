@@ -336,13 +336,31 @@ input[type="color"].modern-form-control {
    ========================================================= */
 
 label.required::after,
-.is-required::after {
+.is-required::after,
+.modern-form-label:has(~ [required])::after,
+.modern-form-label:has(~ * [required])::after {
     margin-left: 3px;
     content: "*";
     color: var(--accent);
-    font-size: 1.15em;
+    font-size: 14px;
     font-weight: 900;
     line-height: 1;
+    vertical-align: -1px;
+}
+
+/* Légende « * Champ obligatoire » (pied de formulaire) */
+.required-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 6px;
+}
+
+.required-legend::before {
+    content: "*";
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 900;
 }
 
 

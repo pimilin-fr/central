@@ -51,7 +51,7 @@
 
 <div class="modern-form-footer">
     <span class="modern-form-footer-copy">
-        {{ isEdit ? 'Les modifications s’appliquent immédiatement.' : 'La catégorie pourra être rattachée à un parent ensuite.' }}
+        <span class="required-legend">Champ obligatoire</span> — {{ isEdit ? 'Les modifications s’appliquent immédiatement.' : 'La catégorie pourra être rattachée à un parent ensuite.' }}
     </span>
 
     {% include 'layout/modern/components/_btns.html.twig' with {

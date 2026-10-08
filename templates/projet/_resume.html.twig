@@ -1,101 +1,69 @@
-{% set months = {
-    '01':'janv.', '02':'févr.', '03':'mars', '04':'avril',
-    '05':'mai', '06':'juin', '07':'juil.', '08':'août',
-    '09':'sept.', '10':'oct.', '11':'nov.', '12':'déc.'
-} %}
+<div class="resume-layout">
+
+    {# REGROUPEMENT #}
+    {% include 'depenses/list/_grouping.html.twig' with {
+        groupBy: groupBy,
+        route: 'app_projet_show',
+        routeParams: {
+            id: entity.id,
+            tab: 'summary'
+        }
+    } %}
+    
 
 
-<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+    {# CARTE RESUME : cercle (début) | identité + infos | liseré (statut) #}
+    <section class="summary-card {{ isDimmed ? 'is-archived' : '' }}"
+             style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }}; --entity-text: {{ entity.textColor ?? '#FFFFFF' }};">
 
-    {# OPTIONS DE GROUPEMENT #}
-    <div class="md:col-span-2 bg-gray-100 p-5 rounded-xl border shadow">
-        {% include 'detail/v2/_grouping.html.twig' with {
-            groupBy: groupBy,
-            route: 'app_projet_show',
-            routeParams: {
-                id: entity.id,
-                tab: 'summary'
-            }
-        } %}
-    </div>
+        {% include 'projet/_circle.html.twig' with { projet: entity } only %}
 
-    {# INFOS Projet #}
-
-
-    <div class="md:col-span-3 bg-gray-100 p-5 rounded-xl shadow border relative overflow-hidden">
-
-        {# Liseré couleur #}
-        {% include 'projet/_status.html.twig'%}
-
-        <div class="pr-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-sm">
-
-            {# =========================
-               LIGNE 1
-               ========================= #}
-
-            {# Nom #}
-            <div>
-                <p class="text-gray-500">Nom</p>
-                <p class="text-gray-800 font-medium">
-                    {{ entity.name }}
-                </p>
+        <div class="summary-body">
+            <div class="summary-head">
+                <h2 class="summary-name" title="{{ entity.name }}">{{ entity.name }}</h2>
+                {% include 'projet/_status.html.twig' with { entity: entity } only %}
             </div>
 
-            {# Texte de recherche #}
-            <div>
-                <p class="text-gray-500">Texte de recherche</p>
-                <p class="text-gray-800 font-medium">
-                    {{ entity.type.fullname ?? '—' }}
-                </p>
-            </div>
+            <div class="summary-grid-2-cols">
+                <div class="summary-field">
+                    <p class="summary-label">Type</p>
+                    <p class="summary-value is-wrap">{{ entity.type.fullname ?? entity.type ?? '—' }}</p>
+                </div>
 
+                <div class="summary-field">
+                    <p class="summary-label">Période</p>
+                    <p class="summary-value is-wrap">{% include 'projet/_period.html.twig' with { projet: entity } only %}</p>
+                </div>
 
-            {# =========================
-               LIGNE 2
-               ========================= #}
-
-            {# Créé le #}
-            <div>
-                <p class="text-gray-500">Démarré le</p>
-                <p class="text-gray-800 font-medium">
-                    {% set m1 = months[entity.beginAt|date('m')] %}
-                    {{ entity.beginAt|date('d') }} {{ m1 }} {{ entity.beginAt|date('Y') }}
-                </p>
-            </div>
-
-            {# Supprimé le #}
-            {% if entity.endAt%}
-                <div>
-                    <p class="text-gray-500">Terminé le</p>
-                    <p class="text-gray-800 font-medium">
-                        {% set m2 = months[entity.endAt|date('m')] %}
-                        {{ entity.endAt|date('d') }} {{ m2 }} {{ entity.endAt|date('Y') }}
+                <div class="summary-field">
+                    <p class="summary-label">Démo</p>
+                    <p class="summary-value">
+                        {% include 'detail/v2/_demo_pill.html.twig' with { entity: entity } %}
                     </p>
                 </div>
-            {% endif %}
 
-        </div>
-        <div>
-            <p class="text-xs text-gray-500 tracking-wide">
-                Démo
-            </p>
-
-            <div class="mt-1">
-                {% include 'detail/v2/_demo.html.twig' with {entity:entity}  %}
+                {% if isDimmed %}
+                    <div class="summary-field">
+                        <p class="summary-label">Terminé le</p>
+                        <p class="summary-value">{{ entity.endAt|date('d/m/Y') }}</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
-    </div>
 
-</div>
+        <div class="summary-ribbon">
+            <span class="summary-ribbon-label">{{ entity.type.name ?? '—' }}</span>
+        </div>
+    </section>
 
-<div>
-    <form method="post" action="{{ path('app_depenses_bulk_update') }}" class="mb-4"  data-bulk-form>
-        <div class="flex flex-wrap items-end gap-4 bg-gray-100 p-4 rounded-lg border shadow-sm space-y-3 mb-4">
-            {{ include('depenses/_bulk_components.html.twig') }}
+    {# MODIFICATION EN MASSE + RELEVES #}
+    <form method="post" action="{{ path('app_depenses_bulk_update') }}" class="bulk-form" data-bulk-form>
+        <div class="bulk-bar" data-bulk-bar>
+            {{ include('depenses/list/_bulk_components.html.twig') }}
         </div>
 
         <div id="releves-container">
-            {% include('detail/v2/_releve.html.twig')%}
+            {% include 'depenses/list/_group.html.twig' %}
         </div>
     </form>
 </div>

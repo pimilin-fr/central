@@ -8,6 +8,7 @@
 {% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
 {% set isDeleted = adresse.deletedAt is not null %}
 {% set hasGeolocation = adresse.latitude is not null and adresse.longitude is not null %}
+{% set adresseType = adresse.adresseType.name|lower %}
 
 {% set isAdresseTiers = tierAdresse is defined and tierAdresse is not null %}
 {% set isPrincipale = isAdresseTiers and tierAdresse.isPrincipale %}
@@ -27,7 +28,26 @@
 
         <div class="entity-circle"
              title="{{ hasGeolocation ? 'Adresse géolocalisée' : 'Adresse non géolocalisée' }}">
-            <twig:ux:icon name="{{ hasGeolocation ? 'lucide:map-pin' : 'lucide:map-pin-off' }}" />
+
+            {% if 'rue' in adresseType%}
+                <twig:ux:icon name="streamline-flex:street-road-solid" />
+            {% elseif 'quartier' in adresseType  %}
+                <twig:ux:icon name="simple-icons:git" />
+            {% elseif 'ville' in adresseType %}
+                <twig:ux:icon name="streamline:city-hall-remix" />
+            {% elseif 'département' in adresseType %}
+                <twig:ux:icon name="mdi:house-group" />
+            {% elseif 'région' in adresseType %}
+                <twig:ux:icon name="gridicons:layout" />
+            {% elseif 'pays' in adresseType %}
+                <twig:ux:icon name="material-symbols:flag-rounded" />
+            {% elseif 'zone' in adresseType %}
+                <twig:ux:icon name="pinhead:contiguous-united-states" />
+            {% elseif 'planète' in adresseType %}
+                <twig:ux:icon name="fluent-mdl2:world" />
+            {% else %}
+                ET ?
+            {% endif %}
         </div>
 
         <div class="entity-ribbon">

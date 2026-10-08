@@ -1,0 +1,49 @@
+{# Carte projet — composants génériques entity-*. Paramètre : projet #}
+{% set now = date() %}
+{% set isDimmed = (projet.endAt and projet.endAt < now) or (projet.beginAt and projet.beginAt > now) %}
+
+<article class="entity-card {{ isDimmed ? 'is-archived' : '' }}"
+         style="--entity-color: {{ projet.couleur ?? 'var(--accent)' }}; --entity-text: {{ projet.textColor ?? '#FFFFFF' }};"
+         data-search-item
+         data-search-value="{{ (
+             (projet.name ?? '') ~ ' ' ~
+             (projet.type.fullname ?? projet.type ?? '')
+         )|lower|e('html_attr') }}">
+    <a href="{{ path('app_projet_show', { id: projet.id }) }}" class="entity-card-link">
+
+        {% include 'projet/_circle.html.twig' with { projet: projet } only %}
+
+        <div class="entity-ribbon">
+            <span class="entity-ribbon-label">{{ projet.type.name ?? '—' }}</span>
+        </div>
+
+        <div class="entity-body">
+            <div class="entity-head">
+                <h2 class="entity-title" title="{{ projet.name }}">{{ projet.name }}</h2>
+                <span class="entity-sub">{% include 'projet/_period.html.twig' with { projet: projet } only %}</span>
+            </div>
+
+            <div class="sep sep-inset">
+                <span class="sep-dot"></span>
+                <span class="sep-line"></span>
+            </div>
+
+            <div class="entity-lines">
+                <div class="entity-line">
+                    <span class="entity-line-icon"><twig:ux:icon name="lucide:folder-tree" /></span>
+                    <span class="entity-line-body">
+                        <span class="entity-line-label">Type</span>
+                        <span class="entity-line-value is-wrap">{{ projet.type.fullname ?? projet.type ?? '—' }}</span>
+                    </span>
+                </div>
+                <div class="entity-line">
+                    <span class="entity-line-icon"><twig:ux:icon name="lucide:activity" /></span>
+                    <span class="entity-line-body">
+                        <span class="entity-line-label">Statut</span>
+                        <span class="entity-line-value">{% include 'projet/_status.html.twig' with { entity: projet } only %}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </a>
+</article>

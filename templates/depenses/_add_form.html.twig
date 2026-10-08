@@ -109,7 +109,7 @@
 <div hidden>{{ form_widget(form.adresse) }}</div>
 
 <div class="modern-form-footer">
-    <span class="modern-form-footer-copy">{{ form_errors(form) }}</span>
+    <span class="modern-form-footer-copy"><span class="required-legend">Champ obligatoire</span>{{ form_errors(form) }}</span>
 
     <button type="submit" class="page-action page-action-primary">
         <twig:ux:icon name="mdi:content-save-outline" />

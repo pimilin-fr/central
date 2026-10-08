@@ -1,118 +1,100 @@
-{% set formAction =  path('app_projet_new') %}
-{% if projet.id is not null %}
-    {% set formAction =  path('app_projet_edit', {
-        id: projet.id
-    })
-    %}
-{% endif %}
+{% set isEdit = projet.id is not null %}
+{% set formAction = isEdit
+    ? path('app_projet_edit', { id: projet.id })
+    : path('app_projet_new') %}
+
 {{ form_start(form, {
-    action: formAction ,
-    attr: {
-        class: 'space-y-6'
-    }
+    action: formAction,
+    attr: { class: 'modern-form' }
 }) }}
 
-{# =========================
-CHAMPS
-========================= #}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {# Nom #}
+<div class="modern-form-intro">
     <div>
-        {{ form_label(form.name, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.name, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.name) }}
+        <span class="modern-form-kicker">IDENTITÉ DU PROJET</span>
+        <h2 class="modern-form-title">Informations essentielles</h2>
     </div>
-    {# tiersType #}
-    <div>
-        {{ form_label(form.type, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
+    <span class="modern-form-step">01 — 03</span>
+</div>
 
-        {{ form_widget(form.type, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
+<div class="form-section-grid">
 
-        {{ form_errors(form.type) }}
+    {# 01 — Identité #}
+    <div class="form-field-card form-field-card-wide">
+        <div class="form-field-heading">
+            <span class="form-field-index">01</span>
+            <h3>Identité</h3>
+        </div>
+        <div class="form-grid-3">
+            <div class="form-span-2">
+                {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.name, { attr: { class: 'modern-form-control', placeholder: 'Ex. Rénovation cuisine' } }) }}
+                {{ form_errors(form.name) }}
+            </div>
+            <div>
+                {{ form_label(form.type, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.type, { attr: { class: 'modern-form-control' } }) }}
+                {{ form_errors(form.type) }}
+            </div>
+        </div>
     </div>
-    {# coleur #}
-    <div>
-        {{ form_label(form.couleur, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
 
-        {{ form_widget(form.couleur, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.couleur) }}
+    {# 02 — Période #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">02</span>
+            <h3>Période</h3>
+        </div>
+        <div class="form-stack">
+            <div>
+                {{ form_label(form.beginAt, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.beginAt, { attr: { class: 'modern-form-control' } }) }}
+                {{ form_errors(form.beginAt) }}
+            </div>
+            <div>
+                {{ form_label(form.endAt, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.endAt, { attr: { class: 'modern-form-control' } }) }}
+                {{ form_errors(form.endAt) }}
+            </div>
+        </div>
     </div>
-    <div>
-        {{ form_label(form.beginAt, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
 
-        {{ form_widget(form.beginAt, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-            }
-        }) }}
-
-        {{ form_errors(form.beginAt) }}
-    </div>
-    <div>
-        {{ form_label(form.endAt, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.endAt, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-            }
-        }) }}
-
-        {{ form_errors(form.endAt) }}
-    </div>
-    {# Demo  #}
-    <div>
-        {{ form_label(form.demoStrategy, null, {
-            label_attr: {
-                class: 'block text-sm font-medium text-gray-700 mb-1'
-            }
-        }) }}
-
-        {{ form_widget(form.demoStrategy, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white
-                       focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.demoStrategy) }}
+    {# 03 — Apparence & démo #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">03</span>
+            <h3>Apparence &amp; démo</h3>
+        </div>
+        <div class="form-stack">
+            <div>
+                {{ form_label(form.couleur, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.couleur, { attr: { class: 'modern-form-control' } }) }}
+                {{ form_errors(form.couleur) }}
+            </div>
+            <div>
+                {{ form_label(form.demoStrategy, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.demoStrategy, { attr: { class: 'modern-form-control' } }) }}
+                {{ form_errors(form.demoStrategy) }}
+            </div>
+        </div>
     </div>
 </div>
-{# =========================
-ACTIONS
-========================= #}
-<div class="flex justify-end gap-3 pt-4">
-    <button type="submit"
-            class="inline-flex items-center gap-2 px-4 py-2
-            text-sm font-medium rounded-lg
-            bg-orange-500 hover:bg-orange-600 text-white transition">
-        {{ ux_icon('mdi:content-save-outline', { class: 'w-4 h-4' }) }}
-        Enregistrer
-    </button>
+
+<div class="modern-form-footer">
+    <span class="modern-form-footer-copy">
+        <span class="required-legend">Champ obligatoire</span> —
+        {{ isEdit ? 'les modifications s’appliquent immédiatement.' : 'vous pourrez rattacher des dépenses après la création.' }}
+    </span>
+
+    {% include 'layout/modern/components/_btns.html.twig' with {
+        btns: [
+            {
+                label: isEdit ? 'Enregistrer' : 'Créer le projet',
+                type: 'submit',
+                icon: isEdit ? 'mdi:content-save-outline' : 'ic:round-add',
+                color: 'primary'
+            }
+        ]
+    } %}
 </div>
 
 {{ form_end(form) }}
