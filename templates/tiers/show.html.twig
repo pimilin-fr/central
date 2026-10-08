@@ -1,9 +1,11 @@
 {% extends 'modern.html.twig' %}
 
+{% set breadcrumb_current = entity.name %}
+
 {% block title %}Tiers - {{entity.name}}{% endblock %}
 
 {% block body %}
-    <div class="page-container tiers-form-page">
+    <div class="page-container">
         <div class="page-heading">
             <div class="page-heading-copy">
                 <h1 class="page-title">{{ entity.name }}</h1>

@@ -292,3 +292,31 @@
     height: 13px;
     color: var(--entity-color);
 }
+
+
+/* =========================================================
+   FIL D'ARIANE (topbar)
+   ========================================================= */
+
+.topbar-breadcrumb {
+    min-width: 0;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.topbar-breadcrumb-link {
+    color: var(--text-soft);
+    font-weight: 700;
+    transition: color 150ms ease;
+}
+
+a.topbar-breadcrumb-link:hover {
+    color: var(--accent-strong);
+}
+
+.topbar-breadcrumb-current {
+    min-width: 0;
+    max-width: 38ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

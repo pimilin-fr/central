@@ -1,81 +1,69 @@
-{% set formAction =  path('app_categorie_new') %}
-{% if categorie is defined %}
-    {% set formAction =  path('app_categorie_edit', {
-        id: categorie.id
-    })
-    %}
-{% endif %}
+{% set isEdit = categorie is defined %}
+{% set formAction = isEdit
+    ? path('app_categorie_edit', { id: categorie.id })
+    : path('app_categorie_new') %}
+
 {{ form_start(form, {
-    action: formAction ,
-    attr: {
-        class: 'space-y-6'
-    }
+    action: formAction,
+    attr: { class: 'modern-form' }
 }) }}
 
-
-{# =========================
-   CHAMPS
-   ========================= #}
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-    {# Nom #}
+<div class="modern-form-intro">
     <div>
-        {{ form_label(form.name, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
+        <span class="modern-form-kicker">IDENTITÉ DE LA CATÉGORIE</span>
+        <h2 class="modern-form-title">Informations essentielles</h2>
+    </div>
+    <span class="modern-form-step">01 — 03</span>
+</div>
 
-        {{ form_widget(form.name, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
+<div class="form-section-grid">
 
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">01</span>
+            <h3>Nom</h3>
+        </div>
+        {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
+        {{ form_widget(form.name, { attr: { class: 'modern-form-control' } }) }}
         {{ form_errors(form.name) }}
     </div>
 
-    {# Libellé #}
-    <div>
-        {{ form_label(form.libelle, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.libelle, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">02</span>
+            <h3>Libellé</h3>
+        </div>
+        {{ form_label(form.libelle, null, { label_attr: { class: 'modern-form-label' } }) }}
+        {{ form_widget(form.libelle, { attr: { class: 'modern-form-control' } }) }}
         {{ form_errors(form.libelle) }}
     </div>
 
-    {# Nature #}
-    <div class="md:col-span-2">
-        {{ form_label(form.nature, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.nature, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
+    <div class="form-field-card form-field-card-wide">
+        <div class="form-field-heading">
+            <span class="form-field-index">03</span>
+            <h3>Nature</h3>
+        </div>
+        {{ form_label(form.nature, null, { label_attr: { class: 'modern-form-label' } }) }}
+        {{ form_widget(form.nature, { attr: { class: 'modern-form-control' } }) }}
         {{ form_errors(form.nature) }}
     </div>
-    
 </div>
 
-{# =========================
-   ACTIONS
-   ========================= #}
-<div class="flex justify-end gap-3 pt-4">
-    <button type="submit"
-            class="inline-flex items-center gap-2 px-4 py-2
-                   text-sm font-medium rounded-lg
-                   bg-orange-500 hover:bg-orange-600 text-white transition">
-        {{ ux_icon('mdi:content-save-outline', { class: 'w-4 h-4' }) }}
-        Enregistrer
-    </button>
+<div class="modern-form-footer">
+    <span class="modern-form-footer-copy">
+        {{ isEdit ? 'Les modifications s’appliquent immédiatement.' : 'La catégorie pourra être rattachée à un parent ensuite.' }}
+    </span>
+
+    {% include 'layout/modern/components/_btns.html.twig' with {
+        btns: [
+            {
+                label: isEdit ? 'Enregistrer' : 'Créer la catégorie',
+                type: 'submit',
+                icon: isEdit ? 'mdi:content-save-outline' : 'ic:round-add',
+                color: 'primary'
+            }
+        ]
+    } %}
 </div>
 
 {{ form_end(form) }}

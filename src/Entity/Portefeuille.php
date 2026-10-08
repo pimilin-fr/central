@@ -63,7 +63,7 @@ class Portefeuille extends ColorableEntity implements DemoEntityInterface {
     // GETTERS
     // ======================
 
-    public function getId(): int {
+    public function getId(): ?int {
         return $this->id;
     }
 

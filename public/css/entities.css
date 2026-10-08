@@ -1,9 +1,21 @@
 /* =========================================================
-   ENTITES — cartes génériques (liste) + bloc chiffre clé
-   Aucune notion de « type » ici : tout passe par deux variables
-   posées en inline sur le conteneur :
-       --entity-color  (couleur de l'entité)
-       --entity-text   (couleur du texte sur cette couleur)
+   ENTITES — composants génériques (tiers, portefeuilles,
+   catégories, adresses…)
+
+   Aucune notion de type métier ici. Tout passe par deux variables
+   posées en inline sur le conteneur (ou localement sur un enfant) :
+       --entity-color  couleur de l'entité
+       --entity-text   couleur du texte posé sur cette couleur
+
+   Structure d'une carte :
+       .entity-card
+         .entity-card-link
+           .entity-circle          (icône ou texte)
+           .entity-ribbon > .entity-ribbon-label
+           .entity-body
+             .entity-head > .entity-title + .entity-sub
+             .sep.sep-inset        (ui.css)
+             .entity-meta | .entity-lines | .kpi | .entity-actions
    ========================================================= */
 
 .entity-grid {
@@ -49,11 +61,14 @@
     color: inherit;
 }
 
-/* Cercle (icône ou texte) — utilisé aussi dans les résumés */
+/* ---------------------------------------------------------
+   CERCLE (icône ou texte) — aussi utilisé dans les résumés
+   --------------------------------------------------------- */
 
 .entity-circle {
     display: grid;
-    place-items: center;
+    place-content: center;
+    justify-items: center;
     width: 58px;
     height: 58px;
     color: var(--entity-text, #fff);
@@ -61,6 +76,7 @@
     border: 3px solid var(--surface);
     border-radius: 50%;
     box-shadow: var(--shadow-sm);
+    line-height: 1;
     transform-origin: center;
     transition:
         transform 220ms cubic-bezier(.2, .8, .2, 1),
@@ -70,6 +86,19 @@
 .entity-circle svg {
     width: 26px;
     height: 26px;
+}
+
+.entity-circle-text {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .04em;
+}
+
+.entity-circle-sub {
+    margin-top: 1px;
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: .08em;
 }
 
 .entity-card .entity-circle {
@@ -87,7 +116,9 @@
         0 0 14px color-mix(in srgb, var(--entity-color, var(--accent)) 30%, transparent);
 }
 
-/* Liseré vertical + libellé */
+/* ---------------------------------------------------------
+   LISERE vertical + libellé
+   --------------------------------------------------------- */
 
 .entity-ribbon {
     position: absolute;
@@ -127,7 +158,9 @@
     font-size: 11px;
 }
 
-/* Corps */
+/* ---------------------------------------------------------
+   CORPS
+   --------------------------------------------------------- */
 
 .entity-body {
     --sep-color: var(--entity-color);
@@ -145,6 +178,7 @@
 }
 
 .entity-title {
+    display: -webkit-box;
     margin: 0;
     overflow: hidden;
     color: var(--text);
@@ -152,8 +186,10 @@
     font-weight: 850;
     letter-spacing: -.02em;
     line-height: 1.18;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .entity-sub {
@@ -165,6 +201,157 @@
     text-overflow: ellipsis;
     text-transform: uppercase;
     white-space: nowrap;
+}
+
+.entity-sub.is-plain {
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+/* Variante compacte (catégories feuilles…) */
+
+.entity-card.is-compact .entity-body {
+    padding: 20px 36px 16px 0;
+}
+
+.entity-card.is-compact .entity-head {
+    justify-content: center;
+    min-height: 60px;
+}
+
+.entity-card.is-compact .entity-title {
+    font-size: 14px;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
+/* Ligne de méta « A / B » */
+
+.entity-meta {
+    padding-left: var(--sep-inset, 22px);
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.entity-meta-main {
+    font-weight: 800;
+}
+
+.entity-meta-sep {
+    margin: 0 5px;
+    color: var(--text-muted);
+}
+
+/* Lignes icône + libellé + valeur */
+
+.entity-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 16px;
+    padding-left: var(--sep-inset, 22px);
+}
+
+.entity-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--text-soft);
+    font-size: 10px;
+}
+
+.entity-line-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.entity-line-icon svg {
+    width: 13px;
+    height: 13px;
+    color: var(--text-muted);
+}
+
+.entity-line.is-primary .entity-line-icon svg {
+    color: var(--accent);
+}
+
+.entity-line-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.entity-line-label {
+    color: var(--text-muted);
+    font-size: 8px;
+    font-weight: 750;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.entity-line-value {
+    overflow: hidden;
+    color: var(--text-soft);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.entity-line-value.is-wrap {
+    white-space: normal;
+}
+
+.entity-line.is-muted {
+    opacity: .7;
+}
+
+/* Actions en pied de carte */
+
+.entity-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0 36px 16px 22px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.entity-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 750;
+    transition: color 150ms ease;
+}
+
+.entity-action svg {
+    width: 15px;
+    height: 15px;
+}
+
+.entity-action:hover {
+    color: var(--accent-strong);
+}
+
+.entity-action.is-active {
+    color: var(--accent);
+}
+
+.entity-action.is-danger:hover {
+    color: var(--danger);
 }
 
 /* ---------------------------------------------------------
@@ -220,7 +407,7 @@
 }
 
 /* ---------------------------------------------------------
-   Cercle dans une carte résumé
+   CERCLE DANS UNE CARTE RESUME
    --------------------------------------------------------- */
 
 .summary-card > .entity-circle,
@@ -246,9 +433,25 @@
     padding-left: 0;
 }
 
+/* Résultat de recherche vide */
+
+.search-empty {
+    margin-top: 18px;
+}
+
 @media (max-width: 1100px) {
     .entity-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 820px) {
+    .entity-ribbon {
+        width: 15px;
+    }
+
+    .entity-card:hover .entity-ribbon {
+        width: 18px;
     }
 }
 

@@ -1,63 +1,42 @@
-<div class="tier-card-footer">
-    {#
-        On privilégie les adresses non supprimées.
-        Si aucune adresse active n'existe, on affiche les supprimées.
-    #}
-    {% set activeAddresses = tiers.tiersAdresses|filter(ta => ta.adresse and not ta.adresse.isDeleted) %}
-    {% set displayedAddresses = activeAddresses|length > 0
-        ? activeAddresses
-        : tiers.tiersAdresses|filter(ta => ta.adresse)
-    %}
+{#
+    On privilégie les adresses non supprimées.
+    Si aucune adresse active n'existe, on affiche les supprimées.
+#}
+{% set activeAddresses = tiers.tiersAdresses|filter(ta => ta.adresse and not ta.adresse.isDeleted) %}
+{% set displayedAddresses = activeAddresses|length > 0
+    ? activeAddresses
+    : tiers.tiersAdresses|filter(ta => ta.adresse)
+%}
 
-    {# ============================================================
-       ADRESSES PRINCIPALES EN PREMIER
-       ============================================================ #}
-    {% for tierAddress in displayedAddresses %}
-        {% if tierAddress.isPrincipale %}
-            <div class="tier-address tier-address-primary">
-                <span class="tier-address-icon">
-                    <twig:ux:icon name="lucide:star" />
-                </span>
-
-                <span class="tier-address-content">
-                    <span class="tier-address-label">Principale</span>
-                    <span class="tier-address-city">
-                        {{ tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' }}
-                    </span>
-                </span>
-            </div>
-        {% endif %}
+<div class="entity-lines">
+    {# Adresses principales en premier #}
+    {% for tierAddress in displayedAddresses|filter(ta => ta.isPrincipale) %}
+        <div class="entity-line is-primary">
+            <span class="entity-line-icon"><twig:ux:icon name="lucide:star" /></span>
+            <span class="entity-line-body">
+                <span class="entity-line-label">Principale</span>
+                <span class="entity-line-value">{{ tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' }}</span>
+            </span>
+        </div>
     {% endfor %}
 
-    {# ============================================================
-       AUTRES ADRESSES
-       ============================================================ #}
-    {% for tierAddress in displayedAddresses %}
-        {% if not tierAddress.isPrincipale %}
-            <div class="tier-address">
-                <span class="tier-address-icon">
-                    <twig:ux:icon name="lucide:map-pin" />
-                </span>
-
-                <span class="tier-address-content">
-                    <span class="tier-address-label">Adresse</span>
-                    <span class="tier-address-city">
-                        {{ tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' }}
-                    </span>
-                </span>
-            </div>
-        {% endif %}
+    {# Autres adresses #}
+    {% for tierAddress in displayedAddresses|filter(ta => not ta.isPrincipale) %}
+        <div class="entity-line">
+            <span class="entity-line-icon"><twig:ux:icon name="lucide:map-pin" /></span>
+            <span class="entity-line-body">
+                <span class="entity-line-label">Adresse</span>
+                <span class="entity-line-value">{{ tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' }}</span>
+            </span>
+        </div>
     {% endfor %}
 
     {% if displayedAddresses is empty %}
-        <div class="tier-address tier-address-muted">
-            <span class="tier-address-icon">
-                <twig:ux:icon name="lucide:map-pin-off" />
-            </span>
-
-            <span class="tier-address-content">
-                <span class="tier-address-label">Adresse</span>
-                <span class="tier-address-city">Aucune adresse</span>
+        <div class="entity-line is-muted">
+            <span class="entity-line-icon"><twig:ux:icon name="lucide:map-pin-off" /></span>
+            <span class="entity-line-body">
+                <span class="entity-line-label">Adresse</span>
+                <span class="entity-line-value">Aucune adresse</span>
             </span>
         </div>
     {% endif %}

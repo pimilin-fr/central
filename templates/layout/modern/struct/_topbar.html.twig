@@ -6,30 +6,57 @@
 
         {% include 'layout/modern/struct/_app_switcher.html.twig' %}
 
-        <div class="topbar-breadcrumb">
+        {#
+            Fil d'Ariane.
+            Les pages peuvent poser (au niveau racine du template enfant) :
+              - breadcrumb_current : libellé de la page (nom de l'objet, « Nouveau tiers »…)
+              - breadcrumb_trail   : étapes intermédiaires [{ label, path }]
+            Sans breadcrumb_current, seule la section est affichée.
+        #}
+        {% set route = app.request.attributes.get('_route') %}
+        {% set sections = [
+            { prefixes: ['app_tiers_', 'app_type_tiers_'], label: 'Tiers',        route: 'app_tiers_index' },
+            { prefixes: ['app_categorie_'],                label: 'Catégories',   route: 'app_categorie_index' },
+            { prefixes: ['app_portefeuille_'],             label: 'Portefeuilles', route: 'app_portefeuille_index' },
+            { prefixes: ['app_adresse_'],                  label: 'Adresses',     route: 'app_adresse_index' },
+            { prefixes: ['app_projet_'],                   label: 'Projets',      route: 'app_projet_index' },
+            { prefixes: ['app_depenses_'],                 label: 'Dépenses',     route: 'app_depenses_index' }
+        ] %}
+        {% set section = null %}
+        {% for candidate in sections %}
+            {% for prefix in candidate.prefixes %}
+                {% if section is null and route starts with prefix %}
+                    {% set section = candidate %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+        <nav class="topbar-breadcrumb" aria-label="Fil d'Ariane">
             <span class="topbar-breadcrumb-root">Central</span>
-            <span class="topbar-breadcrumb-separator">/</span>
-            <span class="topbar-breadcrumb-current">
-                {% block topbar_title %}
-                    {% set route = app.request.attributes.get('_route') %}
-                    {% if route starts with 'app_tiers_' or route starts with 'app_type_tiers_' %}
-                        Tiers
-                    {% elseif route starts with 'app_categorie_' %}
-                        Catégories
-                    {% elseif route starts with 'app_portefeuille_' %}
-                        Portefeuilles
-                    {% elseif route starts with 'app_adresse_' %}
-                        Adresses
-                    {% elseif route starts with 'app_projet_' %}
-                        Projets
-                    {% elseif route starts with 'app_depenses_' %}
-                        Dépenses
+
+            {% if section is null %}
+                <span class="topbar-breadcrumb-separator">/</span>
+                <span class="topbar-breadcrumb-current">Tableau de bord</span>
+            {% elseif breadcrumb_current is defined and breadcrumb_current %}
+                <span class="topbar-breadcrumb-separator">/</span>
+                <a class="topbar-breadcrumb-link" href="{{ path(section.route) }}">{{ section.label }}</a>
+
+                {% for step in breadcrumb_trail ?? [] %}
+                    <span class="topbar-breadcrumb-separator">/</span>
+                    {% if step.path is defined and step.path %}
+                        <a class="topbar-breadcrumb-link" href="{{ step.path }}">{{ step.label }}</a>
                     {% else %}
-                        Tableau de bord
+                        <span class="topbar-breadcrumb-link">{{ step.label }}</span>
                     {% endif %}
-                {% endblock %}
-            </span>
-        </div>
+                {% endfor %}
+
+                <span class="topbar-breadcrumb-separator">/</span>
+                <span class="topbar-breadcrumb-current" aria-current="page" title="{{ breadcrumb_current }}">{{ breadcrumb_current }}</span>
+            {% else %}
+                <span class="topbar-breadcrumb-separator">/</span>
+                <span class="topbar-breadcrumb-current" aria-current="page">{{ section.label }}</span>
+            {% endif %}
+        </nav>
     </div>
 
     <div class="topbar-right">

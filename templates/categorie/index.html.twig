@@ -17,23 +17,25 @@
 
                     <div class="toolbar-info">
                         <span class="toolbar-dot"></span>
-                         <span><strong id="categorie-visible-count">0</strong> catégories</span>
+                        <span><strong id="categorie-visible-count">0</strong> catégories</span>
                     </div>
                 </div>
             </div>
+
             {% include 'layout/modern/components/_btns.html.twig' with {
                 btns: [
                     {
                         label: 'Ajouter',
                         path: path('app_categorie_new'),
-                        icon: 'gridicons:add',   
+                        icon: 'gridicons:add',
                         color: 'primary'
                     }
                 ]
             } %}
-                </div>
-                <section class="categorie-grid-wrapper">
-                    {% include 'categorie/list/_table.html.twig' %}
-                </section>
-            </div>
-        {% endblock %}
+        </div>
+
+        <section class="entity-list">
+            {% include 'categorie/list/_table.html.twig' %}
+        </section>
+    </div>
+{% endblock %}

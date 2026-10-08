@@ -1,4 +1,4 @@
-{% set isEdit = portefeuille is defined %}
+{% set isEdit = portefeuille.id is not null %}
 {% set formAction = isEdit
     ? path('app_portefeuille_edit', { id: portefeuille.id })
     : path('app_portefeuille_new') %}

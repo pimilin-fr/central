@@ -3,7 +3,7 @@
     {# LISTE DES ADRESSES #}
     <div class="geo-list">
         {% for ta in adresses %}
-            {% include 'adresse/_adresse_disp.html.twig' with {
+            {% include 'adresse/card/_card.html.twig' with {
                 adresse: ta.adresse,
                 tierAdresse: ta
             } only %}

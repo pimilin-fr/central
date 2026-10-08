@@ -6,9 +6,12 @@
     info: 'page-action-info',
     warning: 'page-action-warning'
 } %}
-{% if removeContainer is not defined or (not removeContainer) %}
+{# removeContainer: true => pas de <div> englobant (bouton seul dans un formulaire, une barre…) #}
+{% set withContainer = removeContainer is not defined or not removeContainer %}
+
+{% if withContainer %}
     <div class="page-heading-actions">
-    {% endif %}
+{% endif %}
 
     {% for btn in btns %}
         {% set color = btn.color|default('neutral') %}
@@ -42,6 +45,6 @@
             </button>
         {% endif %}
     {% endfor %}
-    {% if removecontainer is not defined  %}
+{% if withContainer %}
     </div>
 {% endif %}

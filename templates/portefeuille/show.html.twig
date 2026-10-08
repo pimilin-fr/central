@@ -1,5 +1,7 @@
 {% extends 'modern.html.twig' %}
 
+{% set breadcrumb_current = entity.libelle ?? entity.name %}
+
 {% block title %}Portefeuille - {{ entity.name }}{% endblock %}
 
 {% block body %}

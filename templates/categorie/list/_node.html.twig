@@ -19,33 +19,34 @@
 {% set categoryPath = pathParts|join(' / ') %}
 
 {% if isLeaf %}
-    {% set natureClass = node.categorie.isDepense() ? 'is-expense' : 'is-income' %}
-    {% set natureShort = node.categorie.isDepense() ? 'DEP' : 'REV' %}
+    {# Carte feuille : composants génériques entity-* (couleur = nature) #}
+    {% set natureColor = node.categorie.isDepense() ? 'var(--category-expense)' : 'var(--category-income)' %}
 
     <article
-        class="categorie-leaf {{ natureClass }}"
+        class="entity-card is-compact"
+        style="--entity-color: {{ natureColor }}; --entity-text: #fff;"
         data-search-item
         data-search-value="{{ categoryPath|lower|e('html_attr') }}"
         >
-        <a href="{{ path('app_categorie_show', { id: node.categorie.id }) }}" class="categorie-leaf-link">
-            <span class="categorie-leaf-circle" aria-hidden="true">
-                <span>
-                    {% if node.categorie.isDepense() %}
-                        <twig:ux:icon name="reicon:money-send3-filled" />
-                    {% else %}
-                        <twig:ux:icon name="healthicons:low-income-level-outline-24px" />
-                    {% endif %}
-                </span>
-            </span>
+        <a href="{{ path('app_categorie_show', { id: node.categorie.id }) }}" class="entity-card-link">
+            <div class="entity-circle" aria-hidden="true">
+                {% if node.categorie.isDepense() %}
+                    <twig:ux:icon name="reicon:money-send3-filled" />
+                {% else %}
+                    <twig:ux:icon name="healthicons:low-income-level-outline-24px" />
+                {% endif %}
+            </div>
 
-            <span class="categorie-leaf-main">
-                <span class="categorie-leaf-title">{{ node.categorie.libelle }}</span>
-                <span class="categorie-leaf-path">{{ categoryPath }}</span>
-            </span>
+            <div class="entity-ribbon" aria-hidden="true">
+                <span class="entity-ribbon-label">{{ node.categorie.natureLibelle }}</span>
+            </div>
 
-            <span class="categorie-leaf-ribbon" aria-hidden="true">
-                <span>{{  node.categorie.natureLibelle }}</span>
-            </span>
+            <div class="entity-body">
+                <div class="entity-head">
+                    <h3 class="entity-title" title="{{ node.categorie.libelle }}">{{ node.categorie.libelle }}</h3>
+                    <span class="entity-sub is-plain" title="{{ categoryPath }}">{{ categoryPath }}</span>
+                </div>
+            </div>
         </a>
     </article>
 {% else %}

@@ -1,9 +1,11 @@
+{# Carte tiers — composants génériques entity-* (couleur = type de tiers) #}
 {% set bgColor = tiers.tiersType.couleur ?? 'var(--accent)' %}
 {% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
 {% set isDeleted = tiers.deletedAt is not null %}
 
 <article
-    class="tier-card {{ isDeleted ? 'is-archived' : '' }}"
+    class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
+    style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};"
     data-search-item
     data-search-value="{{ (
                 (tiers.name ?? '') ~ ' ' ~
@@ -12,17 +14,14 @@
                 (tiers.tiersType.typeN2 ?? '')
             )|lower }}"
     >
-    <a href="{{ path('app_tiers_show', {'id': tiers.id}) }}" class="tier-card-link">
+    <a href="{{ path('app_tiers_show', {'id': tiers.id}) }}" class="entity-card-link">
         {% include 'tiers/card/_circle.html.twig' %}
 
-        <div
-            class="tier-ribbon"
-            style="--tier-color: {{ bgColor }}; --tier-text: {{ textColor }};"
-            >
-            <span class="tier-ribbon-label">{{ tiers.tiersType.libelleLiserai ?? tiers.tiersType.libelle ?? 'TYPE' }}</span>
+        <div class="entity-ribbon">
+            <span class="entity-ribbon-label">{{ tiers.tiersType.libelleLiserai ?? tiers.tiersType.libelle ?? 'TYPE' }}</span>
         </div>
 
-        <div class="tier-card-body">
+        <div class="entity-body">
             {% include 'tiers/card/_content.html.twig' %}
         </div>
     </a>

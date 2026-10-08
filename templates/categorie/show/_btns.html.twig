@@ -1,1 +1,17 @@
-{# empty Twig template #}
+{% set btns = [{
+    label: 'Retour',
+    path: path('app_categorie_index'),
+    icon: 'mdi:arrow-left',
+    color: 'neutral'
+}] %}
+
+{% if entity.parent %}
+    {% set btns = btns|merge([{
+        label: 'Parent',
+        path: path('app_categorie_show', { id: entity.parent.id }),
+        icon: 'icon-park-solid:up-c',
+        color: 'primary'
+    }]) %}
+{% endif %}
+
+{% include 'layout/modern/components/_btns.html.twig' with { btns: btns } %}

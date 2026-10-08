@@ -1,75 +1,40 @@
-{% extends 'base.html.twig' %}
+{% extends 'modern.html.twig' %}
 
-{% block title %}Adresse {% endblock %}
+{# Fil d'Ariane : Central / Catégories / ancêtres… / libellé #}
+{% set trail = [] %}
+{% set ancestor = entity.parent %}
+{% for i in 1..50 %}
+    {% if ancestor %}
+        {% set trail = [{ label: ancestor.libelle, path: path('app_categorie_show', { id: ancestor.id }) }]|merge(trail) %}
+        {% set ancestor = ancestor.parent %}
+    {% endif %}
+{% endfor %}
+{% set breadcrumb_trail = trail %}
+{% set breadcrumb_current = entity.libelle %}
+
+{# Nature : couleur (aucune classe liée à la nature, tout passe par --entity-color) #}
+{% set nature = entity.natureLibelle %}
+{% set natureColor = nature == 'Revenu' ? 'var(--category-income)' : (nature == 'Dépense' ? 'var(--category-expense)' : 'var(--text-muted)') %}
+
+{% block title %}Catégorie - {{ entity.libelle }}{% endblock %}
 
 {% block body %}
-    <div class="space-y-6">
-        {# =========================
-            HEADER : Titre + actions (modernisé)
-            ========================= #}
-        {% set btns = [] %}
-        {% if entity.parent %}
-            {% set btns = btns|merge([
-                {
-                    label: "Parent",
-                    path: path('app_categorie_show', { id: entity.parent.id }),
-                    color: 'green',
-                    icon: 'icon-park-solid:up-c',
-                }
-            ]) %}
-        {% endif %}
-        {% set btns = btns|merge([{
-                label: "Retour",
-                path: path('app_categorie_index'),
-                color: 'gray',
-                icon: 'mdi:arrow-left',
-            }]) %}
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">{{ entity.libelle }}</h1>
 
+                <div class="page-subline">
+                    <span class="entity-pill" style="--entity-color: {{ natureColor }};">
+                        <span class="entity-pill-dot"></span>
+                        <span>{{ nature ?: 'Indéfini' }}</span>
+                    </span>
+                </div>
+            </div>
 
-        {% include 'partials/header.html.twig' with {
-            btns: btns,
-            title: 'Catégorie : '~entity,
-            item: entity
-        } %}
-        
-        {# =========================
-           ONGLETS FONCTIONNELS
-           ========================= #}
-        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+            {% include 'categorie/show/_btns.html.twig' %}
+        </div>
 
-        {% set tabs = [
-            {
-                id: 'summary',
-                label: 'Résumé',
-                content: include('categorie/_resume.html.twig')
-            },{
-                id: 'childs',
-                label: 'Enfants',
-                badge: entity.children|length,
-                content: include('categorie/list/_table.html.twig',{
-                    categories: childs,
-                })
-            },{
-                id: 'edit',
-                label: 'Modifier',
-                icon: 'mdi:pencil',
-                content: render(controller(
-                    'App\\Controller\\CategorieController::edit',
-                    {
-                        id: entity.id
-                    }
-                ))
-            }
-        ] %}
-
-        {% include 'partials/tabs.html.twig' with {
-            tabs: tabs,
-            activeTab: activeTab
-        } %}
-
+        {% include 'categorie/show/_tabs.html.twig' %}
     </div>
-
-
-
-
 {% endblock %}

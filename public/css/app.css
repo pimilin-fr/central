@@ -1176,211 +1176,6 @@ CARDS / PANELS
     box-shadow: var(--shadow-sm);
 }
 
-.tiers-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-}
-
-.tier-card {
-    position: relative;
-    min-width: 0;
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow-sm);
-    transition:
-        transform 180ms ease,
-        box-shadow 180ms ease,
-        border-color 180ms ease,
-        opacity 180ms ease;
-}
-
-.tier-card:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(
-        in srgb,
-        var(--accent) 25%,
-        var(--border)
-        );
-    box-shadow: var(--shadow-md);
-}
-
-.tier-card-link {
-    display: block;
-    height: 100%;
-    padding: 0;
-}
-
-.tier-card-body {
-    position: relative;
-    padding: 24px 42px 18px 22px;
-}
-
-.tier-card-content {
-    min-width: 0;
-}
-
-.tier-card-heading {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    min-width: 0;
-}
-
-.tier-card-title {
-    overflow: hidden;
-    color: var(--text);
-    font-size: 17px;
-    font-weight: 850;
-    letter-spacing: -0.02em;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.tier-card-code {
-    flex: 0 0 auto;
-    color: var(--text-muted);
-    font-size: 9px;
-    font-weight: 800;
-}
-
-.tier-card-separator {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin: 13px 0 10px;
-}
-
-/*.tier-card-separator::before {
-    width: 8px;
-    height: 8px;
-    flex: 0 0 8px;
-    content: "";
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow:
-        0 0 9px color-mix(
-        in srgb,
-        var(--accent) 38%,
-        transparent
-        );
-}*/
-/*
-.tier-card-separator::after {
-    width: 100%;
-    height: 1px;
-    content: "";
-    background: var(--border);
-}*/
-
-.tier-card-type {
-    color: var(--text-soft);
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.tier-card-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    padding-left: 10px;
-    margin-top: 18px;
-}
-
-.tier-address {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text-soft);
-    font-size: 10px;
-}
-
-.tier-address svg {
-    width: 14px;
-    height: 14px;
-    color: var(--text-muted);
-}
-
-.tier-address.is-primary svg {
-    color: var(--accent);
-}
-
-/* =========================================================
-DATE CIRCLE
-========================================================= */
-
-.tier-date-circle {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 45px;
-    height: 45px;
-    border: 3px solid var(--surface);
-    border-radius: 50%;
-    background: var(--tier-color, var(--accent));
-    color: var(--tier-text, var(--accent-contrast));
-    box-shadow: var(--shadow-sm);
-    transform-origin: center;
-    transition:
-        transform 180ms ease,
-        box-shadow 180ms ease;
-}
-
-.tier-card:hover .tier-date-circle {
-    transform: scale(1.08) rotate(6deg);
-}
-
-.tier-date-circle-month {
-    font-size: 15px;
-    font-weight: 900;
-    line-height: 1;
-}
-
-.tier-date-circle-year {
-    margin-top: 2px;
-    font-size: 7px;
-    font-weight: 850;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-/* =========================================================
-TIER RIBBON
-========================================================= */
-
-.tier-ribbon {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 8px;
-    height: 100%;
-    background: var(--tier-color, var(--accent));
-    transition:
-        width 180ms ease,
-        background-color 180ms ease;
-}
-
-.tier-card:hover .tier-ribbon {
-    width: 10px;
-}
-
-.tier-ribbon-label {
-    position: absolute;
-    top: 50%;
-    right: 2px;
-    color: var(--tier-text, var(--accent-contrast));
-    font-size: 7px;
-    font-weight: 900;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    writing-mode: vertical-rl;
-    transform: translateY(-50%) rotate(180deg);
-}
 
 /* =========================================================
 EMPTY STATE
@@ -1580,10 +1375,6 @@ RESPONSIVE
         margin-left: var(--sidebar-width);
     }
 
-    .tiers-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .app-content {
         padding-left: 28px;
         padding-right: 28px;
@@ -1674,10 +1465,6 @@ RESPONSIVE
         padding: 24px 16px 40px;
     }
 
-    .tiers-grid {
-        grid-template-columns: 1fr;
-    }
-
     .page-heading {
         flex-direction: column;
         align-items: stretch;
@@ -1741,10 +1528,6 @@ REDUCED MOTION
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
     }
-}
-
-.tier-search-empty[hidden] {
-    display: none;
 }
 
 
@@ -2040,295 +1823,26 @@ html[data-theme="oldschool"] .app-content {
     border-color: var(--accent-strong);
 }
 
-.page-action-info{
+.page-action-info {
     color: var(--accent-contrast);
     background: var(--info);
     border-color: var(--info-soft);
 }
-.page-action-info:hover{
+.page-action-info:hover {
     color: var(--accent-contrast);
     background: var(--info-strong);
     border-color: var(--info-soft);
 }
 
-.page-action-danger{
+.page-action-danger {
     color: var(--accent-contrast);
     background: var(--danger);
     border-color: var(--danger-soft);
 }
-.page-action-danger:hover{
+.page-action-danger:hover {
     color: var(--accent-contrast);
     background: var(--danger-strong);
     border-color: var(--danger-soft);
 }
-/* ---------------------------------------------------------
-   CARTE — ENTÊTE EN 2 PARTIES
-   --------------------------------------------------------- */
 
-.tier-card-body {
-    position: relative;
-    padding: 22px 48px 20px 0;
-}
 
-.tier-card-heading {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    min-width: 0;
-    min-height: 0;
-    padding: 0 4px 0 90px;
-}
-
-.tier-card-title {
-    width: 100%;
-    min-width: 0;
-    overflow: hidden;
-    color: var(--text);
-    font-size: 17px;
-    font-weight: 850;
-    line-height: 1.18;
-    letter-spacing: -0.02em;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    white-space: normal;
-    overflow-wrap: anywhere;
-}
-
-.tier-card-code {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    overflow: hidden;
-    color: var(--text-muted);
-    font-size: 9px;
-    font-weight: 650;
-    letter-spacing: .05em;
-    line-height: 1.25;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.tier-card-separator {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    width: 100%;
-    margin: 13px 0 10px;
-    padding: 0;
-    padding-left: 10px;
-}
-
-.tier-card-separator-dot {
-    width: 8px;
-    height: 8px;
-    flex: 0 0 8px;
-    border-radius: 50%;
-    background: var(--tier-color, var(--accent));
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tier-color, var(--accent)) 12%, transparent);
-}
-
-.tier-card-separator-line {
-    width: 100%;
-    height: 1px;
-    background: var(--border);
-}
-
-.tier-card-type {
-    width: 100%;
-    padding: 0;
-    padding-left: 10px;
-    color: var(--text-soft);
-    font-size: 11px;
-    font-weight: 500;
-}
-
-.tier-card-type-main {
-    color: var(--text-soft);
-    font-weight: 800;
-}
-
-.tier-card-type-separator {
-    margin: 0 5px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.tier-card-type-detail {
-    color: var(--text-soft);
-    font-weight: 500;
-}
-
-/* ---------------------------------------------------------
-   CERCLE DATE — COULEUR DU TYPE / ROTATION
-   --------------------------------------------------------- */
-
-.tier-date-circle {
-    top: 10px;
-    left: 10px;
-    width: 58px;
-    height: 58px;
-    border-width: 3px;
-    gap: 0;
-    line-height: 1;
-    transform-origin: center;
-    transition:
-        transform 220ms cubic-bezier(.2,.8,.2,1),
-        box-shadow 220ms ease;
-}
-
-.tier-card:hover .tier-date-circle {
-    transform: scale(1.07) rotate(-40deg);
-    box-shadow:
-        0 10px 24px rgba(15, 23, 42, .18),
-        0 0 14px color-mix(in srgb, var(--tier-color, var(--accent)) 28%, transparent);
-}
-
-.tier-date-circle-month {
-    font-size: 13px;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: .04em;
-}
-
-.tier-date-circle-year {
-    margin-top: 1px;
-    font-size: 11px;
-    font-weight: 850;
-    letter-spacing: .08em;
-    line-height: 1;
-}
-
-/* ---------------------------------------------------------
-   LISERAI — COULEUR DU TYPE / PLUS LISIBLE
-   --------------------------------------------------------- */
-
-.tier-ribbon {
-    width: 20px;
-    background: var(--tier-color, var(--accent));
-
-    transition: width 180ms ease, background-color 180ms ease;
-}
-
-.tier-card:hover .tier-ribbon {
-    width: 30px;
-}
-.tier-card:hover .tier-ribbon-label {
-    transform: translateY(-50%) translateX(-30%) rotate(180deg);
-    font-size: 11px;
-}
-.tier-ribbon-label {
-    top: 50%;
-    right: 5px;
-    color: var(--tier-text, #fff);
-    font-size: 9px;
-    font-weight: 900;
-    letter-spacing: .09em;
-    line-height: 1;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .28);
-    white-space: nowrap;
-    writing-mode: vertical-rl;
-    transform: translateY(-50%) rotate(180deg);
-}
-
-/* ---------------------------------------------------------
-   ADRESSES — INFOS SECONDAIRES
-   --------------------------------------------------------- */
-
-.tier-card-footer {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 7px;
-    margin-top: 18px;
-}
-
-.tier-address {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    color: var(--text-soft);
-    font-size: 10px;
-}
-
-.tier-address-icon {
-    display: grid;
-    place-items: center;
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
-    border-radius: 6px;
-    background: var(--surface-soft);
-    border: 1px solid var(--border);
-}
-
-.tier-address svg {
-    width: 13px;
-    height: 13px;
-    color: var(--text-muted);
-}
-
-.tier-address-primary svg {
-    color: var(--accent);
-}
-
-.tier-address-content {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    gap: 1px;
-}
-
-.tier-address-label {
-    color: var(--text-muted);
-    font-size: 8px;
-    font-weight: 750;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-}
-
-.tier-address-city {
-    overflow: hidden;
-    color: var(--text-soft);
-    font-size: 10px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* ---------------------------------------------------------
-   ARCHIVÉ — TRANSPARENCE UNIQUEMENT
-   --------------------------------------------------------- */
-
-.tier-card.is-archived {
-    opacity: .5;
-}
-
-.tier-card.is-archived:hover {
-    opacity: .68;
-}
-
-@media (max-width: 820px) {
-    .tier-card-body {
-        padding-right: 42px;
-    }
-
-    .tier-card-heading {
-        padding-left: 86px;
-    }
-
-    .tier-date-circle {
-        width: 54px;
-        height: 54px;
-        left: 11px;
-    }
-
-    .tier-ribbon {
-        width: 15px;
-    }
-
-    .tier-card:hover .tier-ribbon {
-        width: 18px;
-    }
-}

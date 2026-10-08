@@ -1,0 +1,47 @@
+{# Liste des adresses : un onglet par type d'adresse #}
+{% set types = [] %}
+{% for adresse in adresses %}
+    {% if adresse.adresseType.id not in types|map(type => type.id) %}
+        {% set types = types|merge([adresse.adresseType]) %}
+    {% endif %}
+{% endfor %}
+
+{% set tabs = [] %}
+{% for type in types %}
+    {% set typeAdresses = adresses|filter(adresse => adresse.adresseType.id == type.id) %}
+    {% set tabs = tabs|merge([{
+        id: 'adresse-type-' ~ type.id,
+        label: type.name,
+        badge: typeAdresses|length,
+        content: include('adresse/_children.html.twig', { adresses: typeAdresses })
+    }]) %}
+{% endfor %}
+
+<div id="adresses-list" data-search-target>
+    {% if tabs|length > 0 %}
+        {% include 'layout/modern/components/_tabs.html.twig' with {
+            tabs: tabs,
+            activeTab: app.request.query.get('tab') ?? tabs[0].id
+        } %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><twig:ux:icon name="lucide:map-pin-off" /></div>
+            <div>
+                <h2>Aucune adresse</h2>
+                <p>Aucune adresse n'est actuellement disponible.</p>
+            </div>
+            <a href="{{ path('app_adresse_new') }}" class="page-action page-action-primary">
+                <twig:ux:icon name="ic:round-add" />
+                Ajouter une adresse
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div id="adresses-search-empty" class="empty-state search-empty" hidden>
+    <div class="empty-state-icon"><twig:ux:icon name="lucide:search-x" /></div>
+    <div>
+        <h2>Aucun résultat</h2>
+        <p>Aucune adresse ne correspond à votre recherche.</p>
+    </div>
+</div>
