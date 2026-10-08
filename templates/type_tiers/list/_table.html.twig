@@ -34,7 +34,7 @@
 
                         <div class="categorie-branch-children">
                             {% for type in n3s %}
-                                {% include 'type_tiers/_leaf.html.twig' with { type: type } only %}
+                                {% include 'type_tiers/list/_leaf.html.twig' with { type: type } only %}
                             {% endfor %}
                         </div>
                     </section>

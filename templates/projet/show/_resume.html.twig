@@ -16,12 +16,12 @@
     <section class="summary-card {{ isDimmed ? 'is-archived' : '' }}"
              style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }}; --entity-text: {{ entity.textColor ?? '#FFFFFF' }};">
 
-        {% include 'projet/_circle.html.twig' with { projet: entity } only %}
+        {% include 'projet/card/_circle.html.twig' with { projet: entity } only %}
 
         <div class="summary-body">
             <div class="summary-head">
                 <h2 class="summary-name" title="{{ entity.name }}">{{ entity.name }}</h2>
-                {% include 'projet/_status.html.twig' with { entity: entity } only %}
+                {% include 'projet/card/_status.html.twig' with { entity: entity } only %}
             </div>
 
             <div class="summary-grid-2-cols">
@@ -32,13 +32,13 @@
 
                 <div class="summary-field">
                     <p class="summary-label">Période</p>
-                    <p class="summary-value is-wrap">{% include 'projet/_period.html.twig' with { projet: entity } only %}</p>
+                    <p class="summary-value is-wrap">{% include 'projet/card/_period.html.twig' with { projet: entity } only %}</p>
                 </div>
 
                 <div class="summary-field">
                     <p class="summary-label">Démo</p>
                     <p class="summary-value">
-                        {% include 'detail/v2/_demo_pill.html.twig' with { entity: entity } %}
+                        {% include 'demo/demo/_pill.html.twig' with { entity: entity } %}
                     </p>
                 </div>
 

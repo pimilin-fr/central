@@ -18,7 +18,7 @@
                         <span class="entity-pill-dot"></span>
                         <span>{{ entity.type.fullname ?? entity.type ?? '—' }}</span>
                     </span>
-                    {% include 'projet/_status.html.twig' with { entity: entity } only %}
+                    {% include 'projet/card/_status.html.twig' with { entity: entity } only %}
                 </div>
             </div>
 
@@ -47,7 +47,7 @@
                     id: 'summary',
                     label: 'Résumé',
                     icon: 'ooui:info-filled',
-                    content: include('projet/_resume.html.twig')
+                    content: include('projet/show/_resume.html.twig')
                 },
                 {
                     id: 'edit',

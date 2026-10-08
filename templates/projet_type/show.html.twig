@@ -56,21 +56,21 @@
                     id: 'summary',
                     label: 'Résumé',
                     icon: 'ooui:info-filled',
-                    content: include('projet_type/_resume.html.twig')
+                    content: include('projet_type/show/_resume.html.twig')
                 },
                 {
                     id: 'childs',
                     label: 'Enfants',
                     icon: 'lucide:git-branch',
                     badge: type.children|length,
-                    content: include('projet_type/_table.html.twig', { types: type.children })
+                    content: include('projet_type/list/_table.html.twig', { types: type.children })
                 },
                 {
                     id: 'projets',
                     label: 'Projets',
                     icon: 'ix:project',
                     badge: projets|length,
-                    content: include('projet/_table.html.twig', { projets: projets })
+                    content: include('projet/list/_table.html.twig', { projets: projets })
                 },
                 {
                     id: 'edit',

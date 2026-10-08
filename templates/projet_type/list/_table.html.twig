@@ -1,7 +1,7 @@
 {# Hiérarchie des types de projet. Paramètre : types (racines ou enfants) #}
 <div id="projet-type-list" class="categorie-tree" data-search-target>
     {% for type in types %}
-        {% include 'projet_type/_node.html.twig' with { node: type, level: 0 } %}
+        {% include 'projet_type/list/_node.html.twig' with { node: type, level: 0 } %}
     {% else %}
         <div class="empty-state categorie-empty-state">
             <div class="empty-state-icon"><twig:ux:icon name="lucide:folder-tree" /></div>

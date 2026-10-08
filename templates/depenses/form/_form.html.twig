@@ -1,3 +1,4 @@
+@ -1,130 +0,0 @@
 {#
     Formulaire « Nouvelle opération » — briques du design system, multi-thème.
     On conserve tous les ids / names attendus par app.js (#depense-form, [tiers], [adresse], [adresse_id]).
@@ -67,16 +68,16 @@
                         {{ form_errors(form.tiers) }}
                     </div>
                     {% if form.adresse is defined %}
-                    <div>
-                        {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
-                        <select id="{{ form.adresse.vars.id }}"
-                                name="{{ form.adresse.vars.full_name }}"
-                                class="modern-form-control">
-                            <option value="">Adresse</option>
-                        </select>
-                        {% if form.adresse_id is defined %}{{ form_widget(form.adresse_id) }}{% endif %}
-                        {{ form_errors(form.adresse) }}
-                    </div>
+                        <div>
+                            {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
+                            <select id="{{ form.adresse.vars.id }}"
+                                    name="{{ form.adresse.vars.full_name }}"
+                                    class="modern-form-control">
+                                <option value="">Adresse</option>
+                            </select>
+                            {% if form.adresse_id is defined %}{{ form_widget(form.adresse_id) }}{% endif %}
+                            {{ form_errors(form.adresse) }}
+                        </div>
                     {% endif %}
                 </div>
             </div>

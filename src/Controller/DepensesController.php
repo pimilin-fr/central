@@ -192,7 +192,7 @@ final class DepensesController extends AbstractController {
              * =========================================================
              */
             if ($request->headers->get('X-Requested-With') === 'XMLHttpRequest') {
-                return $this->render('depenses/_add_form.html.twig', [
+                return $this->render('depenses/form/_form.html.twig', [
                             'form' => $form->createView(),
                 ]);
             }
@@ -203,7 +203,7 @@ final class DepensesController extends AbstractController {
          * AFFICHAGE INITIAL
          * =========================================================
          */
-        return $this->render('depenses/_add_form.html.twig', [
+        return $this->render('depenses/form/_form.html.twig', [
                     'form' => $form->createView(),
         ]);
     }

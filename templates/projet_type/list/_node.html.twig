@@ -58,7 +58,7 @@
 
         <div class="categorie-branch-children">
             {% for child in node.children %}
-                {% include 'projet_type/_node.html.twig' with { node: child, level: level + 1 } %}
+                {% include 'projet_type/list/_node.html.twig' with { node: child, level: level + 1 } %}
             {% endfor %}
         </div>
     </section>

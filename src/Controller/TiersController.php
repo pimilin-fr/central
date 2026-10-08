@@ -242,7 +242,7 @@ final class TiersController extends AbstractController {
                     );
         }
 
-        return $this->render('depenses/_add_form.html.twig', [
+        return $this->render('depenses/form/_form.html.twig', [
                     'form' => $form->createView(),
                     'tiers' => $tiers,
         ]);

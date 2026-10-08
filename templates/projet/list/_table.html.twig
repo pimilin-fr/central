@@ -1,6 +1,6 @@
 <div id="projets-list" class="entity-grid" data-search-target>
     {% for projet in projets %}
-        {% include 'projet/_card.html.twig' with { projet: projet } only %}
+        {% include 'projet/card/_card.html.twig' with { projet: projet } only %}
     {% else %}
         <div class="empty-state">
             <div class="empty-state-icon"><twig:ux:icon name="lucide:folder-kanban" /></div>
