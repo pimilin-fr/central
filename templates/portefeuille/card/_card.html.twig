@@ -1,8 +1,5 @@
-{% set isDeleted = portefeuille.deletedAt is not null %}
-{% set preview = preview is defined and preview %}
-{% set linkTag = preview ? 'div' : 'a' %}
+{% set isDeleted =  portefeuille.deletedAt is not null %}
 <article class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
-         data-live-color="couleur"
          style="--entity-color: {{ portefeuille.couleur ?? 'var(--accent)' }}; --entity-text: {{ portefeuille.textColor ?? '#FFFFFF' }};"
          data-search-item
          data-search-value="{{ (
@@ -11,7 +8,7 @@
                     (portefeuille.origine ?? '') ~ ' ' ~
                     (portefeuille.type ?? '')
                  )|lower }}">
-    <{{ linkTag }} class="entity-card-link"{% if not preview %} href="{{ path('app_portefeuille_show', { id: portefeuille.id }) }}"{% endif %}>
+    <a href="{{ path('app_portefeuille_show', { id: portefeuille.id }) }}" class="entity-card-link">
 
         {% include 'portefeuille/card/_circle.html.twig' %}
 
@@ -19,8 +16,10 @@
 
         <div class="entity-body">
             <div class="entity-head">
-                <h2 class="entity-title" title="{{ portefeuille.name }}" data-live="name" data-live-empty="Nom du portefeuille">{{ portefeuille.name }}</h2>
-                <span class="entity-sub" data-live="type,origine" data-live-empty="—">{{ portefeuille.type }}{% if portefeuille.origine %} · {{ portefeuille.origine }}{% endif %}</span>
+                <h2 class="entity-title" title="{{ portefeuille.name }}">{{ portefeuille.name }}</h2>
+                <span class="entity-sub">
+                    {{ portefeuille.type }}{% if portefeuille.origine %} · {{ portefeuille.origine }}{% endif %}
+                </span>
             </div>
 
             <div class="sep sep-inset">
@@ -28,19 +27,7 @@
                 <span class="sep-line"></span>
             </div>
 
-            {% if preview %}
-                <div class="entity-lines">
-                    <div class="entity-line is-muted">
-                        <span class="entity-line-icon"><twig:ux:icon name="lucide:wallet" /></span>
-                        <span class="entity-line-body">
-                            <span class="entity-line-label">Solde</span>
-                            <span class="entity-line-value">Calculé après création</span>
-                        </span>
-                    </div>
-                </div>
-            {% else %}
-                {% include 'portefeuille/card/_balance.html.twig' with { portefeuille: portefeuille } only %}
-            {% endif %}
+            {% include 'portefeuille/card/_balance.html.twig' with { portefeuille: portefeuille } only %}
         </div>
-    </{{ linkTag }}>
+    </a>
 </article>

@@ -47,8 +47,11 @@
 
     <aside class="form-layout-aside">
         {% include 'layout/modern/components/_form_preview.html.twig' with {
-            template: 'type_tiers/_leaf.html.twig',
-            vars: { type: form.vars.value }
+            icon: 'lucide:tag',
+            color: 'couleur',
+            ribbon: 'libelleLiserai',
+            title: 'name',
+            placeholder: 'Nom du type'
         } only %}
     </aside>
 </div>

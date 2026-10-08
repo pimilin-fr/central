@@ -75,8 +75,16 @@
 
     <aside class="form-layout-aside">
         {% include 'layout/modern/components/_form_preview.html.twig' with {
-            template: 'projet/_card.html.twig',
-            vars: { projet: form.vars.value }
+            icon: 'lucide:folder-kanban',
+            color: 'couleur',
+            ribbon: 'type',
+            title: 'name',
+            placeholder: 'Nom du projet',
+            sub: 'period',
+            lines: [
+                { icon: 'lucide:folder-tree', label: 'Type', live: 'type' },
+                { icon: 'lucide:flask-conical', label: 'Mode démo', live: 'demoStrategy' }
+            ]
         } only %}
     </aside>
 </div>

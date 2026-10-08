@@ -54,8 +54,14 @@
 
     <aside class="form-layout-aside">
         {% include 'layout/modern/components/_form_preview.html.twig' with {
-            template: 'projet_type/_leaf.html.twig',
-            vars: { node: form.vars.value, level: 0 }
+            icon: 'lucide:folder-kanban',
+            ribbon: 'name',
+            title: 'libelle',
+            placeholder: 'Libellé du type',
+            sub: 'parent',
+            lines: [
+                { icon: 'lucide:folder-tree', label: 'Parent', live: 'parent', empty: 'Racine' }
+            ]
         } only %}
     </aside>
 </div>

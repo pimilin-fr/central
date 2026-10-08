@@ -2,12 +2,9 @@
 {% set bgColor = tiers.tiersType.couleur ?? 'var(--accent)' %}
 {% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
 {% set isDeleted = tiers.deletedAt is not null %}
-{% set preview = preview is defined and preview %}
-{% set linkTag = preview ? 'div' : 'a' %}
 
 <article
     class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
-    data-live-color="tiersType"
     style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};"
     data-search-item
     data-search-value="{{ (
@@ -17,15 +14,15 @@
                 (tiers.tiersType.typeN2 ?? '')
             )|lower }}"
     >
-    <{{ linkTag }} class="entity-card-link"{% if not preview %} href="{{ path('app_tiers_show', {'id': tiers.id}) }}"{% endif %}>
+    <a href="{{ path('app_tiers_show', {'id': tiers.id}) }}" class="entity-card-link">
         {% include 'tiers/card/_circle.html.twig' %}
 
         <div class="entity-ribbon">
-            <span class="entity-ribbon-label" data-live="tiersType" data-live-empty="TYPE">{{ tiers.tiersType.libelleLiserai ?? tiers.tiersType.libelle ?? 'TYPE' }}</span>
+            <span class="entity-ribbon-label">{{ tiers.tiersType.libelleLiserai ?? tiers.tiersType.libelle ?? 'TYPE' }}</span>
         </div>
 
         <div class="entity-body">
             {% include 'tiers/card/_content.html.twig' %}
         </div>
-    </{{ linkTag }}>
+    </a>
 </article>

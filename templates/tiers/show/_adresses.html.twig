@@ -1,19 +1,28 @@
-<div class="geo-layout">
+{#
+    Adresses liées à un tiers : mêmes cartes que la liste des adresses
+    (adresse/card/_card), avec en plus les actions du lien Tiers ↔ Adresse
+    (définir principale / délier), puis la carte multipoint.
+#}
+<div class="geo-stack">
 
-    {# LISTE DES ADRESSES #}
-    <div class="geo-list">
-        {% for ta in adresses %}
-            {% include 'adresse/card/_card.html.twig' with {
-                adresse: ta.adresse,
-                tierAdresse: ta
-            } only %}
-        {% else %}
-            <div class="geo-empty">
-                <twig:ux:icon name="lucide:map-pin-off" />
-                <p>Aucune adresse liée</p>
+    {% if adresses|length > 0 %}
+        <div class="entity-grid">
+            {% for ta in adresses %}
+                {% include 'adresse/card/_card.html.twig' with {
+                    adresse: ta.adresse,
+                    tierAdresse: ta
+                } only %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><twig:ux:icon name="lucide:map-pin-off" /></div>
+            <div>
+                <h2>Aucune adresse liée</h2>
+                <p>Utilisez le formulaire ci-dessus pour lier une adresse à ce tiers.</p>
             </div>
-        {% endfor %}
-    </div>
+        </div>
+    {% endif %}
 
     {# CARTE MULTIPOINT #}
     <section class="geo-card">

@@ -89,8 +89,17 @@
 
     <aside class="form-layout-aside">
         {% include 'layout/modern/components/_form_preview.html.twig' with {
-            template: 'portefeuille/card/_card.html.twig',
-            vars: { portefeuille: form.vars.value }
+            icon: 'lucide:wallet',
+            color: 'couleur',
+            ribbon: 'libelle',
+            title: 'name',
+            placeholder: 'Nom du portefeuille',
+            sub: 'type,origine',
+            lines: [
+                { icon: 'lucide:star', label: 'Par défaut', live: 'isDefault' },
+                { icon: 'lucide:receipt', label: 'Dépenses réelles', live: 'isReal' },
+                { icon: 'lucide:flask-conical', label: 'Mode démo', live: 'demoStrategy' }
+            ]
         } only %}
     </aside>
 </div>

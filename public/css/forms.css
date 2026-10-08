@@ -662,3 +662,55 @@ label.required::after,
     gap: 8px;
     margin-top: 12px;
 }
+
+
+/* =========================================================
+   OPÉRATION — 2 colonnes : [1 | 2] + note  /  portefeuille
+   ========================================================= */
+
+.op-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.op-main {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+}
+
+.op-main-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 12px;
+}
+
+@media (max-width: 1100px) {
+    .op-layout,
+    .op-main-top {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Choix colorés (--entity-color posé par le template depuis data-color) */
+.choice-card.is-colored {
+    border-left: 4px solid var(--entity-color, var(--border-strong));
+}
+
+.choice-card.is-colored .choice-dot {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 10px;
+    background: var(--entity-color, var(--border-strong));
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--entity-color, var(--border-strong)) 22%, transparent);
+}
+
+.choice-card.is-colored:has(input:checked) {
+    color: var(--text);
+    background: color-mix(in srgb, var(--entity-color) 14%, var(--surface));
+    border-color: var(--entity-color);
+}

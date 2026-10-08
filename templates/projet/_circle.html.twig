@@ -7,10 +7,10 @@
 
 <div class="entity-circle" title="Démarrage du projet">
     {% if projet.beginAt %}
-        <span class="entity-circle-text" data-live="beginMonth" data-live-empty="—">{{ months[projet.beginAt|date('m')] }}</span>
-        <span class="entity-circle-sub" data-live="beginYear" data-live-empty="N/A">{{ projet.beginAt|date('y') }}</span>
+        <span class="entity-circle-text">{{ months[projet.beginAt|date('m')] }}</span>
+        <span class="entity-circle-sub">{{ projet.beginAt|date('y') }}</span>
     {% else %}
-        <span class="entity-circle-text" data-live="beginMonth" data-live-empty="—">—</span>
-        <span class="entity-circle-sub" data-live="beginYear" data-live-empty="N/A">N/A</span>
+        <span class="entity-circle-text">—</span>
+        <span class="entity-circle-sub">N/A</span>
     {% endif %}
 </div>

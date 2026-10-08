@@ -5,8 +5,36 @@
 {% set level = level|default(0) %}
 {% set hasChildren = node.children|length > 0 %}
 
+{% set pathParts = [node.libelle] %}
+{% set current = node.parent %}
+{% for i in 1..50 %}
+    {% if current %}
+        {% set pathParts = [current.libelle]|merge(pathParts) %}
+        {% set current = current.parent %}
+    {% endif %}
+{% endfor %}
+{% set typePath = pathParts|join(' / ') %}
+
 {% if not hasChildren %}
-    {% include 'projet_type/_leaf.html.twig' with { node: node, level: level } only %}
+    <article class="entity-card is-compact"
+             style="--entity-color: var(--accent); --entity-text: var(--accent-contrast, #fff);"
+             data-search-item
+             data-search-value="{{ (typePath ~ ' ' ~ (node.name ?? ''))|lower|e('html_attr') }}">
+        <a href="{{ path('app_projet_type_show', { id: node.id }) }}" class="entity-card-link">
+            <div class="entity-circle" aria-hidden="true"><twig:ux:icon name="lucide:folder-kanban" /></div>
+
+            <div class="entity-ribbon" aria-hidden="true">
+                <span class="entity-ribbon-label">{{ level == 0 ? 'Racine' : 'Type' }}</span>
+            </div>
+
+            <div class="entity-body">
+                <div class="entity-head">
+                    <h3 class="entity-title" title="{{ node.libelle }}">{{ node.libelle }}</h3>
+                    <span class="entity-sub is-plain" title="{{ typePath }}">{{ typePath }}</span>
+                </div>
+            </div>
+        </a>
+    </article>
 {% else %}
     <section class="categorie-branch level-{{ level > 2 ? 2 : level }}" data-search-group>
         <header class="categorie-branch-header">

@@ -99,10 +99,6 @@
             <div>
                 <div class="form-label-line">
                     {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    <button type="button" class="form-inline-btn" data-fill-address>
-                        <twig:ux:icon name="lucide:wand-sparkles" />
-                        Remplir depuis les champs
-                    </button>
                 </div>
                 {{ form_widget(form.adresse, { attr: { class: 'modern-form-control', rows: 2 } }) }}
                 {{ form_errors(form.adresse) }}
@@ -127,8 +123,16 @@
 
     <aside class="form-layout-aside">
         {% include 'layout/modern/components/_form_preview.html.twig' with {
-            template: 'adresse/card/_card.html.twig',
-            vars: { adresse: form.vars.value }
+            icon: 'lucide:map-pin',
+            color: 'adresseType',
+            ribbon: 'city',
+            title: 'name',
+            placeholder: 'Nom de l’adresse',
+            sub: 'adresseType',
+            lines: [
+                { icon: 'lucide:map', label: 'Adresse', live: 'address' },
+                { icon: 'lucide:crosshair', label: 'Coordonnées', live: 'coords', empty: 'Calculées automatiquement' }
+            ]
         } only %}
     </aside>
 </div>

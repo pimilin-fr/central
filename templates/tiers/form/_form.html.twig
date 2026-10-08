@@ -75,8 +75,16 @@
 
     <aside class="form-layout-aside">
         {% include 'layout/modern/components/_form_preview.html.twig' with {
-            template: 'tiers/card/_card.html.twig',
-            vars: { tiers: form.vars.value }
+            icon: 'lucide:user-round',
+            color: 'tiersType',
+            ribbon: 'tiersType',
+            title: 'name',
+            placeholder: 'Nom du tiers',
+            sub: 'tiersType',
+            lines: [
+                { icon: 'lucide:text-cursor-input', label: 'Recherche', live: 'searchText' },
+                { icon: 'lucide:flask-conical', label: 'Mode démo', live: 'demoStrategy' }
+            ]
         } only %}
     </aside>
 </div>
