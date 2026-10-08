@@ -1,0 +1,41 @@
+# À FUSIONNER dans config/packages/doctrine.yaml (voir docs/demo/README.md, étape 2).
+# Deux connexions / deux EntityManagers sur les MÊMES entités.
+# IMPORTANT : « default » doit rester le premier de chaque liste (c'est lui que Symfony choisit
+# pour les formulaires, ParamConverter, repositories…).
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                url: '%env(resolve:DATABASE_URL)%'
+                # ...vos options actuelles (profiling_collect_backtrace, use_savepoints, etc.)
+            demo:
+                url: '%env(resolve:DEMO_DATABASE_URL)%'
+    orm:
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+                report_fields_where_declared: true
+                validate_xml_mapping: true
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware   # = celui que vous utilisez déjà
+                auto_mapping: true
+                mappings:
+                    App:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity'
+                        prefix: 'App\Entity'
+                        alias: App
+            demo:
+                connection: demo
+                report_fields_where_declared: true
+                validate_xml_mapping: true
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware   # DOIT être identique à « default »
+                mappings:
+                    App:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity'
+                        prefix: 'App\Entity'
+                        alias: App

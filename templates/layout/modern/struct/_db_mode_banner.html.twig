@@ -1,0 +1,13 @@
+{#
+    Bandeau « DÉMO » affiché quand l'application tourne sur la base démo (./app demo).
+    À inclure une fois, juste après <body> dans modern.html.twig :
+        {% include 'layout/modern/struct/_db_mode_banner.html.twig' %}
+    Variable Twig db_mode : voir config/packages/twig.demo.yaml.dist
+#}
+{% if db_mode|default('prod') == 'demo' %}
+    <div role="status" style="position:sticky;top:0;z-index:90;display:flex;align-items:center;justify-content:center;gap:10px;padding:5px 12px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--on-warning, #2b1d02);background:var(--warning, #f59e0b);">
+        <twig:ux:icon name="lucide:flask-conical" />
+        Base de démonstration — données fictives, jetables
+        <span style="font-weight:600;letter-spacing:0;text-transform:none;opacity:.85">retour à la prod : ./app prod</span>
+    </div>
+{% endif %}

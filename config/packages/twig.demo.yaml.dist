@@ -1,0 +1,8 @@
+# À FUSIONNER dans config/packages/twig.yaml : expose le mode courant (prod|demo) aux templates.
+twig:
+    globals:
+        db_mode: '%env(default:db_mode_default:APP_DB_MODE)%'
+
+# et dans config/services.yaml :
+# parameters:
+#     db_mode_default: prod

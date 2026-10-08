@@ -106,21 +106,27 @@ class Depenses implements DemoEntityInterface {
         return $this->releve;
     }
 
+    /**
+     * Stratégie dérivée des liens : exclue si un lien est exclu, anonymisée si un lien l'est, sinon copiée.
+     * (Le projet est facultatif : l'ancienne version plantait sur une opération sans projet.)
+     * Pour la construction de la démo, DepensesTransformer applique la même règle via le DemoContext.
+     */
     #[Override]
     public function getDemoStrategy(): DemoStrategy {
-        if ($this->getTiers()->getDemoStrategy() === DemoStrategy::EXCLUDE ||
-                $this->getCategorie()->getDemoStrategy() === DemoStrategy::EXCLUDE ||
-                $this->getPortefeuille()->getDemoStrategy() === DemoStrategy::EXCLUDE ||
-                $this->getProjet()->getDemoStrategy() === DemoStrategy::EXCLUDE) {
+        $strategies = array_filter([
+            $this->getTiers()->getDemoStrategy(),
+            $this->getCategorie()->getDemoStrategy(),
+            $this->getPortefeuille()?->getDemoStrategy(),
+            $this->getProjet()?->getDemoStrategy(),
+        ]);
+
+        if (in_array(DemoStrategy::EXCLUDE, $strategies, true)) {
             return DemoStrategy::EXCLUDE;
-        } elseif ($this->getTiers()->getDemoStrategy() === DemoStrategy::ANONYMIZE ||
-                $this->getCategorie()->getDemoStrategy() === DemoStrategy::ANONYMIZE ||
-                $this->getPortefeuille()->getDemoStrategy() === DemoStrategy::ANONYMIZE ||
-                $this->getProjet()->getDemoStrategy() === DemoStrategy::ANONYMIZE) {
-            return DemoStrategy::ANONYMIZE;
-        } else {
-            return DemoStrategy::COPY;
         }
+
+        return in_array(DemoStrategy::ANONYMIZE, $strategies, true)
+            ? DemoStrategy::ANONYMIZE
+            : DemoStrategy::COPY;
     }
 
     //-- setter
