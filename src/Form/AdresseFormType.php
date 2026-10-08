@@ -120,14 +120,6 @@ class AdresseFormType extends AbstractType {
                         'placeholder' => 'Saisir l’adresse complète...'
                     ]
                 ])
-                ->add('adresseForcee', TextareaType::class, [
-                    'label' => 'Adresse forcée',
-                    'required' => false,
-                    'attr' => [
-                        'rows' => 4,
-                        'placeholder' => 'Saisir l’adresse complète...'
-                    ]
-                ])
                 ->add('adresseExact', TextareaType::class, [
                     'label' => 'Adresse exacte',
                     'required' => false,
