@@ -64,7 +64,7 @@
         <div class="theme-switcher" data-theme-switcher>
             <button type="button" class="topbar-icon-button theme-switcher-trigger" data-theme-menu-toggle aria-expanded="false" aria-haspopup="true" aria-label="Changer de thème" title="Changer de thème">
                 <span class="theme-current-mark" aria-hidden="true"></span>
-                <span class="theme-current-name" data-theme-current-name>Clair</span>
+                <span class="theme-current-name" data-theme-current-name>{{ (themes|first).label }}</span>
                 <twig:ux:icon name="lucide:chevron-down" class="theme-switcher-chevron" />
             </button>
 
@@ -74,29 +74,13 @@
                     <span class="theme-menu-subtitle">Choisissez votre ambiance</span>
                 </div>
 
-                <button type="button" class="theme-option" data-theme-option="light-orange" aria-checked="false">
-                    <span class="theme-option-preview theme-preview-orange"><span></span></span>
-                    <span class="theme-option-copy"><strong>Clair</strong><small>Accent orange</small></span>
-                    <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
-                </button>
-
-                <button type="button" class="theme-option" data-theme-option="gray-green" aria-checked="false">
-                    <span class="theme-option-preview theme-preview-green"><span></span></span>
-                    <span class="theme-option-copy"><strong>Gris</strong><small>Accent vert</small></span>
-                    <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
-                </button>
-
-                <button type="button" class="theme-option" data-theme-option="dark-electric" aria-checked="false">
-                    <span class="theme-option-preview theme-preview-electric"><span></span></span>
-                    <span class="theme-option-copy"><strong>Sombre</strong><small>Bleu électrique</small></span>
-                    <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
-                </button>
-
-                <button type="button" class="theme-option" data-theme-option="oldschool" aria-checked="false">
-                    <span class="theme-option-preview theme-preview-oldschool"><span></span></span>
-                    <span class="theme-option-copy"><strong>Old School</strong><small>Beige &amp; marron</small></span>
-                    <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
-                </button>
+                {% for theme in themes %}
+                    <button type="button" class="theme-option" data-theme-option="{{ theme.id }}" data-theme-label="{{ theme.label }}" aria-checked="false">
+                        <span class="theme-option-preview" data-theme="{{ theme.id }}"><span></span></span>
+                        <span class="theme-option-copy"><strong>{{ theme.label }}</strong><small>{{ theme.hint }}</small></span>
+                        <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
+                    </button>
+                {% endfor %}
             </div>
         </div>
 

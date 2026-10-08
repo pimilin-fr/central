@@ -1,3 +1,20 @@
+{#
+    REGISTRE DES THÈMES — seul endroit à modifier pour en ajouter un.
+    1. Copier public/css/themes/<un-theme>.css en public/css/themes/<mon-theme>.css
+       et changer le sélecteur html[data-theme="<mon-theme>"] (+ les couleurs).
+    2. Ajouter une ligne ci-dessous.
+    Tout le reste (liens CSS, menu, pastille d'aperçu, JS) se génère à partir de cette liste.
+    Le premier thème est le thème par défaut.
+#}
+{% set themes = [
+    { id: 'light-orange',    label: 'Clair',      hint: 'Accent orange' },
+    { id: 'gray-green',      label: 'Gris',       hint: 'Accent vert' },
+    { id: 'dark-electric',   label: 'Sombre',     hint: 'Bleu électrique' },
+    { id: 'oldschool',       label: 'Old School', hint: 'Beige & marron' },
+    { id: 'midnight-copper', label: 'Cuivré',     hint: 'Nuit & cuivre' },
+    { id: 'glacial-neon',       label: 'Néon',     hint:"Néon Glacial"}
+    
+] %}
 <!DOCTYPE html>
 <html lang="fr" class="h-full">
     {% include 'layout/modern/struct/_head.html.twig' %}
@@ -5,7 +22,7 @@
     <body class="min-h-full">
         <div id="app-shell" class="app-shell">
             {% include 'layout/modern/struct/_sidebar.html.twig' %}
- 
+
             <div class="app-main">
                 {% include 'layout/modern/struct/_topbar.html.twig' %}
 

@@ -19,7 +19,7 @@
              style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};">
 
         <div class="entity-circle"
-             style="--entity-color: {{ hasCurrentGeolocation ? 'var(--success)' : 'var(--danger)' }}; --entity-text: #fff;"
+             style="--entity-color: {{ hasCurrentGeolocation ? 'var(--success)' : 'var(--danger)' }}; --entity-text: {{ hasCurrentGeolocation ? 'var(--on-success)' : 'var(--on-danger)' }};"
              title="{{ hasCurrentGeolocation ? 'Adresse géolocalisée' : 'Adresse non géolocalisée' }}">
             <twig:ux:icon name="{{ hasCurrentGeolocation ? 'lucide:map-pin' : 'lucide:map-pin-off' }}" />
         </div>

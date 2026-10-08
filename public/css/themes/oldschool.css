@@ -1,0 +1,87 @@
+/* =========================================================
+   THÈME 4 — OLD SCHOOL / BEIGE / MARRON
+   Fichier autonome : toutes les variables du thème sont ici.
+   Pour créer un thème : copier ce fichier, changer le sélecteur
+   [data-theme="..."], l'ajouter dans _head.html.twig, _topbar.html.twig
+   et design.js.
+   ========================================================= */
+
+html[data-theme="oldschool"],
+.theme-option-preview[data-theme="oldschool"] {
+    color-scheme: light;
+
+    /* Fond & surfaces */
+    --bg: #e7dcc7;
+    --surface: #f5eddf;
+    --surface-soft: #eee3d1;
+    --surface-hover: #e4d6bf;
+
+    /* Texte */
+    --text: #3c2b1f;
+    --text-soft: #725d49;
+    --text-muted: #a08b73;
+
+    /* Bordures */
+    --border: #cdbb9f;
+    --border-strong: #b59f7f;
+
+    /* Accent */
+    --accent: #8b5a2b;
+    --accent-soft: rgba(139, 90, 43, .12);
+    --accent-strong: #70451f;
+    --accent-contrast: #fffaf1;
+
+    /* Information */
+    --info: #177494;
+    --info-strong: #004d66;
+    --info-soft: rgba(56, 189, 248, 0.13);
+    --on-info: #ffffff;
+
+    /* Succès */
+    --success: #567d46;
+    --success-strong: #357b55;
+    --success-soft: rgba(86, 125, 70, 0.10);
+    --on-success: #ffffff;
+
+    /* Alerte */
+    --warning: #a56b24;
+    --warning-strong: #a36700;
+    --warning-soft: rgba(165, 107, 36, 0.10);
+    --on-warning: #2b1d02;
+
+    /* Danger */
+    --danger: #a94442;
+    --danger-strong: #a30404;
+    --danger-soft: rgba(169, 68, 66, 0.10);
+    --on-danger: #ffffff;
+
+    /* Couleurs métier (revenu / dépense / remboursement) */
+    --category-income: #4f9b70;
+    --category-income-strong: #357b55;
+    --category-income-soft: rgba(79, 155, 112, .11);
+    --category-expense: #c76565;
+    --category-expense-strong: #a84747;
+    --category-expense-soft: rgba(199, 101, 101, .11);
+    --category-refund: #b18445;
+    --category-refund-strong: #8d682f;
+    --category-refund-soft: rgba(177, 132, 69, .11);
+
+    /* Montants */
+    --amount-income: var(--category-income-strong);
+    --amount-expense: var(--category-expense-strong);
+    --amount-refund: #3a6f9f;
+
+    /* Ombres, voiles, reflets */
+    --shadow-sm: 0 2px 7px rgba(60, 43, 31, 0.08);
+    --shadow-md: 0 12px 30px rgba(60, 43, 31, 0.12);
+    --shadow-lg: 20px 0 50px rgba(60, 43, 31, 0.2);
+    --shadow-hover: 0 10px 24px rgba(60, 43, 31, 0.2);
+    --overlay: rgba(0, 0, 0, 0.45);
+    --shine: rgba(255, 255, 255, 0.85);
+    --page-glow: rgba(139, 90, 43, 0.035);
+    --preview-border: rgba(0, 0, 0, 0.12);
+
+    /* Texte posé sur une couleur d’entité */
+    --on-entity: #ffffff;
+    --on-entity-shadow: rgba(0, 0, 0, 0.28);
+}

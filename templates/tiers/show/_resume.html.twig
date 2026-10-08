@@ -22,7 +22,7 @@
 
                 {% if tiers.tiersType %}
                     <span class="entity-pill"
-                          style="--entity-color: {{ tiers.tiersType.couleur ?? '#cbd5e1' }};">
+                          style="--entity-color: {{ tiers.tiersType.couleur ?? 'var(--border-strong)' }};">
                         <span class="entity-pill-dot"></span>
                         <span>{{ tiers.tiersType.name }}</span>
                     </span>

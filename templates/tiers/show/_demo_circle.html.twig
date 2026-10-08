@@ -1,12 +1,12 @@
 {% set strategy = entity.demoStrategy.value ?? null %}
 
 {% set mapping = {
-    'copy':      { label: 'Copie',     icon: 'lucide:copy',          color: 'var(--info)',       ink: '#ffffff' },
-    'anonymize': { label: 'Anonymisé', icon: 'lucide:venetian-mask', color: 'var(--warning)',    ink: '#2b1d02' },
-    'exclude':   { label: 'Exclue',    icon: 'lucide:eye-off',       color: 'var(--danger)',     ink: '#ffffff' }
+    'copy':      { label: 'Copie',     icon: 'lucide:copy',          color: 'var(--info)',       ink: 'var(--on-info)' },
+    'anonymize': { label: 'Anonymisé', icon: 'lucide:venetian-mask', color: 'var(--warning)',    ink: 'var(--on-warning)' },
+    'exclude':   { label: 'Exclue',    icon: 'lucide:eye-off',       color: 'var(--danger)',     ink: 'var(--on-danger)' }
 } %}
 
-{% set item = mapping[strategy] ?? { label: 'Erreur', icon: 'lucide:circle-help', color: 'var(--text-muted)', ink: '#ffffff' } %}
+{% set item = mapping[strategy] ?? { label: 'Erreur', icon: 'lucide:circle-help', color: 'var(--text-muted)', ink: 'var(--on-entity)' } %}
 
 <div class="summary-circle-wrap">
     <div class="entity-circle"

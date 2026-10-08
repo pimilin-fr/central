@@ -26,7 +26,7 @@
 
 .entity-card {
     --entity-color: var(--accent);
-    --entity-text: #fff;
+    --entity-text: var(--on-entity);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -73,7 +73,7 @@
     justify-items: center;
     width: 58px;
     height: 58px;
-    color: var(--entity-text, #fff);
+    color: var(--entity-text, var(--on-entity));
     background: var(--entity-color, var(--accent));
     border: 3px solid var(--surface);
     border-radius: 50%;
@@ -114,7 +114,7 @@
 .summary-card:hover .entity-circle {
     transform: scale(1.07) rotate(-40deg);
     box-shadow:
-        0 10px 24px rgba(15, 23, 42, .18),
+        var(--shadow-hover),
         0 0 14px color-mix(in srgb, var(--entity-color, var(--accent)) 30%, transparent);
 }
 
@@ -148,7 +148,7 @@
     letter-spacing: .09em;
     line-height: 1;
     text-overflow: ellipsis;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .28);
+    text-shadow: 0 1px 2px var(--on-entity-shadow);
     text-transform: uppercase;
     white-space: nowrap;
     writing-mode: vertical-rl;

@@ -3,7 +3,7 @@
 .sg-nav {
     position: sticky;
     top: 0;
-    z-index: 30;
+    z-index: 5;
     display: flex;
     flex-wrap: wrap;
     gap: 6px;

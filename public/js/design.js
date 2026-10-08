@@ -12,13 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeOptions = document.querySelectorAll('[data-theme-option]');
     const themeCurrentName = document.querySelector('[data-theme-current-name]');
 
-    const themes = {
-        'light-orange': 'Clair',
-        'gray-green': 'Gris',
-        'dark-electric': 'Sombre',
-        oldschool: 'Old School'
-    };
-    const defaultTheme = 'light-orange';
+    // Les thèmes viennent du menu (généré depuis le registre Twig) : rien à déclarer ici.
+    const themes = {};
+    themeOptions.forEach((option) => {
+        themes[option.dataset.themeOption] = option.dataset.themeLabel || option.dataset.themeOption;
+    });
+    const defaultTheme = themeOptions[0]?.dataset.themeOption || 'light-orange';
 
     const applyTheme = (theme) => {
         if (!Object.prototype.hasOwnProperty.call(themes, theme)) {

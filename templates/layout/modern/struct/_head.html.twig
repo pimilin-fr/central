@@ -3,11 +3,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
         (() => {
-            const themes = ['light-orange', 'gray-green', 'dark-electric', 'oldschool'];
+            const themes = {{ themes|map(t => t.id)|json_encode|raw }};
             const savedTheme = localStorage.getItem('central-theme');
             document.documentElement.dataset.theme = themes.includes(savedTheme)
                     ? savedTheme
-                    : 'light-orange';
+                    : themes[0];
         })();
     </script>
 
@@ -17,7 +17,10 @@
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>◈</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%2300c2ff%22>C</text></svg>"/>
     <link rel="stylesheet"  href="{{ asset('css/autocomplete.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/themes.css')}}" />
+    {# Un fichier CSS par thème, généré depuis le registre (templates/modern.html.twig) #}
+    {% for theme in themes %}
+        <link rel="stylesheet" href="{{ asset('css/themes/' ~ theme.id ~ '.css') }}?v=17" />
+    {% endfor %}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/categories.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/forms.css')  }}" />

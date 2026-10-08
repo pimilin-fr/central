@@ -13,7 +13,7 @@
                 {# Sous-titre : une seule ligne, contour + point dans la couleur du type #}
                 <div class="page-subline">
                     <span class="entity-pill"
-                          style="--entity-color: {{ entity.tiersType.couleur ?? '#cbd5e1' }};">
+                          style="--entity-color: {{ entity.tiersType.couleur ?? 'var(--border-strong)' }};">
                         <span class="entity-pill-dot"></span>
                         <span>{{ entity.tiersType.name ?? '—' }}</span>
                     </span>
