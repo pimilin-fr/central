@@ -441,7 +441,7 @@
 
     background: linear-gradient(
         90deg,
-        color-mix(in srgb, var(--sep-color, var(--accent)) 65%, var(--border)),
+        color-mix(in srgb, var(--sep-color, var(--accent)) 100%, var(--border)),
         var(--border)
         );
 }

@@ -4,7 +4,7 @@
     {
         id: 'summary',
         label: 'Résumé',
-        content: include('tiers/_resume.html.twig',{
+        content: include('tiers/show/_resume.html.twig',{
             tiers: entity
         })
     },{
@@ -27,7 +27,7 @@
                     id: entity.id
                 }
             ))
-            ~ include('tiers/_show_adresses.html.twig')
+            ~ include('tiers/show/_adresses.html.twig')
     },{
         id: 'addoperation',
         label: 'Opération',
