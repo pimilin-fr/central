@@ -326,3 +326,158 @@ input[type="color"].modern-form-control {
         grid-column: auto;
     }
 }
+
+
+/* =========================================================
+   CHAMPS REQUIS — astérisque aux couleurs de l'accent du thème
+   Symfony ajoute la classe "required" sur les <label> des champs
+   obligatoires (form_label) : aucune modification des templates.
+   .is-required : équivalent manuel pour les labels écrits en HTML.
+   ========================================================= */
+
+label.required::after,
+.is-required::after {
+    margin-left: 3px;
+    content: "*";
+    color: var(--accent);
+    font-size: 1.15em;
+    font-weight: 900;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   ENTITY SELECT — <select data-entity-select> (liseré + pastille)
+   Couleur lue depuis data-color des <option> par app.js → --entity-color
+   ========================================================= */
+
+.entity-select {
+    position: relative;
+    display: block;
+}
+
+.entity-select-dot {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    z-index: 1;
+    width: 10px;
+    height: 10px;
+    background: var(--border-strong);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-strong) 25%, transparent);
+    pointer-events: none;
+    transform: translateY(-50%);
+    transition: background 150ms ease, box-shadow 150ms ease;
+}
+
+.entity-select select {
+    padding-left: 34px;
+    border-left-width: 4px;
+}
+
+.entity-select.has-value .entity-select-dot {
+    background: var(--entity-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--entity-color) 22%, transparent);
+}
+
+.entity-select.has-value select {
+    border-left-color: var(--entity-color);
+}
+
+
+/* =========================================================
+   COORDONNÉES — champ + état de validation
+   ========================================================= */
+
+.coords-field {
+    position: relative;
+}
+
+.coords-field .modern-form-control {
+    font-variant-numeric: tabular-nums;
+}
+
+.coords-field.is-valid .modern-form-control {
+    border-color: color-mix(in srgb, var(--success) 60%, var(--border));
+}
+
+.coords-field.is-invalid .modern-form-control {
+    border-color: color-mix(in srgb, var(--danger) 60%, var(--border));
+}
+
+.form-hint {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.coords-field.is-valid .form-hint { color: var(--success); }
+.coords-field.is-invalid .form-hint { color: var(--danger); }
+
+
+/* =========================================================
+   FORM LAYOUT — frise verticale + aperçu en direct
+   .form-layout > .form-timeline (cartes numérotées reliées)
+                + .form-layout-aside (aperçu collant)
+   ========================================================= */
+
+.form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 18px;
+    align-items: start;
+}
+
+.form-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-timeline::before {
+    position: absolute;
+    top: 28px;
+    bottom: 28px;
+    left: 27px;
+    width: 2px;
+    content: "";
+    background: linear-gradient(180deg, var(--accent), var(--border));
+    border-radius: 2px;
+    opacity: .6;
+}
+
+.form-timeline .form-field-card::before {
+    display: none;
+}
+
+.form-layout-aside {
+    position: sticky;
+    top: 84px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-aside-title {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+    .form-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .form-layout-aside {
+        position: static;
+        order: -1;
+    }
+}
+

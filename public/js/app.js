@@ -39,6 +39,9 @@ const App = {
         this.selectAll.init();
         this.adresse.init();
         this.depenseForm.init();
+        this.entitySelect.init();
+        this.liveForm.init();
+        this.coords.init();
 
         CentralMaps.init();
     },
@@ -48,6 +51,58 @@ const App = {
      * ========================================================= */
 
     search: {
+
+        /**
+         * Recherche et onglets : chaque onglet affiche le nombre de résultats
+         * qu'il contient, les onglets sans résultat sont atténués et, si
+         * l'onglet actif est vide alors qu'un autre contient des résultats,
+         * on bascule automatiquement sur le premier onglet concerné.
+         */
+        syncTabs(target, query) {
+            target.querySelectorAll('[data-tabs]').forEach(container => {
+                const filtering = query !== '';
+                let activeButton = null;
+                let firstMatch = null;
+
+                container.classList.toggle('is-filtering', filtering);
+
+                container.querySelectorAll('.tab-button').forEach(button => {
+                    const panel = container.querySelector('#tab-' + button.dataset.tab);
+                    const badge = button.querySelector('.tab-badge');
+
+                    if (!panel) {
+                        return;
+                    }
+
+                    const total = panel.querySelectorAll('[data-search-item]').length;
+                    const visible = panel.querySelectorAll('[data-search-item]:not([hidden])').length;
+
+                    if (badge) {
+                        if (badge.dataset.total === undefined) {
+                            badge.dataset.total = badge.textContent.trim();
+                        }
+
+                        badge.textContent = filtering ? `${visible}/${total}` : badge.dataset.total;
+                    }
+
+                    button.classList.toggle('has-match', filtering && visible > 0);
+                    button.classList.toggle('is-empty', filtering && visible === 0);
+
+                    if (button.classList.contains('is-active')) {
+                        activeButton = button;
+                    }
+
+                    if (filtering && visible > 0 && !firstMatch) {
+                        firstMatch = button;
+                    }
+                });
+
+                if (filtering && firstMatch && activeButton && activeButton.classList.contains('is-empty')) {
+                    firstMatch.click();
+                }
+            });
+        },
+
         init(scope = document) {
 
             App.log('Init generic search');
@@ -121,6 +176,8 @@ const App = {
                         visibleCount,
                         totalCount: items.length
                     });
+
+                    App.search.syncTabs(target, query);
                 };
 
                 input.addEventListener('input', filter);
@@ -592,6 +649,160 @@ const App = {
             });
         }
 
+    },
+
+    /* =========================================================
+     * ENTITY SELECT — liseré + pastille pilotés par data-color
+     * <select data-entity-select> ; <option data-color data-text-color>
+     * Aucun style n'est généré côté PHP : on pose --entity-color.
+     * ========================================================= */
+
+    entitySelect: {
+        init(scope = document) {
+            scope.querySelectorAll('select[data-entity-select]').forEach(select => {
+                if (select.dataset.entityInit) {
+                    return;
+                }
+
+                select.dataset.entityInit = '1';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'entity-select';
+                select.parentNode.insertBefore(wrapper, select);
+                wrapper.appendChild(select);
+
+                const dot = document.createElement('span');
+                dot.className = 'entity-select-dot';
+                dot.setAttribute('aria-hidden', 'true');
+                wrapper.insertBefore(dot, select);
+
+                const sync = () => {
+                    const option = select.options[select.selectedIndex];
+                    const color = option ? option.dataset.color : '';
+
+                    wrapper.classList.toggle('has-value', !!color);
+
+                    if (color) {
+                        wrapper.style.setProperty('--entity-color', color);
+                        wrapper.style.setProperty('--entity-text', option.dataset.textColor || '#fff');
+                    } else {
+                        wrapper.style.removeProperty('--entity-color');
+                        wrapper.style.removeProperty('--entity-text');
+                    }
+                };
+
+                select.addEventListener('change', sync);
+                sync();
+            });
+        }
+    },
+
+    /* =========================================================
+     * LIVE FORM — aperçu en direct
+     * <form data-live-form> ... [data-live="name"] (texte)
+     * ... [data-live-color] (pose --entity-color du type choisi)
+     * Les champs sont retrouvés par name$="[propriété]".
+     * ========================================================= */
+
+    liveForm: {
+        init() {
+            document.querySelectorAll('form[data-live-form]').forEach(form => {
+                const scope = form.closest('[data-live-scope]') || document;
+                const field = name => form.querySelector(`[name$="[${name}]"]`);
+                const value = name => (field(name)?.value || '').trim();
+                const typeLabel = () => {
+                    const select = field('adresseType');
+                    const option = select?.options?.[select.selectedIndex];
+                    return option && option.value ? option.textContent.trim() : '';
+                };
+
+                const compose = () => {
+                    const street = [value('prefix'), value('num'), value('bisTer'), value('typeVoie'), value('nomVoie')]
+                            .filter(Boolean).join(' ');
+                    const city = [value('codePostal'), value('ville'), value('cedex')]
+                            .filter(Boolean).join(' ');
+
+                    return [street, city, value('pays')].filter(Boolean).join(', ');
+                };
+
+                const render = () => {
+                    const texts = {
+                        name: value('name') || 'Nom de l’adresse',
+                        type: typeLabel() || 'Type non choisi',
+                        address: value('adresse') || compose() || '—',
+                        coords: value('adresseForcee') || 'Calculées automatiquement',
+                        city: value('ville') || '···'
+                    };
+
+                    scope.querySelectorAll('[data-live]').forEach(el => {
+                        el.textContent = texts[el.dataset.live] ?? '';
+                    });
+
+                    const select = field('adresseType');
+                    const option = select?.options?.[select.selectedIndex];
+
+                    scope.querySelectorAll('[data-live-color]').forEach(el => {
+                        if (option && option.dataset.color) {
+                            el.style.setProperty('--entity-color', option.dataset.color);
+                            el.style.setProperty('--entity-text', option.dataset.textColor || '#fff');
+                        } else {
+                            el.style.removeProperty('--entity-color');
+                            el.style.removeProperty('--entity-text');
+                        }
+                    });
+                };
+
+                form.addEventListener('input', render);
+                form.addEventListener('change', render);
+                render();
+            });
+        }
+    },
+
+    /* =========================================================
+     * COORDS — validation douce "latitude, longitude"
+     * <input data-coords> ; <… data-coords-state> reçoit .is-valid/.is-invalid
+     * ========================================================= */
+
+    coords: {
+        parse(raw) {
+            const match = raw.trim().match(/^(-?\d{1,2}(?:[.,]\d+)?)\s*[;,\s]\s*(-?\d{1,3}(?:[.,]\d+)?)$/);
+
+            if (!match) {
+                return null;
+            }
+
+            const lat = parseFloat(match[1].replace(',', '.'));
+            const lon = parseFloat(match[2].replace(',', '.'));
+
+            return (Math.abs(lat) <= 90 && Math.abs(lon) <= 180) ? {lat, lon} : null;
+        },
+
+        init() {
+            document.querySelectorAll('input[data-coords]').forEach(input => {
+                const box = input.closest('[data-coords-state]') || input.parentElement;
+                const hint = box.querySelector('[data-coords-hint]');
+
+                const check = () => {
+                    const raw = input.value.trim();
+                    const parsed = raw === '' ? null : App.coords.parse(raw);
+
+                    box.classList.toggle('is-valid', !!parsed);
+                    box.classList.toggle('is-invalid', raw !== '' && !parsed);
+
+                    if (hint) {
+                        hint.textContent = raw === ''
+                                ? 'Laisser vide pour une géolocalisation automatique.'
+                                : (parsed
+                                        ? `Latitude ${parsed.lat} · Longitude ${parsed.lon}`
+                                        : 'Format attendu : latitude, longitude (ex. 48.8566, 2.3522).');
+                    }
+                };
+
+                input.addEventListener('input', check);
+                check();
+            });
+        }
     },
 
     /* =========================================================

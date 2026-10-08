@@ -4,13 +4,14 @@
     {
         id: 'summary',
         label: 'Résumé',
+        icon: 'ooui:info-filled',
         content: include('tiers/show/_resume.html.twig',{
             tiers: entity
         })
     },{
         id: 'edit',
         label: 'Modifier',
-        icon: 'mdi:pencil',
+        icon: 'mingcute:edit-2-fill',
         content: render(controller(
                 'App\\Controller\\TiersController::edit',
                 {
@@ -20,6 +21,7 @@
     },{
         id: 'adresses',
         label: 'Adresses',
+        icon: 'mdi:address-marker',
         badge: adresses|length,
         content: render(controller(
                 'App\\Controller\\TiersController::addAdresse',
@@ -31,7 +33,7 @@
     },{
         id: 'addoperation',
         label: 'Opération',
-        icon: 'ic:round-add',
+        icon: 'gridicons:add',
         content: render(controller(
             'App\\Controller\\TiersController::addOperation',
             {

@@ -38,38 +38,7 @@
             } %}
         </div>
 
-        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
-
-        {% set tabs = [
-            {
-                id: 'summary',
-                label: 'Résumé',
-                content: include('portefeuille/show/_activite.html.twig', {
-                    portefeuille: entity,
-                    groups: groups
-                })
-            },{
-                id: 'edit',
-                label: 'Modifier',
-                icon: 'mdi:pencil',
-                content: render(controller(
-                    'App\\Controller\\PortefeuilleController::edit',
-                    { id: entity.id }
-                ))
-            },{
-                id: 'addoperation',
-                label: 'Opération',
-                icon: 'ic:round-add',
-                content: render(controller(
-                    'App\\Controller\\PortefeuilleController::addOperation',
-                    { id: entity.id }
-                ))
-            }
-        ] %}
-
-        {% include 'layout/modern/components/_tabs.html.twig' with {
-            tabs: tabs,
-            activeTab: activeTab
-        } %}
+        {# Onglets fonctionnels #}
+        {% include 'portefeuille/show/_tabs.html.twig' %}
     </div>
 {% endblock %}

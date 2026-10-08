@@ -1,7 +1,7 @@
 {#
     Carte adresse — composants génériques entity-*.
-      - couleur de la carte et du liseré : type d'adresse
-      - couleur du cercle : géolocalisation (vert = géolocalisée, rouge = non)
+      - couleur de la carte, du liseré et du cercle : type d'adresse (--entity-color)
+      - géolocalisation : portée par l'icône du cercle (épingle / épingle barrée)
     Paramètres : adresse, tierAdresse (optionnel : lien Tiers ↔ Adresse)
 #}
 {% set bgColor = adresse.adresseType.couleur ?? 'var(--accent)' %}
@@ -26,7 +26,6 @@
     <a href="{{ path('app_adresse_show', { id: adresse.id }) }}" class="entity-card-link">
 
         <div class="entity-circle"
-             style="--entity-color: {{ hasGeolocation ? 'var(--success)' : 'var(--danger)' }}; --entity-text: #fff;"
              title="{{ hasGeolocation ? 'Adresse géolocalisée' : 'Adresse non géolocalisée' }}">
             <twig:ux:icon name="{{ hasGeolocation ? 'lucide:map-pin' : 'lucide:map-pin-off' }}" />
         </div>

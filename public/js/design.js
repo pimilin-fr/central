@@ -187,15 +187,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 180);
     };
 
-    document.querySelectorAll('[data-flash]')
-            .forEach((flash) => {
-                const closeButton = flash.querySelector('[data-flash-close]');
+    document.querySelectorAll('[data-flash]').forEach((flash) => {
+        const delay = parseInt(flash.dataset.flashDelay || '5000', 10);
+        const closeButton = flash.querySelector('[data-flash-close]');
+        const progress = flash.querySelector('.flash-progress');
+        let remaining = delay;
+        let startedAt = 0;
+        let timer = null;
 
-                closeButton?.addEventListener('click', () => removeFlash(flash));
+        const start = () => {
+            startedAt = Date.now();
+            timer = window.setTimeout(() => removeFlash(flash), remaining);
+            if (progress) {
+                progress.style.animationDuration = remaining + 'ms';
+                progress.style.animationPlayState = 'running';
+            }
+        };
 
-                window.setTimeout(() => {
-                    removeFlash(flash);
-                }, 5000);
-            });
+        const pause = () => {
+            window.clearTimeout(timer);
+            remaining -= Date.now() - startedAt;
+            if (progress) {
+                progress.style.animationPlayState = 'paused';
+            }
+        };
+
+        closeButton?.addEventListener('click', () => {
+            window.clearTimeout(timer);
+            removeFlash(flash);
+        });
+
+        flash.addEventListener('mouseenter', pause);
+        flash.addEventListener('mouseleave', start);
+
+        start();
+    });
 
 });

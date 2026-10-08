@@ -4,13 +4,14 @@
     {
         id: 'summary',
         label: 'Résumé',
-        content: include('adresse/show/_resume.html.twig')
+        content: include('adresse/show/_resume.html.twig'),
+        icon: 'ooui:info-filled'
     },{
         id: 'childs',
         label: 'Enfants',
         icon: 'lucide:git-branch',
         badge: adresse.children|length,
-        content: include('adresse/_children.html.twig', { adresses: adresse.children })
+        content: include('adresse/list/_children.html.twig', { adresses: adresse.children })
     },{
         id: 'tiers',
         label: 'Tiers liés',

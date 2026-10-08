@@ -4,11 +4,12 @@
     {
         id: 'summary',
         label: 'Résumé',
-        content: include('categorie/show/_resume.html.twig')
+        content: include('categorie/show/_resume.html.twig'),
+        icon: 'ooui:info-filled'
     },{
         id: 'childs',
         label: 'Enfants',
-        icon: 'lucide:folder-tree',
+        icon: 'mdi:baby-bottle',
         badge: entity.children|length,
         content: include('categorie/list/_table.html.twig', {
             categories: childs
@@ -16,7 +17,7 @@
     },{
         id: 'edit',
         label: 'Modifier',
-        icon: 'mdi:pencil',
+        icon: 'mingcute:edit-2-fill',
         content: render(controller(
             'App\\Controller\\CategorieController::edit',
             { id: entity.id }

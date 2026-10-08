@@ -50,7 +50,7 @@
                     <p class="summary-label">Statut</p>
                     <p class="summary-value">
                         <span class="demo-pill" style="--entity-color: {{ entity.deletedAt ? 'var(--danger)' : 'var(--success)' }};">
-                            <twig:ux:icon name="{{ entity.deletedAt ? 'lucide:circle-x' : 'lucide:circle-check' }}" />
+                            <twig:ux:icon name="{{ entity.deletedAt ? 'material-symbols:dangerous-rounded' : 'material-symbols:check-circle' }}" />
                             {{ entity.deletedAt ? 'Inactif' : 'Actif' }}
                         </span>
                     </p>

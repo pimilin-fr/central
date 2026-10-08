@@ -1,0 +1,33 @@
+{% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+{% set tabs = [
+    {
+        id: 'summary',
+        label: 'Résumé',
+        icon: 'ooui:info-filled',
+        content: include('portefeuille/show/_activite.html.twig', {
+            portefeuille: entity,
+            groups: groups
+        })
+    },{
+        id: 'edit',
+        label: 'Modifier',
+        icon: 'mingcute:edit-2-fill',
+        content: render(controller(
+            'App\\Controller\\PortefeuilleController::edit',
+            { id: entity.id }
+        ))
+    },{
+        id: 'addoperation',
+        label: 'Opération',
+        icon: 'ic:round-add',
+        content: render(controller(
+            'App\\Controller\\PortefeuilleController::addOperation',
+            { id: entity.id }
+        ))
+    }
+] %}
+
+{% include 'layout/modern/components/_tabs.html.twig' with {
+    tabs: tabs,
+    activeTab: activeTab
+} %}

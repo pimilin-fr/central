@@ -320,3 +320,222 @@ a.topbar-breadcrumb-link:hover {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+
+/* ---------------------------------------------------------
+   Survol : le point "respire" (halo) et la ligne s'étire avec
+   un reflet qui la parcourt. Déclenché par la carte parente
+   (entity-card, summary-card) ou par le séparateur lui-même.
+   --------------------------------------------------------- */
+
+.sep-dot {
+    transition: transform 240ms cubic-bezier(.2, .8, .2, 1), box-shadow 240ms ease;
+}
+
+.sep-line {
+    position: relative;
+    overflow: hidden;
+    transform-origin: left center;
+    transition: height 240ms ease, filter 240ms ease;
+}
+
+.sep-line::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(90deg, transparent 0, rgba(255, 255, 255, .75) 50%, transparent 100%);
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.entity-card:hover .sep-dot,
+.summary-card:hover .sep-dot,
+.sep:hover .sep-dot {
+    transform: scale(1.3);
+    box-shadow:
+        0 0 0 4px color-mix(in srgb, var(--sep-color, var(--accent)) 22%, transparent),
+        0 0 12px color-mix(in srgb, var(--sep-color, var(--accent)) 55%, transparent);
+}
+
+.entity-card:hover .sep-line,
+.summary-card:hover .sep-line,
+.sep:hover .sep-line {
+    height: 3px;
+    filter: saturate(1.25);
+}
+
+.entity-card:hover .sep-line::after,
+.summary-card:hover .sep-line::after,
+.sep:hover .sep-line::after {
+    opacity: 1;
+    animation: sep-sweep 1.1s ease-out 1 both;
+}
+
+@keyframes sep-sweep {
+    to { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sep-dot,
+    .sep-line { transition: none; }
+    .sep-line::after { display: none; }
+}
+
+
+/* =========================================================
+   FLASH — pile de toasts
+   ========================================================= */
+
+.flash-stack {
+    position: fixed;
+    top: 72px;
+    right: 22px;
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(380px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.flash-message {
+    --flash-color: var(--accent);
+    --flash-soft: var(--accent-soft);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px 14px 14px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--flash-color);
+    border-radius: 13px;
+    box-shadow: var(--shadow-md);
+    pointer-events: auto;
+    animation: flash-in 240ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.flash-message.is-leaving {
+    opacity: 0;
+    transform: translateX(14px);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.flash-success { --flash-color: var(--success); --flash-soft: var(--success-soft); }
+.flash-error   { --flash-color: var(--danger);  --flash-soft: var(--danger-soft); }
+.flash-warning { --flash-color: var(--warning); --flash-soft: var(--warning-soft); }
+.flash-info    { --flash-color: var(--accent);  --flash-soft: var(--accent-soft); }
+
+.flash-icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    color: var(--flash-color);
+    background: var(--flash-soft);
+    border-radius: 10px;
+}
+
+.flash-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.flash-content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    gap: 2px;
+}
+
+.flash-label {
+    color: var(--flash-color);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.flash-text {
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.flash-close {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.flash-close:hover {
+    color: var(--text);
+    background: var(--surface-soft);
+}
+
+.flash-close svg {
+    width: 15px;
+    height: 15px;
+}
+
+.flash-progress {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--flash-color);
+    opacity: .55;
+    transform-origin: left center;
+    animation: flash-progress 5s linear forwards;
+}
+
+@keyframes flash-progress {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
+@media (max-width: 640px) {
+    .flash-stack {
+        top: 64px;
+        right: 16px;
+        left: 16px;
+        width: auto;
+    }
+}
+
+
+/* =========================================================
+   ONGLETS — état pendant une recherche (compteurs par onglet)
+   ========================================================= */
+
+[data-tabs].is-filtering .tab-button.is-empty {
+    opacity: .45;
+}
+
+[data-tabs].is-filtering .tab-button.has-match:not(.is-active) .tab-badge {
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+[data-tabs].is-filtering .tab-button.has-match:not(.is-active)::after {
+    width: 6px;
+    height: 6px;
+    margin-left: -2px;
+    content: "";
+    background: var(--accent);
+    border-radius: 50%;
+}
+
