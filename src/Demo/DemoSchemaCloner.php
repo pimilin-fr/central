@@ -5,6 +5,7 @@ namespace App\Demo;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use RuntimeException;
 
 /**
@@ -22,7 +23,7 @@ class DemoSchemaCloner {
         /** Production (lecture seule). */
         private EntityManagerInterface $em,
         /** Démo (jetable). */
-        private EntityManagerInterface $demoEm
+        #[Autowire(service: 'doctrine.orm.demo_entity_manager')] private EntityManagerInterface $demoEm
     ) {
     }
 

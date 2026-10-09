@@ -41,6 +41,7 @@
                     <span class="entity-line-body">
                         <span class="entity-line-label">Statut</span>
                         <span class="entity-line-value">{% include 'projet/card/_status.html.twig' with { entity: projet } only %}</span>
+                        {% include 'demo/card/_pill.html.twig'  with { entity: projet }  %}
                     </span>
                 </div>
             </div>

@@ -6,6 +6,7 @@ use App\Demo\DemoContext;
 use App\Demo\DemoFaker;
 use App\Demo\DemoStrategy;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Doctrine\ORM\QueryBuilder;
 use ReflectionProperty;
 
@@ -13,7 +14,7 @@ abstract class AbstractDemoTransformer implements DemoTransformerInterface {
 
     public function __construct(
         /** EntityManager de la base démo (cible). */
-        protected EntityManagerInterface $demoEm,
+        #[Autowire(service: 'doctrine.orm.demo_entity_manager')] protected EntityManagerInterface $demoEm,
         protected DemoFaker $faker
     ) {
     }

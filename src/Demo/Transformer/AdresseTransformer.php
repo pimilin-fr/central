@@ -9,6 +9,7 @@ use App\Entity\Adresse;
 use App\Entity\AdresseType;
 use App\Entity\TiersAdresse;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Adresses (arbre).
@@ -40,7 +41,7 @@ class AdresseTransformer extends AbstractDemoTransformer {
     public function __construct(
         /** EntityManager de la base de PRODUCTION (source). */
         private EntityManagerInterface $em,
-        EntityManagerInterface $demoEm,
+        #[Autowire(service: 'doctrine.orm.demo_entity_manager')] EntityManagerInterface $demoEm,
         DemoFaker $faker
     ) {
         parent::__construct($demoEm, $faker);
@@ -163,7 +164,6 @@ class AdresseTransformer extends AbstractDemoTransformer {
                 ->setNomVoie($source->getNomVoie())
                 ->setCedex($source->getCedex())
                 ->setAdresseForcee($source->getAdresseForcee())
-                ->setAdresseExact($source->getAdresseExact())
                 ->setLatitude($source->getLatitude())
                 ->setLongitude($source->getLongitude());
         }
@@ -192,8 +192,7 @@ class AdresseTransformer extends AbstractDemoTransformer {
             ->setTypeVoie($typeVoie)
             ->setNomVoie($nomVoie)
             ->setCedex($source->getCedex())
-            ->setAdresseForcee(null)
-            ->setAdresseExact(null);
+            ->setAdresseForcee(null);
 
         // coordonnées : même décalage pour toute la famille (les distances relatives sont conservées)
         if ($source->getLatitude() !== null && $source->getLongitude() !== null) {

@@ -4,6 +4,7 @@ namespace App\Demo;
 
 use App\Demo\Transformer\DemoTransformerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Throwable;
 
@@ -28,7 +29,7 @@ class DemoBuilder {
         /** Base de production (source, lecture seule). */
         private EntityManagerInterface $em,
         /** Base démo (cible). */
-        private EntityManagerInterface $demoEm,
+        #[Autowire(service: 'doctrine.orm.demo_entity_manager')] private EntityManagerInterface $demoEm,
         private DemoContext $context,
         private DemoFaker $faker,
         #[AutowireIterator('app.demo.transformer')]

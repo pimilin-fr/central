@@ -59,7 +59,7 @@ class ImportAdresseCommand extends Command {
                     ->setCedex($row['Cedex'])
                     ->setPays($row['Pays'])
                     ->setAdresseForcee($row['AdresseForcee'])
-                    ->setAdresseExact($row['AdresseExacte'])
+                    //->setAdresseExact($row['AdresseExacte'])
                     ->setAdresseGeo($row['AdresseGeo']);
 //            $adresse->setRue($row['rue'] ?? null)
             // ===== Gestion de l'adresseType =====

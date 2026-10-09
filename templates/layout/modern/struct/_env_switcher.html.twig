@@ -1,0 +1,76 @@
+{#
+    Sélecteur d'environnement (remplace l'ancien bouton « Profil »).
+      - Central = production, Démo = base jetable aux données fictives.
+      - La bascule ne fait qu'écrire var/db_mode : la production n'est jamais modifiée.
+      - « Reconstruire la démo » est une action À PART (copie + anonymisation, prod en lecture seule).
+    JS : public/js/env.js — CSS : public/css/env.css
+#}
+{% set env_mode = app_db_mode() %}
+{% set is_demo = env_mode == 'demo' %}
+{% set building = app_db_building() %}
+{% set last_build = app_db_last_build() %}
+{% set token = app_env_token() %}
+
+<div class="env-switcher{{ is_demo ? ' is-demo' : '' }}{{ building ? ' is-building' : '' }}" data-env-switcher data-env-mode="{{ env_mode }}" data-env-building="{{ building ? '1' : '0' }}" data-env-state-url="{{ path('app_env_state') }}">
+    <button type="button" class="topbar-user env-trigger" data-env-toggle aria-expanded="false" aria-haspopup="true" title="Environnement : {{ is_demo ? 'Démo' : 'Central (production)' }}">
+        <span class="topbar-user-avatar">{{ is_demo ? 'D' : 'C' }}<i class="env-busy-dot" aria-hidden="true"></i></span>
+        <span class="topbar-user-copy">
+            <span class="topbar-user-name">{{ is_demo ? 'Démo' : 'Central' }}</span>
+            <span class="topbar-user-status">{{ is_demo ? 'Données fictives' : 'Production' }}</span>
+        </span>
+        <twig:ux:icon name="lucide:chevron-down" class="topbar-user-chevron" />
+    </button>
+
+    <div class="env-menu" data-env-menu aria-hidden="true" role="menu">
+        <div class="env-menu-header">
+            <span class="env-menu-title">Environnement</span>
+            <span class="env-menu-subtitle">Choisissez la base utilisée</span>
+        </div>
+
+        {# --- Central (prod) --- #}
+        <form method="post" action="{{ path('app_env_switch', { mode: 'prod' }) }}">
+            <input type="hidden" name="_token" value="{{ token }}">
+            <button type="submit" class="env-option{{ not is_demo ? ' is-active' : '' }}" {{ not is_demo or building ? 'disabled' : '' }} role="menuitemradio" aria-checked="{{ not is_demo ? 'true' : 'false' }}">
+                <span class="env-option-icon"><twig:ux:icon name="lucide:landmark" /></span>
+                <span class="env-option-copy"><strong>Central</strong><small>Production — vos vraies données</small></span>
+                <span class="env-option-check"><twig:ux:icon name="lucide:check" /></span>
+            </button>
+        </form>
+
+        {# --- Démo --- #}
+        <form method="post" action="{{ path('app_env_switch', { mode: 'demo' }) }}">
+            <input type="hidden" name="_token" value="{{ token }}">
+            <button type="submit" class="env-option env-option-demo{{ is_demo ? ' is-active' : '' }}" {{ is_demo or building ? 'disabled' : '' }} role="menuitemradio" aria-checked="{{ is_demo ? 'true' : 'false' }}">
+                <span class="env-option-icon"><twig:ux:icon name="lucide:flask-conical" /></span>
+                <span class="env-option-copy"><strong>Démo</strong><small>Données fictives, jetables</small></span>
+                <span class="env-option-check"><twig:ux:icon name="lucide:check" /></span>
+            </button>
+        </form>
+
+        <div class="env-menu-separator"></div>
+
+        {# --- Reconstruction : action spécifique, jamais automatique --- #}
+        <form method="post" action="{{ path('app_env_rebuild') }}" data-env-confirm="Reconstruire la base démo ?&#10;&#10;La production est d'abord sauvegardée puis lue en lecture seule ; la démo actuelle est effacée et recréée.">
+            <input type="hidden" name="_token" value="{{ token }}">
+            <button type="submit" class="env-option env-option-rebuild" data-env-rebuild {{ is_demo or building ? 'disabled' : '' }}>
+                <span class="env-option-icon"><twig:ux:icon name="lucide:refresh-cw" class="env-spin-icon" /></span>
+                <span class="env-option-copy">
+                    <strong data-env-rebuild-title>{{ building ? 'Reconstruction en cours…' : 'Reconstruire la démo' }}</strong>
+                    <small data-env-rebuild-hint>
+                        {% if building %}
+                            Patientez, rechargez la page dans un instant
+                        {% elseif is_demo %}
+                            Revenez d'abord sur Central
+                        {% elseif last_build and last_build.state == 'ok' %}
+                            Dernière copie : {{ last_build.date }}
+                        {% elseif last_build %}
+                            Dernier essai en échec ({{ last_build.date }})
+                        {% else %}
+                            Copie + anonymisation de la prod
+                        {% endif %}
+                    </small>
+                </span>
+            </button>
+        </form>
+    </div>
+</div>

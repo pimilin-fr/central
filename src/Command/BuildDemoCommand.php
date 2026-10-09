@@ -7,6 +7,7 @@ use App\Demo\DemoPurger;
 use App\Demo\DemoSchemaCloner;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,7 +26,7 @@ class BuildDemoCommand extends Command {
         /** Base de production (source). */
         private EntityManagerInterface $em,
         /** Base démo (cible). */
-        private EntityManagerInterface $demoEm,
+        #[Autowire(service: 'doctrine.orm.demo_entity_manager')] private EntityManagerInterface $demoEm,
         private DemoBuilder $builder,
         private DemoPurger $purger,
         private DemoSchemaCloner $cloner

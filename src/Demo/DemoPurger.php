@@ -6,6 +6,7 @@ use App\Demo\Transformer\DemoTransformerInterface;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
@@ -19,7 +20,7 @@ class DemoPurger {
      * @param iterable<DemoTransformerInterface> $transformers
      */
     public function __construct(
-        private EntityManagerInterface $demoEm,
+        #[Autowire(service: 'doctrine.orm.demo_entity_manager')] private EntityManagerInterface $demoEm,
         #[AutowireIterator('app.demo.transformer')]
         private iterable $transformers
     ) {
