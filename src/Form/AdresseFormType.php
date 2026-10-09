@@ -71,7 +71,7 @@ class AdresseFormType extends AbstractType {
                     'required' => true, // l'astérisque s'affiche automatiquement
                     'attr' => ['data-entity-select' => ''],
                     'choice_attr' => static fn(AdresseType $type): array => [
-                        'data-color' => $type->getColor(),
+                        'data-color' => $type->getCssColor(),
                         'data-text-color' => $type->getTextColor(),
                     ],
                 ])

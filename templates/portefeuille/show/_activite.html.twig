@@ -12,7 +12,7 @@
 
     {# CARTE RESUME : cercle (type) | identité + infos | solde | liseré (couleur + libellé) #}
     <section class="summary-card {{ portefeuille.deletedAt ? 'is-archived' : '' }}"
-             style="--entity-color: {{ portefeuille.couleur ?? 'var(--accent)' }}; --entity-text: {{ portefeuille.textColor ?? '#FFFFFF' }};">
+             style="--entity-color: {{ (portefeuille.couleur ?? null)|entity_color }}; --entity-text: {{ (portefeuille.couleur ?? null)|entity_text }};">
 
         {% include 'portefeuille/card/_circle.html.twig' %}
 
@@ -22,7 +22,7 @@
                 <h2 class="summary-name" title="{{ portefeuille.libelle }}">{{ portefeuille.libelle }}</h2>
 
                 {% if portefeuille.type %}
-                    <span class="entity-pill" style="--entity-color: {{ portefeuille.couleur ?? 'var(--accent)' }};">
+                    <span class="entity-pill" style="--entity-color: {{ (portefeuille.couleur ?? null)|entity_color }};">
                         <span class="entity-pill-dot"></span>
                         <span>{{ portefeuille.type }}</span>
                     </span>

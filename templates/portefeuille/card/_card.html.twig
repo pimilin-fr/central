@@ -1,6 +1,6 @@
 {% set isDeleted =  portefeuille.deletedAt is not null %}
 <article class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
-         style="--entity-color: {{ portefeuille.couleur ?? 'var(--accent)' }}; --entity-text: {{ portefeuille.textColor ?? '#FFFFFF' }};"
+         style="--entity-color: {{ (portefeuille.couleur ?? null)|entity_color }}; --entity-text: {{ (portefeuille.couleur ?? null)|entity_text }};"
          data-search-item
          data-search-value="{{ (
                     (portefeuille.name ?? '') ~ ' ' ~

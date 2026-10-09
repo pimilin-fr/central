@@ -14,7 +14,7 @@
 
     {# CARTE RESUME : cercle (début) | identité + infos | liseré (statut) #}
     <section class="summary-card {{ isDimmed ? 'is-archived' : '' }}"
-             style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }}; --entity-text: {{ entity.textColor ?? '#FFFFFF' }};">
+             style="--entity-color: {{ (entity.couleur ?? null)|entity_color }}; --entity-text: {{ (entity.couleur ?? null)|entity_text }};">
 
         {% include 'projet/card/_circle.html.twig' with { projet: entity } only %}
 

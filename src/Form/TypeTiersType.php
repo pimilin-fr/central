@@ -7,7 +7,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\ColorType;
 
 class TypeTiersType extends AbstractType {
 
@@ -16,10 +15,7 @@ class TypeTiersType extends AbstractType {
                 ->add('name', TextType::class, [
                     'label' => 'Nom',
                 ])
-                ->add('couleur', ColorType::class, [
-                    'label' => 'Couleur',
-                    'required' => false,
-                ])
+                ->add('couleur', EntityColorType::class)
                 ->add('libelleLiserai', TextType::class, [
                     'label' => 'Libellé du liserai',
                     'required' => false,

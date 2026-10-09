@@ -12,7 +12,7 @@
                 <h1 class="page-title">{{ entity.typeN3 }}</h1>
 
                 <div class="page-subline">
-                    <span class="entity-pill" style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }};">
+                    <span class="entity-pill" style="--entity-color: {{ (entity.couleur ?? null)|entity_color }};">
                         <span class="entity-pill-dot"></span>
                         <span>{{ [entity.typeN1, entity.typeN2]|filter(v => v)|join(' / ') ?: 'Type de tiers' }}</span>
                     </span>

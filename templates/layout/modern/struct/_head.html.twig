@@ -21,6 +21,8 @@
     {% for theme in themes %}
         <link rel="stylesheet" href="{{ asset('css/themes/' ~ theme.id ~ '.css') }}?v=17" />
     {% endfor %}
+    {# Palette d'entités calculée depuis l'accent du thème (après les thèmes) #}
+    <link rel="stylesheet" href="{{ asset('css/palette.css') ~ '?v=1' }}" />
     <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/env.css') ~ '?v=1' }}" />
     <link rel="stylesheet" href="{{ asset('css/categories.css') }}" />
@@ -36,7 +38,7 @@
     <script defer src="{{ asset('js/design.js') ~ '?v=14' }}"></script>
     <script defer src="{{ asset('js/env.js') ~ '?v=1' }}"></script>
     <script defer src="{{ asset('js/maps.js') ~ '?v=14' }}"></script>
-    <script defer src="{{ asset('js/app.js') ~ '?v=14' }}"></script>
+    <script defer src="{{ asset('js/app.js') ~ '?v=15' }}"></script>
 
 
     {% block stylesheets %}{% endblock %}

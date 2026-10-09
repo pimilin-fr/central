@@ -40,6 +40,7 @@ const App = {
         this.adresse.init();
         this.depenseForm.init();
         this.entitySelect.init();
+        this.colorPicker.init();
         this.liveForm.init();
         this.coords.init();
 
@@ -698,6 +699,113 @@ const App = {
     },
 
     /* =========================================================
+     * COULEURS D'ENTITÉ — valeurs liées au thème
+     *   ''        → accent du thème
+     *   '@N'      → emplacement N de la palette du thème (var(--palette-N))
+     *   '#rrggbb' → couleur libre (figée)
+     * colors.resolve(raw) → {color, text} prêts pour --entity-color / --entity-text
+     * ========================================================= */
+
+    colors: {
+        resolve(raw) {
+            const value = (raw || '').trim();
+            const slot = /^@(\d{1,2}|n[1-5]|info|ok|warn|danger|text|soft|muted|line)$/.exec(value);
+
+            if (slot) {
+                return {color: `var(--palette-${slot[1]})`, text: `var(--palette-${slot[1]}-ink)`};
+            }
+
+            if (/^#[0-9a-f]{6}$/i.test(value)) {
+                const r = parseInt(value.slice(1, 3), 16);
+                const g = parseInt(value.slice(3, 5), 16);
+                const b = parseInt(value.slice(5, 7), 16);
+
+                return {color: value, text: (0.299 * r + 0.587 * g + 0.114 * b) > 165 ? '#1F2937' : '#FFFFFF'};
+            }
+
+            if (/^#[0-9a-f]{3,8}$/i.test(value) || value.startsWith('var(')) {
+                return {color: value, text: ''};
+            }
+
+            return {};
+        }
+    },
+
+    /* =========================================================
+     * SÉLECTEUR DE COULEUR (_color_picker.html.twig)
+     * Pastilles : défaut (accent) / 12 couleurs du thème / couleur libre.
+     * La valeur est écrite dans le champ masqué, puis `input` + `change` sont émis
+     * pour que l'aperçu en direct (liveForm) se mette à jour.
+     * ========================================================= */
+
+    colorPicker: {
+        init(scope = document) {
+            scope.querySelectorAll('[data-color-picker]').forEach(picker => {
+                if (picker.dataset.pickerInit) {
+                    return;
+                }
+
+                picker.dataset.pickerInit = '1';
+
+                const input = picker.querySelector('input[type="hidden"], input[data-color-input]');
+                const custom = picker.querySelector('[data-color-custom]');
+                const hint = picker.querySelector('[data-color-hint]');
+                const swatches = Array.from(picker.querySelectorAll('.color-swatch'));
+                const customSwatch = custom ? custom.closest('.color-swatch') : null;
+
+                const HINTS = {
+                    default: 'Par défaut : accent du thème.',
+                    slot: 'Couleur du thème : elle s\'adapte au thème choisi.',
+                    custom: 'Couleur libre : elle ne change pas avec le thème.'
+                };
+
+                const refresh = () => {
+                    const value = input.value || '';
+                    const kind = /^@[a-z0-9]+$/.test(value) ? 'slot' : (/^#[0-9a-f]{6}$/i.test(value) ? 'custom' : 'default');
+
+                    swatches.forEach(swatch => {
+                        const own = swatch.dataset.value;
+                        swatch.classList.toggle('is-selected', swatch === customSwatch ? kind === 'custom' : own === value);
+                    });
+
+                    if (customSwatch && kind === 'custom') {
+                        customSwatch.style.setProperty('--sw', value);
+                    }
+
+                    if (hint) {
+                        hint.textContent = HINTS[kind];
+                    }
+                };
+
+                const emit = () => {
+                    input.dispatchEvent(new Event('input', {bubbles: true}));
+                    input.dispatchEvent(new Event('change', {bubbles: true}));
+                };
+
+                picker.addEventListener('click', event => {
+                    const swatch = event.target.closest('button.color-swatch');
+
+                    if (swatch && picker.contains(swatch)) {
+                        input.value = swatch.dataset.value || '';
+                        refresh();
+                        emit();
+                    }
+                });
+
+                if (custom) {
+                    custom.addEventListener('input', () => {
+                        input.value = custom.value;
+                        refresh();
+                        emit();
+                    });
+                }
+
+                refresh();
+            });
+        }
+    },
+
+    /* =========================================================
      * LIVE FORM — aperçu en direct (générique)
      *   <form data-live-form>
      *   [data-live="prop"] ou "propA,propB" : texte = valeur du champ
@@ -796,7 +904,12 @@ const App = {
                         return option ? {color: option.dataset.color, text: option.dataset.textColor} : {};
                     }
 
-                    return /^#[0-9a-f]{3,8}$/i.test(el.value) ? {color: el.value} : {};
+                    // Champ couleur d'entité : vide = accent du thème
+                    if (el.matches('[data-entity-color]') && !el.value) {
+                        return {color: 'var(--accent)', text: 'var(--accent-contrast, #fff)'};
+                    }
+
+                    return App.colors.resolve(el.value);
                 };
 
                 scope.querySelectorAll('[data-live]').forEach(el => {
@@ -844,10 +957,10 @@ const App = {
                 // Champ « autocomplete » : l'élément choisi peut porter une couleur.
                 App.events.on('autocomplete:selected', e => {
                     const item = e.detail.item || {};
-                    const color = item.couleur || item.color;
+                    const resolved = App.colors.resolve(item.couleur || item.color);
 
-                    if (e.detail.form === form && color) {
-                        scope.querySelectorAll('[data-live-color]').forEach(el => applyColor(el, color, item.textColor));
+                    if (e.detail.form === form && resolved.color) {
+                        scope.querySelectorAll('[data-live-color]').forEach(el => applyColor(el, resolved.color, resolved.text || item.textColor));
                     }
 
                     render();

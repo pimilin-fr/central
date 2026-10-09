@@ -38,7 +38,7 @@
                 </div>
                 <div>
                     {{ form_label(form.couleur, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.couleur, { attr: { class: 'modern-form-control' } }) }}
+                    {% include 'layout/modern/components/_color_picker.html.twig' with { field: form.couleur } only %}
                     {{ form_errors(form.couleur) }}
                 </div>
             </div>

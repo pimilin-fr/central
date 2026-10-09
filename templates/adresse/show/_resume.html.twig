@@ -1,5 +1,5 @@
-{% set bgColor = adresse.adresseType.couleur ?? 'var(--accent)' %}
-{% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
+{% set bgColor = (adresse.adresseType.couleur ?? null)|entity_color %}
+{% set textColor = (adresse.adresseType.couleur ?? null)|entity_text %}
 {% set isDeleted = adresse.deletedAt is not null %}
 
 {# Géolocalisation : l'adresse courante, ou au moins une rue descendante #}

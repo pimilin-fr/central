@@ -8,7 +8,6 @@ use App\Entity\ProjetType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -52,10 +51,7 @@ class ProjetFormType extends AbstractType {
                         };
                     },
                 ])
-                ->add('couleur', ColorType::class, [
-                    'label' => 'Couleur',
-                    'required' => false,
-                ])
+                ->add('couleur', EntityColorType::class)
                 ->add('endAt', DateType::class, [
                     'widget' => 'single_text', // 👈 important
                     'label' => 'Fin',

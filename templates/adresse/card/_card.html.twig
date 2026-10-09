@@ -4,8 +4,8 @@
       - géolocalisation : portée par l'icône du cercle (épingle / épingle barrée)
     Paramètres : adresse, tierAdresse (optionnel : lien Tiers ↔ Adresse)
 #}
-{% set bgColor = adresse.adresseType.couleur ?? 'var(--accent)' %}
-{% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
+{% set bgColor = (adresse.adresseType.couleur ?? null)|entity_color %}
+{% set textColor = (adresse.adresseType.couleur ?? null)|entity_text %}
 {% set isDeleted = adresse.deletedAt is not null %}
 {% set hasGeolocation = adresse.latitude is not null and adresse.longitude is not null %}
 {% set adresseType = adresse.adresseType.name|lower %}

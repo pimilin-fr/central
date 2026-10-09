@@ -1,0 +1,61 @@
+{#
+    Sélecteur de couleur d'entité (champ EntityColorType).
+      - Par défaut      : accent du thème (valeur vide)
+      - Vives du thème  : info / succès / alerte / danger (« @info », « @ok », « @warn », « @danger »)
+      - Neutres du thème: texte / secondaire / discret / bordure (« @text », « @soft », « @muted », « @line »)
+      - Nuancier        : 12 teintes calculées depuis l'accent (« @1 » … « @12 »)
+      - Libre           : couleur figée (#rrggbb), non liée au thème
+    Tout ce qui est « du thème » suit le changement de thème.
+    La valeur réelle est dans le champ masqué ; public/js/app.js (colorPicker) le pilote.
+#}
+{% set raw = field.vars.value|default('') %}
+{% set isHex = raw matches '/^#[0-9A-Fa-f]{6}$/' %}
+{% set isSlot = raw != '' and not isHex %}
+
+<div class="color-picker" data-color-picker>
+    {{ form_widget(field, { type: 'hidden' }) }}
+
+    <div class="color-picker-swatches" role="group" aria-label="Couleur">
+        <button type="button" class="color-swatch is-default {{ raw == '' ? 'is-selected' : '' }}"
+                data-value="" style="--sw: var(--accent)"
+                title="Par défaut (accent du thème)" aria-label="Par défaut"></button>
+
+        <span class="color-picker-sep" aria-hidden="true"></span>
+
+        {% for key, label in entity_vivid_slots() %}
+            <button type="button" class="color-swatch {{ raw == '@' ~ key ? 'is-selected' : '' }}"
+                    data-value="@{{ key }}" style="--sw: var(--palette-{{ key }})"
+                    title="{{ label }} (couleur du thème)" aria-label="{{ label }} (couleur du thème)"></button>
+        {% endfor %}
+
+        <span class="color-picker-sep" aria-hidden="true"></span>
+
+        {% for key, label in entity_neutral_slots() %}
+            <button type="button" class="color-swatch {{ raw == '@' ~ key ? 'is-selected' : '' }}"
+                    data-value="@{{ key }}" style="--sw: var(--palette-{{ key }})"
+                    title="{{ label }} (neutre du thème)" aria-label="{{ label }} (neutre du thème)"></button>
+        {% endfor %}
+
+        <span class="color-picker-sep" aria-hidden="true"></span>
+
+        {% for n in entity_palette_slots() %}
+            <button type="button" class="color-swatch {{ raw == '@' ~ n ? 'is-selected' : '' }}"
+                    data-value="@{{ n }}" style="--sw: var(--palette-{{ n }})"
+                    title="Teinte {{ n }} du nuancier" aria-label="Teinte {{ n }} du nuancier"></button>
+        {% endfor %}
+
+        <span class="color-picker-sep" aria-hidden="true"></span>
+
+        <label class="color-swatch is-custom {{ isHex ? 'is-selected' : '' }}"
+               style="--sw: {{ isHex ? raw : 'transparent' }}"
+               title="Couleur libre (ne suit pas le thème)">
+            <input type="color" value="{{ isHex ? raw : '#808080' }}" data-color-custom aria-label="Couleur libre">
+        </label>
+    </div>
+
+    <p class="color-picker-hint" data-color-hint>
+        {% if isHex %}Couleur libre : elle ne change pas avec le thème.
+        {% elseif isSlot %}Couleur du thème : elle s'adapte au thème choisi.
+        {% else %}Par défaut : accent du thème.{% endif %}
+    </p>
+</div>

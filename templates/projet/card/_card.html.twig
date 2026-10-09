@@ -3,7 +3,7 @@
 {% set isDimmed = (projet.endAt and projet.endAt < now) or (projet.beginAt and projet.beginAt > now) %}
 
 <article class="entity-card {{ isDimmed ? 'is-archived' : '' }}"
-         style="--entity-color: {{ projet.couleur ?? 'var(--accent)' }}; --entity-text: {{ projet.textColor ?? '#FFFFFF' }};"
+         style="--entity-color: {{ (projet.couleur ?? null)|entity_color }}; --entity-text: {{ (projet.couleur ?? null)|entity_text }};"
          data-search-item
          data-search-value="{{ (
              (projet.name ?? '') ~ ' ' ~

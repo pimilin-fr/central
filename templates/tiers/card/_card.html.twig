@@ -1,6 +1,6 @@
 {# Carte tiers — composants génériques entity-* (couleur = type de tiers) #}
-{% set bgColor = tiers.tiersType.couleur ?? 'var(--accent)' %}
-{% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
+{% set bgColor = (tiers.tiersType.couleur ?? null)|entity_color %}
+{% set textColor = (tiers.tiersType.couleur ?? null)|entity_text %}
 {% set isDeleted = tiers.deletedAt is not null %}
 
 <article

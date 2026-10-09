@@ -45,7 +45,7 @@ class AddDepensesType extends AbstractType {
                         return $repository->findAllOrdered();
                     },
                     'choice_attr' => static fn(Portefeuille $p): array => [
-                        'data-color' => $p->getCouleur(),
+                        'data-color' => $p->getCssColor(),
                         'data-text-color' => $p->getTextColor(),
                     ],
                 ])

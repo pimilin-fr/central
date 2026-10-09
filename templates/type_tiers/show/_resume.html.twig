@@ -7,7 +7,7 @@
     } %}
 
     {# CARTE RESUME : cercle | identité + hiérarchie | liseré (couleur + libellé) #}
-    <section class="summary-card" style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }}; --entity-text: {{ entity.textColor ?? '#FFFFFF' }};">
+    <section class="summary-card" style="--entity-color: {{ (entity.couleur ?? null)|entity_color }}; --entity-text: {{ (entity.couleur ?? null)|entity_text }};">
 
         <div class="entity-circle"><twig:ux:icon name="lucide:tag" /></div>
 
@@ -15,7 +15,7 @@
             <div class="summary-head">
                 <h2 class="summary-name" title="{{ entity.typeN3 }}">{{ entity.typeN3 }}</h2>
                 {% if entity.code %}
-                    <span class="entity-pill" style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }};" title="{{ entity.code }}">
+                    <span class="entity-pill" style="--entity-color: {{ (entity.couleur ?? null)|entity_color }};" title="{{ entity.code }}">
                         <span class="entity-pill-dot"></span>
                         <span>#{{ entity.code|slice(0, 30) }}</span>
                     </span>

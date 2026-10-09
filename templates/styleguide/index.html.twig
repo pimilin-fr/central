@@ -77,7 +77,28 @@
                 <div class="sg-cell"><div class="sg-shadow" style="box-shadow: var(--shadow-md)"></div><span class="sg-caption">--shadow-md</span></div>
             </div>
 
-            <p class="sg-sub">Couleurs d'entité (--entity-color, posées en style inline par type)</p>
+            <p class="sg-sub">Nuancier calculé depuis l'accent (@1 … @12, change avec le thème)</p>
+            <div class="sg-row">
+                {% for n in entity_palette_slots() %}
+                    <span class="entity-pill" style="--entity-color: var(--palette-{{ n }}); --entity-text: var(--palette-{{ n }}-ink);"><span class="entity-pill-dot"></span>@{{ n }}</span>
+                {% endfor %}
+            </div>
+
+            <p class="sg-sub">Couleurs vives du thème (@info, @ok, @warn, @danger : tokens déjà définis par le thème)</p>
+            <div class="sg-row">
+                {% for key, label in entity_vivid_slots() %}
+                    <span class="entity-pill" style="--entity-color: var(--palette-{{ key }}); --entity-text: var(--palette-{{ key }}-ink);"><span class="entity-pill-dot"></span>{{ label }} · @{{ key }}</span>
+                {% endfor %}
+            </div>
+
+            <p class="sg-sub">Neutres du thème (@text, @soft, @muted, @line : tokens déjà définis par le thème)</p>
+            <div class="sg-row">
+                {% for key, label in entity_neutral_slots() %}
+                    <span class="entity-pill" style="--entity-color: var(--palette-{{ key }}); --entity-text: var(--palette-{{ key }}-ink);"><span class="entity-pill-dot"></span>{{ label }} · @{{ key }}</span>
+                {% endfor %}
+            </div>
+
+            <p class="sg-sub">Couleurs libres (#rrggbb : figées, ne suivent pas le thème)</p>
             <div class="sg-row">
                 {% for s in sample %}
                     <span class="entity-pill" style="--entity-color: {{ s.c }}"><span class="entity-pill-dot"></span>{{ s.name }}</span>

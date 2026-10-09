@@ -53,7 +53,7 @@ class TiersType extends AbstractType {
                     'choice_label' => 'name',
                     'choice_attr' => static function (TypeTiers $type): array {
                         return [
-                            'data-color' => $type->getCouleur(),
+                            'data-color' => $type->getCssColor(),
                             'data-text-color' => $type->getTextColor(),
                         ];
                     },

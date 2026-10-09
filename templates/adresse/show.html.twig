@@ -11,7 +11,7 @@
                 <h1 class="page-title">{{ adresse.name }}</h1>
 
                 <div class="page-subline">
-                    <span class="entity-pill" style="--entity-color: {{ adresse.adresseType.couleur ?? 'var(--accent)' }};">
+                    <span class="entity-pill" style="--entity-color: {{ (adresse.adresseType.couleur ?? null)|entity_color }};">
                         <span class="entity-pill-dot"></span>
                         <span>{{ adresse.adresseType.name }}</span>
                     </span>

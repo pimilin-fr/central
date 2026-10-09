@@ -35,12 +35,12 @@
                 <td class="px-4 py-2">
                     <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full"
                           style="
-                          background-color: {{ depense.tiers.tiersType.color }};
-                          color: {{ depense.tiers.tiersType.textColor }};
+                          background-color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_color }};
+                          color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_text }};
                           ">
 
                         <span class="w-2 h-2 rounded-full"
-                              style="background-color: {{ depense.tiers.tiersType.color }}"></span>
+                              style="background-color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_color }}"></span>
 
                         <span>{{ depense.tiers.name }}</span>
                     </span>
@@ -50,12 +50,12 @@
                     {% if (depense.projet) %}
                         <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full"
                               style="
-                              background-color: {{ depense.projet.color }};
-                              color: {{ depense.projet.textColor }};
+                              background-color: {{ (depense.projet.couleur ?? null)|entity_color }};
+                              color: {{ (depense.projet.couleur ?? null)|entity_text }};
                               ">
 
                             <span class="w-2 h-2 rounded-full"
-                                  style="background-color: {{ depense.projet.color }}"></span>
+                                  style="background-color: {{ (depense.projet.couleur ?? null)|entity_color }}"></span>
 
                             <span>{{ depense.projet.name }}</span>
                         </span>
