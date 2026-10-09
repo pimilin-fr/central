@@ -85,4 +85,8 @@ html[data-theme="light-orange"],
     /* Texte posé sur une couleur d’entité */
     --on-entity: #ffffff;
     --on-entity-shadow: rgba(0, 0, 0, 0.28);
+
+    /* Carte (Leaflet) : filtre appliqué aux tuiles pour les fondre dans le thème.
+       --map-bg (optionnel) = fond visible pendant le chargement des tuiles. */
+    --map-tiles-filter: sepia(.18) saturate(.85) hue-rotate(-6deg) brightness(1.02);
 }

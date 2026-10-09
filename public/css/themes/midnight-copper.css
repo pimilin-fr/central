@@ -79,4 +79,8 @@ html[data-theme="midnight-copper"],
     /* Texte posé sur une couleur d’entité */
     --on-entity: #ffffff;
     --on-entity-shadow: rgba(0, 0, 0, 0.35);
+
+    /* Carte (Leaflet) : filtre appliqué aux tuiles pour les fondre dans le thème.
+       --map-bg (optionnel) = fond visible pendant le chargement des tuiles. */
+    --map-tiles-filter: invert(1) hue-rotate(180deg) sepia(.35) brightness(.8) contrast(.9) saturate(.8);
 }

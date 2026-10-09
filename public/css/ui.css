@@ -559,3 +559,49 @@ a.topbar-breadcrumb-link:hover {
     border-radius: 50%;
 }
 
+
+/* =========================================================
+   CARTES (Leaflet) — habillage par le thème
+   Les tuiles sont recolorées par --map-tiles-filter (défini
+   dans chaque fichier de thème). Marqueurs et zones ne sont
+   pas dans le panneau des tuiles : ils ne sont pas filtrés.
+   ========================================================= */
+.leaflet-container {
+    background: var(--map-bg, var(--bg));
+    font-family: inherit;
+    color: var(--text);
+}
+.leaflet-tile-pane {
+    filter: var(--map-tiles-filter, none);
+    transition: filter .25s ease;
+}
+.leaflet-container .leaflet-control-attribution {
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    color: var(--text-soft);
+}
+.leaflet-container .leaflet-control-attribution a { color: var(--accent); }
+.leaflet-bar,
+.leaflet-bar a {
+    border-color: var(--border);
+}
+.leaflet-bar a,
+.leaflet-bar a:hover {
+    background-color: var(--surface);
+    color: var(--text);
+}
+.leaflet-bar a:hover { background-color: var(--bg); }
+.leaflet-container .leaflet-popup-content-wrapper,
+.leaflet-container .leaflet-popup-tip {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+.leaflet-container a.leaflet-popup-close-button { color: var(--text-soft); }
+.leaflet-container a.leaflet-popup-close-button:hover { color: var(--text); }
+.map-popup-title { font-weight: 600; color: var(--text); }
+.map-popup-meta  { font-size: .75rem; color: var(--text-soft); margin-top: .25rem; }
+.map-popup-link  {
+    display: inline-flex; align-items: center; margin-top: .5rem;
+    font-size: .875rem; font-weight: 500; color: var(--accent-strong, var(--accent));
+}
+.map-popup-link:hover { text-decoration: underline; }

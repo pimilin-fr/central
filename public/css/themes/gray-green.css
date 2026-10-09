@@ -76,4 +76,8 @@ html[data-theme="gray-green"],
     /* Texte posé sur une couleur d’entité */
     --on-entity: #ffffff;
     --on-entity-shadow: rgba(0, 0, 0, 0.32);
+
+    /* Carte (Leaflet) : filtre appliqué aux tuiles pour les fondre dans le thème.
+       --map-bg (optionnel) = fond visible pendant le chargement des tuiles. */
+    --map-tiles-filter: grayscale(.55) contrast(.95) brightness(1.01);
 }
