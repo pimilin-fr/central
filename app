@@ -6,9 +6,10 @@
 #   ./app prod             revient à la production (reprend simplement la connexion)
 #   ./app status           indique la base utilisée
 #   ./app backup           sauvegarde de la prod (var/backups/)
+#   ./app doctor           teste les connexions prod/démo et affiche l'erreur exacte
 #   ./app help
 #
-# Prérequis dans .env.local (valeurs entre guillemets) :
+# Prérequis dans .env ou .env.local (valeurs entre guillemets) :
 #   DATABASE_PROD_URL="mysql://user:pass@127.0.0.1:3306/central?serverVersion=8.0&charset=utf8mb4"
 #   DATABASE_DEMO_URL="mysql://user:pass@127.0.0.1:3306/central_demo?serverVersion=8.0&charset=utf8mb4"
 #   (facultatif) DATABASE_PROD_RO_URL=  un utilisateur MySQL en LECTURE SEULE sur la prod, utilisé pour la copie
@@ -44,15 +45,16 @@ db_name() { php -r '$u = parse_url($argv[1]); echo ltrim($u["path"] ?? "", "/");
 db_label() { php -r '$u = parse_url($argv[1]); printf("%s@%s:%s/%s", $u["user"] ?? "?", $u["host"] ?? "?", $u["port"] ?? 3306, ltrim($u["path"] ?? "", "/"));' -- "$1"; }
 
 load_config() {
-    [ -f "$ENV_FILE" ] || die "$ENV_FILE introuvable (lancez ce script à la racine du projet)."
+    [ -f "bin/console" ] || die "Lancez ce script à la racine du projet (bin/console introuvable)."
+    [ -f "$ENV_FILE" ] || : > "$ENV_FILE"
     PROD_URL="$(env_get DATABASE_PROD_URL)"
     DEMO_URL="$(env_get DATABASE_DEMO_URL)"
     RO_URL="$(env_get DATABASE_PROD_RO_URL)"
     BUILD_OPTS="$(env_get DEMO_BUILD_OPTS)"
     BUILD_OPTS="${BUILD_OPTS:---shift=auto --jitter=15 --strip-notes}"
 
-    [ -n "$PROD_URL" ] || die "DATABASE_PROD_URL manquante dans $ENV_FILE."
-    [ -n "$DEMO_URL" ] || die "DATABASE_DEMO_URL manquante dans $ENV_FILE."
+    [ -n "$PROD_URL" ] || die "DATABASE_PROD_URL manquante (.env ou $ENV_FILE)."
+    [ -n "$DEMO_URL" ] || die "DATABASE_DEMO_URL manquante (.env ou $ENV_FILE)."
     [ "$PROD_URL" != "$DEMO_URL" ] || die "DATABASE_PROD_URL et DATABASE_DEMO_URL sont identiques : refus."
 
     local prod_db demo_db
@@ -210,13 +212,33 @@ cmd_backup() {
     [ "$rc" -eq 0 ] || die "La sauvegarde a échoué."
 }
 
-cmd_help() { sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; }
+# Teste réellement les connexions (affiche l'erreur MySQL brute en cas d'échec) : ne fait QUE « SELECT 1 ».
+cmd_doctor() {
+    load_config
+    echo "Mode : $(current_mode)    DATABASE_URL effective : $(db_label "$(env_get DATABASE_URL)")"
+    local name url rc=0
+    for name in PROD DEMO; do
+        if [ "$name" = PROD ]; then url="$PROD_URL"; else url="$DEMO_URL"; fi
+        php -r '
+            $u = parse_url($argv[1]); parse_str($u["query"] ?? "", $q);
+            $dsn = sprintf("mysql:host=%s;port=%d;dbname=%s;charset=%s", $u["host"] ?? "127.0.0.1", $u["port"] ?? 3306, ltrim($u["path"] ?? "", "/"), $q["charset"] ?? "utf8mb4");
+            try { $p = new PDO($dsn, rawurldecode($u["user"] ?? ""), rawurldecode($u["pass"] ?? ""), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]); $p->query("SELECT 1"); echo "OK   "; }
+            catch (Throwable $e) { echo "ÉCHEC ", $e->getMessage(); exit(1); }
+        ' -- "$url" > /tmp/.app_doctor.$$ 2>&1 && green "  $name : $(cat /tmp/.app_doctor.$$)$(db_label "$url")" || { red "  $name : $(cat /tmp/.app_doctor.$$)  [$(db_label "$url")]"; rc=1; }
+        rm -f /tmp/.app_doctor.$$
+    done
+    [ "$rc" -eq 0 ] || echo "→ Si la PROD échoue : ./app prod  (ou supprimez .env.local pour retrouver exactement le .env)."
+    return "$rc"
+}
+
+cmd_help() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
 
 case "${1:-help}" in
     demo)   shift; cmd_demo "$@" ;;
     prod)   cmd_prod ;;
     status) cmd_status ;;
     backup) cmd_backup ;;
+    doctor) cmd_doctor ;;
     help|-h|--help) cmd_help ;;
     *) cmd_help; exit 1 ;;
 esac
