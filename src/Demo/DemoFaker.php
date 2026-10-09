@@ -96,6 +96,14 @@ class DemoFaker {
     // Noms
     // ------------------------------------------------------------------
 
+    public function firstName(string|int $key, int $attempt = 0): string {
+        return $this->pick(self::FIRST_NAMES, 'pf', $key, $attempt);
+    }
+
+    public function lastName(string|int $key, int $attempt = 0): string {
+        return $this->pick(self::LAST_NAMES, 'pl', $key, $attempt);
+    }
+
     public function personName(string|int $key): string {
         return $this->unique('person', static fn (self $f, int $i) => sprintf(
             '%s %s',
@@ -131,7 +139,7 @@ class DemoFaker {
      *
      * @param callable(self,int):string $generate
      */
-    private function unique(string $kind, callable $generate): string {
+    public function unique(string $kind, callable $generate): string {
         for ($attempt = 0; $attempt < 25; $attempt++) {
             $value = $generate($this, $attempt);
             if (!isset($this->used[$kind][$value])) {

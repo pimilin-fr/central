@@ -43,6 +43,10 @@ class Tiers implements DemoEntityInterface {
     #[ORM\Column(enumType: DemoStrategy::class)]
     private DemoStrategy $demoStrategy = DemoStrategy::COPY;
 
+    /** Personne physique (true) ou société (false, défaut). Sert surtout à fabriquer des noms crédibles pour la démo. */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $personne = false;
+
     public function __construct() {
         $this->id = Uuid::v7()->toRfc4122();
         $this->createdAt = new DateTimeImmutable();
@@ -85,6 +89,10 @@ class Tiers implements DemoEntityInterface {
         return $this->tiersAdresses;
     }
 
+    public function isPersonne(): bool {
+        return $this->personne;
+    }
+
     #[\Override]
     public function getDemoStrategy(): DemoStrategy {
         return $this->demoStrategy;
@@ -116,6 +124,11 @@ class Tiers implements DemoEntityInterface {
 
     public function setDeletedAt(?DateTimeImmutable $deletedAt): self {
         $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    public function setPersonne(bool $personne): self {
+        $this->personne = $personne;
         return $this;
     }
 

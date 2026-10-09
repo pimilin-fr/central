@@ -1,9 +1,14 @@
 <div class="entity-head">
     <h2 class="entity-title" title="{{ tiers.name }}">{{ tiers.name }}</h2>
 
-    {% if tiers.code %}
-        <span class="entity-sub is-plain">{{ tiers.code }}</span>
-    {% endif %}
+    {# Nature (personne / société) + code sur la même ligne : aucune hauteur ajoutée #}
+    {% set isPerson = tiers_is_person(tiers) %}
+    <span class="entity-sub is-plain entity-sub-row">
+        <span class="entity-nature{{ isPerson ? ' is-person' : '' }}" title="{{ isPerson ? 'Personne' : 'Société' }}">
+            <twig:ux:icon name="{{ isPerson ? 'lucide:user-round' : 'lucide:building-2' }}" />
+        </span>
+        {% if tiers.code %}<span class="entity-sub-text">{{ tiers.code }}</span>{% endif %}
+    </span>
 </div>
 
 <div class="sep sep-inset">

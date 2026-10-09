@@ -34,10 +34,21 @@
             <span class="form-field-index">02</span>
             <h3>Type de tiers</h3>
         </div>
-        <div>
-            {{ form_label(form.tiersType, null, { label_attr: { class: 'modern-form-label' } }) }}
-            {{ form_widget(form.tiersType, { attr: { class: 'modern-form-control', 'data-entity-select': '' } }) }}
-            {{ form_errors(form.tiersType) }}
+        <div class="form-stack">
+            <div>
+                {{ form_label(form.tiersType, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.tiersType, { attr: { class: 'modern-form-control', 'data-entity-select': '' } }) }}
+                {{ form_errors(form.tiersType) }}
+            </div>
+            <div>
+                <label class="choice-card">
+                    {{ form_widget(form.personne) }}
+                    <twig:ux:icon name="lucide:user-round" />
+                    <span>Personne physique</span>
+                </label>
+                <p class="form-hint">Décochée : société ou organisme. Sert à l'icône des cartes et aux noms fictifs de la démo.</p>
+                {{ form_errors(form.personne) }}
+            </div>
         </div>
     </div>
 

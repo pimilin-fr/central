@@ -1,43 +1,44 @@
 {#
-    On privilégie les adresses non supprimées.
-    Si aucune adresse active n'existe, on affiche les supprimées.
+    Adresses du tiers, en grille compacte : 3 par ligne (2 puis 1 si la carte est étroite).
+      - nombre de colonnes : variable CSS --lines-cols dans entities.css (.entity-lines.is-flow)
+      - nombre d'adresses affichées avant « +N » : maxShown ci-dessous
+    On privilégie les adresses non supprimées ; sans adresse active, on affiche les supprimées.
 #}
+{% set maxShown = 6 %}
+
 {% set activeAddresses = tiers.tiersAdresses|filter(ta => ta.adresse and not ta.adresse.isDeleted) %}
 {% set displayedAddresses = activeAddresses|length > 0
     ? activeAddresses
     : tiers.tiersAdresses|filter(ta => ta.adresse)
 %}
+{# principales d'abord #}
+{% set ordered = displayedAddresses|filter(ta => ta.isPrincipale)|merge(displayedAddresses|filter(ta => not ta.isPrincipale)) %}
+{% set shown = ordered|slice(0, maxShown) %}
+{% set hidden = ordered|slice(maxShown) %}
 
-<div class="entity-lines">
-    {# Adresses principales en premier #}
-    {% for tierAddress in displayedAddresses|filter(ta => ta.isPrincipale) %}
-        <div class="entity-line is-primary">
-            <span class="entity-line-icon"><twig:ux:icon name="lucide:star" /></span>
+<div class="entity-lines is-flow">
+    {% for tierAddress in shown %}
+        {% set city = tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' %}
+        <div class="entity-line{{ tierAddress.isPrincipale ? ' is-primary' : '' }}" title="{{ tierAddress.isPrincipale ? 'Adresse principale' : 'Adresse' }} : {{ city }}">
+            <span class="entity-line-icon"><twig:ux:icon name="{{ tierAddress.isPrincipale ? 'lucide:star' : 'lucide:map-pin' }}" /></span>
             <span class="entity-line-body">
-                <span class="entity-line-label">Principale</span>
-                <span class="entity-line-value">{{ tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' }}</span>
+                <span class="entity-line-label">{{ tierAddress.isPrincipale ? 'Principale' : 'Adresse' }}</span>
+                <span class="entity-line-value">{{ city }}</span>
             </span>
         </div>
     {% endfor %}
 
-    {# Autres adresses #}
-    {% for tierAddress in displayedAddresses|filter(ta => not ta.isPrincipale) %}
-        <div class="entity-line">
-            <span class="entity-line-icon"><twig:ux:icon name="lucide:map-pin" /></span>
-            <span class="entity-line-body">
-                <span class="entity-line-label">Adresse</span>
-                <span class="entity-line-value">{{ tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' }}</span>
-            </span>
+    {% if hidden|length > 0 %}
+        <div class="entity-line is-more" title="{{ hidden|map(ta => ta.adresse.villeCourte ?? ta.adresse.ville ?? '?')|join(', ') }}">
+            <span class="entity-line-icon">+{{ hidden|length }}</span>
+            <span class="entity-line-body"><span class="entity-line-value">autre{{ hidden|length > 1 ? 's' : '' }}</span></span>
         </div>
-    {% endfor %}
+    {% endif %}
 
-    {% if displayedAddresses is empty %}
-        <div class="entity-line is-muted">
+    {% if ordered is empty %}
+        <div class="entity-line is-muted is-empty">
             <span class="entity-line-icon"><twig:ux:icon name="lucide:map-pin-off" /></span>
-            <span class="entity-line-body">
-                <span class="entity-line-label">Adresse</span>
-                <span class="entity-line-value">Aucune adresse</span>
-            </span>
+            <span class="entity-line-body"><span class="entity-line-value">Aucune adresse</span></span>
         </div>
     {% endif %}
 </div>

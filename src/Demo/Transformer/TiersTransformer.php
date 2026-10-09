@@ -3,20 +3,30 @@
 namespace App\Demo\Transformer;
 
 use App\Demo\DemoContext;
+use App\Demo\DemoFaker;
+use App\Demo\TiersNamer;
 use App\Demo\DemoStrategy;
 use App\Entity\Tiers;
 use App\Entity\TypeTiers;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Tiers : copie, anonymisation (faux nom stable) ou exclusion selon le champ demoStrategy.
  *
  * Anonymisé : le nom ET le texte de recherche sont remplacés (le texte de recherche contient souvent
- * des alias / noms réels). Particulier ou société : déduit du nom du type de tiers (PERSON_HINTS).
+ * des alias / noms réels). Le faux nom dépend de la nature (case « personne » ou type listé dans
+ * config/demo/tiers_naming.yaml) et du type de tiers : voir TiersNamer.
  */
 class TiersTransformer extends AbstractDemoTransformer {
 
-    /** Mots du libellé de type (N1/N2/N3) indiquant une personne physique => « Prénom Nom ». */
-    private const PERSON_HINTS = '/particulier|personne|physique|famille|proche|ami|salari|privé|prive|individu/iu';
+    public function __construct(
+        #[Autowire(service: 'doctrine.orm.demo_entity_manager')] EntityManagerInterface $demoEm,
+        DemoFaker $faker,
+        private readonly TiersNamer $namer
+    ) {
+        parent::__construct($demoEm, $faker);
+    }
 
     public function getOrder(): int { return 80; }
 
@@ -43,10 +53,7 @@ class TiersTransformer extends AbstractDemoTransformer {
         $searchText = $source->getSearchText();
 
         if ($strategy === DemoStrategy::ANONYMIZE) {
-            $isPerson = (bool) preg_match(self::PERSON_HINTS, $source->getTiersType()->getName());
-            $name = $isPerson
-                ? $this->faker->personName($source->getId())
-                : $this->faker->companyName($source->getId());
+            $name = $this->namer->name($source->getTiersType(), $source->isPersonne(), $source->getId());
             $searchText = $name;
         }
 
@@ -54,6 +61,7 @@ class TiersTransformer extends AbstractDemoTransformer {
         $target->setName((string) $name)
             ->setSearchText($searchText)
             ->setTiersType($type)
+            ->setPersonne($source->isPersonne())
             ->setCreatedAt($source->getCreatedAt())
             ->setDeletedAt($source->getDeletedAt())
             ->setDemoStrategy(DemoStrategy::COPY);

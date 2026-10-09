@@ -1,0 +1,163 @@
+# Noms factices des tiers ANONYMISÉS, selon leur type (N1 / N2 / N3).
+# Fichier à enrichir librement : aucune modification de code nécessaire.
+# Vérifier la couverture de VOS types :   php bin/console app:demo:types            (--unmatched = seulement ceux sans règle)
+#
+# Fonctionnement
+#  - On cherche d'abord au niveau N3 (le plus précis), puis N2, puis N1. Dans un niveau, la PREMIÈRE règle
+#    du fichier qui correspond gagne : mettez les règles précises avant les générales.
+#  - keywords : mots (ou suites de mots) cherchés dans le libellé du niveau. Insensible aux accents, à la casse,
+#    aux pluriels et à « et / & ». Un « * » final = début de mot (« boulang* » : boulanger, boulangerie…).
+#  - names    : modèles de noms, un est choisi (stable) pour chaque tiers. Variables : {prenom} {nom} {lieu}
+#               ex. « Boulangerie {nom} » => Boulangerie Martin ; « Pharmacie {lieu} » => Pharmacie du Moulin.
+#  - person   : true = le modèle fabrique un nom de personne (« Dr {prenom} {nom} »). Un tiers coché
+#               « Personne physique » ne reçoit QUE des règles person: true ; sans règle => « Prénom Nom ».
+#  - Sans règle pour une société => nom de société générique.
+
+# La nature (personne / société) vient de la case « Personne physique » du tiers (société par défaut).
+
+rules:
+  # ---- Alimentation -------------------------------------------------------
+  - keywords: ["boulang*", "patisserie", "viennoiserie"]
+    names: ["Boulangerie {nom}", "Fournil {lieu}", "Boulangerie {lieu}", "Au Fournil {lieu}", "Pâtisserie {nom}", "La Mie Dorée {lieu}"]
+  - keywords: ["boucherie", "charcuterie", "traiteur", "volaille"]
+    names: ["Boucherie {nom}", "Boucherie {lieu}", "Charcuterie {nom}", "Traiteur {nom}"]
+  - keywords: ["poissonnerie", "poisson"]
+    names: ["Poissonnerie {lieu}", "Poissonnerie {nom}", "La Criée {lieu}"]
+  - keywords: ["primeur", "fruit", "legume", "marche"]
+    names: ["Primeur {nom}", "Le Jardin {lieu}", "Fruits & Légumes {nom}", "Marché {lieu}"]
+  - keywords: ["epicerie", "superette", "proximite", "cave", "vin"]
+    names: ["Épicerie {nom}", "Épicerie {lieu}", "Supérette {lieu}", "Cave {nom}"]
+  - keywords: ["supermarche", "hypermarche", "grande surface", "course", "alimentation", "drive"]
+    names: ["Supermarché {lieu}", "Super {nom}", "Hyper {lieu}", "Marché U {lieu}", "Le Panier {lieu}"]
+  - keywords: ["fast food", "restauration rapide", "snack", "kebab", "pizza", "burger", "sandwich"]
+    names: ["Pizzeria {nom}", "Snack {lieu}", "Burger {nom}", "Chez {prenom}", "Le Kebab {lieu}"]
+  - keywords: ["restaurant", "resto", "brasserie", "gastronomie", "sortie"]
+    names: ["Restaurant {lieu}", "Chez {prenom}", "Brasserie {lieu}", "Auberge {lieu}", "Le Bistrot {lieu}", "Restaurant {nom}"]
+  - keywords: ["cafe", "bar", "pub", "salon de the"]
+    names: ["Café {lieu}", "Le Bar {lieu}", "Café {nom}", "Le Comptoir {lieu}"]
+
+  # ---- Santé --------------------------------------------------------------
+  - keywords: ["medecin", "docteur", "generaliste", "specialiste", "pediatre", "dermatologue", "ophtalmo*", "gynecolog*", "cardiolog*"]
+    person: true
+    names: ["Dr {prenom} {nom}", "Docteur {nom}", "Dr {nom}"]
+  - keywords: ["dentiste", "orthodont*", "dentaire"]
+    person: true
+    names: ["Dr {prenom} {nom} – dentiste", "Cabinet dentaire {nom}", "Dr {nom}"]
+  - keywords: ["kine*", "osteopathe", "podologue", "psycholog*", "orthophon*", "infirmier", "sage femme"]
+    person: true
+    names: ["{prenom} {nom} – kinésithérapeute", "Cabinet {nom}", "{prenom} {nom} – thérapeute"]
+  - keywords: ["pharmacie", "parapharmacie"]
+    names: ["Pharmacie {lieu}", "Pharmacie {nom}", "Grande Pharmacie {lieu}"]
+  - keywords: ["opticien", "optique", "lunette", "audioprothes*"]
+    names: ["Optique {nom}", "Optique {lieu}", "Lunetterie {lieu}"]
+  - keywords: ["hopital", "clinique", "laboratoire", "radiologie", "analyse"]
+    names: ["Clinique {lieu}", "Centre hospitalier {lieu}", "Laboratoire {nom}", "Centre de radiologie {lieu}"]
+  - keywords: ["mutuelle", "complementaire sante"]
+    names: ["Mutuelle {lieu}", "Mutuelle {nom}", "Harmonie {lieu}"]
+
+  # ---- Finances / administratif ------------------------------------------
+  - keywords: ["assurance", "assureur"]
+    names: ["Assurances {nom}", "Mutuelle d'assurance {lieu}", "Assurances {lieu}"]
+  - keywords: ["banque", "credit", "pret", "epargne", "frais bancaire"]
+    names: ["Banque {lieu}", "Crédit {lieu}", "Caisse d'épargne {lieu}", "Banque {nom}"]
+  - keywords: ["impot", "taxe", "tresor", "fiscalite", "finances publique"]
+    names: ["Centre des finances publiques {lieu}", "Trésorerie {lieu}", "Service des impôts {lieu}"]
+  - keywords: ["avocat", "notaire", "huissier", "juridique", "comptable", "expert comptable", "conseil"]
+    person: true
+    names: ["Maître {nom}", "Étude {nom}", "Cabinet {nom} & Associés", "Maître {prenom} {nom}"]
+  - keywords: ["association", "don", "cotisation", "syndicat", "ong"]
+    names: ["Association {lieu}", "Amicale {lieu}", "Les Amis {lieu}", "Association {nom}"]
+  - keywords: ["poste", "courrier", "colis"]
+    names: ["Bureau de poste {lieu}", "Relais colis {lieu}"]
+
+  # ---- Logement / énergie / abonnements ----------------------------------
+  - keywords: ["agence immobiliere", "immobilier", "syndic", "loyer", "proprietaire", "bailleur"]
+    names: ["Agence {nom} Immobilier", "Immobilier {lieu}", "Syndic {lieu}", "Agence {lieu}"]
+  - keywords: ["electricite", "energie", "gaz", "chauffage", "fioul"]
+    names: ["Énergie {lieu}", "Électricité {lieu}", "Gaz {lieu}", "Énergies {nom}"]
+  - keywords: ["eau", "assainissement"]
+    names: ["Compagnie des eaux {lieu}", "Eaux {lieu}"]
+  - keywords: ["internet", "telephon*", "mobile", "telecom*", "fibre", "box"]
+    names: ["Télécom {lieu}", "Fibre {lieu}", "Mobile {nom}", "Connect {lieu}"]
+  - keywords: ["abonnement", "streaming", "tv", "television", "musique", "video"]
+    names: ["Média+ {lieu}", "Stream {nom}", "Ciné+ {lieu}"]
+  - keywords: ["plombier", "plomberie", "chauffagiste"]
+    names: ["Plomberie {nom}", "{nom} Plomberie Chauffage", "Sanitaire {lieu}"]
+  - keywords: ["electricien", "electricite generale"]
+    names: ["Électricité {nom}", "{nom} Électricité", "Élec {lieu}"]
+  - keywords: ["menuisier", "menuiserie", "charpent*", "macon", "maconnerie", "peintre", "peinture", "couvreur", "artisan", "travaux", "renovation"]
+    names: ["Entreprise {nom} & Fils", "Menuiserie {nom}", "{nom} Rénovation", "Maçonnerie {nom}", "Peinture {nom}"]
+  - keywords: ["bricolage", "brico*", "jardinerie", "jardin", "quincaillerie", "materiaux"]
+    names: ["Brico {lieu}", "Jardinerie {lieu}", "Quincaillerie {nom}", "Matériaux {nom}"]
+  - keywords: ["meuble", "decoration", "ameublement", "electromenager", "literie"]
+    names: ["Meubles {nom}", "Maison {lieu}", "Déco {lieu}", "Électro {lieu}"]
+
+  # ---- Transports / auto ---------------------------------------------------
+  - keywords: ["carburant", "essence", "gazole", "station service", "station"]
+    names: ["Station {lieu}", "Station-service {nom}", "Carburants {lieu}"]
+  - keywords: ["garage", "entretien auto", "mecanique", "pneu", "controle technique", "carrosserie", "reparation auto"]
+    names: ["Garage {nom}", "Garage {lieu}", "Auto {nom}", "Carrosserie {nom}", "Pneus {lieu}"]
+  - keywords: ["parking", "peage", "autoroute", "stationnement"]
+    names: ["Parking {lieu}", "Autoroutes {lieu}", "Stationnement {lieu}"]
+  - keywords: ["train", "bus", "metro", "tram", "taxi", "vtc", "transport", "avion", "vol", "compagnie aerienne"]
+    names: ["Transports {lieu}", "Taxi {nom}", "Voyages {lieu}", "Réseau {lieu}"]
+
+  # ---- Loisirs / achats ----------------------------------------------------
+  - keywords: ["vetement", "habillement", "mode", "chaussure", "pret a porter", "lingerie"]
+    names: ["Mode {nom}", "Boutique {lieu}", "Chaussures {nom}", "Prêt-à-porter {lieu}"]
+  - keywords: ["sport", "fitness", "salle de sport", "piscine", "equitation", "club"]
+    names: ["Club de sport {lieu}", "Salle {nom}", "Sport {lieu}", "Piscine {lieu}"]
+  - keywords: ["cinema", "theatre", "spectacle", "concert", "culture", "musee", "loisir"]
+    names: ["Cinéma {lieu}", "Théâtre {lieu}", "Espace culturel {lieu}", "Musée {lieu}"]
+  - keywords: ["librairie", "livre", "papeterie", "presse", "journaux"]
+    names: ["Librairie {nom}", "Papeterie {lieu}", "Maison de la presse {lieu}", "Librairie {lieu}"]
+  - keywords: ["voyage", "vacance", "hotel", "camping", "hebergement", "location vacances", "gite"]
+    names: ["Hôtel {lieu}", "Camping {lieu}", "Gîte {lieu}", "Voyages {nom}", "Résidence {lieu}"]
+  - keywords: ["informatique", "electronique", "multimedia", "high tech", "ordinateur", "telephone portable"]
+    names: ["Informatique {nom}", "Multimédia {lieu}", "Micro {lieu}", "Électro {lieu}"]
+  - keywords: ["fleur*", "cadeau", "bijou*", "jouet"]
+    names: ["Fleuriste {nom}", "Fleurs {lieu}", "Bijouterie {nom}", "Cadeaux {lieu}", "Jouets {lieu}"]
+  - keywords: ["coiffeu*", "coiffure", "beaute", "esthetique", "barbier", "institut", "spa"]
+    names: ["Coiffure {prenom}", "Salon {nom}", "Institut {lieu}", "Beauté {nom}"]
+
+  # ---- Enfants / éducation / animaux --------------------------------------
+  - keywords: ["ecole", "creche", "education", "scolaire", "formation", "cours", "universite", "college", "lycee", "garderie", "cantine"]
+    names: ["École {lieu}", "Crèche {lieu}", "Centre de formation {lieu}", "Collège {lieu}", "Garderie {lieu}"]
+  - keywords: ["veterinaire", "animaux", "animalerie", "pension animale"]
+    names: ["Cabinet vétérinaire {nom}", "Clinique vétérinaire {lieu}", "Animalerie {lieu}"]
+
+  # ---- Ajoutés d'après vos types réels (app:demo:types -u) ----------------
+  - keywords: ["electro"]
+    names: ["Électro {lieu}", "Électro {nom}", "Discount Électro {lieu}", "Maison de l'électro {nom}"]
+  - keywords: ["cordonnier", "serrurier", "cordonnerie", "serrurerie"]
+    names: ["Cordonnerie-Serrurerie {nom}", "Cordonnerie {lieu}", "Serrurerie {nom}", "Atelier {nom} – clés & talons"]
+  - keywords: ["borne", "recharge", "rechargement"]
+    names: ["Recharge {lieu}", "Bornes {lieu}", "Charge+ {nom}", "ÉlectroCharge {lieu}"]
+  - keywords: ["fromagerie", "cremerie", "fromage"]
+    names: ["Fromagerie {nom}", "La Fromagerie {lieu}", "Crémerie {lieu}", "Fromagerie {prenom}"]
+  - keywords: ["produit exotique", "exotique"]
+    names: ["Saveurs du Monde {nom}", "Exotic Market {lieu}", "Le Comptoir du Monde {nom}", "Épicerie {nom} – saveurs du monde"]
+  - keywords: ["rencontre"]
+    names: ["Affinités {lieu}", "Duo {nom}", "Rencontres {lieu}", "Cœur à Cœur {nom}"]
+  - keywords: ["sucrerie", "confiserie", "chocolat*", "glacier", "glace", "bonbon"]
+    names: ["Confiserie {nom}", "Chocolaterie {nom}", "Glacier {lieu}", "Douceurs {lieu}", "La Maison du Chocolat {lieu}"]
+  - keywords: ["photographe", "photo*"]
+    names: ["Studio {nom}", "Photo {lieu}", "Atelier Photo {nom}", "Studio {nom} Photographie"]
+  - keywords: ["demenageur", "demenagement"]
+    names: ["Déménagements {nom}", "{nom} Déménagement", "Déménagements {lieu}"]
+  - keywords: ["stockage", "garde meuble", "box"]
+    names: ["Garde-Meuble {lieu}", "Box Stockage {lieu}", "Stockage {nom}"]
+  - keywords: ["plateforme", "marketplace", "e commerce", "site web"]
+    names: ["Marketplace {nom}", "{nom} Market", "Webshop {lieu}", "Shop {nom}"]
+
+  # ---- Repli par branche (un nouveau type sans règle propre reste crédible) ----
+  - keywords: ["specialise"]
+    names: ["Boutique {nom}", "Maison {nom}", "Comptoir {lieu}", "Établissements {nom}", "Atelier {lieu}"]
+  - keywords: ["numerique"]
+    names: ["{nom} Digital", "Web {lieu}", "Net {nom}", "Digital {lieu}"]
+  - keywords: ["alimentaire"]
+    names: ["Maison {nom}", "Épicerie {lieu}", "Comptoir {lieu}", "Saveurs {lieu}"]
+  - keywords: ["logistique"]
+    names: ["Logistique {nom}", "Transports {nom}", "Logis {lieu}"]
+  - keywords: ["infrastructure"]
+    names: ["Services {lieu}", "Réseau {lieu}", "Équipements {nom}"]

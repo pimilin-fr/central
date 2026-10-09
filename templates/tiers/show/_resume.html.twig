@@ -27,6 +27,12 @@
                         <span>{{ tiers.tiersType.name }}</span>
                     </span>
                 {% endif %}
+
+                {% set isPerson = tiers_is_person(tiers) %}
+                <span class="entity-pill" style="--entity-color: var(--border-strong);" title="{{ isPerson ? 'Personne physique' : 'Société / organisme' }}">
+                    <twig:ux:icon name="{{ isPerson ? 'lucide:user-round' : 'lucide:building-2' }}" />
+                    <span>{{ isPerson ? 'Personne' : 'Société' }}</span>
+                </span>
             </div>
 
             <div class="summary-grid-2-cols">

@@ -8,6 +8,7 @@ use App\Entity\TypeTiers;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -20,6 +21,11 @@ class TiersType extends AbstractType {
         $builder
                 ->add('name', TextType::class, [
                     'label' => 'Nom',
+                ])
+                ->add('personne', CheckboxType::class, [
+                    'label' => 'Personne physique',
+                    'required' => false,
+                    'help' => 'Décochée : société / organisme (par défaut).',
                 ])
                 ->add('searchText', TextareaType::class, [
                     'label' => 'Texte de recherche',

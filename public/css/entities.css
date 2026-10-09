@@ -478,3 +478,106 @@
         border-left: 0;
     }
 }
+
+
+/* =========================================================
+   NATURE (personne / société) — à côté du code, sans hauteur ajoutée
+   ========================================================= */
+
+.entity-sub-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+}
+
+.entity-sub-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.entity-nature {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    color: var(--text-muted);
+}
+
+.entity-nature svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* personne : un cran plus marqué, teinté de la couleur du type */
+.entity-nature.is-person {
+    color: color-mix(in srgb, var(--entity-color) 75%, var(--text));
+}
+
+/* =========================================================
+   ADRESSES EN GRILLE — .entity-lines.is-flow
+   Variante de .entity-lines : N éléments par ligne, icône + valeur
+   (le libellé passe en infobulle). Les autres cartes ne sont pas touchées.
+
+   >>> Nombre de colonnes : --lines-cols (3 par défaut) <<<
+   La carte se resserre toute seule : 2 colonnes si elle est étroite, 1 si très étroite.
+   ========================================================= */
+
+.entity-lines.is-flow {
+    --lines-cols: 3;
+    display: grid;
+    grid-template-columns: repeat(var(--lines-cols), minmax(0, 1fr));
+    gap: 8px 8px;
+}
+
+.entity-lines.is-flow .entity-line {
+    gap: 6px;
+}
+
+.entity-lines.is-flow .entity-line-label {
+    display: none;
+}
+
+.entity-lines.is-flow .entity-line-value {
+    font-size: 11px;
+}
+
+.entity-lines.is-flow .entity-line.is-more .entity-line-icon {
+    flex-basis: auto;
+    width: auto;
+    min-width: 20px;
+    padding: 0 4px;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.entity-lines.is-flow .entity-line.is-empty {
+    grid-column: 1 / -1;
+}
+
+/* les cartes qui contiennent une grille d'adresses mesurent leur propre largeur */
+.entity-card:has(.entity-lines.is-flow) {
+    container-type: inline-size;
+}
+
+@container (max-width: 359px) {
+    .entity-lines.is-flow { --lines-cols: 2; }
+}
+
+@container (max-width: 249px) {
+    .entity-lines.is-flow { --lines-cols: 1; }
+}
+
+/* icône dans une case à cocher « choice-card » (ex. Personne physique) */
+.choice-card > svg {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+}
+
+.choice-card:has(input:checked) > svg {
+    color: var(--accent);
+}
