@@ -1,73 +1,62 @@
-{% extends 'base.html.twig' %}
+{% extends 'modern.html.twig' %}
 
-{% block title %}Projet{% endblock %}
+{% set breadcrumb_current = entity.name %}
+
+{% block title %}Projet - {{ entity.name }}{% endblock %}
 
 {% block body %}
-    <div class="space-y-6">
-        {# =========================
-              HEADER : Titre + actions (modernisé)
-              ========================= #}
-        {% set btns = [] %}
-        {% if entity.type %}
-            {% set btns = btns|merge([
-                {
-                    label: "Type",
-                    path: path('app_projet_type_show', { id:  entity.type.id }),
-                    color: 'green',
-                    icon: 'icon-park-solid:up-c',
-                }
-            ]) %}
-        {% endif %}
-        {% set btns = btns|merge([{
-                label: "Retour",
+    {% set now = date() %}
+    {% set isDimmed = (entity.endAt and entity.endAt < now) or (entity.beginAt and entity.beginAt > now) %}
+
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">{{ entity.name }}</h1>
+
+                <div class="page-subline">
+                    <span class="entity-pill" style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }};">
+                        <span class="entity-pill-dot"></span>
+                        <span>{{ entity.type.fullname ?? entity.type ?? '—' }}</span>
+                    </span>
+                    {% include 'projet/card/_status.html.twig' with { entity: entity } only %}
+                </div>
+            </div>
+
+            {% set btns = [{
+                label: 'Retour',
                 path: path('app_projet_index'),
-                color: 'gray',
                 icon: 'mdi:arrow-left',
-            }]) %}
+                color: 'neutral'
+            }] %}
+            {% if entity.type %}
+                {% set btns = btns|merge([{
+                    label: 'Type',
+                    path: path('app_projet_type_show', { id: entity.type.id }),
+                    icon: 'icon-park-solid:up-c',
+                    color: 'primary'
+                }]) %}
+            {% endif %}
 
+            {% include 'layout/modern/components/_btns.html.twig' with { btns: btns } %}
+        </div>
 
-        {% include 'partials/header.html.twig' with {
-            btns: btns,
-            title: 'Projet : '~entity.name,
-            item: entity,
-            subTitle:{
-                color: entity.couleur ,
-                label: entity.type.fullname 
-            }
-        } %}
-
-        {# =========================
-        ONGLETS FONCTIONNELS
-        ========================= #}
         {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
-
-        {% set tabs = [
-            {
-                id: 'summary',
-                label: 'Résumé',
-                content: include('projet/_resume.html.twig')
-            },{
-                id: 'edit',
-                label: 'Modifier',
-                icon: 'mdi:pencil',
-                content: render(controller(
-                    'App\\Controller\\ProjetController::edit',
-                    {
-                        id: entity.id
-                    }
-                ))
-            }
-            ] %}
-
-        {% include 'partials/tabs.html.twig' with {
-            tabs: tabs,
+        {% include 'layout/modern/components/_tabs.html.twig' with {
+            tabs: [
+                {
+                    id: 'summary',
+                    label: 'Résumé',
+                    icon: 'ooui:info-filled',
+                    content: include('projet/show/_resume.html.twig')
+                },
+                {
+                    id: 'edit',
+                    label: 'Modifier',
+                    icon: 'mingcute:edit-2-fill',
+                    content: render(controller('App\\Controller\\ProjetController::edit', { id: entity.id }))
+                }
+            ],
             activeTab: activeTab
-            } %}
+        } %}
     </div>
 {% endblock %}
-{#
-                id: 'expenses',
-                label: 'Dépenses',
-                badge: lignes|length, 
-                content: include('projet/_releve.html.twig')
-            #}

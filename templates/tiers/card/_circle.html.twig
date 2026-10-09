@@ -1,41 +1,15 @@
-{% if tiers.createdAt %}
-    {% set year = tiers.createdAt|date('y') %}
-    {% set month = tiers.createdAt|date('F')|lower %}
-    {% set month_fr = {
-                        'january':'jan.', 'february':'fév.', 'march':'mars', 'april':'avril',
-                        'may':'mai', 'june':'juin', 'july':'juil.', 'august':'août',
-                        'september':'sept.', 'october':'oct.', 'november':'nov.', 'december':'déc.'
-                    }[month] %}
-{% else %}
-    {% set year = '—' %}
-    {% set month_fr = '—' %}
-{% endif %}
+{% set months = {
+    '01': 'JAN', '02': 'FÉV', '03': 'MAR', '04': 'AVR',
+    '05': 'MAI', '06': 'JUN', '07': 'JUI', '08': 'AOÛ',
+    '09': 'SEP', '10': 'OCT', '11': 'NOV', '12': 'DÉC'
+} %}
 
-<div class="absolute -top-3 -left-3
-            w-16 h-16
-            rounded-full
-            flex flex-col items-center justify-center
-            font-bold text-xs
-            z-20
-            shadow-lg
-            ring-4 ring-white
-            transition-all duration-300 ease-out
-            group-hover:scale-120
-            group-hover:-rotate-40"
-     style="
-         background-color: {{ bgColor }};
-         color: {{ textColor }};
-         box-shadow: 0 8px 20px -8px {{ bgColor }};
-     ">
-
-    <span class="leading-none">
-        {{ month_fr }}
-    </span>
-
-    <span class="w-8 border-t border-current/40 my-1"></span>
-
-    <span class="text-lg leading-none">
-        {{ year }}
-    </span>
-
+<div class="entity-circle">
+    {% if tiers.createdAt %}
+        <span class="entity-circle-text">{{ months[tiers.createdAt|date('m')] }}</span>
+        <span class="entity-circle-sub">{{ tiers.createdAt|date('y') }}</span>
+    {% else %}
+        <span class="entity-circle-text">—</span>
+        <span class="entity-circle-sub">N/A</span>
+    {% endif %}
 </div>

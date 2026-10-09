@@ -1,0 +1,53 @@
+{#
+    Aperçu en direct d'une entité (même rendu que les cartes de liste).
+    À placer dans <aside class="form-layout-aside"> d'un formulaire portant
+    data-live-form ; les valeurs viennent des champs name$="[propriété]".
+
+    Paramètres :
+      icon    : icône du cercle (ex. 'lucide:user')
+      ribbon  : propriété(s) pour le liseré        (ex. 'tiersType')
+      title   : propriété du titre                 (ex. 'name')
+      sub     : propriété(s) du sous-titre         (optionnel)
+      color   : champ portant la couleur           (optionnel ; select data-color ou input couleur)
+      lines   : [{ icon, label, live, empty }]     (optionnel)
+      placeholder : titre affiché tant que le champ est vide
+#}
+<h3 class="form-aside-title">Aperçu</h3>
+
+<article class="entity-card" {% if color is defined and color %}data-live-color="{{ color }}"{% endif %}>
+    <div class="entity-card-link">
+        <div class="entity-circle"><twig:ux:icon name="{{ icon|default('lucide:circle') }}" /></div>
+
+        <div class="entity-ribbon">
+            <span class="entity-ribbon-label" data-live="{{ ribbon|default('') }}" data-live-empty="···">···</span>
+        </div>
+
+        <div class="entity-body">
+            <div class="entity-head">
+                <h2 class="entity-title" data-live="{{ title|default('name') }}">{{ placeholder|default('Sans nom') }}</h2>
+                {% if sub is defined and sub %}
+                    <span class="entity-sub" data-live="{{ sub }}" data-live-empty="—">—</span>
+                {% endif %}
+            </div>
+
+            {% if lines is defined and lines|length > 0 %}
+                <div class="sep sep-inset">
+                    <span class="sep-dot"></span>
+                    <span class="sep-line"></span>
+                </div>
+
+                <div class="entity-lines">
+                    {% for line in lines %}
+                        <div class="entity-line">
+                            <span class="entity-line-icon"><twig:ux:icon name="{{ line.icon }}" /></span>
+                            <span class="entity-line-body">
+                                <span class="entity-line-label">{{ line.label }}</span>
+                                <span class="entity-line-value is-wrap" data-live="{{ line.live }}" data-live-empty="{{ line.empty|default('—') }}">{{ line.empty|default('—') }}</span>
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</article>

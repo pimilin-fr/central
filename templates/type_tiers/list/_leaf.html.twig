@@ -1,0 +1,22 @@
+{# Carte type de tiers (feuille N3) — composants génériques entity-*. Paramètre : type #}
+{% set lineage = [type.typeN1, type.typeN2]|filter(v => v)|join(' / ') %}
+
+<article class="entity-card is-compact"
+         style="--entity-color: {{ type.couleur ?? 'var(--accent)' }}; --entity-text: {{ type.textColor ?? '#FFFFFF' }};"
+         data-search-item
+         data-search-value="{{ ((type.typeN1 ?? '') ~ ' ' ~ (type.typeN2 ?? '') ~ ' ' ~ (type.typeN3 ?? '') ~ ' ' ~ (type.name ?? '') ~ ' ' ~ (type.libelle ?? '') ~ ' ' ~ (type.libelleLiserai ?? ''))|lower|e('html_attr') }}">
+    <a href="{{ path('app_type_tiers_show', { id: type.id }) }}" class="entity-card-link">
+        <div class="entity-circle" aria-hidden="true"><twig:ux:icon name="lucide:tag" /></div>
+
+        <div class="entity-ribbon" aria-hidden="true">
+            <span class="entity-ribbon-label">{{ type.libelleLiserai ?? type.libelle ?? 'TYPE' }}</span>
+        </div>
+
+        <div class="entity-body">
+            <div class="entity-head">
+                <h3 class="entity-title" title="{{ type.typeN3 ?? type.name }}">{{ type.typeN3 ?? type.name }}</h3>
+                <span class="entity-sub is-plain" title="{{ lineage }}">{{ lineage ?: '—' }}</span>
+            </div>
+        </div>
+    </a>
+</article>

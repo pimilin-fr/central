@@ -1,0 +1,46 @@
+{% set baseQuery = app.request.query.all|filter((value, name) => name != 'tab') %}
+
+{% set periodOptions = {
+    annee: 'Année',
+    trimestre: 'Trimestre',
+    mois: 'Mois',
+    semaine: 'Semaine'
+} %}
+
+{% set elementOptions = {
+    releve: 'Relevé',
+    portefeuille: 'Portefeuille',
+    adresse: 'Adresse',
+    categorie: 'Catégorie',
+    tiers: 'Tiers',
+    projet: 'Projet'
+} %}
+
+<div class="group-bar">
+    <span class="group-bar-title">
+        <twig:ux:icon name="lucide:layers" />
+        Regrouper par
+    </span>
+
+    <div class="group-bar-set">
+        <span class="group-bar-label">Date</span>
+        <div class="segmented" role="group" aria-label="Regrouper par période">
+            {% for key, label in periodOptions %}
+                <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ groupBy: key })) }}"
+                   class="segmented-item {{ groupBy == key ? 'is-active' : '' }}"
+                   {% if groupBy == key %}aria-current="true"{% endif %}>{{ label }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="group-bar-set">
+        <span class="group-bar-label">Élément</span>
+        <div class="segmented" role="group" aria-label="Regrouper par élément">
+            {% for key, label in elementOptions %}
+                <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ groupBy: key })) }}"
+                   class="segmented-item {{ groupBy == key ? 'is-active' : '' }}"
+                   {% if groupBy == key %}aria-current="true"{% endif %}>{{ label }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>

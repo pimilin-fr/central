@@ -1,0 +1,107 @@
+{#
+    Carte adresse — composants génériques entity-*.
+      - couleur de la carte, du liseré et du cercle : type d'adresse (--entity-color)
+      - géolocalisation : portée par l'icône du cercle (épingle / épingle barrée)
+    Paramètres : adresse, tierAdresse (optionnel : lien Tiers ↔ Adresse)
+#}
+{% set bgColor = adresse.adresseType.couleur ?? 'var(--accent)' %}
+{% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
+{% set isDeleted = adresse.deletedAt is not null %}
+{% set hasGeolocation = adresse.latitude is not null and adresse.longitude is not null %}
+{% set adresseType = adresse.adresseType.name|lower %}
+
+{% set isAdresseTiers = tierAdresse is defined and tierAdresse is not null %}
+{% set isPrincipale = isAdresseTiers and tierAdresse.isPrincipale %}
+
+<article
+    class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
+    style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};"
+    data-search-item
+    data-search-value="{{ (
+        (adresse.name ?? '') ~ ' ' ~
+        (adresse.adresse ?? '') ~ ' ' ~
+        (adresse.ville ?? '') ~ ' ' ~
+        (adresse.adresseType.name ?? '')
+    )|lower|e('html_attr') }}"
+    >
+    <a href="{{ path('app_adresse_show', { id: adresse.id }) }}" class="entity-card-link">
+
+        <div class="entity-circle"
+             title="{{ hasGeolocation ? 'Adresse géolocalisée' : 'Adresse non géolocalisée' }}">
+
+            {% if 'rue' in adresseType%}
+                <twig:ux:icon name="streamline-flex:street-road-solid" />
+            {% elseif 'quartier' in adresseType  %}
+                <twig:ux:icon name="simple-icons:git" />
+            {% elseif 'ville' in adresseType %}
+                <twig:ux:icon name="streamline:city-hall-remix" />
+            {% elseif 'département' in adresseType %}
+                <twig:ux:icon name="mdi:house-group" />
+            {% elseif 'région' in adresseType %}
+                <twig:ux:icon name="gridicons:layout" />
+            {% elseif 'pays' in adresseType %}
+                <twig:ux:icon name="material-symbols:flag-rounded" />
+            {% elseif 'zone' in adresseType %}
+                <twig:ux:icon name="pinhead:contiguous-united-states" />
+            {% elseif 'planète' in adresseType %}
+                <twig:ux:icon name="fluent-mdl2:world" />
+            {% else %}
+                ET ?
+            {% endif %}
+        </div>
+
+        <div class="entity-ribbon">
+            <span class="entity-ribbon-label">{{ adresse.villeCourte ?? adresse.ville }}</span>
+        </div>
+
+        <div class="entity-body">
+            <div class="entity-head">
+                <h2 class="entity-title" title="{{ adresse.name }}">{{ adresse.name }}</h2>
+                <span class="entity-sub">{{ adresse.adresseType.name }}</span>
+            </div>
+
+            <div class="sep sep-inset">
+                <span class="sep-dot"></span>
+                <span class="sep-line"></span>
+            </div>
+
+            <div class="entity-lines">
+                {% if isPrincipale %}
+                    <div class="entity-line is-primary">
+                        <span class="entity-line-icon"><twig:ux:icon name="lucide:star" /></span>
+                        <span class="entity-line-body">
+                            <span class="entity-line-label">Statut</span>
+                            <span class="entity-line-value">Adresse principale</span>
+                        </span>
+                    </div>
+                {% endif %}
+
+                <div class="entity-line">
+                    <span class="entity-line-icon"><twig:ux:icon name="lucide:map" /></span>
+                    <span class="entity-line-body">
+                        <span class="entity-line-label">Adresse</span>
+                        <span class="entity-line-value is-wrap">{{ adresse.adresse ?: '—' }}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </a>
+
+    {% if isAdresseTiers %}
+        <div class="entity-actions">
+            <a href="{{ path('app_tiers_adresse_toggle_principale', { id: tierAdresse.id, tiers: tierAdresse.tiers.id }) }}"
+               class="entity-action {{ isPrincipale ? 'is-active' : '' }}"
+               title="{{ isPrincipale ? 'Retirer comme adresse principale' : 'Définir comme adresse principale' }}">
+                <twig:ux:icon name="{{ isPrincipale ? 'lucide:star' : 'lucide:star-off' }}" />
+                {{ isPrincipale ? 'Principale' : 'Définir principale' }}
+            </a>
+
+            <a href="{{ path('app_tiers_adresse_unlink', { id: tierAdresse.id }) }}"
+               class="entity-action is-danger"
+               title="Délier l'adresse">
+                <twig:ux:icon name="lucide:unlink" />
+                Délier
+            </a>
+        </div>
+    {% endif %}
+</article>

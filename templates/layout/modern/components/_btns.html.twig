@@ -1,0 +1,50 @@
+{% set buttonColors = {
+    primary: 'page-action-primary',
+    neutral: 'page-action-neutral',
+    danger: 'page-action-danger',
+    success: 'page-action-success',
+    info: 'page-action-info',
+    warning: 'page-action-warning'
+} %}
+{# removeContainer: true => pas de <div> englobant (bouton seul dans un formulaire, une barre…) #}
+{% set withContainer = removeContainer is not defined or not removeContainer %}
+
+{% if withContainer %}
+    <div class="page-heading-actions">
+{% endif %}
+
+    {% for btn in btns %}
+        {% set color = btn.color|default('neutral') %}
+
+        {% if btn.type is not defined or btn.type == 'link' %}
+            <a
+                href="{{ btn.path }}"
+                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }} {{ btn.class ??"" }}"
+                {% if btn.attr is defined %}
+                    {% for at in btn.attr %}
+                        {{ at.label }}="{{ at.value }}"
+                    {% endfor %}
+                {% endif %}
+                >
+                {% if btn.icon is defined %}
+                    <twig:ux:icon name="{{ btn.icon }}" />
+                {% endif %}
+                <span>{{ btn.label }}</span>
+            </a>
+        {% elseif btn.type == 'submit' %}
+            <button
+                type="submit"
+                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }} {{ btn.class ??"" }}"
+                >
+                {% if btn.icon is defined %}
+                    <twig:ux:icon name="{{ btn.icon }}" />
+                {% else %}
+                    <twig:ux:icon name="mdi:content-save-outline" />
+                {% endif %}
+                <span>{{ btn.label|default('Enregistrer') }}</span>
+            </button>
+        {% endif %}
+    {% endfor %}
+{% if withContainer %}
+    </div>
+{% endif %}

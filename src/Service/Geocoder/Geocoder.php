@@ -27,7 +27,6 @@ class Geocoder {
             new StructuredGeoQueryBuilder($adresse),
             new AdresseGeoQueryBuilder($adresse),
             new AdresseGeoQueryBuilder($adresse),
-            new AdresseExactGeoQueryBuilder($adresse),
         ];
     }
 

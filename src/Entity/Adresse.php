@@ -68,9 +68,6 @@ class Adresse implements DemoEntityInterface {
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $adresseForcee = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $adresseExact = null;
-
     #[ORM\OneToMany(mappedBy: 'adresseParent', targetEntity: self::class)]
     private Collection $children;
 
@@ -151,10 +148,6 @@ class Adresse implements DemoEntityInterface {
 
     public function getAdresseForcee(): ?string {
         return $this->adresseForcee;
-    }
-
-    public function getAdresseExact(): ?string {
-        return $this->adresseExact;
     }
 
     public function getChildren(): Collection {
@@ -256,12 +249,7 @@ class Adresse implements DemoEntityInterface {
         $this->adresseForcee = $adresseForcee;
         return $this;
     }
-
-    public function setAdresseExact(?string $adresseExact) {
-        $this->adresseExact = $adresseExact;
-        return $this;
-    }
-
+    
     public function setChildren(Collection $children) {
         $this->children = $children;
         return $this;

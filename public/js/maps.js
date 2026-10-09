@@ -1,6 +1,12 @@
 const CentralMaps = {
     instances: new Map(),
 
+    // Couleur lue dans les variables du thème courant (aucune couleur en dur).
+    themeColor(name, fallback = '#808080') {
+        const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        return value || fallback;
+    },
+
     config: {
         debug: true,
         version: 'v1.3.8',
@@ -8,14 +14,14 @@ const CentralMaps = {
 
         marker: {
             radius: 10,
-            borderColor: '#FFFFFF',
+            get borderColor() { return CentralMaps.themeColor('--surface'); },
             borderWeight: 2,
             fillOpacity: 0.8,
             colors: {
-                current: '#F97316',
-                principale: '#16A34A',
-                secondaire: '#64748B',
-                default: '#2563EB'
+                get current() { return CentralMaps.themeColor('--accent'); },
+                get principale() { return CentralMaps.themeColor('--success'); },
+                get secondaire() { return CentralMaps.themeColor('--text-soft'); },
+                get default() { return CentralMaps.themeColor('--info'); }
             }
         },
 
@@ -436,7 +442,7 @@ const CentralMaps = {
         // Forme différente pour le point du groupe
         const marker = L.circleMarker([latitude, longitude], {
             radius: this.config.marker.radius + 4, // plus gros
-            color: '#000000', // bordure noire pour le distinguer
+            color: CentralMaps.themeColor('--text'), // bordure contrastée pour le distinguer
             weight: 3,
             fillColor: color,
             fillOpacity: 1

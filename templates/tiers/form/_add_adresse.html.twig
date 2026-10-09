@@ -1,0 +1,23 @@
+{{ form_start(form, {
+    action: path('app_tiers_add_adresse', { id: tiers.id }),
+    attr: { class: 'inline-form' }
+}) }}
+
+    <div class="inline-form-field">
+        {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
+        {{ form_widget(form.adresse, {
+            attr: { class: (form.adresse.vars.attr.class|default('')) ~ ' modern-form-control' }
+        }) }}
+    </div>
+
+    <label class="inline-check">
+        {{ form_widget(form.isPrincipale) }}
+        <span>Principale</span>
+    </label>
+
+    <button type="submit" class="page-action page-action-primary">
+        <twig:ux:icon name="lucide:plus" />
+        <span>Ajouter</span>
+    </button>
+
+{{ form_end(form) }}

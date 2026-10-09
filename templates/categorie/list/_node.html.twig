@@ -1,0 +1,81 @@
+{% set hasChildren = node.children|length > 0 %}
+{% set level = node.level %}
+{% set isLeaf = not hasChildren %}
+
+{#
+    Le chemin est construit depuis l'entité afin que la recherche porte
+    sur toute la hiérarchie, et pas uniquement sur le libellé de la feuille.
+#}
+{% set pathParts = [node.categorie.libelle] %}
+{% set current = node.categorie.parent %}
+
+{% for i in 1..50 %}
+    {% if current %}
+        {% set pathParts = [current.libelle]|merge(pathParts) %}
+        {% set current = current.parent %}
+    {% endif %}
+{% endfor %}
+
+{% set categoryPath = pathParts|join(' / ') %}
+
+{% if isLeaf %}
+    {# Carte feuille : composants génériques entity-* (couleur = nature) #}
+    {% set natureColor = node.categorie.isDepense() ? 'var(--category-expense)' : 'var(--category-income)' %}
+
+    <article
+        class="entity-card is-compact"
+        style="--entity-color: {{ natureColor }}; --entity-text: #fff;"
+        data-search-item
+        data-search-value="{{ categoryPath|lower|e('html_attr') }}"
+        >
+        <a href="{{ path('app_categorie_show', { id: node.categorie.id }) }}" class="entity-card-link">
+            <div class="entity-circle" aria-hidden="true">
+                {% if node.categorie.isDepense() %}
+                    <twig:ux:icon name="reicon:money-send3-filled" />
+                {% else %}
+                    <twig:ux:icon name="healthicons:low-income-level-outline-24px" />
+                {% endif %}
+            </div>
+
+            <div class="entity-ribbon" aria-hidden="true">
+                <span class="entity-ribbon-label">{{ node.categorie.natureLibelle }}</span>
+            </div>
+
+            <div class="entity-body">
+                <div class="entity-head">
+                    <h3 class="entity-title" title="{{ node.categorie.libelle }}">{{ node.categorie.libelle }}</h3>
+                    <span class="entity-sub is-plain" title="{{ categoryPath }}">{{ categoryPath }}</span>
+                </div>
+            </div>
+        </a>
+    </article>
+{% else %}
+    <section
+        class="categorie-branch level-{{ level }}"
+        data-search-group
+        >
+        <header class="categorie-branch-header">
+            <div class="categorie-branch-heading">
+                <span class="categorie-branch-index">{{ '%02d'|format(level + 1) }}</span>
+                <div class="categorie-branch-copy">
+                    <span class="categorie-branch-kicker">{{ level == 0 ? 'Racine' : 'Sous-niveau' }}</span>
+                    <h2 class="categorie-branch-title">{{ node.categorie.libelle }}</h2>
+                </div>
+            </div>
+
+            <div class="categorie-branch-meta">
+                <span class="categorie-branch-count">
+                    {{ node.children|length }}
+                    {{ node.children|length == 1 ? 'enfant' : 'enfants' }}
+                </span>
+                <twig:ux:icon name="lucide:layers-3" />
+            </div>
+        </header>
+
+        <div class="categorie-branch-children">
+            {% for child in node.children %}
+                {% include 'categorie/list/_node.html.twig' with { node: child } %}
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}

@@ -17,7 +17,6 @@ class CategorieRepository extends ServiceEntityRepository {
 
     public function findAllOrdered(): array {
         return $this->createQueryBuilder('c')
-                        //->andWhere('c.deletedAt IS NULL')
                         ->orderBy('c.name', 'ASC')
                         ->getQuery()
                         ->getResult();

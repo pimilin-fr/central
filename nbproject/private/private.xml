@@ -3,16 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/index.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/_table.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/_table.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/Portefeuille.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/PortefeuilleView.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/PortefeuilleType.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Entity/Depenses.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/AddDepensesType.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/PortefeuilleRepository.php</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Repository/PortefeuilleViewRepository.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/_resume.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/_resume.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/list/_table.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/list/_node.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/_activite.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/depenses/list/_group.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/show/_btns.html.twig</file>
         </group>
     </open-files>
 </project-private>

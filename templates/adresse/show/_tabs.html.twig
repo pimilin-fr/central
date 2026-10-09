@@ -1,0 +1,32 @@
+{% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+
+{% set tabs = [
+    {
+        id: 'summary',
+        label: 'Résumé',
+        content: include('adresse/show/_resume.html.twig'),
+        icon: 'ooui:info-filled'
+    },{
+        id: 'childs',
+        label: 'Enfants',
+        icon: 'lucide:git-branch',
+        badge: adresse.children|length,
+        content: include('adresse/list/_children.html.twig', { adresses: adresse.children })
+    },{
+        id: 'tiers',
+        label: 'Tiers liés',
+        icon: 'mage:user-fill',
+        badge: adresse.tiers|length,
+        content: include('tiers/list/_table.html.twig', { tiers: adresse.tiers })
+    },{
+        id: 'edit',
+        label: 'Modifier',
+        icon: 'mingcute:edit-2-fill',
+        content: include('adresse/form/_form.html.twig')
+    }
+] %}
+
+{% include 'layout/modern/components/_tabs.html.twig' with {
+    tabs: tabs,
+    activeTab: activeTab
+} %}

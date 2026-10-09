@@ -1,0 +1,12 @@
+{# Période « 12 janv. 2025 → 3 mars 2026 » — paramètre : projet #}
+{% set months = {
+    '01':'janv.', '02':'févr.', '03':'mars', '04':'avril',
+    '05':'mai', '06':'juin', '07':'juil.', '08':'août',
+    '09':'sept.', '10':'oct.', '11':'nov.', '12':'déc.'
+} %}
+{%- if projet.beginAt -%}
+    {{ projet.beginAt|date('d') }} {{ months[projet.beginAt|date('m')] }} {{ projet.beginAt|date('Y') }}
+{%- else -%}
+    —
+{%- endif -%}
+{%- if projet.endAt %} → {{ projet.endAt|date('d') }} {{ months[projet.endAt|date('m')] }} {{ projet.endAt|date('Y') }}{% endif -%}

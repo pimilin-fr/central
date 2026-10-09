@@ -1,0 +1,47 @@
+{# Barre de modification en masse — composants du design system (aucune classe Tailwind). #}
+<span class="bulk-bar-kicker">Modification en masse</span>
+
+<div class="bulk-field bulk-field-action">
+    <label class="modern-form-label" for="bulk-action">Action</label>
+    <select id="bulk-action" name="action" class="modern-form-control">
+        <option value="">-- Choisir --</option>
+        <option value="set_date_releve" data-fields="date">Date relevé</option>
+        <option value="set_projet" data-fields="projet">Affecter à un projet</option>
+        <option value="delete" data-fields="" data-tone="danger">Supprimer la ligne</option>
+    </select>
+</div>
+
+<div class="bulk-field bulk-field-date" data-field="date" hidden>
+    <label class="modern-form-label" for="bulk-date">Date</label>
+    <input type="date" id="bulk-date" name="date_value" class="modern-form-control">
+</div>
+
+{# Projet : autocomplete + id caché #}
+<div class="bulk-field bulk-field-projet" data-field="projet" hidden>
+    <label class="modern-form-label" for="bulk-projet">Projet</label>
+    <input type="text"
+           id="bulk-projet"
+           name="projet"
+           class="modern-form-control autocomplete"
+           placeholder="Rechercher un projet"
+           autocomplete="off"
+           data-endpoint="/projet/search"/>
+    <input type="hidden" name="projet_id">
+</div>
+
+{#<button type="submit" class="page-action page-action-primary bulk-submit">
+    <twig:ux:icon name="material-symbols:check-circle" />
+    <span>Appliquer</span>
+</button>#}
+{% include 'layout/modern/components/_btns.html.twig' with {
+        removeContainer:true,
+        btns: [
+            {
+                type: 'submit',
+                label: 'Appliquer',
+                icon: 'lucide:check',
+                color: 'primary',
+                class:"page-action page-action-primary bulk-submit"
+            }
+        ]
+} %}

@@ -1,34 +1,41 @@
-{% extends 'base.html.twig' %}
+{% extends 'modern.html.twig' %}
 
 {% block title %}Portefeuilles{% endblock %}
 
 {% block body %}
-    <div class="space-y-6">
-        {# =========================
-            HEADER : Titre + actions (modernisé)
-            ========================= #}
-        {% 
-            set btns = [
-                {
-                    label: "Ajouter",
-                    path: path('app_portefeuille_new'),
-                    color: 'green',
-                    icon: 'ic:round-add',
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <div class="toolbar">
+                    {% include 'layout/modern/components/_search.html.twig' with {
+                        target: '#portefeuilles-list',
+                        placeholder: 'Rechercher un portefeuille...',
+                        aria_label: 'Rechercher un portefeuille',
+                        empty: '#portefeuilles-search-empty',
+                        count: '#portefeuilles-visible-count'
+                    } %}
 
-                }
-            ]
-        
-        %}
-        {% include 'partials/header.html.twig' with {
-            btns: btns,
-            title: "Portefeuilles - Liste",
-            item: null
-        } %}
-        
-        {# Table #}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            {% include 'portefeuille/_table.html.twig' %}
+                    <div class="toolbar-info">
+                        <span class="toolbar-dot"></span>
+                        <span><strong id="portefeuilles-visible-count">{{ items|length }}</strong> portefeuilles</span>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                btns: [
+                    {
+                        label: 'Ajouter',
+                        path: path('app_portefeuille_new'),
+                        icon: 'gridicons:add',
+                        color: 'primary'
+                    }
+                ]
+            } %}
         </div>
-    </div>
 
+        <section class="entity-list">
+            {% include 'portefeuille/show/_table.html.twig' %}
+        </section>
+    </div>
 {% endblock %}

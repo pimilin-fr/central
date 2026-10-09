@@ -1,0 +1,16 @@
+{# Cercle date de début (mois / année) — paramètre : projet #}
+{% set months = {
+    '01': 'JAN', '02': 'FÉV', '03': 'MAR', '04': 'AVR',
+    '05': 'MAI', '06': 'JUN', '07': 'JUI', '08': 'AOÛ',
+    '09': 'SEP', '10': 'OCT', '11': 'NOV', '12': 'DÉC'
+} %}
+
+<div class="entity-circle" title="Démarrage du projet">
+    {% if projet.beginAt %}
+        <span class="entity-circle-text">{{ months[projet.beginAt|date('m')] }}</span>
+        <span class="entity-circle-sub">{{ projet.beginAt|date('y') }}</span>
+    {% else %}
+        <span class="entity-circle-text">—</span>
+        <span class="entity-circle-sub">N/A</span>
+    {% endif %}
+</div>

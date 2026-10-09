@@ -1,72 +1,44 @@
-{% extends 'base.html.twig' %}
+{% extends 'modern.html.twig' %}
 
-{% block title %}Portefeuille - {{ entity.name }} {% endblock %}
+{% set breadcrumb_current = entity.libelle ?? entity.name %}
 
-{% block body %}        
-    <div class="space-y-6">
-        {# =========================
-            HEADER : Titre + actions (modernisé)
-            ========================= #}
-        {% set btns = [
-                {
-                    label: "Suppr.",
-                    path: path('app_portefeuille_delete', {id:entity.id}),
-                    color: 'red',
-                    icon: 'gridicons:trash'
-                }, {
-                    label: "Retour",
-                    path: path('app_portefeuille_index'),
-                    color: 'gray',
-                    icon: 'mdi:arrow-left',
-            }] %}
+{% block title %}Portefeuille - {{ entity.name }}{% endblock %}
 
+{% block body %}
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
 
-        {% include 'partials/header.html.twig' with {
-            btns: btns,
-            title: 'Portefeuille : '~entity.name,
-            item: entity
-        } %}
+                <h1 class="page-title">{{ entity.libelle }}</h1>
 
-        {# =========================
-        ONGLETS FONCTIONNELS
-        ========================= #}
-        {% set activeTab = app.request.query.get('tab') ?? 'summary' %}
+                <div class="page-subline">
+                    <span class="entity-pill" style="--entity-color: {{ entity.couleur ?? 'var(--accent)' }};">
+                        <span class="entity-pill-dot"></span>
+                        <span>{{ entity.type ?? '—' }} {% if entity.origine %}- {{ entity.origine }}{%endif%}</span>
+                    </span>
+                    
+                </div>
+            </div>
 
-        {% set tabs = [
-            {
-                id: 'summary',
-                label: 'Résumé',
-                content: include('portefeuille/_activite.html.twig',{
-                    portefeuille: entity,
-                    groups: groups
-                })
-            },{
-                id: 'edit',
-                label: 'Modifier',
-                icon: 'mdi:pencil',
-                content: render(controller(
-                    'App\\Controller\\PortefeuilleController::edit',
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                btns: [
                     {
-                        id: entity.id
-                    }
-                ))
-            },{
-                id: 'addoperation',
-                label: 'Opération',
-                icon: 'ic:round-add',
-                content: render(controller(
-                    'App\\Controller\\PortefeuilleController::addOperation',
+                        label: 'Retour',
+                        path: path('app_portefeuille_index'),
+                        icon: 'mdi:arrow-left',
+                        color: 'neutral'
+                    },
                     {
-                        id: entity.id
+                        label: 'Suppr.',
+                        path: path('app_portefeuille_delete', { id: entity.id }),
+                        icon: 'gridicons:trash',
+                        color: 'danger'
                     }
-                ))
-            }
-        ] %}
+                ]
+            } %}
+        </div>
 
-        {% include 'partials/tabs.html.twig' with {
-        tabs: tabs,
-        activeTab: activeTab
-    } %}
+        {# Onglets fonctionnels #}
+        {% include 'portefeuille/show/_tabs.html.twig' %}
     </div>
-
 {% endblock %}

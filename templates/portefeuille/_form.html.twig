@@ -1,148 +1,125 @@
-{% set formAction =  path('app_portefeuille_new') %}
-{% if portefeuille is defined %}
-    {% set formAction =  path('app_portefeuille_edit', {
-        id: portefeuille.id
-    })
-    %}
-{% endif %}
+{% set isEdit = portefeuille.id is not null %}
+{% set formAction = isEdit
+    ? path('app_portefeuille_edit', { id: portefeuille.id })
+    : path('app_portefeuille_new') %}
+
 {{ form_start(form, {
-    action: formAction ,
-    attr: {
-        class: 'space-y-6'
-    }
+    action: formAction,
+    attr: { class: 'modern-form', 'data-live-form': '' }
 }) }}
 
-{# =========================
-   CHAMPS
-   ========================= #}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="form-layout" data-live-scope>
 
-    {# Nom #}
-    <div>
-        {{ form_label(form.name, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
+    <div class="form-timeline">
 
-        {{ form_widget(form.name, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
+        {# 01 — Identité #}
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">01</span>
+                <h3>Identité</h3>
+            </div>
+            <div class="form-row" style="--cols: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr)">
+                <div>
+                    {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.name, { attr: { class: 'modern-form-control', placeholder: 'Ex. Compte courant' } }) }}
+                    {{ form_errors(form.name) }}
+                </div>
+                <div>
+                    {{ form_label(form.type, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.type, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.type) }}
+                </div>
+                <div>
+                    {{ form_label(form.origine, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.origine, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.origine) }}
+                </div>
+            </div>
+        </div>
 
-        {{ form_errors(form.name) }}
+        {# 02 — Apparence #}
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">02</span>
+                <h3>Apparence</h3>
+            </div>
+            <div class="form-row" style="--cols: minmax(0, 2fr) minmax(0, 1fr)">
+                <div>
+                    {{ form_label(form.libelle, 'Libellé du liseré', { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.libelle, { attr: { class: 'modern-form-control', placeholder: 'Texte affiché sur le liseré' } }) }}
+                    {{ form_errors(form.libelle) }}
+                </div>
+                <div>
+                    {{ form_label(form.couleur, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.couleur, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.couleur) }}
+                </div>
+            </div>
+        </div>
+
+        {# 03 — Comportement #}
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">03</span>
+                <h3>Comportement</h3>
+            </div>
+            <div class="form-row" style="--cols: minmax(0, 1fr) minmax(0, 1fr)">
+                <div>
+                    <label class="choice-card">
+                        {{ form_widget(form.isDefault) }}
+                        <span>Par défaut</span>
+                    </label>
+                    {{ form_errors(form.isDefault) }}
+                </div>
+                <div>
+                    <label class="choice-card">
+                        {{ form_widget(form.isReal) }}
+                        <span>Dépenses réelles</span>
+                    </label>
+                    {{ form_errors(form.isReal) }}
+                </div>
+            </div>
+
+            <div class="form-row" style="--cols: minmax(0, 1fr)">
+                <div>
+                    {% include 'layout/modern/components/_demo_choices.html.twig' with { field: form.demoStrategy } only %}
+                </div>
+            </div>
+        </div>
     </div>
 
-    {# Libellé #}
-    <div>
-        {{ form_label(form.type, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.type, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.type) }}
-    </div>
-
-    <div>
-        {{ form_label(form.isDefault, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.isDefault, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.isDefault) }}
-    </div>
-    <div>
-        {{ form_label(form.isReal, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.isReal, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.isReal) }}
-    </div>
-
-    <div>
-        {{ form_label(form.origine, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.origine, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.origine) }}
-    </div>
-    <div>
-        {{ form_label(form.libelle, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.libelle, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.libelle) }}
-    </div>
-    <div>
-        {{ form_label(form.couleur, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.couleur, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.couleur) }}
-    </div>
-    {# Demo  #}
-    <div>
-        {{ form_label(form.demoStrategy, null, {
-            label_attr: {
-                class: 'block text-sm font-medium text-gray-700 mb-1'
-            }
-        }) }}
-
-        {{ form_widget(form.demoStrategy, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 bg-white
-                       focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.demoStrategy) }}
-    </div>
+    <aside class="form-layout-aside">
+        {% include 'layout/modern/components/_form_preview.html.twig' with {
+            icon: 'lucide:wallet',
+            color: 'couleur',
+            ribbon: 'libelle',
+            title: 'name',
+            placeholder: 'Nom du portefeuille',
+            sub: 'type,origine',
+            lines: [
+                { icon: 'lucide:star', label: 'Par défaut', live: 'isDefault' },
+                { icon: 'lucide:receipt', label: 'Dépenses réelles', live: 'isReal' },
+                { icon: 'lucide:flask-conical', label: 'Mode démo', live: 'demoStrategy' }
+            ]
+        } only %}
+    </aside>
 </div>
 
-{# =========================
-   ACTIONS
-   ========================= #}
-<div class="flex justify-end gap-3 pt-4">
-    <button type="submit"
-            class="inline-flex items-center gap-2 px-4 py-2
-            text-sm font-medium rounded-lg
-            bg-orange-500 hover:bg-orange-600 text-white transition">
-        {{ ux_icon('mdi:content-save-outline', { class: 'w-4 h-4' }) }}
-        Enregistrer
-    </button>
+<div class="modern-form-footer">
+    <span class="modern-form-footer-copy">
+        <span class="required-legend">Champ obligatoire</span>
+    </span>
+
+    {% include 'layout/modern/components/_btns.html.twig' with {
+        btns: [
+            {
+                label: isEdit ? 'Enregistrer' : 'Créer le portefeuille',
+                type: 'submit',
+                icon: isEdit ? 'mdi:content-save-outline' : 'ic:round-add',
+                color: 'primary'
+            }
+        ]
+    } %}
 </div>
 
 {{ form_end(form) }}

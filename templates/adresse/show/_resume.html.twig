@@ -1,0 +1,168 @@
+{% set bgColor = adresse.adresseType.couleur ?? 'var(--accent)' %}
+{% set textColor = adresse.adresseType.textColor ?? '#FFFFFF' %}
+{% set isDeleted = adresse.deletedAt is not null %}
+
+{# Géolocalisation : l'adresse courante, ou au moins une rue descendante #}
+{% set hasCurrentGeolocation = adresse.latitude is not null and adresse.longitude is not null %}
+{% set hasChildGeolocation = false %}
+{% for zone in adresseMap.zones %}
+    {% if zone.points|length > 0 %}
+        {% set hasChildGeolocation = true %}
+    {% endif %}
+{% endfor %}
+{% set hasMapData = hasCurrentGeolocation or hasChildGeolocation %}
+
+<div class="resume-layout">
+
+    {# CARTE RESUME : cercle (géolocalisation) | identité + adresse | liseré (type d'adresse) #}
+    <section class="summary-card {{ isDeleted ? 'is-archived' : '' }}"
+             style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};">
+
+        <div class="entity-circle"
+             style="--entity-color: {{ hasCurrentGeolocation ? 'var(--success)' : 'var(--danger)' }}; --entity-text: {{ hasCurrentGeolocation ? 'var(--on-success)' : 'var(--on-danger)' }};"
+             title="{{ hasCurrentGeolocation ? 'Adresse géolocalisée' : 'Adresse non géolocalisée' }}">
+            <twig:ux:icon name="{{ hasCurrentGeolocation ? 'lucide:map-pin' : 'lucide:map-pin-off' }}" />
+        </div>
+
+        <div class="summary-body">
+            <div class="summary-head">
+                <h2 class="summary-name" title="{{ adresse.name }}">{{ adresse.name }}</h2>
+
+                <span class="entity-pill" style="--entity-color: {{ bgColor }};">
+                    <span class="entity-pill-dot"></span>
+                    <span>{{ adresse.adresseType.name }}</span>
+                </span>
+            </div>
+
+            <div class="summary-grid-2-cols">
+                <div class="summary-field is-wide">
+                    <p class="summary-label">Adresse</p>
+                    <p class="summary-value is-wrap">
+                        {{ adresse.prefix }}
+                        {% if adresse.num != 0 %}{{ adresse.num }}{% endif %}
+                        {{ adresse.bisTer }} {{ adresse.typeVoie }} {{ adresse.nomVoie }}<br>
+                        {{ adresse.codePostal }} {{ adresse.ville }}{% if adresse.cedex %} CEDEX {{ adresse.cedex }}{% endif %}<br>
+                        {{ adresse.pays }}
+                    </p>
+                </div>
+
+                <div class="summary-field">
+                    <p class="summary-label">Géolocalisation</p>
+                    <p class="summary-value">
+                        <span class="flag {{ hasCurrentGeolocation ? 'is-on' : '' }}">
+                            <twig:ux:icon name="{{ hasCurrentGeolocation ? 'lucide:circle-check' : 'lucide:circle-x' }}" />
+                            {{ hasCurrentGeolocation ? 'Renseignée' : 'Non renseignée' }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="summary-field">
+                    <p class="summary-label">Statut</p>
+                    <p class="summary-value">
+                        <span class="demo-pill" style="--entity-color: {{ isDeleted ? 'var(--danger)' : 'var(--success)' }};">
+                            <twig:ux:icon name="{{ isDeleted ? 'lucide:circle-x' : 'lucide:circle-check' }}" />
+                            {{ isDeleted ? 'Supprimée' : 'Active' }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-ribbon">
+            <span class="summary-ribbon-label">{{ adresse.villeCourte ?? adresse.ville }}</span>
+        </div>
+    </section>
+
+    {# ADRESSE PARENTE + CARTE #}
+    <div class="geo-layout">
+
+        <div class="geo-list">
+            {% if adresse.adresseParent %}
+                <p class="summary-label">Adresse parente</p>
+                {% include 'adresse/card/_card.html.twig' with { adresse: adresse.adresseParent } only %}
+            {% else %}
+                <div class="geo-empty">
+                    <twig:ux:icon name="lucide:git-branch" />
+                    <p>Aucune adresse parente</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <section class="geo-card">
+            <div class="geo-card-ribbon" style="{{ hasMapData ? '' : 'background: var(--border-strong);' }}"></div>
+
+            <div class="geo-card-body">
+                <div class="geo-card-head">
+                    <p class="summary-label">Géolocalisation</p>
+                    <p class="geo-card-count">
+                        <twig:ux:icon name="{{ hasMapData ? 'lucide:map-pinned' : 'lucide:map-pin-off' }}" />
+                        {% if hasCurrentGeolocation %}
+                            Localisation disponible
+                        {% elseif hasChildGeolocation %}
+                            Localisation des rues
+                        {% else %}
+                            Non renseignée
+                        {% endif %}
+                    </p>
+                </div>
+
+                {% if hasMapData %}
+                    <div id="adresse-map-{{ adresse.id }}"
+                         data-map
+                         data-map-type="hierarchical"
+                         class="app-map geo-map">
+
+                        {% if hasCurrentGeolocation %}
+                            <span data-map-current
+                                  data-id="{{ adresseMap.current.id }}"
+                                  data-name="{{ adresseMap.current.name }}"
+                                  data-url="{{ adresseMap.current.url }}"
+                                  data-latitude="{{ adresseMap.current.latitude }}"
+                                  data-longitude="{{ adresseMap.current.longitude }}">
+                            </span>
+                        {% endif %}
+
+                        {% for zone in adresseMap.zones %}
+                            <div data-map-zone
+                                 data-zone="{{ zone.id }}"
+                                 data-zone-name="{{ zone.name }}">
+                                {% for point in zone.points %}
+                                    <span data-map-point
+                                          data-id="{{ point.id }}"
+                                          data-name="{{ point.name }}"
+                                          data-url="{{ point.url }}"
+                                          data-latitude="{{ point.latitude }}"
+                                          data-longitude="{{ point.longitude }}">
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <p class="geo-card-foot">
+                        {% if hasCurrentGeolocation %}
+                            Latitude : {{ adresse.latitude }} · Longitude : {{ adresse.longitude }}
+                        {% else %}
+                            L'adresse courante n'est pas géolocalisée : la carte affiche les rues géolocalisées de ses descendants.
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <div class="geo-notes">
+                        {% if adresse.adresse %}
+                            <div class="summary-field">
+                                <p class="summary-label">Adresse complète</p>
+                                <p class="summary-value is-wrap">{{ adresse.adresse }}</p>
+                            </div>
+                        {% endif %}
+                        {% if adresse.adresseForcee %}
+                            <div class="summary-field">
+                                <p class="summary-label">Coordonnées forcées</p>
+                                <p class="summary-value is-wrap">{{ adresse.adresseForcee }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>

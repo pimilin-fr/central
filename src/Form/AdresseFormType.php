@@ -8,11 +8,12 @@ use App\Repository\AdresseRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class AdresseFormType extends AbstractType {
 
@@ -65,16 +66,24 @@ class AdresseFormType extends AbstractType {
                 ->add('adresseType', EntityType::class, [
                     'class' => AdresseType::class,
                     'label' => 'Type',
-                    'choice_label' => 'name', // ce qui s’affiche
+                    'choice_label' => 'name',
                     'placeholder' => 'Choisir un type',
-                    'required' => false,
-                    'choice_attr' => function ($adresseType, $key, $value) {
-                        // $adresseType est l'objet AdresseType
-                        return ['style' => 'background-color:' . $adresseType->getColor()];
-                    },
-                    'attr' => [
-                        'class' => 'adresse-type-select',
+                    'required' => true, // l'astérisque s'affiche automatiquement
+                    'attr' => ['data-entity-select' => ''],
+                    'choice_attr' => static fn(AdresseType $type): array => [
+                        'data-color' => $type->getColor(),
+                        'data-text-color' => $type->getTextColor(),
                     ],
+                ])
+
+                // Coordonnées forcées (texte "lat, lon") — validation serveur recommandée :
+                ->add('adresseForcee', TextType::class, [
+                    'label' => 'Coordonnées forcées',
+                    'required' => false,
+                    'constraints' => [new Assert\Regex(
+                                pattern: '/^-?\d{1,2}(?:[.,]\d+)?\s*[;,\s]\s*-?\d{1,3}(?:[.,]\d+)?$/',
+                                message: 'Format attendu : latitude, longitude (ex. 48.8566, 2.3522).',
+                        )],
                 ])
                 ->add('prefix', TextType::class, [
                     'label' => 'Préfix',
@@ -115,22 +124,6 @@ class AdresseFormType extends AbstractType {
                 ->add('adresse', TextareaType::class, [
                     'label' => 'Adresse complète',
                     'required' => true,
-                    'attr' => [
-                        'rows' => 4,
-                        'placeholder' => 'Saisir l’adresse complète...'
-                    ]
-                ])
-                ->add('adresseForcee', TextareaType::class, [
-                    'label' => 'Adresse forcée',
-                    'required' => false,
-                    'attr' => [
-                        'rows' => 4,
-                        'placeholder' => 'Saisir l’adresse complète...'
-                    ]
-                ])
-                ->add('adresseExact', TextareaType::class, [
-                    'label' => 'Adresse exacte',
-                    'required' => false,
                     'attr' => [
                         'rows' => 4,
                         'placeholder' => 'Saisir l’adresse complète...'

@@ -1,0 +1,39 @@
+{#
+    Messages flash — pile de toasts (haut droite), thémés.
+    Types Symfony : success, error|danger, warning, info|notice.
+    JS : design.js (fermeture, auto-disparition 5 s, pause au survol).
+#}
+{% set flashStyles = {
+    success: { icon: 'lucide:check-circle-2', label: 'Succès', class: 'flash-success' },
+    error:   { icon: 'lucide:circle-x', label: 'Erreur', class: 'flash-error' },
+    danger:  { icon: 'lucide:circle-x', label: 'Erreur', class: 'flash-error' },
+    warning: { icon: 'lucide:triangle-alert', label: 'Attention', class: 'flash-warning' },
+    info:    { icon: 'lucide:info', label: 'Information', class: 'flash-info' },
+    notice:  { icon: 'lucide:info', label: 'Information', class: 'flash-info' }
+} %}
+
+{% set flashes = app.flashes %}
+{% if flashes|length > 0 %}
+    <div class="flash-stack" role="region" aria-label="Notifications">
+        {% for type, messages in flashes %}
+            {% set style = flashStyles[type] ?? flashStyles.info %}
+
+            {% for message in messages %}
+                <div class="flash-message {{ style.class }}" data-flash data-flash-delay="{{ type in ['error', 'danger'] ? 9000 : 5000 }}" role="{{ type in ['error', 'danger'] ? 'alert' : 'status' }}">
+                    <div class="flash-icon"><twig:ux:icon name="{{ style.icon }}" /></div>
+
+                    <div class="flash-content">
+                        <span class="flash-label">{{ style.label }}</span>
+                        <span class="flash-text">{{ message }}</span>
+                    </div>
+
+                    <button type="button" class="flash-close" data-flash-close aria-label="Fermer">
+                        <twig:ux:icon name="lucide:x" />
+                    </button>
+
+                    <span class="flash-progress" aria-hidden="true"></span>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}

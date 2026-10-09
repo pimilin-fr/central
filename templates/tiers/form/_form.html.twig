@@ -1,0 +1,69 @@
+{% set isEdit = tiers is defined and tiers.id is not null %}
+{% set formAction = isEdit ? path('app_tiers_edit', { id: tiers.id }) : path('app_tiers_new') %}
+
+{{ form_start(form, {
+    action: formAction,
+    attr: { class: 'modern-form' }
+}) }}
+
+<div class="form-section-grid">
+
+    {# 01 — Identité #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">01</span>
+            <h3>Identité</h3>
+        </div>
+        <div class="form-stack">
+            <div>
+                {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.name, { attr: { class: 'modern-form-control', placeholder: 'Ex. Jean Dupont ou Société Martin' } }) }}
+                {{ form_errors(form.name) }}
+            </div>
+            <div>
+                {{ form_label(form.searchText, null, { label_attr: { class: 'modern-form-label' } }) }}
+                {{ form_widget(form.searchText, { attr: { class: 'modern-form-control', rows: 3, placeholder: 'Alias, nom abrégé, repère…' } }) }}
+                {{ form_errors(form.searchText) }}
+            </div>
+        </div>
+    </div>
+
+    {# 02 — Type de tiers (liste colorée) #}
+    <div class="form-field-card">
+        <div class="form-field-heading">
+            <span class="form-field-index">02</span>
+            <h3>Type de tiers</h3>
+        </div>
+        <div>
+            {{ form_label(form.tiersType, null, { label_attr: { class: 'modern-form-label' } }) }}
+            {{ form_widget(form.tiersType, { attr: { class: 'modern-form-control', 'data-entity-select': '' } }) }}
+            {{ form_errors(form.tiersType) }}
+        </div>
+    </div>
+
+    {# 03 — Mode démo #}
+    <div class="form-field-card form-field-card-wide">
+        <div class="form-field-heading">
+            <span class="form-field-index">03</span>
+            <h3>Mode démo</h3>
+        </div>
+        {% include 'layout/modern/components/_demo_choices.html.twig' with { field: form.demoStrategy } only %}
+    </div>
+</div>
+
+<div class="modern-form-footer">
+    <span class="modern-form-footer-copy"><span class="required-legend">Champ obligatoire</span></span>
+
+    {% include 'layout/modern/components/_btns.html.twig' with {
+        btns: [
+            {
+                label: isEdit ? 'Enregistrer' : 'Créer le tiers',
+                type: 'submit',
+                icon: isEdit ? 'mdi:content-save-outline' : 'ic:round-add',
+                color: 'primary'
+            }
+        ]
+    } %}
+</div>
+
+{{ form_end(form) }}

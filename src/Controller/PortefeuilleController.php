@@ -160,7 +160,7 @@ final class PortefeuilleController extends AbstractController {
                     );
         }
 
-        return $this->render('depenses/_add_form.html.twig', [
+        return $this->render('depenses/form/_form.html.twig', [
                     'form' => $form->createView(),
                     'portefeuille' => $portefeuille,
         ]);

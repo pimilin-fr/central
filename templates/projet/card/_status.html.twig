@@ -1,0 +1,27 @@
+{#
+    Statut d'un projet calculé à partir des dates (tokens de thème).
+    Paramètres : entity (projet), mode = 'pill' (défaut) | 'label' (texte seul)
+#}
+{% set now = date() %}
+{% set threeMonths = date('+3 months') %}
+
+{% if entity.endAt and entity.endAt < now %}
+    {% set st = { label: 'Terminé', icon: 'lucide:circle-x', color: 'var(--danger)' } %}
+{% elseif entity.beginAt and entity.beginAt > now %}
+    {% set st = { label: 'À venir', icon: 'lucide:clock', color: 'var(--info)' } %}
+{% elseif entity.endAt and entity.endAt <= threeMonths %}
+    {% set st = { label: 'Fin proche', icon: 'lucide:triangle-alert', color: 'var(--warning)' } %}
+{% elseif entity.beginAt %}
+    {% set st = { label: 'En cours', icon: 'lucide:circle-play', color: 'var(--success)' } %}
+{% else %}
+    {% set st = { label: 'Indéfini', icon: 'lucide:circle-help', color: 'var(--text-muted)' } %}
+{% endif %}
+
+{%- if mode is defined and mode == 'label' -%}
+    {{ st.label }}
+{%- else -%}
+    <span class="demo-pill" style="--entity-color: {{ st.color }};">
+        <twig:ux:icon name="{{ st.icon }}" />
+        {{ st.label }}
+    </span>
+{%- endif -%}

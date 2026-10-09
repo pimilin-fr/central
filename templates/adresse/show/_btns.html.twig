@@ -1,0 +1,33 @@
+{% set btns = [{
+    label: 'Retour',
+    path: path('app_adresse_index'),
+    icon: 'mdi:arrow-left',
+    color: 'neutral'
+}] %}
+
+{% if adresse.adresseParent %}
+    {% set btns = btns|merge([{
+        label: 'Parent',
+        path: path('app_adresse_show', { id: adresse.adresseParent.id }),
+        icon: 'icon-park-solid:up-c',
+        color: 'primary'
+    }]) %}
+{% endif %}
+
+{% if adresse.deletedAt is null %}
+    {% set btns = btns|merge([{
+        label: 'Suppr.',
+        path: path('app_adresse_delete', { id: adresse.id }),
+        icon: 'gridicons:trash',
+        color: 'danger'
+    }]) %}
+{% else %}
+    {% set btns = btns|merge([{
+        label: 'Restaurer',
+        path: path('app_adresse_restore', { id: adresse.id }),
+        icon: 'fa-solid:trash-restore-alt',
+        color: 'info'
+    }]) %}
+{% endif %}
+
+{% include 'layout/modern/components/_btns.html.twig' with { btns: btns } %}

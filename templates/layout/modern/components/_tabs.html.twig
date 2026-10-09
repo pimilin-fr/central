@@ -1,0 +1,37 @@
+<div
+    class="modern-tabs"
+    data-tabs
+    data-default-tab="{{ activeTab|default('summary') }}"
+>
+    <div class="modern-tabs-nav-wrap">
+        <nav class="modern-tabs-nav" aria-label="Sections">
+            {% for tab in tabs %}
+                <button
+                    type="button"
+                    class="tab-button {{ activeTab == tab.id ? 'is-active' : '' }}"
+                    data-tab="{{ tab.id }}"
+                    aria-selected="{{ activeTab == tab.id ? 'true' : 'false' }}"
+                >
+                    {% if tab.icon is defined and tab.icon %}
+                        <twig:ux:icon name="{{ tab.icon }}" />
+                    {% endif %}
+                    <span>{{ tab.label }}</span>
+                    {% if tab.badge is defined and tab.badge is not null %}
+                        <span class="tab-badge">{{ tab.badge }}</span>
+                    {% endif %}
+                </button>
+            {% endfor %}
+        </nav>
+    </div>
+
+    {% for tab in tabs %}
+        <div
+            id="tab-{{ tab.id }}"
+            class="tab-content modern-tabs-content {{ activeTab == tab.id ? '' : 'hidden' }}"
+            role="tabpanel"
+            {% if tab.url is defined %}data-url="{{ tab.url }}" data-loaded="0"{% endif %}
+        >
+            {{ (tab.content ?? '')|raw }}
+        </div>
+    {% endfor %}
+</div>

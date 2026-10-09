@@ -1,0 +1,36 @@
+<div class="resume-layout">
+    <section class="summary-card">
+        <div class="entity-circle"><twig:ux:icon name="lucide:folder-kanban" /></div>
+
+        <div class="summary-body">
+            <div class="summary-head">
+                <h2 class="summary-name" title="{{ type.libelle }}">{{ type.libelle }}</h2>
+                {% if type.parent %}
+                    <a class="entity-pill" href="{{ path('app_projet_type_show', { id: type.parent.id }) }}">
+                        <span class="entity-pill-dot"></span>
+                        <span>{{ type.parent.libelle }}</span>
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="summary-grid-2-cols">
+                <div class="summary-field">
+                    <p class="summary-label">Nom</p>
+                    <p class="summary-value">{{ type.name ?: '—' }}</p>
+                </div>
+                <div class="summary-field">
+                    <p class="summary-label">Libellé</p>
+                    <p class="summary-value">{{ type.libelle ?: '—' }}</p>
+                </div>
+                <div class="summary-field">
+                    <p class="summary-label">Enfants</p>
+                    <p class="summary-value">{{ type.children|length }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-ribbon">
+            <span class="summary-ribbon-label">{{ type.parent ? 'Type' : 'Racine' }}</span>
+        </div>
+    </section>
+</div>

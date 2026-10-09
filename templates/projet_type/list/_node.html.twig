@@ -1,0 +1,65 @@
+{#
+    Nœud de la hiérarchie des types de projet.
+    Paramètres : node, level (défaut 0)
+#}
+{% set level = level|default(0) %}
+{% set hasChildren = node.children|length > 0 %}
+
+{% set pathParts = [node.libelle] %}
+{% set current = node.parent %}
+{% for i in 1..50 %}
+    {% if current %}
+        {% set pathParts = [current.libelle]|merge(pathParts) %}
+        {% set current = current.parent %}
+    {% endif %}
+{% endfor %}
+{% set typePath = pathParts|join(' / ') %}
+
+{% if not hasChildren %}
+    <article class="entity-card is-compact"
+             style="--entity-color: var(--accent); --entity-text: var(--accent-contrast, #fff);"
+             data-search-item
+             data-search-value="{{ (typePath ~ ' ' ~ (node.name ?? ''))|lower|e('html_attr') }}">
+        <a href="{{ path('app_projet_type_show', { id: node.id }) }}" class="entity-card-link">
+            <div class="entity-circle" aria-hidden="true"><twig:ux:icon name="lucide:folder-kanban" /></div>
+
+            <div class="entity-ribbon" aria-hidden="true">
+                <span class="entity-ribbon-label">{{ level == 0 ? 'Racine' : 'Type' }}</span>
+            </div>
+
+            <div class="entity-body">
+                <div class="entity-head">
+                    <h3 class="entity-title" title="{{ node.libelle }}">{{ node.libelle }}</h3>
+                    <span class="entity-sub is-plain" title="{{ typePath }}">{{ typePath }}</span>
+                </div>
+            </div>
+        </a>
+    </article>
+{% else %}
+    <section class="categorie-branch level-{{ level > 2 ? 2 : level }}" data-search-group>
+        <header class="categorie-branch-header">
+            <div class="categorie-branch-heading">
+                <span class="categorie-branch-index">{{ '%02d'|format(level + 1) }}</span>
+                <div class="categorie-branch-copy">
+                    <span class="categorie-branch-kicker">{{ level == 0 ? 'Racine' : 'Sous-niveau' }}</span>
+                    <h2 class="categorie-branch-title">
+                        <a href="{{ path('app_projet_type_show', { id: node.id }) }}">{{ node.libelle }}</a>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="categorie-branch-meta">
+                <span class="categorie-branch-count">
+                    {{ node.children|length }} {{ node.children|length == 1 ? 'enfant' : 'enfants' }}
+                </span>
+                <twig:ux:icon name="lucide:layers-3" />
+            </div>
+        </header>
+
+        <div class="categorie-branch-children">
+            {% for child in node.children %}
+                {% include 'projet_type/list/_node.html.twig' with { node: child, level: level + 1 } %}
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}

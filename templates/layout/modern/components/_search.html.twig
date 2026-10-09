@@ -1,0 +1,29 @@
+{#
+    Composant de recherche réutilisable.
+
+    Paramètres :
+    - target        : sélecteur CSS du conteneur à filtrer
+    - placeholder   : texte du champ
+    - aria_label    : libellé accessible
+    - empty         : sélecteur CSS de l'état vide de recherche
+    - count         : sélecteur CSS d'un compteur optionnel
+    - item_selector : sélecteur des éléments filtrables
+#}
+<div
+    class="toolbar-search"
+    data-search
+>
+    <twig:ux:icon name="lucide:search" />
+
+    <input
+        type="search"
+        data-search-input
+        data-search-target="{{ target|default('') }}"
+        data-search-item="{{ item_selector|default('[data-search-item]') }}"
+        {% if empty is defined and empty %}data-search-empty="{{ empty }}"{% endif %}
+        {% if count is defined and count %}data-search-count="{{ count }}"{% endif %}
+        placeholder="{{ placeholder|default('Rechercher...') }}"
+        aria-label="{{ aria_label|default('Rechercher') }}"
+        autocomplete="off"
+    />
+</div>

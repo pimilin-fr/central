@@ -1,0 +1,71 @@
+{% for group in groups %}
+
+    {% set groupKey = group.key %}
+
+    <div class="ops-group">
+
+        {# HEADER DU GROUPE : couleurs des montants identiques à celles d'une ligne #}
+        <div class="ops-group-header" onclick="toggleGroup('{{ groupKey }}')">
+
+            <div class="ops-group-title">
+                <span class="ops-group-label {{ groupKey == '0' ? 'is-unassigned' : '' }}">
+                    {{ group.label }}
+                </span>
+
+                <span class="ops-group-count">
+                    {% if group.depenses is not empty %}
+                        {{ group.depenses|length }} opération{{ group.depenses|length > 1 ? 's' : '' }}
+                    {% else %}
+                        aucune opération
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="ops-group-totals">
+
+                {# Dépenses : rouge ; négatives = remboursement, bleu #}
+                {% if group.totalDepense > 0 %}
+                    <span class="amount-expense font-medium">
+                        - {{ group.totalDepense|number_format(2, ',', ' ') }} €
+                    </span>
+                {% elseif group.totalDepense < 0 %}
+                    <span class="amount-refund font-medium">
+                        + {{ group.totalDepense|abs|number_format(2, ',', ' ') }} €
+                    </span>
+                {% endif %}
+
+                {# Revenus : vert ; négatifs = rouge #}
+                {% if group.totalRevenu > 0 %}
+                    <span class="amount-income font-medium">
+                        + {{ group.totalRevenu|number_format(2, ',', ' ') }} €
+                    </span>
+                {% elseif group.totalRevenu < 0 %}
+                    <span class="amount-expense font-medium">
+                        - {{ group.totalRevenu|abs|number_format(2, ',', ' ') }} €
+                    </span>
+                {% endif %}
+
+                {# Balances : uniquement si cumulatif #}
+                {% if group.cumulative %}
+                    <span class="ops-balance-prev">
+                        {{ group.previousBalance|number_format(2, ',', ' ') }} €
+                    </span>
+                    <strong>→</strong>
+                    <span class="ops-balance {{ group.currentBalance < 0 ? 'amount-expense' : 'amount-income' }}">
+                        {{ group.currentBalance|number_format(2, ',', ' ') }} €
+                    </span>
+                {% endif %}
+            </div>
+
+        </div>
+
+        {# DETAILS #}
+        <div id="group-{{ groupKey }}" class="hidden">
+            {{ include('depenses/list/_table.html.twig', {
+                depenses: group.depenses
+            }) }}
+        </div>
+
+    </div>
+
+{% endfor %}

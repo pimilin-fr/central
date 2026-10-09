@@ -1,79 +1,84 @@
-<div class="max-w-xl">
-    {% set formAction =  path('app_type_tiers_new') %}
-    {% if typeTiers is defined %}
-        {% set formAction =  path('app_type_tiers_edit', {
-                id: typeTiers.id
-        })%}
-    {% endif %}
-    {{ form_start(form, {
-        action: formAction ,
-        attr: {
-            class: 'space-y-6'
-        }
-    }) }}
-    {# Nom #}
-    <div>
-        {{ form_label(form.name, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
+{% set typeId = form.vars.value.id ?? null %}
+{% set isEdit = typeId is not null %}
+{% set formAction = isEdit ? path('app_type_tiers_edit', { id: typeId }) : path('app_type_tiers_new') %}
 
-        {{ form_widget(form.name, {
-            attr: {
-                class: 'block w-full rounded-lg border-gray-300 shadow-sm
-                        focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
+{{ form_start(form, {
+    action: formAction,
+    attr: { class: 'modern-form', 'data-live-form': '' }
+}) }}
 
-        {{ form_errors(form.name) }}
+<div class="form-layout" data-live-scope>
+
+    <div class="form-timeline">
+
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">01</span>
+                <h3>Identité</h3>
+            </div>
+            <div class="form-row" style="--cols: minmax(0, 1fr)">
+                <div>
+                    {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.name, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.name) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">02</span>
+                <h3>Apparence</h3>
+            </div>
+            <div class="form-row" style="--cols: minmax(0, 2fr) minmax(0, 1fr)">
+                <div>
+                    {{ form_label(form.libelleLiserai, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.libelleLiserai, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.libelleLiserai) }}
+                </div>
+                <div>
+                    {{ form_label(form.couleur, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.couleur, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.couleur) }}
+                </div>
+            </div>
+        </div>
     </div>
 
-    {# Couleur #}
-    <div>
-        {{ form_label(form.couleur, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.couleur, {
-            attr: {
-                class: 'block w-full rounded-lg border-gray-300 shadow-sm
-                        focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.couleur) }}
-    </div>
-
-    {# Libellé liserai #}
-    <div>
-        {{ form_label(form.libelleLiserai, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.libelleLiserai, {
-            attr: {
-                class: 'block w-full rounded-lg border-gray-300 shadow-sm
-                        focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.libelleLiserai) }}
-    </div>
-
-    <div class="pt-4 flex justify-end gap-2 border-t">
-        <button
-            type="submit"
-            class="inline-flex items-center px-4 py-2 rounded-lg
-            bg-blue-600 text-white text-sm font-medium
-            hover:bg-blue-700 transition">
-            Enregistrer
-        </button>
-        <button type="submit" name="recompute_code" value="1"
-                class="inline-flex items-center px-4 py-2 rounded-lg
-                bg-orange-600 text-white text-sm font-medium
-                hover:bg-orange-700 transition">
-            🔄 Recalculer le code
-        </button>
-    </div>
-
-    {{ form_end(form) }}
+    <aside class="form-layout-aside">
+        {% include 'layout/modern/components/_form_preview.html.twig' with {
+            icon: 'lucide:tag',
+            color: 'couleur',
+            ribbon: 'libelleLiserai',
+            title: 'name',
+            placeholder: 'Nom du type'
+        } only %}
+    </aside>
 </div>
+
+<div class="modern-form-footer">
+    <span class="modern-form-footer-copy">
+        <span class="required-legend">Champ obligatoire</span>
+    </span>
+
+    <div class="page-heading-actions">
+        {% if isEdit %}
+            <button type="submit" name="recompute_code" value="1" class="page-action page-action-warning">
+                <twig:ux:icon name="lucide:refresh-cw" />
+                <span>Recalculer le code</span>
+            </button>
+        {% endif %}
+
+        {% include 'layout/modern/components/_btns.html.twig' with {
+            removeContainer: true,
+            btns: [{
+                label: isEdit ? 'Enregistrer' : 'Créer le type',
+                type: 'submit',
+                icon: isEdit ? 'mdi:content-save-outline' : 'ic:round-add',
+                color: 'primary'
+            }]
+        } %}
+    </div>
+</div>
+
+{{ form_end(form) }}

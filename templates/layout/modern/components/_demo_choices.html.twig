@@ -1,0 +1,7 @@
+{#
+    Choix de la stratégie de démo : libellé + liste déroulante.
+    Paramètre : field (ex. form.demoStrategy)
+#}
+{{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
+{{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
+{{ form_errors(field) }}

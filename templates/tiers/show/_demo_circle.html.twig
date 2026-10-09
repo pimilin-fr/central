@@ -1,0 +1,20 @@
+{% set strategy = entity.demoStrategy.value ?? null %}
+
+{% set mapping = {
+    'copy':      { label: 'Copie',     icon: 'lucide:copy',          color: 'var(--info)',       ink: 'var(--on-info)' },
+    'anonymize': { label: 'Anonymisé', icon: 'lucide:venetian-mask', color: 'var(--warning)',    ink: 'var(--on-warning)' },
+    'exclude':   { label: 'Exclue',    icon: 'lucide:eye-off',       color: 'var(--danger)',     ink: 'var(--on-danger)' }
+} %}
+
+{% set item = mapping[strategy] ?? { label: 'Erreur', icon: 'lucide:circle-help', color: 'var(--text-muted)', ink: 'var(--on-entity)' } %}
+
+<div class="summary-circle-wrap">
+    <div class="entity-circle"
+         style="--entity-color: {{ item.color }}; --entity-text: {{ item.ink }};"
+         title="Stratégie de démo : {{ item.label }}"
+         role="img"
+         aria-label="Stratégie de démo : {{ item.label }}">
+        <twig:ux:icon name="{{ item.icon }}" />
+    </div>
+    <span class="summary-circle-caption">{{ item.label }}</span>
+</div>

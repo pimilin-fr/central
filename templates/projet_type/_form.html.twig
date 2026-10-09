@@ -1,78 +1,84 @@
-{% set formAction =  path('app_projet_type_new') %}
+{#
+    Formulaire type de projet — frise + aperçu (carte réelle).
+    L'action conserve la logique historique (variable `tiers` si définie).
+#}
+{% set formAction = path('app_projet_type_new') %}
 {% if tiers is defined %}
-    {% set formAction =  path('app_projet_type_edit', {
-        id: tiers.id
-    })
-    %}
+    {% set formAction = path('app_projet_type_edit', { id: tiers.id }) %}
 {% endif %}
+{% set isEdit = form.vars.value.id is not null %}
+
 {{ form_start(form, {
-    action: formAction ,
-    attr: {
-        class: 'space-y-6'
-    }
+    action: formAction,
+    attr: { class: 'modern-form', 'data-live-form': '' }
 }) }}
-{# =========================
-   CHAMPS
-   ========================= #}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-    {# Nom #}
-    <div>
-        {{ form_label(form.name, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
+<div class="form-layout" data-live-scope>
 
-        {{ form_widget(form.name, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
+    <div class="form-timeline">
 
-        {{ form_errors(form.name) }}
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">01</span>
+                <h3>Identité</h3>
+            </div>
+            <div class="form-row" style="--cols: minmax(0, 1fr) minmax(0, 1fr)">
+                <div>
+                    {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.name, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.name) }}
+                </div>
+                <div>
+                    {{ form_label(form.libelle, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.libelle, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.libelle) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-field-card">
+            <div class="form-field-heading">
+                <span class="form-field-index">02</span>
+                <h3>Hiérarchie</h3>
+            </div>
+            <div class="form-row" style="--cols: minmax(0, 1fr)">
+                <div>
+                    {{ form_label(form.parent, null, { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.parent, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_errors(form.parent) }}
+                    <p class="form-hint">Laisser vide pour créer un type racine.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    {# Parent #}
-    <div>
-        {{ form_label(form.parent, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.parent, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.parent) }}
-    </div>
-    {# Libellé #}
-    <div>
-        {{ form_label(form.libelle, null, {
-            label_attr: { class: 'block text-sm font-medium text-gray-700 mb-1' }
-        }) }}
-
-        {{ form_widget(form.libelle, {
-            attr: {
-                class: 'w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500'
-            }
-        }) }}
-
-        {{ form_errors(form.libelle) }}
-    </div>
-
+    <aside class="form-layout-aside">
+        {% include 'layout/modern/components/_form_preview.html.twig' with {
+            icon: 'lucide:folder-kanban',
+            ribbon: 'name',
+            title: 'libelle',
+            placeholder: 'Libellé du type',
+            sub: 'parent',
+            lines: [
+                { icon: 'lucide:folder-tree', label: 'Parent', live: 'parent', empty: 'Racine' }
+            ]
+        } only %}
+    </aside>
 </div>
 
-{# =========================
-   ACTIONS
-   ========================= #}
-<div class="flex justify-end gap-3 pt-4">
-    <button type="submit"
-            class="inline-flex items-center gap-2 px-4 py-2
-                   text-sm font-medium rounded-lg
-                   bg-orange-500 hover:bg-orange-600 text-white transition">
-        {{ ux_icon('mdi:content-save-outline', { class: 'w-4 h-4' }) }}
-        Enregistrer
-    </button>
+<div class="modern-form-footer">
+    <span class="modern-form-footer-copy">
+        <span class="required-legend">Champ obligatoire</span>
+    </span>
+
+    {% include 'layout/modern/components/_btns.html.twig' with {
+        btns: [{
+            label: isEdit ? 'Enregistrer' : 'Créer le type',
+            type: 'submit',
+            icon: isEdit ? 'mdi:content-save-outline' : 'ic:round-add',
+            color: 'primary'
+        }]
+    } %}
 </div>
 
 {{ form_end(form) }}

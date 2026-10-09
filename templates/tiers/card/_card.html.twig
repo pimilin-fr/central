@@ -1,0 +1,28 @@
+{# Carte tiers — composants génériques entity-* (couleur = type de tiers) #}
+{% set bgColor = tiers.tiersType.couleur ?? 'var(--accent)' %}
+{% set textColor = tiers.tiersType.textColor ?? '#FFFFFF' %}
+{% set isDeleted = tiers.deletedAt is not null %}
+
+<article
+    class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
+    style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};"
+    data-search-item
+    data-search-value="{{ (
+                (tiers.name ?? '') ~ ' ' ~
+                (tiers.tiersType.libelle ?? '') ~ ' ' ~
+                (tiers.tiersType.typeN1 ?? '') ~ ' ' ~
+                (tiers.tiersType.typeN2 ?? '')
+            )|lower }}"
+    >
+    <a href="{{ path('app_tiers_show', {'id': tiers.id}) }}" class="entity-card-link">
+        {% include 'tiers/card/_circle.html.twig' %}
+
+        <div class="entity-ribbon">
+            <span class="entity-ribbon-label">{{ tiers.tiersType.libelleLiserai ?? tiers.tiersType.libelle ?? 'TYPE' }}</span>
+        </div>
+
+        <div class="entity-body">
+            {% include 'tiers/card/_content.html.twig' %}
+        </div>
+    </a>
+</article>

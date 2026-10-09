@@ -1,0 +1,67 @@
+<div class="resume-layout">
+
+    {# REGROUPEMENT #}
+    {% include 'depenses/list/_grouping.html.twig' with {
+        groupBy: groupBy,
+        route: 'app_tiers_show',
+        routeParams: {
+            id: tiers.id,
+            tab: 'summary'
+        }
+    } %}
+
+    {# CARTE RESUME : cercle stratégie | identité (nom + type) + infos | liseré statut #}
+    <section class="summary-card {{ tiers.deletedAt ? 'is-inactive' : '' }}">
+
+        {% include 'tiers/show/_demo_circle.html.twig' with { entity: tiers } %}
+
+        <div class="summary-body">
+
+            <div class="summary-head">
+                <h2 class="summary-name" title="{{ tiers.name }}">{{ tiers.name }}</h2>
+
+                {% if tiers.tiersType %}
+                    <span class="entity-pill"
+                          style="--entity-color: {{ tiers.tiersType.couleur ?? 'var(--border-strong)' }};">
+                        <span class="entity-pill-dot"></span>
+                        <span>{{ tiers.tiersType.name }}</span>
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="summary-grid-2-cols">
+                <div class="summary-field">
+                    <p class="summary-label">Texte de recherche</p>
+                    <p class="summary-value" title="{{ tiers.searchText ?? '' }}">{{ tiers.searchText ?? '—' }}</p>
+                </div>
+
+                <div class="summary-field">
+                    <p class="summary-label">Créé le</p>
+                    <p class="summary-value">{{ tiers.createdAt ? tiers.createdAt|date('d/m/Y') : '—' }}</p>
+                </div>
+
+                {% if tiers.deletedAt %}
+                    <div class="summary-field">
+                        <p class="summary-label">Supprimé le</p>
+                        <p class="summary-value">{{ tiers.deletedAt|date('d/m/Y') }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="summary-ribbon">
+            <span class="summary-ribbon-label">{{ tiers.deletedAt ? 'Inactif' : 'Actif' }}</span>
+        </div>
+    </section>
+
+    {# MODIFICATION EN MASSE + RELEVES #}
+    <form method="post" action="{{ path('app_depenses_bulk_update') }}" class="bulk-form" data-bulk-form>
+        <div class="bulk-bar" data-bulk-bar>
+            {{ include('depenses/list/_bulk_components.html.twig') }}
+        </div>
+
+        <div id="releves-container">
+            {% include 'depenses/list/_group.html.twig' %}
+        </div>
+    </form>
+</div>

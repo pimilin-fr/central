@@ -1,0 +1,79 @@
+html[data-theme="gray-green"],
+.theme-option-preview[data-theme="gray-green"] {
+    color-scheme: light;
+
+    /* Fond & surfaces */
+    --bg: #c5cac7;
+    --surface: #d6dad8;
+    --surface-soft: #cfd3d1;
+    --surface-hover: #bcc1be;
+
+    /* Texte */
+    --text: #0f1613;
+    --text-soft: #434e48;
+    --text-muted: #6a756f;
+
+    /* Bordures */
+    --border: #aab1ad;
+    --border-strong: #8e9692;
+
+    /* Accent */
+    --accent: #17945f;
+    --accent-soft: rgba(23, 148, 95, .13);
+    --accent-strong: #0f754a;
+    --accent-contrast: #ffffff;
+
+    /* Information */
+    --info: #177494;
+    --info-strong: #004d66;
+    --info-soft: rgba(56, 189, 248, 0.15);
+    --on-info: #ffffff;
+
+    /* Succès */
+    --success: #22a06b;
+    --success-strong: #357b55;
+    --success-soft: rgba(34, 160, 107, 0.12);
+    --on-success: #ffffff;
+
+    /* Alerte */
+    --warning: #c88722;
+    --warning-strong: #a36700;
+    --warning-soft: rgba(200, 135, 34, 0.12);
+    --on-warning: #2b1d02;
+
+    /* Danger */
+    --danger: #d94b4b;
+    --danger-strong: #a30404;
+    --danger-soft: rgba(217, 75, 75, 0.12);
+    --on-danger: #ffffff;
+
+    /* Couleurs métier */
+    --category-income: #4f9b70;
+    --category-income-strong: #357b55;
+    --category-income-soft: rgba(79, 155, 112, .13);
+    --category-expense: #c76565;
+    --category-expense-strong: #a84747;
+    --category-expense-soft: rgba(199, 101, 101, .13);
+    --category-refund: #b18445;
+    --category-refund-strong: #8d682f;
+    --category-refund-soft: rgba(177, 132, 69, .13);
+
+    /* Montants */
+    --amount-income: var(--category-income-strong);
+    --amount-expense: var(--category-expense-strong);
+    --amount-refund: #2f7bbf;
+
+    /* Ombres, voiles, reflets */
+    --shadow-sm: 0 2px 8px rgba(23, 33, 28, 0.07);
+    --shadow-md: 0 12px 35px rgba(23, 33, 28, 0.11);
+    --shadow-lg: 20px 0 50px rgba(15, 23, 42, 0.22);
+    --shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.22);
+    --overlay: rgba(0, 0, 0, 0.50);
+    --shine: rgba(255, 255, 255, 0.80);
+    --page-glow: rgba(34, 160, 107, 0.045);
+    --preview-border: rgba(0, 0, 0, 0.16);
+
+    /* Texte posé sur une couleur d’entité */
+    --on-entity: #ffffff;
+    --on-entity-shadow: rgba(0, 0, 0, 0.32);
+}

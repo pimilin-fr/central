@@ -1,0 +1,425 @@
+{% extends 'modern.html.twig' %}
+
+{% block title %}Styleguide{% endblock %}
+
+{#
+    PAGE TEMPORAIRE — catalogue des composants du design system.
+    Tout est rendu avec les classes réelles de l'application et les variables du thème courant :
+    changez de thème (barre du haut) pour voir chaque composant se mettre à jour.
+#}
+{% set breadcrumb_current = 'Styleguide' %}
+
+{% set tokenGroups = {
+    'Fond & surfaces': ['--bg', '--surface', '--surface-soft', '--surface-hover'],
+    'Texte': ['--text', '--text-soft', '--text-muted'],
+    'Bordures': ['--border', '--border-strong'],
+    'Accent': ['--accent', '--accent-soft', '--accent-strong', '--accent-contrast'],
+    'Information': ['--info', '--info-strong', '--info-soft'],
+    'Succès': ['--success', '--success-strong', '--success-soft'],
+    'Alerte': ['--warning', '--warning-strong','--warning-soft'],
+    'Danger': ['--danger', '--danger-strong', '--danger-soft'],
+    'Montants': ['--amount-income', '--amount-expense', '--amount-refund'],
+    'Texte sur couleur pleine': ['--on-entity', '--on-info', '--on-success', '--on-warning', '--on-danger'],
+    'Divers': ['--page-glow', '--overlay', '--shine', '--preview-border', '--on-entity-shadow', '--shadow-lg', '--shadow-hover']
+} %}
+
+{% set sample = [
+    { name: 'Orange', c: '#f97316' }, { name: 'Vert', c: '#22a06b' }, { name: 'Bleu', c: '#3b82f6' },
+    { name: 'Violet', c: '#8b5cf6' }, { name: 'Rose', c: '#ec4899' }, { name: 'Gris', c: '#64748b' }
+] %}
+
+{% block body %}
+    <link rel="stylesheet" href="{{ asset('css/styleguide.css') }}?v=1">
+
+    <div class="page-container">
+
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <p class="page-eyebrow">Page temporaire</p>
+                <h1 class="modern-form-title">Styleguide</h1>
+                <p class="page-subline">Thème courant : <strong data-sg-theme>—</strong> — changez de thème pour comparer.</p>
+            </div>
+        </div>
+
+        <nav class="sg-nav" aria-label="Sections du styleguide">
+            <a href="#tokens">Tokens</a>
+            <a href="#typo">Typographie</a>
+            <a href="#boutons">Boutons</a>
+            <a href="#separateurs">Séparateurs</a>
+            <a href="#pastilles">Pastilles</a>
+            <a href="#cartes">Cartes</a>
+            <a href="#formulaires">Formulaires</a>
+            <a href="#onglets">Onglets</a>
+            <a href="#messages">Messages</a>
+            <a href="#vides">États</a>
+        </nav>
+
+        {# ===================== TOKENS ===================== #}
+        <section class="sg-section" id="tokens">
+            <h2>Variables du thème</h2>
+            <p class="sg-lead">Valeur calculée en direct (mise à jour à chaque changement de thème). Un token vide ou « — » n'est pas défini dans ce thème.</p>
+
+            {% for group, vars in tokenGroups %}
+                <p class="sg-sub">{{ group }}</p>
+                <div class="sg-grid" style="--sg-min: 230px">
+                    {% for v in vars %}
+                        <div class="sg-token">
+                            <span class="sg-swatch" style="--sg-c: var({{ v }})"></span>
+                            <span><b>{{ v }}</b><small data-sg-var="{{ v }}">—</small></span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <p class="sg-sub">Ombres</p>
+            <div class="sg-grid" style="--sg-min: 200px">
+                <div class="sg-cell"><div class="sg-shadow" style="box-shadow: var(--shadow-sm)"></div><span class="sg-caption">--shadow-sm</span></div>
+                <div class="sg-cell"><div class="sg-shadow" style="box-shadow: var(--shadow-md)"></div><span class="sg-caption">--shadow-md</span></div>
+            </div>
+
+            <p class="sg-sub">Couleurs d'entité (--entity-color, posées en style inline par type)</p>
+            <div class="sg-row">
+                {% for s in sample %}
+                    <span class="entity-pill" style="--entity-color: {{ s.c }}"><span class="entity-pill-dot"></span>{{ s.name }}</span>
+                    {% endfor %}
+            </div>
+        </section>
+
+        {# ===================== TYPO ===================== #}
+        <section class="sg-section" id="typo">
+            <h2>Typographie</h2>
+            <p class="sg-lead">Hiérarchie utilisée dans les pages.</p>
+            <div class="sg-type">
+                <p class="page-eyebrow">page-eyebrow — sur-titre</p>
+                <h1 class="modern-form-title">modern-form-title — titre de page</h1>
+                <p class="page-subline">page-subline — ligne de contexte sous le titre</p>
+                <p class="modern-form-kicker">modern-form-kicker</p>
+                <p class="summary-label">summary-label — petit libellé en capitales</p>
+                <p class="kpi-value">kpi-value 1 234,56 €</p>
+                <p><strong>Texte courant</strong> — <span style="color: var(--text-soft)">text-soft</span> — <span style="color: var(--text-muted)">text-muted</span> — <a href="#typo" style="color: var(--accent)">lien accent</a></p>
+            </div>
+        </section>
+
+        {# ===================== BOUTONS ===================== #}
+        <section class="sg-section" id="boutons">
+            <h2>Boutons</h2>
+            <p class="sg-lead">Chaque variante de <code>.page-action</code> (via <code>_btns.html.twig</code>), puis les autres familles de boutons.</p>
+
+            <p class="sg-sub">page-action — variantes (couleur)</p>
+            {% include 'layout/modern/components/_btns.html.twig' with { btns: [
+            { label: 'Primary', path: '#', icon: 'gridicons:add', color: 'primary' },
+            { label: 'Neutral', path: '#', icon: 'lucide:pencil', color: 'neutral' },
+            { label: 'Info', path: '#', icon: 'lucide:info', color: 'info' },
+            { label: 'Danger', path: '#', icon: 'lucide:trash-2', color: 'danger' },
+            { label: 'Success', path: '#', icon: 'lucide:check', color: 'success' },
+            { label: 'Warning', path: '#', icon: 'lucide:triangle-alert', color: 'warning' }
+        ] } %}
+
+            <p class="sg-sub">page-action — sans icône / désactivé / survol forcé</p>
+            <div class="sg-row">
+                <a href="#" class="page-action page-action-primary"><span>Sans icône</span></a>
+                <button type="button" class="page-action page-action-primary" disabled><span>Désactivé</span></button>
+                <button type="button" class="page-action page-action-neutral" disabled><span>Désactivé</span></button>
+                <a href="#" class="btn">.btn</a>
+            </div>
+
+            <p class="sg-sub">entity-action — petits boutons de carte</p>
+            <div class="sg-row">
+                <a href="#" class="entity-action"><twig:ux:icon name="lucide:star-off" /> Défaut</a>
+                <a href="#" class="entity-action is-active"><twig:ux:icon name="lucide:star" /> Actif</a>
+                <a href="#" class="entity-action is-danger"><twig:ux:icon name="lucide:unlink" /> Danger</a>
+            </div>
+
+            <p class="sg-sub">topbar-icon-button</p>
+            <div class="sg-row">
+                <button type="button" class="topbar-icon-button" aria-label="Exemple"><twig:ux:icon name="lucide:bell" /></button>
+                <button type="button" class="topbar-icon-button" aria-label="Exemple"><twig:ux:icon name="lucide:settings" /></button>
+            </div>
+
+            <p class="sg-sub">segmented — choix exclusif</p>
+            <div class="segmented">
+                <span class="segmented-item is-active">Mois</span>
+                <span class="segmented-item">Trimestre</span>
+                <span class="segmented-item">Année</span>
+            </div>
+        </section>
+
+        {# ===================== SEPARATEURS ===================== #}
+        <section class="sg-section" id="separateurs">
+            <h2>Séparateurs</h2>
+            <p class="sg-lead">Point + trait dégradé, piloté par <code>--sep-color</code> (défaut : accent). Survolez pour voir l'effet.</p>
+
+            <div class="sg-grid" style="--sg-min: 260px">
+                <div class="sg-cell"><div class="sep"><span class="sep-dot"></span><span class="sep-line"></span></div><span class="sg-caption">.sep (accent)</span></div>
+                <div class="sg-cell"><div class="sep sep-inset"><span class="sep-dot"></span><span class="sep-line"></span></div><span class="sg-caption">.sep.sep-inset</span></div>
+                            {% for s in sample %}
+                    <div class="sg-cell">
+                        <div class="sep" style="--sep-color: {{ s.c }}"><span class="sep-dot"></span><span class="sep-line"></span></div>
+                        <span class="sg-caption">--sep-color: {{ s.c }}</span>
+                    </div>
+                {% endfor %}
+                <div class="sg-cell"><div class="sep" style="--sep-color: var(--info)"><span class="sep-dot"></span><span class="sep-line"></span></div><span class="sg-caption">var(--info)</span></div>
+                <div class="sg-cell"><div class="sep" style="--sep-color: var(--danger)"><span class="sep-dot"></span><span class="sep-line"></span></div><span class="sg-caption">var(--danger)</span></div>
+            </div>
+
+            <p class="sg-sub">Trait simple (bordure) / pointillé (form-more)</p>
+            <hr style="border: 0; border-top: 1px solid var(--border)">
+            <hr style="border: 0; border-top: 1px dashed var(--border)">
+        </section>
+
+        {# ===================== PASTILLES ===================== #}
+        <section class="sg-section" id="pastilles">
+            <h2>Pastilles, badges, indicateurs</h2>
+
+            <p class="sg-sub">entity-pill</p>
+            <div class="sg-row">
+                {% for s in sample %}<span class="entity-pill" style="--entity-color: {{ s.c }}"><span class="entity-pill-dot"></span>{{ s.name }}</span>{% endfor %}
+            </div>
+
+            <p class="sg-sub">demo-pill (stratégie)</p>
+            <div class="sg-row">
+                <span class="demo-pill" style="--entity-color: var(--info)"><twig:ux:icon name="lucide:copy" /> Copie</span>
+                <span class="demo-pill" style="--entity-color: var(--warning)"><twig:ux:icon name="lucide:venetian-mask" /> Anonymisé</span>
+                <span class="demo-pill" style="--entity-color: var(--danger)"><twig:ux:icon name="lucide:eye-off" /> Exclue</span>
+                <span class="demo-pill" style="--entity-color: var(--text-muted)"><twig:ux:icon name="lucide:circle-help" /> Erreur</span>
+            </div>
+
+            <p class="sg-sub">flag (indicateur on/off)</p>
+            <div class="sg-row">
+                <span class="flag is-on"><twig:ux:icon name="lucide:check-circle-2" /> Actif</span>
+                <span class="flag"><twig:ux:icon name="lucide:circle" /> Inactif</span>
+            </div>
+
+            <p class="sg-sub">tab-badge / montants</p>
+            <div class="sg-row">
+                <span class="tab-badge">12</span>
+                <strong class="amount-income">+ 1 250,00 €</strong>
+                <strong class="amount-expense">- 84,90 €</strong>
+                <strong class="amount-refund">+ 19,00 €</strong>
+            </div>
+
+            <p class="sg-sub">toolbar-info</p>
+            <div class="toolbar-info"><span class="toolbar-dot"></span><span><strong>24</strong> éléments</span></div>
+        </section>
+
+        {# ===================== CARTES ===================== #}
+        <section class="sg-section" id="cartes">
+            <h2>Cartes</h2>
+            <p class="sg-lead">Carte d'entité générique (cercle, liseré, séparateur, lignes, actions) avec plusieurs couleurs d'entité.</p>
+
+            <div class="entity-grid">
+                {% for s in sample|slice(0, 3) %}
+                    <article class="entity-card" style="--entity-color: {{ s.c }}; --entity-text: #fff;">
+                        <a href="#" class="entity-card-link">
+                            <div class="entity-circle"><twig:ux:icon name="lucide:map-pin" /></div>
+                            <div class="entity-ribbon"><span class="entity-ribbon-label">Libellé</span></div>
+                            <div class="entity-body">
+                                <div class="entity-head">
+                                    <h2 class="entity-title">Titre {{ s.name }}</h2>
+                                    <span class="entity-sub">Sous-titre</span>
+                                </div>
+                                <div class="sep sep-inset"><span class="sep-dot"></span><span class="sep-line"></span></div>
+                                <div class="entity-lines">
+                                    <div class="entity-line is-primary">
+                                        <span class="entity-line-icon"><twig:ux:icon name="lucide:star" /></span>
+                                        <span class="entity-line-body">
+                                            <span class="entity-line-label">Statut</span>
+                                            <span class="entity-line-value">Ligne mise en avant</span>
+                                        </span>
+                                    </div>
+                                    <div class="entity-line">
+                                        <span class="entity-line-icon"><twig:ux:icon name="lucide:map" /></span>
+                                        <span class="entity-line-body">
+                                            <span class="entity-line-label">Adresse</span>
+                                            <span class="entity-line-value">12 rue de l'Exemple, 75000 Paris</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="entity-actions">
+                            <a href="#" class="entity-action is-active"><twig:ux:icon name="lucide:star" /> Principale</a>
+                            <a href="#" class="entity-action is-danger"><twig:ux:icon name="lucide:unlink" /> Délier</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <p class="sg-sub">Carte archivée</p>
+            <div class="entity-grid">
+                <article class="entity-card is-archived" style="--entity-color: #64748b; --entity-text: #fff;">
+                    <a href="#" class="entity-card-link">
+                        <div class="entity-circle"><twig:ux:icon name="lucide:archive" /></div>
+                        <div class="entity-ribbon"><span class="entity-ribbon-label">Archivé</span></div>
+                        <div class="entity-body">
+                            <div class="entity-head"><h2 class="entity-title">Entité archivée</h2><span class="entity-sub">is-archived</span></div>
+                        </div>
+                    </a>
+                </article>
+            </div>
+
+            <p class="sg-sub">KPI / panel / card</p>
+            <div class="sg-grid" style="--sg-min: 260px">
+                <div class="panel" style="padding: 16px">
+                    <div class="kpi">
+                        <p class="kpi-label">Solde actuel</p>
+                        <p class="kpi-value amount-income">1 250,00 €</p>
+                        <div class="kpi-lines">
+                            <div class="kpi-line"><span>Dépenses</span><strong class="amount-expense">- 84,90 €</strong></div>
+                            <div class="kpi-line"><span>Remboursements</span><strong class="amount-refund">+ 19,00 €</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="padding: 16px">.card — surface, bordure, ombre du thème</div>
+            </div>
+        </section>
+
+        {# ===================== FORMULAIRES ===================== #}
+        <section class="sg-section" id="formulaires">
+            <h2>Formulaires</h2>
+            <p class="sg-lead">Champs, états, cartes de formulaire numérotées, choix colorés.</p>
+
+            <form class="modern-form" onsubmit="return false">
+                <div class="form-section-grid">
+                    <div class="form-field-card">
+                        <div class="form-field-heading"><span class="form-field-index">01</span><h3>Champs</h3></div>
+                        <div class="form-stack">
+                            <div>
+                                <label class="modern-form-label required">Champ obligatoire</label>
+                                <input class="modern-form-control" placeholder="Texte" required>
+                            </div>
+                            <div>
+                                <label class="modern-form-label">Champ facultatif</label>
+                                <input class="modern-form-control" placeholder="Texte">
+                                <p class="form-hint">Texte d'aide sous le champ.</p>
+                            </div>
+                            <div>
+                                <label class="modern-form-label">Désactivé</label>
+                                <input class="modern-form-control" value="Valeur" disabled>
+                            </div>
+                            <div>
+                                <label class="modern-form-label">Liste déroulante</label>
+                                <select class="modern-form-control"><option>Option A</option><option>Option B</option></select>
+                            </div>
+                            <div>
+                                <label class="modern-form-label">Zone de texte</label>
+                                <textarea class="modern-form-control" rows="3" placeholder="Texte long"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-field-card">
+                        <div class="form-field-heading"><span class="form-field-index">02</span><h3>Choix</h3></div>
+                        <div class="form-stack">
+                            <div>
+                                <label class="modern-form-label">entity-select (couleur de l'option)</label>
+                                <select class="modern-form-control" data-entity-select>
+                                    <option value="">— Choisir —</option>
+                                    {% for s in sample %}<option value="{{ loop.index }}" data-color="{{ s.c }}" data-text-color="#fff">{{ s.name }}</option>{% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="modern-form-label">choice-card</label>
+                                <div class="choice-list">
+                                    <label class="choice-card"><input type="radio" name="sg-a" checked><span>Choix simple</span></label>
+                                    <label class="choice-card"><input type="radio" name="sg-a"><span>Autre choix</span></label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="modern-form-label">choice-card colorée</label>
+                                <div class="choice-list">
+                                    {% for s in sample|slice(0, 3) %}
+                                        <label class="choice-card is-colored" style="--entity-color: {{ s.c }}; --entity-text: #fff;">
+                                            <input type="radio" name="sg-b" {{ loop.first ? 'checked' : '' }}><span class="choice-dot" aria-hidden="true"></span><span>{{ s.name }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div>
+                                <label class="inline-check"><input type="checkbox" checked> Case à cocher (inline-check)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-field-card form-field-card-wide">
+                        <div class="form-field-heading"><span class="form-field-index">03</span><h3>Champs sur une ligne (form-row)</h3></div>
+                        <div class="form-row" style="--cols: 110px 90px 100px 160px">
+                            <div><label class="modern-form-label">Préfixe</label><input class="modern-form-control"></div>
+                            <div><label class="modern-form-label">Num</label><input class="modern-form-control"></div>
+                            <div><label class="modern-form-label">Bis/Ter</label><input class="modern-form-control"></div>
+                            <div><label class="modern-form-label">Type voie</label><input class="modern-form-control"></div>
+                        </div>
+                        <details class="form-more"><summary>form-more — section repliable</summary>
+                            <div class="form-row" style="--cols: 1fr"><div><label class="modern-form-label">Champ</label><input class="modern-form-control"></div></div>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="modern-form-footer">
+                    <span class="modern-form-footer-copy"><span class="required-legend">Champ obligatoire</span></span>
+                    {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [
+                    { label: 'Enregistrer', type: 'submit', icon: 'mdi:content-save-outline', color: 'primary' }
+                ] } %}
+                </div>
+            </form>
+
+            <p class="sg-sub">Frise verticale (form-timeline)</p>
+            <div class="form-timeline">
+                <div class="form-field-card"><div class="form-field-heading"><span class="form-field-index">01</span><h3>Étape</h3></div><p class="form-hint">Contenu de l'étape.</p></div>
+                <div class="form-field-card"><div class="form-field-heading"><span class="form-field-index">02</span><h3>Étape suivante</h3></div><p class="form-hint">Contenu de l'étape.</p></div>
+            </div>
+        </section>
+
+        {# ===================== ONGLETS ===================== #}
+        <section class="sg-section" id="onglets">
+            <h2>Onglets</h2>
+            {% include 'layout/modern/components/_tabs.html.twig' with {
+            activeTab: 'a',
+            tabs: [
+                { id: 'sg-a', label: 'Résumé', icon: 'lucide:layout-dashboard', badge: 3, content: '<p style="padding:14px">Contenu de l’onglet « Résumé ».</p>' },
+                { id: 'sg-b', label: 'Opérations', icon: 'lucide:receipt', badge: 12, content: '<p style="padding:14px">Contenu de l’onglet « Opérations ».</p>' },
+                { id: 'sg-c', label: 'Sans badge', content: '<p style="padding:14px">Troisième onglet.</p>' }
+            ]
+        } %}
+        </section>
+
+        {# ===================== MESSAGES ===================== #}
+        <section class="sg-section" id="messages">
+            <h2>Messages (toasts)</h2>
+            <div class="sg-stage">
+                <div class="sg-grid" style="--sg-min: 320px">
+                    <div class="flash-message flash-success"><div class="flash-icon"><twig:ux:icon name="lucide:check-circle-2" /></div><div class="flash-content"><span class="flash-label">Succès</span><span class="flash-text">Enregistrement effectué.</span></div></div>
+                    <div class="flash-message flash-info"><div class="flash-icon"><twig:ux:icon name="lucide:info" /></div><div class="flash-content"><span class="flash-label">Information</span><span class="flash-text">Message d'information.</span></div></div>
+                    <div class="flash-message flash-warning"><div class="flash-icon"><twig:ux:icon name="lucide:triangle-alert" /></div><div class="flash-content"><span class="flash-label">Attention</span><span class="flash-text">Vérifiez ce point.</span></div></div>
+                    <div class="flash-message flash-error"><div class="flash-icon"><twig:ux:icon name="lucide:circle-x" /></div><div class="flash-content"><span class="flash-label">Erreur</span><span class="flash-text">Une erreur est survenue.</span></div></div>
+                </div>
+            </div>
+        </section>
+
+        {# ===================== ETATS ===================== #}
+        <section class="sg-section" id="vides">
+            <h2>États vides</h2>
+            <div class="empty-state">
+                <div class="empty-state-icon"><twig:ux:icon name="lucide:map-pin-off" /></div>
+                <div><h2>Aucun élément</h2><p>Texte d'explication de l'état vide.</p></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        (function () {
+            const paint = () => {
+                const cs = getComputedStyle(document.documentElement);
+                document.querySelectorAll('[data-sg-var]').forEach(el => {
+                    el.textContent = cs.getPropertyValue(el.dataset.sgVar).trim() || '— (non défini)';
+                });
+                const t = document.querySelector('[data-sg-theme]');
+                if (t) {
+                    t.textContent = document.documentElement.dataset.theme || 'light-orange';
+                }
+            };
+            paint();
+            new MutationObserver(paint).observe(document.documentElement, {attributes: true});
+        })();
+    </script>
+{% endblock %}

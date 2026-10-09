@@ -1,0 +1,729 @@
+/* =========================================================
+   FORMS — TIERS / BRIQUES LÉGÈRES
+   ========================================================= */
+
+.modern-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.modern-form-intro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 2px 2px;
+}
+
+.modern-form-kicker {
+    color: var(--accent-strong);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .15em;
+}
+
+.modern-form-title {
+    margin: 3px 0 0;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 850;
+    letter-spacing: -.02em;
+}
+
+.modern-form-step {
+    color: var(--text-muted);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .1em;
+}
+
+.form-section-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.form-field-card {
+    position: relative;
+    min-width: 0;
+    padding: 14px 15px 15px;
+    background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft));
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    box-shadow: none;
+    transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.form-field-card::before {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: -1px;
+    width: 2px;
+    content: "";
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+    opacity: .55;
+}
+
+.form-field-card:hover {
+    background: var(--surface);
+    border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
+}
+
+.form-field-card-wide {
+    grid-column: 1 / -1;
+}
+
+.form-field-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 12px;
+}
+
+.form-field-index {
+    display: grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    flex: 0 0 25px;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+    border-radius: 7px;
+    font-size: 8px;
+    font-weight: 900;
+}
+
+.form-field-heading h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.modern-form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-muted);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .03em;
+}
+
+.modern-form-control {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    color: var(--text);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.modern-form-control:hover {
+    background: var(--surface-hover);
+}
+
+.modern-form-control:focus {
+    background: var(--surface);
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.modern-form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.modern-form .form-error-message,
+.modern-form .invalid-feedback {
+    display: block;
+    margin-top: 5px;
+    color: var(--danger);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.modern-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding-top: 2px;
+}
+
+.modern-form-footer-copy {
+    color: var(--text-muted);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+@media (max-width: 760px) {
+    .form-section-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .form-field-card-wide {
+        grid-column: auto;
+    }
+
+    .modern-form-footer,
+    .modern-form-intro {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+
+/* =========================================================
+   FORMS — VARIANTES (opération, adresse)
+   ========================================================= */
+
+.form-section-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.choice-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    color: var(--text-soft);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.choice-card:hover {
+    background: var(--surface-hover);
+}
+
+.choice-card input {
+    accent-color: var(--accent);
+}
+
+.choice-card:has(input:checked) {
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+/* Formulaire en ligne (ajout d'adresse) */
+.inline-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding: 12px 14px;
+    background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.inline-form-field {
+    display: flex;
+    align-items: center;
+    flex: 1 1 280px;
+    gap: 10px;
+    min-width: 0;
+}
+
+.inline-form-field .modern-form-label {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.inline-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.inline-check input {
+    accent-color: var(--accent);
+}
+
+@media (max-width: 900px) {
+    .form-section-grid-3 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+input[type="color"].modern-form-control {
+    padding: 4px;
+    cursor: pointer;
+}
+
+
+/* Grilles internes aux cartes de formulaire */
+
+.form-grid-3,
+.form-grid-4,
+.form-grid-5 {
+    display: grid;
+    gap: 12px;
+}
+
+.form-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.form-grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.form-grid-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.form-span-2 {
+    grid-column: span 2;
+}
+
+.form-span-3 {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+    .form-grid-3,
+    .form-grid-4,
+    .form-grid-5 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .form-grid-3,
+    .form-grid-4,
+    .form-grid-5 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .form-span-2 {
+        grid-column: auto;
+    }
+}
+
+
+/* =========================================================
+   CHAMPS REQUIS — astérisque aux couleurs de l'accent du thème
+   Symfony ajoute la classe "required" sur les <label> des champs
+   obligatoires (form_label) : aucune modification des templates.
+   .is-required : équivalent manuel pour les labels écrits en HTML.
+   ========================================================= */
+
+label.required::after,
+.is-required::after,
+.modern-form-label:has(~ [required])::after,
+.modern-form-label:has(~ * [required])::after {
+    margin-left: 3px;
+    content: "*";
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+    vertical-align: -1px;
+}
+
+/* Légende « * Champ obligatoire » (pied de formulaire) */
+.required-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 6px;
+}
+
+.required-legend::before {
+    content: "*";
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   ENTITY SELECT — <select data-entity-select> (liseré + pastille)
+   Couleur lue depuis data-color des <option> par app.js → --entity-color
+   ========================================================= */
+
+.entity-select {
+    position: relative;
+    display: block;
+}
+
+.entity-select-dot {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    z-index: 1;
+    width: 10px;
+    height: 10px;
+    background: var(--border-strong);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-strong) 25%, transparent);
+    pointer-events: none;
+    transform: translateY(-50%);
+    transition: background 150ms ease, box-shadow 150ms ease;
+}
+
+.entity-select select {
+    padding-left: 34px;
+    border-left-width: 4px;
+}
+
+.entity-select.has-value .entity-select-dot {
+    background: var(--entity-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--entity-color) 22%, transparent);
+}
+
+.entity-select.has-value select {
+    border-left-color: var(--entity-color);
+}
+
+
+/* =========================================================
+   COORDONNÉES — champ + état de validation
+   ========================================================= */
+
+.coords-field {
+    position: relative;
+}
+
+.coords-field .modern-form-control {
+    font-variant-numeric: tabular-nums;
+}
+
+.coords-field.is-valid .modern-form-control {
+    border-color: color-mix(in srgb, var(--success) 60%, var(--border));
+}
+
+.coords-field.is-invalid .modern-form-control {
+    border-color: color-mix(in srgb, var(--danger) 60%, var(--border));
+}
+
+.form-hint {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.coords-field.is-valid .form-hint { color: var(--success); }
+.coords-field.is-invalid .form-hint { color: var(--danger); }
+
+
+/* =========================================================
+   FORM LAYOUT — frise verticale + aperçu en direct
+   .form-layout > .form-timeline (cartes numérotées reliées)
+                + .form-layout-aside (aperçu collant)
+   ========================================================= */
+
+.form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 18px;
+    align-items: start;
+}
+
+.form-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-timeline::before {
+    position: absolute;
+    top: 28px;
+    bottom: 28px;
+    left: 27px;
+    width: 2px;
+    content: "";
+    background: linear-gradient(180deg, var(--accent), var(--border));
+    border-radius: 2px;
+    opacity: .6;
+}
+
+.form-timeline .form-field-card::before {
+    display: none;
+}
+
+.form-layout-aside {
+    position: sticky;
+    top: 84px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-aside-title {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+    .form-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .form-layout-aside {
+        position: static;
+        order: -1;
+    }
+}
+
+
+/* =========================================================
+   FORM ROW — champs sur une même ligne, largeurs explicites
+   <div class="form-row" style="--cols: 90px 90px 1fr">
+   ========================================================= */
+
+.form-row {
+    display: grid;
+    grid-template-columns: var(--cols, repeat(auto-fit, minmax(150px, 1fr)));
+    gap: 10px;
+    align-items: end;
+}
+
+.form-row + .form-row,
+.form-row + .form-more,
+.form-more + .form-row {
+    margin-top: 12px;
+}
+
+@media (max-width: 760px) {
+    .form-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-row > :last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Compléments repliables */
+.form-more {
+    border-top: 1px dashed var(--border);
+    padding-top: 10px;
+}
+
+.form-more > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.form-more > summary::-webkit-details-marker {
+    display: none;
+}
+
+.form-more > summary::before {
+    content: "+";
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.form-more[open] > summary::before {
+    content: "−";
+}
+
+.form-more > summary:hover {
+    color: var(--text);
+}
+
+.form-more > .form-row {
+    margin-top: 10px;
+}
+
+/* Petit bouton d'action dans un champ */
+.form-inline-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.form-inline-btn:hover {
+    border-color: var(--accent);
+}
+
+.form-inline-btn svg {
+    width: 13px;
+    height: 13px;
+}
+
+.form-label-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.form-label-line .modern-form-label {
+    margin: 0;
+}
+
+/* Champs plus légers dans les cartes de frise */
+.form-timeline .modern-form-control {
+    min-height: 38px;
+    background: transparent;
+    border-color: transparent;
+    border-bottom-color: var(--border-strong);
+    border-radius: 6px 6px 0 0;
+}
+
+.form-timeline .modern-form-control:hover {
+    background: var(--surface-soft);
+}
+
+.form-timeline .modern-form-control:focus {
+    background: var(--surface);
+    border-color: transparent;
+    border-bottom-color: var(--accent);
+    box-shadow: 0 2px 0 0 var(--accent);
+}
+
+.form-timeline textarea.modern-form-control {
+    border-color: var(--border);
+    border-radius: 9px;
+}
+
+
+
+/* Aperçu : la carte réelle, non cliquable */
+.form-preview .entity-card-link,
+.form-preview a {
+    pointer-events: none;
+}
+
+.form-preview .entity-card {
+    max-width: 360px;
+}
+
+/* Choix en grille (portefeuilles d'une opération…) */
+.choice-list.is-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    flex-direction: unset;
+}
+
+.form-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+
+/* =========================================================
+   OPÉRATION — 2 colonnes : [1 | 2] + note  /  portefeuille
+   ========================================================= */
+
+.op-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.op-main {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+}
+
+.op-main-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 12px;
+}
+
+@media (max-width: 1100px) {
+    .op-layout,
+    .op-main-top {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Choix colorés (--entity-color posé par le template depuis data-color) */
+.choice-card.is-colored {
+    border-left: 4px solid var(--entity-color, var(--border-strong));
+}
+
+.choice-card.is-colored .choice-dot {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 10px;
+    background: var(--entity-color, var(--border-strong));
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--entity-color, var(--border-strong)) 22%, transparent);
+}
+
+.choice-card.is-colored:has(input:checked) {
+    color: var(--text);
+    background: color-mix(in srgb, var(--entity-color) 14%, var(--surface));
+    border-color: var(--entity-color);
+}
+
+
+/* =========================================================
+   FORM — variantes de mise en page
+   ========================================================= */
+
+.form-layout.is-single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.form-row.is-start {
+    justify-content: start;
+}

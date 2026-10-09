@@ -1,0 +1,16 @@
+{# Grille de cartes adresse. Paramètre : adresses #}
+{% if adresses|length > 0 %}
+    <div class="entity-grid">
+        {% for adresse in adresses %}
+            {% include 'adresse/card/_card.html.twig' with { adresse: adresse } only %}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon"><twig:ux:icon name="lucide:git-branch" /></div>
+        <div>
+            <h2>Aucune adresse</h2>
+            <p>Il n'y a aucune adresse à afficher ici.</p>
+        </div>
+    </div>
+{% endif %}
