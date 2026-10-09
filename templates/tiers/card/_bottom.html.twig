@@ -20,7 +20,7 @@
     {% for tierAddress in shown %}
         {% set city = tierAddress.adresse.villeCourte ?? tierAddress.adresse.ville ?? 'Ville inconnue' %}
         <div class="entity-line{{ tierAddress.isPrincipale ? ' is-primary' : '' }}" title="{{ tierAddress.isPrincipale ? 'Adresse principale' : 'Adresse' }} : {{ city }}">
-            <span class="entity-line-icon"><twig:ux:icon name="{{ tierAddress.isPrincipale ? 'lucide:star' : 'lucide:map-pin' }}" /></span>
+            <span class="entity-line-icon"><twig:ux:icon name="{{ tierAddress.isPrincipale ? 'material-symbols:star-rounded' : 'lucide:map-pin' }}" /></span>
             <span class="entity-line-body">
                 <span class="entity-line-label">{{ tierAddress.isPrincipale ? 'Principale' : 'Adresse' }}</span>
                 <span class="entity-line-value">{{ city }}</span>
