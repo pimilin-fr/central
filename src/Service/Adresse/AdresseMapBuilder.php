@@ -36,9 +36,14 @@ class AdresseMapBuilder {
             return $map;
         } foreach ($children as $zone) {
             $points = $this->collectRuePoints($zone);
+            // Adresse de la zone elle-même : affichée dans la zone quand celle-ci n'a qu'un point
+            $anchor = $this->buildPoint($zone);
             $map['zones'][] = [
                 'id' => $zone->getId(),
                 'name' => $zone->getName(),
+                'latitude' => $anchor['latitude'],
+                'longitude' => $anchor['longitude'],
+                'url' => $anchor['url'],
                 'points' => $points,
             ];
         } return $map;

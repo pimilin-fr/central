@@ -13,17 +13,15 @@ const CentralMaps = {
 
     config: {
         debug: true,
-        version: 'v1.4.0',
+        version: 'v1.4.6',
         appName: 'Central-ModuleMap',
 
         marker: {
             radius: 10,
-            currentRadiusBonus: 4,
             borderWeight: 2,
             currentBorderWeight: 3,
             fillOpacity: 0.8,
             get borderColor() { return CentralMaps.themeColor('--surface'); },
-            get currentBorderColor() { return CentralMaps.themeColor('--text'); },
             colors: {
                 get default() { return CentralMaps.themeColor('--accent'); },
                 get current() { return CentralMaps.themeColor('--accent'); },
@@ -41,11 +39,11 @@ const CentralMaps = {
             marginMeters: 100,
             // Zones de 1 ou 2 points : demi-largeur du rectangle (1 point = carré de 2 × cette valeur).
             minHalfMeters: 150,
+            // Adresse de la zone elle-même (data-latitude/longitude sur [data-map-zone]) :
+            // 'single' = ajoutée aux zones n'ayant qu'un point, 'always' = à toutes, 'never' = jamais.
+            includeAnchor: 'single',
             // Angle des pointes au-delà duquel un coin est biseauté (limite de "mitre").
             miterLimit: 2,
-            // Point central non rattaché explicitement : rattaché à la zone la plus proche
-            // si elle est à moins de cette distance (sinon marqueur isolé).
-            attachMaxMeters: 5000,
             // Un point central à moins de cette distance d'un point de la zone est le même point.
             sameSpotMeters: 5
         },
@@ -222,13 +220,16 @@ const CentralMaps = {
     // Marqueurs
     // ------------------------------------------------------------------
 
+    // Point central (adresse affichée) : même taille que les autres, mais cerclé
+    // d'une teinte plus marquée de la couleur de sa zone (plus sombre en thème clair,
+    // plus claire en thème sombre) et plein.
     markerStyle(color, central = false) {
         const config = this.config.marker;
 
         if (central) {
             return {
-                radius: config.radius + config.currentRadiusBonus,
-                color: config.currentBorderColor,
+                radius: config.radius,
+                color: this.shiftLightness(color, this.isDarkTheme() ? 0.22 : -0.22),
                 weight: config.currentBorderWeight,
                 fillColor: color,
                 fillOpacity: 1
@@ -244,13 +245,18 @@ const CentralMaps = {
         };
     },
 
+    shiftLightness(color, delta) {
+        const lab = this.rgbToOklab(this.parseColor(color));
+        const chroma = Math.hypot(lab.a, lab.b);
+        const hue = (Math.atan2(lab.b, lab.a) * 180 / Math.PI + 360) % 360;
+
+        return this.oklchToHex(Math.min(0.97, Math.max(0.15, lab.L + delta)), chroma, hue);
+    },
+
     createMarker(latitude, longitude, options = {}) {
         return L.circleMarker(
                 [latitude, longitude],
-                this.markerStyle(
-                        options.color ?? this.config.marker.colors.default,
-                        options.central === true
-                        )
+                this.markerStyle(options.color ?? this.config.marker.colors.default, options.central === true)
                 );
     },
 
@@ -357,14 +363,14 @@ const CentralMaps = {
     },
 
     /**
-     * Rattache le point central à sa zone. Ordre :
-     *  1. le point est DANS un élément [data-map-zone] ;
-     *  2. il porte data-zone-name = nom d'une zone ;
-     *  3. il tombe dans la forme d'une zone ;
-     *  4. sinon la zone la plus proche (config.zone.attachMaxMeters).
-     * Retourne l'index de la zone, ou -1.
+     * Zone à laquelle appartient le point central, ou -1.
+     *  - un seul enfant (une seule zone) : le point central en fait partie ;
+     *  - plusieurs zones : il n'appartient à aucune (ex. « Europe » face à France,
+     *    Allemagne, Suisse…), sauf rattachement explicite :
+     *      · [data-map-current] placé DANS un [data-map-zone],
+     *      · ou data-zone-name égal au nom d'une zone.
      */
-    findCurrentZone(currentElement, current, zones) {
+    findCurrentZone(currentElement, zones) {
         if (zones.length === 0) {
             return -1;
         }
@@ -386,31 +392,7 @@ const CentralMaps = {
             }
         }
 
-        const target = [current.latitude, current.longitude];
-
-        for (let i = 0; i < zones.length; i++) {
-            const ring = this.buildZoneShape(zones[i].points.map((p) => [p.latitude, p.longitude]));
-
-            if (ring && this.isPointInPolygon(target, ring.map(([lat, lng]) => ({lat, lng})))) {
-                return i;
-            }
-        }
-
-        let best = -1;
-        let bestDistance = Infinity;
-
-        zones.forEach((zone, i) => {
-            zone.points.forEach((p) => {
-                const distance = this.distanceMeters(target, [p.latitude, p.longitude]);
-
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    best = i;
-                }
-            });
-        });
-
-        return bestDistance <= this.config.zone.attachMaxMeters ? best : -1;
+        return zones.length === 1 ? 0 : -1;
     },
 
     // Garde-fou : quoi qu'il arrive dans le calcul des zones/couleurs, la carte
@@ -461,6 +443,23 @@ const CentralMaps = {
                 return;
             }
 
+            // L'adresse de la zone est ajoutée dans la zone (évite les "ronds seuls")
+            const anchor = this.readPoint(zoneElement);
+            const mode = this.config.zone.includeAnchor;
+
+            if (anchor && (mode === 'always' || (mode === 'single' && points.length === 1))) {
+                const spot = [anchor.latitude, anchor.longitude];
+                const duplicate = points.some((p) => this.distanceMeters(
+                                    spot, [p.latitude, p.longitude]
+                                    ) <= this.config.zone.sameSpotMeters);
+
+                if (!duplicate) {
+                    anchor.name = anchor.name || name;
+                    anchor.isAnchor = true;
+                    points.unshift(anchor);
+                }
+            }
+
             zones.push({element: zoneElement, name, points, central: null});
         });
 
@@ -470,7 +469,7 @@ const CentralMaps = {
         let loose = null; // point central sans zone
 
         if (current) {
-            const zoneIndex = this.findCurrentZone(currentElement, current, zones);
+            const zoneIndex = this.findCurrentZone(currentElement, zones);
 
             if (zoneIndex >= 0) {
                 const zone = zones[zoneIndex];
@@ -498,12 +497,15 @@ const CentralMaps = {
         const layers = [];
 
         // Couleurs dès la création (on ne restyle qu'après chargement de la carte)
-        const colors = this.buildPalette(zones.length);
+        // Point central isolé (plusieurs zones) : il prend la 1re couleur (l'accent),
+        // les zones prennent les suivantes, pour qu'aucune ne lui ressemble.
+        const offset = loose ? 1 : 0;
+        const colors = this.buildPalette(zones.length + offset);
         const zoneFillOpacity = this.zoneFillOpacity();
 
         // Zones d'abord (elles passent ainsi sous les marqueurs), puis les marqueurs
         zones.forEach((zone, index) => {
-            zone.color = colors[index];
+            zone.color = colors[index + offset];
             zone.layer = this.createZonePolygon(
                     zone.points.map((p) => [p.latitude, p.longitude]),
                     zone.color,
@@ -522,7 +524,7 @@ const CentralMaps = {
                 const isCentral = zone.central === point;
                 const marker = this.createMarker(point.latitude, point.longitude, {color: zone.color, central: isCentral});
 
-                marker.bindPopup(this.createPointPopup(point.name, point.url, zone.name));
+                marker.bindPopup(this.createPointPopup(point.name, point.url, point.isAnchor ? '' : zone.name));
                 marker.addTo(map);
                 markers.push(marker);
 
@@ -533,7 +535,7 @@ const CentralMaps = {
         let looseMarker = null;
 
         if (loose) {
-            looseMarker = this.createMarker(loose.latitude, loose.longitude, {color: this.config.marker.colors.current, central: true});
+            looseMarker = this.createMarker(loose.latitude, loose.longitude, {color: colors[0], central: true});
             looseMarker.bindPopup(this.createPointPopup(loose.name, loose.url));
             looseMarker.addTo(map);
             markers.push(looseMarker);
@@ -541,11 +543,11 @@ const CentralMaps = {
 
         // 4. Couleurs (calculées depuis le thème, réappliquées à chaque changement de thème)
         const restyle = () => {
-            const palette = this.buildPalette(zones.length);
+            const palette = this.buildPalette(zones.length + offset);
             const fillOpacity = this.zoneFillOpacity();
 
             zones.forEach((zone, index) => {
-                const color = palette[index];
+                const color = palette[index + offset];
 
                 if (zone.layer) {
                     zone.layer.setStyle({
@@ -562,7 +564,7 @@ const CentralMaps = {
             });
 
             if (looseMarker) {
-                looseMarker.setStyle(this.markerStyle(this.config.marker.colors.current, true));
+                looseMarker.setStyle(this.markerStyle(palette[0], true));
             }
         };
 

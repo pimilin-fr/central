@@ -125,7 +125,10 @@
                         {% for zone in adresseMap.zones %}
                             <div data-map-zone
                                  data-zone="{{ zone.id }}"
-                                 data-zone-name="{{ zone.name }}">
+                                 data-zone-name="{{ zone.name }}"
+                                 data-url="{{ zone.url ?? '' }}"
+                                 data-latitude="{{ zone.latitude ?? '' }}"
+                                 data-longitude="{{ zone.longitude ?? '' }}">
                                 {% for point in zone.points %}
                                     <span data-map-point
                                           data-id="{{ point.id }}"
