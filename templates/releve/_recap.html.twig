@@ -1,5 +1,5 @@
 {# Repères du relevé : relevé précédent (mouvement) et solde cumulé avant. Paramètres : previous (résumé ou null), cumulBefore #}
-<section class="rc-recap" aria-label="Relevé précédent">
+<div class="rc-recap{{ inline|default(false) ? ' is-inline' : '' }}" aria-label="Relevé précédent">
     {% if previous %}
         <div class="rc-recap-item">
             <span class="rc-recap-label">Relevé précédent</span>
@@ -19,4 +19,4 @@
     {% else %}
         <div class="rc-recap-item"><span class="rc-recap-label">Relevé précédent</span><strong>Aucun : premier relevé de ce portefeuille</strong></div>
     {% endif %}
-</section>
+</div>

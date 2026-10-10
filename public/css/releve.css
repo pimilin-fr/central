@@ -310,3 +310,79 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 .rc-linkbtn:hover { text-decoration: underline; }
 .rc-linkbtn[aria-pressed="true"] { color: var(--text); text-decoration: underline; }
 .is-hide-done > .rc-line.is-done { display: none; }
+
+/* =========================================================
+   MISE EN PAGE « LIGNES D'ABORD » : le relevé est l'élément principal,
+   la page défile (pas d'ascenseur interne), « À pointer » reste en vue à côté,
+   soldes et boutons dans une barre fixe en bas.
+   ========================================================= */
+.rc-page .page-heading { margin-block-end: 8px; }
+.rc-page .page-title { font-size: 22px; }
+.rc { gap: 10px; }
+
+/* bandeau du haut : une seule ligne de repères */
+.rc-top { display: flex; flex-wrap: wrap; align-items: end; gap: 8px 20px; padding: 10px 14px; }
+.rc-top .rc-field { inline-size: 11rem; }
+.rc-top .rc-drafts { flex-basis: 100%; margin: 0; }
+.rc-recap.is-inline { flex: 1 1 auto; margin: 0; padding: 0; background: none; border: 0; box-shadow: none; align-items: end; }
+.rc-helpbox { margin-inline-start: auto; align-self: start; font-size: 12px; }
+.rc-helpbox > summary { cursor: pointer; color: var(--accent); font-weight: 750; }
+.rc-helpbox[open] { flex-basis: 100%; margin-inline-start: 0; }
+
+/* colonnes : relevé large, « À pointer » étroit et fixe */
+.rc-columns { grid-template-columns: minmax(0, 1fr) minmax(17rem, 25rem); gap: 12px; }
+.rc-pool-panel { position: sticky; top: 8px; max-block-size: calc(100vh - 84px); padding: 10px; gap: 8px; }
+.rc-pool-panel .rc-list.is-pool { max-block-size: none; overflow: auto; min-block-size: 0; }
+.rc-pool-panel { grid-template-rows: auto auto auto minmax(0, 1fr); }
+.rc-pool-actions .page-action { padding-inline: 8px; font-size: 11.5px; }
+@media (max-width: 960px) {
+    .rc-columns { grid-template-columns: minmax(0, 1fr); }
+    .rc-pool-panel { position: static; max-block-size: none; }
+    .rc-pool-panel .rc-list.is-pool { max-block-size: 50vh; }
+}
+
+/* le relevé : pas de défilement interne ; l'en-tête reste collé en haut */
+.rc-list.is-selected { max-block-size: none; overflow: visible; gap: 2px; }
+.rc-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    margin: -14px -14px 4px;
+    padding: 8px 14px;
+    background: var(--surface);
+    border-block-end: 1px solid var(--border);
+    border-radius: 14px 14px 0 0;
+    gap: 6px 16px;
+}
+.rc-sticky .rc-progress { flex: 1 1 20rem; flex-wrap: nowrap; white-space: nowrap; }
+.rc-sticky .rc-msg { flex-basis: 100%; margin: 0; }
+
+/* lignes compactes : tiers et catégories sur la même ligne */
+.rc-line-head { padding: 3px 8px; }
+.rc-op { padding: 4px 8px; }
+.rc-main { display: flex; align-items: baseline; gap: 8px; min-inline-size: 0; }
+.rc-main strong { flex: 0 1 auto; max-inline-size: 65%; }
+.rc-main small { flex: 1 1 0; min-inline-size: 0; }
+.rc-btn { inline-size: 22px; block-size: 22px; }
+.rc-done { inline-size: 20px; block-size: 20px; font-size: 11px; }
+.rc-parts { padding-block-end: 4px; }
+.rc-parts .rc-op { padding-block: 2px; }
+
+/* barre fixe : soldes + actions */
+.rc-actions {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 6;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+}
+.rc-sums { display: flex; flex-wrap: wrap; gap: 4px 22px; color: var(--text-soft); font-size: 12px; }
+.rc-sums strong { margin-inline-start: 6px; color: var(--text); font-size: 15px; font-variant-numeric: tabular-nums; }
+.rc-sums strong.amount-expense { color: var(--danger); }
+.rc-sums strong.amount-income { color: var(--success); }
+.rc-actions-buttons { display: inline-flex; gap: 8px; }

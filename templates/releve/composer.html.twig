@@ -15,7 +15,7 @@
 {% block title %}Relevé — {{ portefeuille.libelle }}{% endblock %}
 
 {% block body %}
-    <div class="page-container">
+    <div class="page-container rc-page">
         <div class="page-heading">
             <div class="page-heading-copy">
                 <h1 class="page-title">Faire le relevé</h1>
@@ -49,9 +49,8 @@
             </p>
         {% endif %}
 
-        {% include 'releve/_recap.html.twig' with { previous: previous, cumulBefore: cumulBefore } only %}
-
         {% if closed %}
+            {% include 'releve/_recap.html.twig' with { previous: previous, cumulBefore: cumulBefore } only %}
             {# ---------- RELEVÉ FINALISÉ : lecture seule, tel le relevé de compte ---------- #}
             <section class="rc-panel">
                 <header class="rc-panel-head">
@@ -107,37 +106,67 @@
                 <input type="hidden" name="_token" value="{{ csrf_token(token) }}">
                 <input type="hidden" name="releve" value="{{ releve.id }}">
 
-                <section class="rc-panel rc-meta">
+                {# Bandeau compact : date, solde avant, relevé précédent, autres brouillons, aide #}
+                <section class="rc-panel rc-top">
                     <label class="rc-field">
                         <span class="modern-form-label">Date du relevé</span>
                         <input type="date" name="date" class="modern-form-control" required value="{{ releve.date|date('Y-m-d') }}">
                     </label>
                     <label class="rc-field">
-                        <span class="modern-form-label">Solde avant ce relevé <small>({{ previous ? 'calculé, modifiable' : 'à saisir si besoin' }})</small></span>
+                        <span class="modern-form-label">Solde avant <small>({{ previous ? 'calculé, modifiable' : 'à saisir si besoin' }})</small></span>
                         <input type="number" step="0.01" class="modern-form-control" data-rc-start placeholder="{{ cumulBefore|number_format(2, '.', '') }}" inputmode="decimal">
                     </label>
+                    {% include 'releve/_recap.html.twig' with { previous: previous, cumulBefore: cumulBefore, inline: true } only %}
+                    {% if drafts|length > (isNew ? 0 : 1) %}
+                        <p class="rc-drafts">
+                            Autres relevés en cours :
+                            {% for draft in drafts %}
+                                {% if draft.id != releve.id %}
+                                    <a href="{{ path('app_releve_compose', { id: portefeuille.id, releve: draft.id }) }}">{{ draft.date|date('d/m/Y') }}</a>{{ not loop.last ? ' · ' : '' }}
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                    <details class="rc-helpbox">
+                        <summary>Aide</summary>
+                        <p class="rc-help">Cliquez sur ＋ dans l'ordre d'apparition sur le relevé de compte, ou glissez-déposez. <strong>⤓</strong> place les prochaines lignes après une ligne donnée. Une commande éclatée en plusieurs catégories se pointe en <strong>un seul détail</strong> : cochez ses opérations (même date, tiers libres) puis « Ajouter en un détail ».<br><strong>✓</strong> = ligne vérifiée sur votre relevé de compte : automatique quand vous ajoutez ou déplacez une ligne (pas quand vous regroupez) ; en cliquant ✓ à la main, les lignes au-dessus sont pointées aussi. Ce suivi n'est pas enregistré en base : il est gardé dans ce navigateur.</p>
+                    </details>
                 </section>
 
-                {% if drafts|length > (isNew ? 0 : 1) %}
-                    <p class="rc-drafts">
-                        Autres relevés en cours :
-                        {% for draft in drafts %}
-                            {% if draft.id != releve.id %}
-                                <a href="{{ path('app_releve_compose', { id: portefeuille.id, releve: draft.id }) }}">{{ draft.date|date('d/m/Y') }}</a>{{ not loop.last ? ' · ' : '' }}
-                            {% endif %}
-                        {% endfor %}
-                    </p>
-                {% endif %}
-
                 <div class="rc-columns">
-                    {# ---- À POINTER ---- #}
-                    <section class="rc-panel">
+                    {# ---- RELEVÉ : l'élément principal (pleine hauteur, c'est la page qui défile) ---- #}
+                    <section class="rc-panel rc-panel-main">
+                        <header class="rc-panel-head rc-sticky">
+                            <h2>Relevé <span class="rc-count" data-rc-count title="Lignes du relevé">0</span> <small data-rc-ops-count></small></h2>
+                            <div class="rc-progress" data-rc-progress-box hidden>
+                                <span class="rc-progress-text" data-rc-progress-text></span>
+                                <span class="rc-bar" aria-hidden="true"><i data-rc-progress-bar></i></span>
+                                <button type="button" class="rc-linkbtn" data-rc-done-all></button>
+                                <button type="button" class="rc-linkbtn" data-rc-hide-done aria-pressed="false">Masquer les pointées</button>
+                            </div>
+                            <div class="rc-sorts" role="group" aria-label="Outils du relevé">
+                                <button type="button" class="page-action page-action-neutral" data-rc-merge title="Regroupe les lignes cochées en un seul détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>Regrouper</span></button>
+                                <button type="button" class="rc-btn" data-rc-sort="asc" title="Trier par date : du plus ancien au plus récent (ex. espèces)">↑</button>
+                                <button type="button" class="rc-btn" data-rc-sort="desc" title="Trier par date : du plus récent au plus ancien">↓</button>
+                            </div>
+                            <p class="rc-msg" data-rc-msg role="status" hidden></p>
+                        </header>
+                        <ol class="rc-list is-selected" data-rc-list>
+                            {% for line in lines %}
+                                {% include 'releve/_composer_line.html.twig' with { line: line } only %}
+                            {% endfor %}
+                        </ol>
+                        <p class="rc-empty" data-rc-empty hidden>Aucune opération pour l'instant : choisissez-les dans « À pointer ».</p>
+                    </section>
+
+                    {# ---- À POINTER : colonne latérale qui reste en vue ---- #}
+                    <aside class="rc-panel rc-pool-panel">
                         <header class="rc-panel-head">
                             <h2>À pointer <span class="rc-count" data-rc-pool-count>{{ pool|length }}</span></h2>
                             <div class="rc-pool-actions">
-                                <button type="button" class="page-action page-action-neutral" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>Ajouter en un détail</span></button>
-                                <button type="button" class="page-action page-action-neutral" data-rc-open-op title="Créer une opération qui n'existe pas encore (ex. frais bancaires)"><twig:ux:icon name="lucide:plus" /><span>Nouvelle opération</span></button>
+                                <button type="button" class="page-action page-action-neutral" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>En un détail</span></button>
                                 <button type="button" class="page-action page-action-neutral" data-rc-add-all title="Ajouter toutes les opérations affichées, une ligne chacune, par date"><twig:ux:icon name="lucide:list-plus" /><span>Tout ajouter</span></button>
+                                <button type="button" class="page-action page-action-neutral" data-rc-open-op title="Créer une opération qui n'existe pas encore (ex. frais bancaires)"><twig:ux:icon name="lucide:plus" /><span>Nouvelle</span></button>
                             </div>
                         </header>
                         {% include 'releve/_operation_panel.html.twig' with { portefeuille: portefeuille, releve: releve, token: token } only %}
@@ -148,50 +177,24 @@
                             {% endfor %}
                         </ul>
                         <p class="rc-empty" data-rc-pool-empty hidden>Plus aucune opération à pointer.</p>
-                    </section>
-
-                    {# ---- RELEVÉ ---- #}
-                    <section class="rc-panel rc-panel-main">
-                        <header class="rc-panel-head">
-                            <h2>Relevé <span class="rc-count" data-rc-count title="Lignes du relevé">0</span> <small data-rc-ops-count></small></h2>
-                            <div class="rc-sorts" role="group" aria-label="Outils du relevé">
-                                <button type="button" class="page-action page-action-neutral" data-rc-merge title="Regroupe les lignes cochées en un seul détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>Regrouper la sélection</span></button>
-                                <span class="group-bar-label">Trier par date</span>
-                                <button type="button" class="rc-btn" data-rc-sort="asc" title="Du plus ancien au plus récent (ex. espèces)">↑</button>
-                                <button type="button" class="rc-btn" data-rc-sort="desc" title="Du plus récent au plus ancien">↓</button>
-                            </div>
-                        </header>
-                        <p class="rc-help">Cliquez sur ＋ dans l'ordre d'apparition sur le relevé de compte, ou glissez-déposez. <strong>⤓</strong> place les prochaines lignes après une ligne donnée. Une commande éclatée en plusieurs catégories se pointe en <strong>un seul détail</strong> : cochez ses opérations (même date, tiers libres) puis « Ajouter en un détail ».<br><strong>✓</strong> = ligne vérifiée sur ton relevé de compte : automatique quand tu ajoutes ou déplaces une ligne, manuel sinon (<strong>✓↑</strong> : pointer tout jusqu'ici). Ce suivi n'est pas enregistré en base : il est gardé dans ce navigateur.</p>
-                        <div class="rc-progress" data-rc-progress-box hidden>
-                            <span class="rc-progress-text" data-rc-progress-text></span>
-                            <span class="rc-bar" aria-hidden="true"><i data-rc-progress-bar></i></span>
-                            <button type="button" class="rc-linkbtn" data-rc-done-all></button>
-                            <button type="button" class="rc-linkbtn" data-rc-hide-done aria-pressed="false">Masquer les pointées</button>
-                        </div>
-                        <p class="rc-msg" data-rc-msg role="status" hidden></p>
-                        <ol class="rc-list is-selected" data-rc-list>
-                            {% for line in lines %}
-                                {% include 'releve/_composer_line.html.twig' with { line: line } only %}
-                            {% endfor %}
-                        </ol>
-                        <p class="rc-empty" data-rc-empty hidden>Aucune opération pour l'instant : choisissez-les à gauche.</p>
-                        <footer class="rc-total rc-total-multi">
-                            <span>Solde du relevé <small>(mouvement)</small></span>
-                            <strong data-rc-total>0,00 €</strong>
-                            <span>Solde cumulé</span>
-                            <strong data-rc-cumul>0,00 €</strong>
-                        </footer>
-                    </section>
+                    </aside>
                 </div>
 
+                {# Barre fixe en bas : soldes + actions, toujours visibles même avec 60 lignes #}
                 <div class="rc-actions">
-                    <button type="submit" name="action" value="save" class="page-action page-action-neutral" data-rc-submit>
-                        <twig:ux:icon name="lucide:save" /><span>Enregistrer (reste en cours)</span>
-                    </button>
-                    <button type="submit" name="action" value="finalize" class="page-action page-action-primary" data-rc-submit data-rc-finalize
-                            data-confirm="Finaliser ce relevé ? L'ordre des opérations sera figé (vous pourrez le rouvrir au besoin).">
-                        <twig:ux:icon name="lucide:lock" /><span>Finaliser le relevé</span>
-                    </button>
+                    <div class="rc-sums">
+                        <span>Mouvement <strong data-rc-total>0,00 €</strong></span>
+                        <span>Solde cumulé <strong data-rc-cumul>0,00 €</strong></span>
+                    </div>
+                    <span class="rc-actions-buttons">
+                        <button type="submit" name="action" value="save" class="page-action page-action-neutral" data-rc-submit>
+                            <twig:ux:icon name="lucide:save" /><span>Enregistrer</span>
+                        </button>
+                        <button type="submit" name="action" value="finalize" class="page-action page-action-primary" data-rc-submit data-rc-finalize
+                                data-confirm="Finaliser ce relevé ? L'ordre des opérations sera figé (vous pourrez le rouvrir au besoin).">
+                            <twig:ux:icon name="lucide:lock" /><span>Finaliser</span>
+                        </button>
+                    </span>
                 </div>
             </form>
 

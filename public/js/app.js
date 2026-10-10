@@ -684,14 +684,13 @@ const App = {
                         '<label class="rc-pick" title="Cocher pour regrouper des lignes en un détail"><input type="checkbox" data-rc-check-line' + (keepChecked ? ' checked' : '') + '></label>' +
                         '<span class="rc-grip" aria-hidden="true">⋮⋮</span>' +
                         '<span class="rc-rank">' + (index + 1) + '</span>' +
-                        '<button type="button" class="rc-done' + (isDone(line) ? ' is-on' : '') + '" data-rc-done aria-pressed="' + (isDone(line) ? 'true' : 'false') + '" title="' + (isDone(line) ? 'Pointée : cliquer pour dépointer' : 'À pointer : cliquer quand la ligne est vérifiée sur le relevé de compte') + '">✓</button>' +
+                        '<button type="button" class="rc-done' + (isDone(line) ? ' is-on' : '') + '" data-rc-done aria-pressed="' + (isDone(line) ? 'true' : 'false') + '" title="' + (isDone(line) ? 'Pointée : cliquer pour dépointer' : 'Cliquer quand la ligne est vérifiée sur le relevé de compte (les lignes au-dessus sont pointées aussi)') + '">✓</button>' +
                         '<span class="rc-date">' + esc(first.dataset.dateFr) + '</span>' +
                         '<span class="rc-main"><strong>' + esc(tiersNames.join(' + ')) + '</strong><small>' + esc(categories) + '</small></span>' +
                         (parts.length > 1 ? '<span class="rc-chip is-detail" title="Plusieurs opérations pointées ensemble">Détail × ' + parts.length + '</span>' : '<span></span>') +
                         '<span class="rc-amount ' + (total < 0 ? 'amount-expense' : 'amount-income') + '">' + signed(total) + '</span>' +
                         '<span class="rc-balance" title="Solde cumulé après cette ligne">' + money.format(running) + ' €</span>' +
                         '<span class="rc-tools">' +
-                        '<button type="button" class="rc-btn" data-rc-upto title="Pointer toutes les lignes jusqu\'ici (là où j\'en suis)" aria-label="Pointer jusqu\'ici">✓↑</button>' +
                         '<button type="button" class="rc-btn' + (line === cursor ? ' is-on' : '') + '" data-rc-here title="Insérer les prochaines lignes juste après celle-ci" aria-label="Insérer après cette ligne">⤓</button>' +
                         '<button type="button" class="rc-btn" data-rc-up title="Monter" aria-label="Monter">▲</button>' +
                         '<button type="button" class="rc-btn" data-rc-down title="Descendre" aria-label="Descendre">▼</button>' +
@@ -898,13 +897,12 @@ const App = {
                 }
 
                 if (target.closest('[data-rc-done]') && line) {
-                    setDone(line, !isDone(line));
-                    return refresh();
-                }
-
-                if (target.closest('[data-rc-upto]') && line) {
-                    const all = lines();
-                    all.slice(0, all.indexOf(line) + 1).forEach(l => setDone(l, true));
+                    if (isDone(line)) {
+                        setDone(line, false);
+                    } else { // pointer une ligne = pointer aussi toutes celles au-dessus
+                        const all = lines();
+                        all.slice(0, all.indexOf(line) + 1).forEach(l => setDone(l, true));
+                    }
                     return refresh();
                 }
 
@@ -928,7 +926,7 @@ const App = {
                     if (!sameGroup(picked)) {
                         return say(NOT_SAME);
                     }
-                    addParts(picked);
+                    addParts(picked, undefined, false); // regrouper ne pointe pas
                     return changed();
                 }
 
@@ -951,7 +949,7 @@ const App = {
                     parts.filter(p => !ul.contains(p)).forEach(p => ul.append(p));
                     picked.slice(1).forEach(dropLine);
                     keep.querySelector('[data-rc-check-line]').checked = false;
-                    setDone(keep, true);
+                    setDone(keep, picked.every(isDone)); // pointé seulement si toutes les lignes l'étaient
                     return changed();
                 }
 
@@ -962,7 +960,7 @@ const App = {
 
                 if (target.closest('[data-rc-detach]') && part) {
                     const owner = part.closest('[data-rc-line]');
-                    const alone = newLine([part]);
+                    const alone = newLine([part], isDone(owner)); // garde l'état de la ligne d'origine
                     owner.after(alone);
                     return changed();
                 }
@@ -1003,11 +1001,10 @@ const App = {
                     return refresh();
                 }
                 if (target.closest('[data-rc-split]')) {
-                    setDone(line, true);
                     const parts = partsOf(line);
                     let after = line;
                     parts.slice(1).forEach(p => {
-                        const alone = newLine([p]);
+                        const alone = newLine([p], isDone(line)); // dégrouper ne pointe pas
                         after.after(alone);
                         after = alone;
                     });
