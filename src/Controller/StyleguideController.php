@@ -18,4 +18,14 @@ class StyleguideController extends AbstractController
     {
         return $this->render('styleguide/index.html.twig');
     }
+
+    /**
+     * TEMPORAIRE — page de vérification du chantier « kit UI » (à supprimer en fin de chantier :
+     * cette route, templates/styleguide/verification.html.twig et public/js/verification.js).
+     */
+    #[Route('/verification', name: 'app_styleguide_verification', methods: ['GET'])]
+    public function verification(): Response
+    {
+        return $this->render('styleguide/verification.html.twig');
+    }
 }

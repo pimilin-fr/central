@@ -1,0 +1,64 @@
+{% extends 'modern.html.twig' %}
+
+{% block title %}Vérification du kit UI{% endblock %}
+
+{#
+    TEMPORAIRE — vérification du chantier « kit UI ».
+    Mise à jour à chaque étape : ajouter l'étape dans public/js/verification.js (const STEPS),
+    puis les liens/cases manuelles ci-dessous. Suppression en fin de chantier (voir StyleguideController).
+#}
+{% set breadcrumb_current = 'Vérification' %}
+
+{% block body %}
+    <link rel="stylesheet" href="{{ asset('css/styleguide.css') }}?v=2">
+    <div class="page-container" id="vf"
+         data-pages='{{ [
+            { label: 'Portefeuilles', url: path('app_portefeuille_index') },
+            { label: 'Opérations', url: path('app_depenses_index') },
+            { label: 'Tous les relevés', url: path('app_releve_all') },
+            { label: 'Prévisions', url: path('app_prevision_index') },
+            { label: 'Suggestions de prévisions', url: path('app_prevision_suggestions') },
+            { label: 'Tiers', url: path('app_tiers_index') },
+            { label: 'Adresses', url: path('app_adresse_index') },
+            { label: 'Catégories', url: path('app_categorie_index') },
+            { label: 'Types de tiers', url: path('app_type_tiers_index') },
+            { label: 'Projets', url: path('app_projet_index') },
+            { label: 'Types de projet', url: path('app_projet_type_index') },
+            { label: 'Styleguide', url: path('app_styleguide') }
+         ]|json_encode|e('html_attr') }}'
+         data-scripts='{{ [asset('js/app.js'), asset('js/releve.js'), asset('js/prevision.js')]|json_encode|e('html_attr') }}'>
+
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">Vérification du kit UI <span class="pill pill-accent">temporaire</span></h1>
+                <p>Contrôles automatiques (lus dans vos vraies pages) + liste de vérifications à faire à l'œil, étape par étape.</p>
+            </div>
+            <div class="page-heading-actions">
+                <button type="button" class="btn btn-primary" data-vf-run><twig:ux:icon name="lucide:play" /><span>Lancer les contrôles</span></button>
+            </div>
+        </div>
+
+        <section class="rc-panel" style="margin-bottom:16px">
+            <div class="rc-panel-head"><h2>Pages supplémentaires à scanner</h2></div>
+            <p class="pv-range">Une URL par ligne, pour les pages qui demandent un identifiant : par exemple <code>/portefeuille/show/1</code>, <code>/releve/composer/1</code>, <code>/portefeuille/show/1?tab=prevision</code>. Mémorisé dans ce navigateur.</p>
+            <textarea class="form-control" rows="3" data-vf-extra style="width:100%" placeholder="/portefeuille/show/1&#10;/releve/composer/1"></textarea>
+        </section>
+
+        <section class="rc-panel" style="margin-bottom:16px">
+            <div class="rc-panel-head"><h2>Contrôles automatiques <span class="pill pill-solid" data-vf-score>–</span></h2></div>
+            <div data-vf-results><p class="pv-range">Cliquez sur « Lancer les contrôles ».</p></div>
+        </section>
+
+        <section class="rc-panel" style="margin-bottom:16px">
+            <div class="rc-panel-head"><h2>Classes utilisées mais sans aucun style</h2></div>
+            <p class="pv-range">Classes trouvées dans le HTML et le JS des pages scannées mais absentes de toutes les feuilles de style chargées. Certaines sont normales (accroches JS, états posés par script) ; celles qui ressemblent à du Tailwind (<code>px-4</code>…) sont à nettoyer.</p>
+            <div data-vf-undef><p class="pv-range">—</p></div>
+        </section>
+
+        <section class="rc-panel" data-vf-manual>
+            <div class="rc-panel-head"><h2>À vérifier à l'œil</h2></div>
+            <div data-vf-manual-body></div>
+        </section>
+    </div>
+    <script src="{{ asset('js/verification.js') }}?v=1" defer></script>
+{% endblock %}
