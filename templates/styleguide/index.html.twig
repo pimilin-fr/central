@@ -84,7 +84,7 @@
                         <div class="sg-cell">
                             <div class="color-family-strip">
                                 {% for shade in family.shades %}
-                                    <span class="entity-pill" style="--entity-color: {{ shade.var }}; --entity-text: {{ shade.var|replace({')': '-ink)'}) }}; border-radius: 0; justify-content: center; min-height: 2rem;" title="{{ shade.label }}">{{ loop.index }}</span>
+                                    <span class="sg-shade" style="--sw: {{ shade.var }}; --sw-ink: {{ shade.var|replace({')': '-ink)'}) }};" title="{{ shade.label }}">{{ loop.index }}</span>
                                 {% endfor %}
                             </div>
                             <span class="sg-caption">{{ family.label }} · {{ family.shades[0].value }} … {{ family.shades[4].value }}</span>

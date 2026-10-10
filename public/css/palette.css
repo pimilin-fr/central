@@ -354,3 +354,15 @@
 .color-picker-option { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; color: var(--text-soft); }
 .color-picker-scale { margin: 0; font-size: .6875rem; color: var(--text-muted); }
 .color-picker-hint { margin: 0; font-size: .75rem; color: var(--text-muted); }
+
+/* Styleguide : nuance pleine (fond = nuance, texte = encre calculée) */
+.sg-shade {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 2.25rem;
+    background: var(--sw);
+    color: var(--sw-ink);
+    font-size: .75rem;
+    font-weight: 700;
+}
