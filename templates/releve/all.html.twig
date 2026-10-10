@@ -1,0 +1,94 @@
+{% extends 'modern.html.twig' %}
+
+{# Fil d'Ariane : Central > Portefeuilles > Relevés #}
+{% set breadcrumb_current = 'Tous les relevés' %}
+{% set breadcrumb_trail = [] %}
+
+{% block title %}Tous les relevés{% endblock %}
+
+{% block body %}
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">Tous les relevés</h1>
+                <div class="page-subline">Tous portefeuilles confondus · le solde cumulé est celui de chaque portefeuille</div>
+            </div>
+
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                btns: [{
+                    label: 'Portefeuilles',
+                    path: path('app_portefeuille_index'),
+                    icon: 'mdi:arrow-left',
+                    color: 'neutral'
+                }]
+            } %}
+        </div>
+
+        <section class="rc-panel">
+            <header class="rc-panel-head">
+                <h2>Relevés <span class="rc-count">{{ rows|length }}</span></h2>
+                <form method="get" class="rc-filters">
+                    <select name="portefeuille" class="modern-form-control" onchange="this.form.submit()" aria-label="Portefeuille">
+                        <option value="">Tous les portefeuilles</option>
+                        {% for p in portefeuilles %}
+                            <option value="{{ p.id }}" {{ p.id == ptfId ? 'selected' : '' }}>{{ p.libelle }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="etat" class="modern-form-control" onchange="this.form.submit()" aria-label="État">
+                        <option value="">Clos et non clos</option>
+                        <option value="ouvert" {{ etat == 'ouvert' ? 'selected' : '' }}>Non clos</option>
+                        <option value="clos" {{ etat == 'clos' ? 'selected' : '' }}>Clos</option>
+                    </select>
+                </form>
+            </header>
+
+            {% if rows is empty %}
+                <p class="rc-empty">Aucun relevé.</p>
+            {% else %}
+                <div class="rc-table-wrap">
+                    <table class="ops-table rc-releves">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left">Relevé</th>
+                                <th class="px-4 py-3 text-left">Portefeuille</th>
+                                <th class="px-4 py-3 text-left">État</th>
+                                <th class="px-4 py-3 text-right">Lignes</th>
+                                <th class="px-4 py-3 text-right">Opérations</th>
+                                <th class="px-4 py-3 text-right" title="Somme des opérations du relevé">Mouvement</th>
+                                <th class="px-4 py-3 text-right" title="Somme des mouvements de tous les relevés du portefeuille jusqu'à celui-ci">Solde cumulé</th>
+                                <th class="px-4 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                {% set releve = row.releve %}
+                                {% set ptf = releve.portefeuille %}
+                                {% set url = path('app_releve_compose', { id: ptf.id, releve: releve.id }) %}
+                                <tr class="ops-row {{ releve.closed ? 'is-closed' : 'is-open' }}">
+                                    <td class="px-4 py-2"><a class="ops-group-link" href="{{ url }}">{{ releve.date|date('d/m/Y') }}</a></td>
+                                    <td class="px-4 py-2">
+                                        <a href="{{ path('app_releve_index', { id: ptf.id }) }}" class="entity-pill" style="--entity-color: {{ (ptf.couleur ?? null)|entity_color }};">
+                                            <span class="entity-pill-dot"></span><span>{{ ptf.libelle }}</span>
+                                        </a>
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        {% if releve.closed %}
+                                            <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
+                                        {% else %}
+                                            <span class="ops-group-badge is-open"><twig:ux:icon name="lucide:lock-open" /> Non clos</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-2 text-right">{{ row.lines }}</td>
+                                    <td class="px-4 py-2 text-right">{{ row.ops }}</td>
+                                    <td class="px-4 py-2 text-right font-medium {{ row.total < 0 ? 'amount-expense' : 'amount-income' }}">{{ row.total < 0 ? '−' : '+' }} {{ row.total|abs|number_format(2, ',', ' ') }} €</td>
+                                    <td class="px-4 py-2 text-right font-medium">{{ row.cumul|number_format(2, ',', ' ') }} €</td>
+                                    <td class="px-4 py-2 text-right"><a class="ops-group-link" href="{{ url }}">{{ releve.closed ? 'Voir' : 'Compléter / clore' }}</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

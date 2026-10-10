@@ -92,4 +92,21 @@ class ReleveRepository extends ServiceEntityRepository {
                         ->getQuery()
                         ->getResult();
     }
+
+    /**
+     * Tous les relevés, tous portefeuilles confondus (ordre chronologique), avec leurs opérations.
+     *
+     * @return list<Releve>
+     */
+    public function findEveryAsc(): array {
+        return $this->createQueryBuilder('r')
+                        ->innerJoin('r.portefeuille', 'p')
+                        ->leftJoin('r.depenses', 'd')
+                        ->leftJoin('d.categorie', 'c')
+                        ->addSelect('p', 'd', 'c')
+                        ->orderBy('r.date', 'ASC')
+                        ->addOrderBy('r.id', 'ASC')
+                        ->getQuery()
+                        ->getResult();
+    }
 }

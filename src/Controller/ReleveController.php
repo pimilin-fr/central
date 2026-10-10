@@ -94,6 +94,49 @@ final class ReleveController extends AbstractController {
         return $this->render('releve/index.html.twig', $this->listData($portefeuille, $em, $releveRepo));
     }
 
+    /**
+     * Tous les relevés, tous portefeuilles confondus (récents d'abord).
+     * Filtres GET : portefeuille = id · etat = clos | ouvert. Le solde cumulé reste celui de CHAQUE portefeuille
+     * (calculé avant filtrage).
+     */
+    #[Route('/tous', name: 'app_releve_all', methods: ['GET'])]
+    public function all(Request $request, EntityManagerInterface $em, ReleveRepository $releveRepo, \App\Repository\PortefeuilleRepository $ptfRepo): Response {
+        $manager = new ReleveManager($em);
+        $byPtf = [];
+        foreach ($releveRepo->findEveryAsc() as $releve) {
+            $byPtf[$releve->getPortefeuille()->getId()][] = $releve;
+        }
+
+        $rows = [];
+        foreach ($byPtf as $releves) {
+            foreach ($manager->summarize($releves) as $row) {
+                $rows[] = $row;
+            }
+        }
+
+        $ptfId = $this->intParam($request->query->get('portefeuille'));
+        $etat = (string) $request->query->get('etat', '');
+        $rows = array_values(array_filter($rows, static function (array $row) use ($ptfId, $etat): bool {
+            if ($ptfId > 0 && $row['releve']->getPortefeuille()->getId() !== $ptfId) {
+                return false;
+            }
+
+            return match ($etat) {
+                'clos' => $row['releve']->isClosed(),
+                'ouvert' => !$row['releve']->isClosed(),
+                default => true,
+            };
+        }));
+        usort($rows, static fn (array $a, array $b): int => [$b['releve']->getDate(), $b['releve']->getId()] <=> [$a['releve']->getDate(), $a['releve']->getId()]);
+
+        return $this->render('releve/all.html.twig', [
+                    'rows' => $rows,
+                    'portefeuilles' => $ptfRepo->findAll(),
+                    'ptfId' => $ptfId,
+                    'etat' => $etat,
+        ]);
+    }
+
     /** Même liste, sans page autour (onglet « Relevés » de la fiche portefeuille). */
     public function fragment(Portefeuille $portefeuille, EntityManagerInterface $em, ReleveRepository $releveRepo): Response {
         return $this->render('releve/_list.html.twig', $this->listData($portefeuille, $em, $releveRepo));

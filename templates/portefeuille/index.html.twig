@@ -25,6 +25,12 @@
             {% include 'layout/modern/components/_btns.html.twig' with {
                 btns: [
                     {
+                        label: 'Tous les relevés',
+                        path: path('app_releve_all'),
+                        icon: 'lucide:list-ordered',
+                        color: 'neutral'
+                    },
+                    {
                         label: 'Ajouter',
                         path: path('app_portefeuille_new'),
                         icon: 'gridicons:add',
