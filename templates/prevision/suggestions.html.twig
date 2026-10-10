@@ -1,0 +1,81 @@
+{% extends 'modern.html.twig' %}
+
+{% set breadcrumb_current = 'Suggestions' %}
+{% set breadcrumb_trail = [{ label: 'Prévisions', path: path('app_prevision_index') }] %}
+
+{% block title %}Suggestions de prévisions{% endblock %}
+
+{% block body %}
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">Suggestions</h1>
+                <p class="page-subtitle">Opérations qui reviennent régulièrement dans vos 24 derniers mois et qui n'ont pas encore de règle. Rien n'est créé tant que vous ne validez pas.</p>
+            </div>
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                btns: [{ label: 'Retour', path: path('app_prevision_index'), icon: 'mdi:arrow-left', color: 'neutral' }]
+            } %}
+        </div>
+
+        <section class="rc-panel" data-pv-suggestions>
+            <header class="rc-panel-head">
+                <h2>Récurrences repérées <span class="rc-count" data-pv-count>{{ suggestions|length }}</span></h2>
+                <button type="button" class="pv-link-btn hidden" data-pv-reset>Réafficher les suggestions masquées</button>
+            </header>
+
+            {% if suggestions is empty %}
+                <p class="rc-empty">Rien de régulier détecté (ou tout est déjà couvert par une règle).</p>
+            {% else %}
+                <div class="rc-table-wrap">
+                    <table class="ops-table">
+                        <thead><tr>
+                            <th class="px-4 py-3 text-left">Tiers</th>
+                            <th class="px-4 py-3 text-left">Ce qui a été constaté</th>
+                            <th class="px-4 py-3 text-left">Prochaine</th>
+                            <th class="px-4 py-3 text-right">Montant</th>
+                            <th class="px-4 py-3"></th>
+                        </tr></thead>
+                        <tbody>
+                        {% for s in suggestions %}
+                            {% set params = {
+                                tiers: s.tiers.id,
+                                categorie: s.categorie.id,
+                                portefeuille: s.portefeuille.id,
+                                projet: s.projet ? s.projet.id : null,
+                                frequence: s.frequence.value,
+                                jour: s.jour,
+                                montant: s.montant,
+                                min: s.min,
+                                max: s.max,
+                                estime: s.estime ? 1 : 0,
+                                certitude: s.certitude.value,
+                                debut: s.prochaine|date('Y-m-d')
+                            } %}
+                            <tr class="ops-row" data-pv-suggestion="{{ s.tiers.id }}|{{ s.categorie.id }}|{{ s.portefeuille.id }}">
+                                <td class="px-4 py-2">
+                                    <strong>{{ s.tiers.name }}</strong>
+                                    <div class="pv-range">{{ s.categorie.libelle ?: s.categorie.name }} · {{ s.portefeuille.libelle }}</div>
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ s.resume }}
+                                    <div class="pv-range">dernière le {{ s.derniere|date('d/m/Y') }} · régularité {{ (s.regularite * 100)|round }} %</div>
+                                </td>
+                                <td class="px-4 py-2">{{ s.prochaine|date('d/m/Y') }} <span class="pv-badge is-{{ s.certitude.value }}">{{ s.certitude.label }}</span></td>
+                                <td class="px-4 py-2 text-right font-medium">
+                                    {{ s.estime ? '≈ ' : '' }}{{ s.montant|number_format(2, ',', ' ') }} €
+                                </td>
+                                <td class="px-4 py-2">
+                                    <div class="pv-actions">
+                                        <a class="page-action page-action-primary" href="{{ path('app_prevision_new', params) }}">Créer la règle</a>
+                                        <button type="button" class="pv-link-btn" data-pv-hide>Masquer</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

@@ -2,20 +2,17 @@
 
 namespace App\Form;
 
-use App\Entity\Categorie;
 use App\Entity\Portefeuille;
 use App\Entity\PrevisionRegle;
-use App\Entity\Projet;
-use App\Entity\Tiers;
 use App\Prevision\Certitude;
 use App\Prevision\Frequence;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -25,35 +22,39 @@ use Symfony\Component\Validator\Constraints\Count;
 class PrevisionRegleType extends AbstractType {
 
     public function buildForm(FormBuilderInterface $builder, array $options): void {
+        /** @var PrevisionRegle|null $regle */
+        $regle = $options['data'] ?? null;
         $builder
                 ->add('libelle', TextType::class, ['label' => 'Libellé', 'attr' => ['placeholder' => 'Ex. Abonnement internet']])
-                ->add('categorie', EntityType::class, [
-                    'class' => Categorie::class,
-                    'choice_label' => static fn (Categorie $c): string => $c->getLibelle() ?: $c->getName(),
-                    'placeholder' => 'Choisir une catégorie',
+                // Champs à autocomplétion (comme sur les opérations) : libellé visible + identifiant caché ; résolus par le contrôleur.
+                ->add('categorie', TextType::class, [
+                    'mapped' => false,
                     'label' => 'Catégorie',
-                    'query_builder' => static fn (EntityRepository $er) => $er->createQueryBuilder('c')->andWhere('c.deletedAt IS NULL')->orderBy('c.libelle', 'ASC'),
+                    'data' => $regle?->getCategorie()?->getLibelle() ?: $regle?->getCategorie()?->getName(),
+                    'attr' => ['class' => 'autocomplete', 'data-endpoint' => '/categories/search', 'autocomplete' => 'off'],
                 ])
-                ->add('tiers', EntityType::class, [
-                    'class' => Tiers::class,
-                    'choice_label' => 'name',
-                    'placeholder' => 'Choisir un tiers',
+                ->add('categorie_id', HiddenType::class, ['mapped' => false, 'data' => $regle?->getCategorie()?->getId()])
+                ->add('tiers', TextType::class, [
+                    'mapped' => false,
                     'label' => 'Tiers',
-                    'query_builder' => static fn (EntityRepository $er) => $er->createQueryBuilder('t')->andWhere('t.deletedAt IS NULL')->orderBy('t.name', 'ASC'),
+                    'data' => $regle?->getTiers()?->getName(),
+                    'attr' => ['class' => 'autocomplete', 'data-endpoint' => '/tiers/search', 'autocomplete' => 'off'],
                 ])
+                ->add('tiers_id', HiddenType::class, ['mapped' => false, 'data' => $regle?->getTiers()?->getId()])
                 ->add('portefeuille', EntityType::class, [
                     'class' => Portefeuille::class,
                     'choice_label' => 'libelle',
                     'placeholder' => 'Choisir un portefeuille',
                     'label' => 'Portefeuille',
                 ])
-                ->add('projet', EntityType::class, [
-                    'class' => Projet::class,
-                    'choice_label' => 'name',
+                ->add('projet', TextType::class, [
+                    'mapped' => false,
                     'required' => false,
-                    'placeholder' => 'Aucun projet',
                     'label' => 'Projet',
+                    'data' => $regle?->getProjet()?->getName(),
+                    'attr' => ['class' => 'autocomplete', 'data-endpoint' => '/projet/search', 'autocomplete' => 'off'],
                 ])
+                ->add('projet_id', HiddenType::class, ['mapped' => false, 'data' => $regle?->getProjet()?->getId()])
                 ->add('certitude', EnumType::class, [
                     'class' => Certitude::class,
                     'label' => 'Certitude',

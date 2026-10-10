@@ -10,6 +10,7 @@
                 <p class="page-subtitle">Ce qui va arriver : abonnements, LOA, paiements en plusieurs fois, factures variables. Pondéré par la certitude.</p>
             </div>
             <div class="pv-actions">
+                <a class="page-action" href="{{ path('app_prevision_suggestions') }}" title="Récurrences repérées dans vos opérations"><twig:ux:icon name="lucide:sparkles" /><span>Suggestions</span></a>
                 <form method="post" action="{{ path('app_prevision_refresh') }}" class="pv-inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">
                     <button type="submit" class="page-action" title="Ajoute les échéances des prochains mois">Actualiser</button>

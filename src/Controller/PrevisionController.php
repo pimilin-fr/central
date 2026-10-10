@@ -2,17 +2,26 @@
 
 namespace App\Controller;
 
+use App\Entity\Categorie;
 use App\Entity\PrevisionEcheance;
 use App\Entity\PrevisionRegle;
 use App\Entity\PrevisionTranche;
+use App\Entity\Projet;
+use App\Entity\Tiers;
+use App\Entity\Portefeuille;
 use App\Form\PrevisionRegleType;
 use App\Prevision\StatutEcheance;
 use App\Repository\PrevisionEcheanceRepository;
 use App\Repository\PrevisionRegleRepository;
+use App\Prevision\Certitude;
+use App\Prevision\Frequence;
+use App\Service\PrevisionDetector;
 use App\Service\PrevisionManager;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -64,9 +73,55 @@ final class PrevisionController extends AbstractController {
     #[Route('/regle/new', name: 'app_prevision_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, PrevisionManager $manager): Response {
         $regle = new PrevisionRegle();
-        $regle->addTranche((new PrevisionTranche())->setAPartirDe(new DateTime('today')));
+        $montant = null;
+        if ($request->isMethod('GET')) {
+            $montant = $this->prefill($regle, $request, $em);
+        }
+        $tranche = (new PrevisionTranche())->setAPartirDe($regle->getDebut());
+        if ($montant !== null) {
+            $tranche->setMontant($montant['montant'])->setMontantMin($montant['min'])->setMontantMax($montant['max']);
+        }
+        $regle->addTranche($tranche);
 
         return $this->handleForm($regle, $request, $em, $manager);
+    }
+
+    /** Pré-remplit une règle à partir des paramètres d'URL (suggestions détectées). @return array{montant: string, min: ?string, max: ?string}|null */
+    private function prefill(PrevisionRegle $regle, Request $request, EntityManagerInterface $em): ?array {
+        $q = $request->query;
+        if ($q->get('tiers')) {
+            $tiers = $em->getRepository(Tiers::class)->find((string) $q->get('tiers'));
+            $regle->setTiers($tiers)->setLibelle($tiers?->getName() ?? '');
+        }
+        if ($this->intParam($q->get('categorie')) > 0) {
+            $regle->setCategorie($em->getRepository(Categorie::class)->find($this->intParam($q->get('categorie'))));
+        }
+        if ($this->intParam($q->get('portefeuille')) > 0) {
+            $regle->setPortefeuille($em->getRepository(Portefeuille::class)->find($this->intParam($q->get('portefeuille'))));
+        }
+        if ($this->intParam($q->get('projet')) > 0) {
+            $regle->setProjet($em->getRepository(Projet::class)->find($this->intParam($q->get('projet'))));
+        }
+        if (($f = Frequence::tryFrom((string) $q->get('frequence'))) !== null) {
+            $regle->setFrequence($f);
+        }
+        if (($c = Certitude::tryFrom((string) $q->get('certitude'))) !== null) {
+            $regle->setCertitude($c);
+        }
+        if ($this->intParam($q->get('jour')) > 0) {
+            $regle->setJour($this->intParam($q->get('jour')));
+        }
+        $regle->setEstime($q->getBoolean('estime'));
+        if (($d = DateTime::createFromFormat('!Y-m-d', (string) $q->get('debut'))) !== false) {
+            $regle->setDebut($d);
+        }
+        $montant = str_replace(',', '.', (string) $q->get('montant'));
+
+        return is_numeric($montant) ? [
+            'montant' => $montant,
+            'min' => is_numeric($q->get('min')) ? (string) $q->get('min') : null,
+            'max' => is_numeric($q->get('max')) ? (string) $q->get('max') : null,
+        ] : null;
     }
 
     #[Route('/regle/{id}/edit', name: 'app_prevision_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
@@ -77,6 +132,10 @@ final class PrevisionController extends AbstractController {
     private function handleForm(PrevisionRegle $regle, Request $request, EntityManagerInterface $em, PrevisionManager $manager): Response {
         $form = $this->createForm(PrevisionRegleType::class, $regle);
         $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $this->resolveRelations($form, $regle, $em);
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($regle);
@@ -89,6 +148,42 @@ final class PrevisionController extends AbstractController {
         }
 
         return $this->render('prevision/form.html.twig', ['regle' => $regle, 'form' => $form]);
+    }
+
+    /** Tiers / catégorie / projet viennent des champs à autocomplétion (identifiants cachés). */
+    private function resolveRelations(\Symfony\Component\Form\FormInterface $form, PrevisionRegle $regle, EntityManagerInterface $em): void {
+        $tiersId = (string) $form->get('tiers_id')->getData();
+        $tiers = $tiersId !== '' ? $em->getRepository(Tiers::class)->find($tiersId) : null;
+        if ($tiers === null) {
+            $form->get('tiers')->addError(new FormError('Choisissez un tiers dans la liste.'));
+        }
+        $regle->setTiers($tiers);
+
+        $categorieId = $this->intParam($form->get('categorie_id')->getData());
+        $categorie = $categorieId > 0 ? $em->getRepository(Categorie::class)->find($categorieId) : null;
+        if ($categorie === null) {
+            $form->get('categorie')->addError(new FormError('Choisissez une catégorie dans la liste.'));
+        }
+        $regle->setCategorie($categorie);
+
+        $projetId = $this->intParam($form->get('projet_id')->getData());
+        $regle->setProjet($projetId > 0 ? $em->getRepository(Projet::class)->find($projetId) : null);
+    }
+
+    /** Saisie assistée : ce que l'historique sait déjà d'un tiers (catégorie, portefeuille, montant, rythme…). */
+    #[Route('/assist/tiers/{id}', name: 'json_prevision_assist_tiers', methods: ['GET'])]
+    public function assistTiers(Tiers $tiers, PrevisionDetector $detector): JsonResponse {
+        return $this->json($detector->profilTiers($tiers) ?? ['vide' => true]);
+    }
+
+    /** Récurrences repérées dans l'historique, non encore couvertes par une règle. */
+    #[Route('/suggestions', name: 'app_prevision_suggestions', methods: ['GET'])]
+    public function suggestions(PrevisionDetector $detector): Response {
+        return $this->render('prevision/suggestions.html.twig', ['suggestions' => $detector->detect()]);
+    }
+
+    private function intParam(mixed $value): int {
+        return is_scalar($value) && ctype_digit((string) $value) ? (int) $value : 0;
     }
 
     /** Recalcule les échéances de toutes les règles actives (à lancer à chaque début de mois, ou par la commande). */
