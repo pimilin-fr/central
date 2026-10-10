@@ -1,0 +1,93 @@
+{% extends 'modern.html.twig' %}
+
+{% block title %}Prévisions{% endblock %}
+
+{% block body %}
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">Prévisions</h1>
+                <p class="page-subtitle">Ce qui va arriver : abonnements, LOA, paiements en plusieurs fois, factures variables. Pondéré par la certitude.</p>
+            </div>
+            <div class="pv-actions">
+                <form method="post" action="{{ path('app_prevision_refresh') }}" class="pv-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">
+                    <button type="submit" class="page-action" title="Ajoute les échéances des prochains mois">Actualiser</button>
+                </form>
+                <a class="page-action page-action-primary" href="{{ path('app_prevision_new') }}"><twig:ux:icon name="gridicons:add" /><span>Nouvelle règle</span></a>
+            </div>
+        </div>
+
+        {% if retard is not empty %}
+            <section class="rc-panel pv-month">
+                <header class="pv-month-head"><h3 class="pv-late">En retard · {{ retard|length }}</h3><span class="pv-month-sums">dates dépassées, à concrétiser ou ignorer</span></header>
+                <div class="rc-table-wrap"><table class="ops-table"><tbody>
+                    {% for e in retard %}{% include 'prevision/_echeance_row.html.twig' with { e: e, late: true, today: today } only %}{% endfor %}
+                </tbody></table></div>
+            </section>
+        {% endif %}
+
+        {% for key, month in months %}
+            <section class="rc-panel pv-month">
+                <header class="pv-month-head">
+                    <h3>{{ ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][month.label|date('n') - 1] }} {{ month.label|date('Y') }}</h3>
+                    <span class="pv-month-sums">
+                        Prévu : <strong>{{ month.brut < 0 ? '−' : '+' }} {{ month.brut|abs|number_format(2, ',', ' ') }} €</strong>
+                        · pondéré : <strong>{{ month.pondere < 0 ? '−' : '+' }} {{ month.pondere|abs|number_format(2, ',', ' ') }} €</strong>
+                    </span>
+                </header>
+                <div class="rc-table-wrap"><table class="ops-table"><tbody>
+                    {% for e in month.echeances %}{% include 'prevision/_echeance_row.html.twig' with { e: e, late: false, today: today } only %}{% endfor %}
+                </tbody></table></div>
+            </section>
+        {% else %}
+            {% if retard is empty %}<p class="rc-empty">Aucune échéance prévue. Créez une règle pour commencer.</p>{% endif %}
+        {% endfor %}
+
+        <section class="rc-panel">
+            <header class="rc-panel-head"><h2>Règles <span class="rc-count">{{ regles|length }}</span></h2></header>
+            {% if regles is empty %}
+                <p class="rc-empty">Aucune règle.</p>
+            {% else %}
+                <div class="rc-table-wrap">
+                    <table class="ops-table">
+                        <thead><tr>
+                            <th class="px-4 py-3 text-left">Règle</th>
+                            <th class="px-4 py-3 text-left">Rythme</th>
+                            <th class="px-4 py-3 text-left">Certitude</th>
+                            <th class="px-4 py-3 text-left">Montants</th>
+                            <th class="px-4 py-3 text-left">Période</th>
+                            <th class="px-4 py-3"></th>
+                        </tr></thead>
+                        <tbody>
+                        {% for r in regles %}
+                            <tr class="ops-row {{ r.actif ? '' : 'is-closed' }}">
+                                <td class="px-4 py-2">
+                                    <a class="ops-group-link" href="{{ path('app_prevision_edit', { id: r.id }) }}">{{ r.libelle }}</a>
+                                    <div class="pv-range">{{ r.tiers.name }} · {{ r.portefeuille.libelle }}{% if not r.actif %} · inactive{% endif %}</div>
+                                </td>
+                                <td class="px-4 py-2">{{ r.frequence.label }}, le {{ r.jour }}{% if r.jourFin %}–{{ r.jourFin }}{% endif %}</td>
+                                <td class="px-4 py-2"><span class="pv-badge is-{{ r.certitude.value }}">{{ r.certitude.label }}</span>{% if r.estime %} <span class="pv-range">montant variable</span>{% endif %}</td>
+                                <td class="px-4 py-2">
+                                    {% for t in r.tranches %}
+                                        <div>{{ t.montant|number_format(2, ',', ' ') }} €<span class="pv-range"> dès le {{ t.aPartirDe|date('d/m/Y') }}</span></div>
+                                    {% endfor %}
+                                    {% if estimations[r.id] is defined and estimations[r.id] is not null %}
+                                        <div class="pv-range" title="Moyenne des 6 dernières opérations de ce tiers">≈ {{ estimations[r.id]|number_format(2, ',', ' ') }} € en moyenne récente</div>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-2">
+                                    dès le {{ r.debut|date('d/m/Y') }}
+                                    {% if r.fin %}<div class="pv-range">jusqu'au {{ r.fin|date('d/m/Y') }}</div>{% endif %}
+                                    {% if r.nbEcheances %}<div class="pv-range">{{ r.nbEcheances }} échéances</div>{% endif %}
+                                </td>
+                                <td class="px-4 py-2 text-right"><a class="ops-group-link" href="{{ path('app_prevision_edit', { id: r.id }) }}">Modifier</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

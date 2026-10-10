@@ -44,6 +44,12 @@
             <span class="sidebar-link-copy">Portefeuilles</span>
         </a>
 
+        <a href="{{ path('app_prevision_index') }}"
+           class="sidebar-link {{ route starts with 'app_prevision_' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="lucide:calendar-clock" /></span>
+            <span class="sidebar-link-copy">Prévisions</span>
+        </a>
+
         <a href="{{ path('app_adresse_index') }}"
            class="sidebar-link {{ route starts with 'app_adresse_' ? 'is-active' : '' }}">
             <span class="sidebar-link-icon"><twig:ux:icon name="entypo:address" /></span>
