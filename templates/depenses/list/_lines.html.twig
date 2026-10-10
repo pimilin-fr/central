@@ -1,0 +1,62 @@
+{#
+    Liste d'un relevé : EXACTEMENT le rendu de l'écran « Faire le relevé » (relevé clos), avec une case de sélection
+    pour les modifications en masse. Paramètres : depenses (déjà dans l'ordre du relevé), before (solde avant, ou null)
+#}
+{% set lines = [] %}
+{% set cur = [] %}
+{% set curRank = null %}
+{% for depense in depenses %}
+    {% if cur is not empty and depense.releveOrdre is not null and depense.releveOrdre == curRank %}
+        {% set cur = cur|merge([depense]) %}
+    {% else %}
+        {% if cur is not empty %}{% set lines = lines|merge([cur]) %}{% endif %}
+        {% set cur = [depense] %}
+    {% endif %}
+    {% set curRank = depense.releveOrdre %}
+{% endfor %}
+{% if cur is not empty %}{% set lines = lines|merge([cur]) %}{% endif %}
+
+<div data-select-scope>
+    <label class="rc-selectall"><input type="checkbox" class="select-all"> Tout sélectionner</label>
+    <ol class="rc-list is-readonly is-inline is-selectable">
+        {% set run = before|default(0) %}
+        {% for line in lines %}
+            {% set total = 0 %}
+            {% set names = [] %}
+            {% for op in line %}
+                {% set total = total + (op.categorie.isDepense ? -(op.montant * 1) : (op.montant * 1)) %}
+                {% if op.tiers.name not in names %}{% set names = names|merge([op.tiers.name]) %}{% endif %}
+            {% endfor %}
+            {% set run = run + total %}
+            <li class="rc-line is-readonly" {{ names|length > 1 ? 'data-multi-tiers=1' : '' }}>
+                <div class="rc-line-head">
+                    {% if line|length == 1 %}
+                        <input type="checkbox" name="ids[]" value="{{ line[0].id }}" class="row-checkbox">
+                    {% else %}
+                        <input type="checkbox" class="line-check" title="Cocher tout le détail">
+                    {% endif %}
+                    <span class="rc-rank">{{ line[0].releveOrdre ?? loop.index }}</span>
+                    <span class="rc-date">{{ line[0].date|date('d/m/Y') }}</span>
+                    <span class="rc-main"><strong>{{ names|join(' + ') }}</strong>{% if line|length == 1 %}<small>{{ line[0].categorie.name }}</small>{% endif %}</span>
+                    {% if line|length > 1 %}<span class="rc-chip is-detail">Détail × {{ line|length }}</span>{% else %}<span></span>{% endif %}
+                    <span class="rc-amount {{ total < 0 ? 'amount-expense' : 'amount-income' }}">{{ total < 0 ? '−' : '+' }} {{ total|abs|number_format(2, ',', ' ') }} €</span>
+                    {% if before is not null %}<span class="rc-balance is-visible">{{ run|number_format(2, ',', ' ') }} €</span>{% endif %}
+                </div>
+                {% if line|length > 1 %}
+                    <ul class="rc-parts is-open">
+                        {% for op in line %}
+                            {% set signed = op.categorie.isDepense ? -(op.montant * 1) : (op.montant * 1) %}
+                            <li class="rc-op">
+                                <input type="checkbox" name="ids[]" value="{{ op.id }}" class="row-checkbox">
+                                <span class="rc-main">{% if names|length > 1 %}<strong>{{ op.tiers.name }}</strong>{% endif %}<small>{{ op.categorie.name }}</small></span>
+                                <span class="rc-amount {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">{{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% else %}
+            <li class="rc-empty">Pas de dépenses</li>
+        {% endfor %}
+    </ol>
+</div>

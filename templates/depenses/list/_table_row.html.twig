@@ -1,0 +1,107 @@
+{# Une opération (ligne + ligne de détail masquée). Paramètres : depense, numbered, colCount, sub, rankCount, part #}
+    <tr class="ops-row depense-row{{ sub ? ' is-sub' : '' }}{{ rankCount > 1 ? ' is-multi' : '' }}{{ part|default(false) ? ' ops-part' : '' }}"
+        data-id="{{ depense.id }}">
+
+        <td onclick="event.stopPropagation()">
+            <input type="checkbox"
+                   name="ids[]"
+                   value="{{ depense.id }}"
+                   class="row-checkbox">
+        </td>
+
+        {% if numbered %}<td class="px-4 py-2 text-right ops-rank{{ sub ? ' is-sub' : '' }}"{% if rankCount > 1 and not sub %} title="Détail : {{ rankCount }} opérations pointées ensemble"{% endif %}>{{ sub ? '↳' : (depense.releveOrdre ?? '·') }}</td>{% endif %}
+
+        <td class="px-4 py-2">
+            {{ depense.date|date('d/m/Y') }}
+        </td>
+
+        <td class="px-4 py-2">
+            {{ depense.categorie.name ?? '-' }}
+        </td>
+
+        <td class="px-4 py-2">
+            <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full"
+                  style="
+                  background-color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_color }};
+                  color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_text }};
+                  ">
+
+                <span class="w-2 h-2 rounded-full"
+                      style="background-color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_color }}"></span>
+
+                <span>{{ depense.tiers.name }}</span>
+            </span>
+        </td>
+
+        <td class="px-4 py-2">
+            {% if (depense.projet) %}
+                <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full"
+                      style="
+                      background-color: {{ (depense.projet.couleur ?? null)|entity_color }};
+                      color: {{ (depense.projet.couleur ?? null)|entity_text }};
+                      ">
+
+                    <span class="w-2 h-2 rounded-full"
+                          style="background-color: {{ (depense.projet.couleur ?? null)|entity_color }}"></span>
+
+                    <span>{{ depense.projet.name }}</span>
+                </span>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+
+        {#<td class="px-4 py-2 text-right font-medium
+            {{ depense.categorie.isDepense ? 'text-red-500' : 'text-green-500' }}">
+            {{ depense.montant|number_format(2, ',', ' ') }} €
+        </td>#}
+
+        {% if depense.categorie.isDepense %}
+            {% if  depense.montant < 0 %}
+                <td class="px-4 py-2 text-right amount-refund font-medium">
+                    + {{ 
+                    (
+                        (depense.montant|default('0')|replace({' ': '', ',': '.'})) * -1
+                    )
+                    |number_format(2, ',', ' ')
+                    }} €
+                </td>
+            {% else %}
+                <td class="px-4 py-2 text-right amount-expense font-medium">
+                    - {{ depense.montant|number_format(2, ',', ' ') }} €
+                </td>
+            {% endif %}
+        {% else %}
+            <td class="px-4 py-2 text-right amount-income font-medium">
+                + {{ depense.montant|number_format(2, ',', ' ') }} €
+            </td>
+        {% endif %}
+    </tr>
+
+                {# DETAILS (hidden) #}
+    <tr class="hidden ops-detail-row detail-row" id="detail-{{ depense.id }}">
+        <td colspan="{{ colCount }}" class="ops-detail-cell">
+
+            <div class="grid grid-cols-3 gap-4">
+
+                <div>
+                    <strong>Commande :</strong> {{ depense.numCommande ?? '-' }}
+                </div>
+
+                <div>
+                    <strong>Portefeuille :</strong> {{ depense.portefeuille.libelle }}
+                </div>
+
+                <div>
+                    <strong>Relevé :</strong>
+                    {{ depense.releve ? depense.releve.date|date('d/m/Y') : '-' }}
+                </div>
+                
+                <div class="md:row-span-3">
+                    <strong>Note :</strong> {{ depense.note ? depense.note  : '-' }}
+                </div>
+
+            </div>
+
+        </td>
+    </tr>

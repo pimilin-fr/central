@@ -28,7 +28,7 @@
         <span class="group-bar-label">Date</span>
         <div class="segmented" role="group" aria-label="Regrouper par période">
             {% for key, label in periodOptions %}
-                <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ groupBy: key })) }}"
+                <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ groupBy: key, tri: 'date' })) }}"
                    class="segmented-item {{ groupBy == key ? 'is-active' : '' }}"
                    {% if groupBy == key %}aria-current="true"{% endif %}>{{ label }}</a>
             {% endfor %}
@@ -39,7 +39,7 @@
         <span class="group-bar-label">Élément</span>
         <div class="segmented" role="group" aria-label="Regrouper par élément">
             {% for key, label in elementOptions %}
-                <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ groupBy: key })) }}"
+                <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ groupBy: key, tri: 'date' })) }}"
                    class="segmented-item {{ groupBy == key ? 'is-active' : '' }}"
                    {% if groupBy == key %}aria-current="true"{% endif %}>{{ label }}</a>
             {% endfor %}
@@ -53,7 +53,7 @@
                class="segmented-item {{ currentTri == 'date' ? 'is-active' : '' }}"
                title="Par date (habituel)"
                {% if currentTri == 'date' %}aria-current="true"{% endif %}>Date</a>
-            <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ tri: 'releve' })) }}"
+            <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ tri: 'releve', groupBy: 'releve' })) }}"
                class="segmented-item {{ currentTri == 'releve' ? 'is-active' : '' }}"
                title="Par relevé, dans l'ordre du relevé de compte (les relevés finalisés sont toujours ainsi)"
                {% if currentTri == 'releve' %}aria-current="true"{% endif %}>Relevé</a>

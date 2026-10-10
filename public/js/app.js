@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.8.0",
+        version: "v1.8.1",
         appName: "Central"
     },
 
@@ -1041,18 +1041,23 @@ const App = {
             App.log('Init select all');
 
             document.addEventListener('change', function (e) {
+                if (e.target.classList.contains('line-check')) {
+                    const line = e.target.closest('.rc-line');
+                    line && line.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
+                    return;
+                }
                 if (!e.target.classList.contains('select-all')) {
                     return;
                 }
 
-                const table = e.target.closest('table');
+                const table = e.target.closest('table, [data-select-scope]');
                 const checked = e.target.checked;
 
                 if (!table) {
                     return;
                 }
 
-                table.querySelectorAll('.row-checkbox').forEach(cb => {
+                table.querySelectorAll('.row-checkbox, .line-check').forEach(cb => {
                     cb.checked = checked;
 
                     cb.addEventListener('click', e => e.stopPropagation());

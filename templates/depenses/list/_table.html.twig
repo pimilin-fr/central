@@ -1,3 +1,6 @@
+{% if numbered|default(false) %}
+    {{ include('depenses/list/_lines.html.twig', { depenses: depenses, before: before|default(null) }, with_context = false) }}
+{% else %}
 {% set numbered = numbered|default(false) %}
 {% set colCount = numbered ? 7 : 6 %}
 {% set releveId = depense.releveId ?? 0 %}
@@ -136,3 +139,4 @@
 
     </tbody>
 </table>
+{% endif %}

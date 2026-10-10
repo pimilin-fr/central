@@ -408,3 +408,11 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 .ops-subgroup.is-releve.is-open { border-left: 3px solid var(--warning); }
 .ops-subgroup.is-none { border-left: 3px dashed var(--border); }
 .ops-subgroup .ops-table { margin: 0; }
+
+
+/* ---- Liste d'un relevé dans un portefeuille : même rendu que l'écran du relevé + sélection ---- */
+.rc-list.is-inline { max-block-size: none; overflow: visible; padding: 8px 10px; }
+.rc-list.is-selectable .rc-line-head { grid-template-columns: auto 1.6rem auto minmax(0, 1fr) auto auto auto; }
+.rc-list.is-selectable .rc-parts .rc-op { grid-template-columns: auto minmax(0, 1fr) auto; }
+.rc-list.is-selectable .rc-line-head > input, .rc-list.is-selectable .rc-op > input { margin: 0; }
+.rc-selectall { display: inline-flex; align-items: center; gap: 6px; margin: 8px 12px 0; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; }

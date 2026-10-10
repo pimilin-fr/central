@@ -26,6 +26,9 @@ class DepenseGroupManager {
         $this->grouper = $grouper;
         $this->groupBy = $request->query->get('groupBy', 'releve');
         $this->tri = DepenseOrderer::normalize($request->query->get('tri'));
+        if ($this->tri === DepenseOrderer::TRI_RELEVE) {
+            $this->groupBy = 'releve'; // « Tri : Relevé » = les relevés sont les groupes principaux
+        }
     }
 
     public function build(array $depenses, float $initialBalance = 0): array {

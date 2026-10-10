@@ -118,7 +118,8 @@
             {% else %}
                 {{ include('depenses/list/_table.html.twig', {
                     depenses: group.depenses,
-                    numbered: group.statementOrder
+                    numbered: group.statementOrder,
+                    before: (group.statementOrder and group.cumulative) ? group.previousBalance : null
                 }) }}
             {% endif %}
         </div>
