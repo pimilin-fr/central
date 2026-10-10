@@ -101,20 +101,6 @@
     border-radius: 10px;
     font-size: 12px;
 }
-.rc-line.is-cursor { box-shadow: 0 3px 0 -1px var(--accent); }
-.rc-line.is-cursor::after {
-    content: "les prochaines lignes iront ici ↓";
-    position: absolute;
-    inset-inline-end: 8px;
-    inset-block-end: -9px;
-    padding: 0 6px;
-    color: var(--accent-contrast);
-    background: var(--accent);
-    border-radius: 6px;
-    font-size: 9px;
-    font-weight: 800;
-    z-index: 1;
-}
 .rc-line[data-parts]:not([data-parts="1"]) { border-inline-start: 3px solid var(--accent); }
 .rc-line-head {
     column-gap: 7px;
@@ -331,9 +317,8 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 
 /* colonnes : relevé large, « À pointer » étroit et fixe */
 .rc-columns { grid-template-columns: minmax(0, 1fr) minmax(17rem, 25rem); gap: 12px; }
-.rc-pool-panel { position: sticky; top: 8px; max-block-size: calc(100vh - 84px); padding: 10px; gap: 8px; }
-.rc-pool-panel .rc-list.is-pool { max-block-size: none; overflow: auto; min-block-size: 0; }
-.rc-pool-panel { grid-template-rows: auto auto auto minmax(0, 1fr); }
+.rc-pool-panel { position: sticky; top: calc(var(--topbar-height, 72px) + 8px); max-block-size: calc(100vh - var(--topbar-height, 72px) - 84px); padding: 10px; gap: 8px; }
+.rc-pool-panel .rc-list.is-pool { max-block-size: calc(100vh - var(--topbar-height, 72px) - 250px); overflow: auto; min-block-size: 8rem; }
 .rc-pool-actions .page-action { padding-inline: 8px; font-size: 11.5px; }
 @media (max-width: 960px) {
     .rc-columns { grid-template-columns: minmax(0, 1fr); }
@@ -345,7 +330,7 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 .rc-list.is-selected { max-block-size: none; overflow: visible; gap: 2px; }
 .rc-sticky {
     position: sticky;
-    top: 0;
+    top: var(--topbar-height, 72px); /* sous la barre du haut (elle est collée et passerait par-dessus) */
     z-index: 6;
     margin: -14px -14px 4px;
     padding: 8px 14px;
@@ -386,3 +371,26 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 .rc-sums strong.amount-expense { color: var(--danger); }
 .rc-sums strong.amount-income { color: var(--success); }
 .rc-actions-buttons { display: inline-flex; gap: 8px; }
+
+/* ---- Sélection multiple : total des éléments cochés ---- */
+.rc-selsum {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    padding: 4px 10px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    border-radius: 8px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.rc-selsum[hidden] { display: none; }
+.rc-selsum strong { font-size: 13px; }
+.rc-selsum .rc-linkbtn { margin-inline-start: auto; font-size: 11.5px; }
+.rc-sticky .rc-selsum { flex-basis: 100%; }
+
+.rc-selsum .page-action { padding: 2px 10px; font-size: 11.5px; }
+.rc-selsum-actions { margin-inline-start: auto; display: inline-flex; align-items: center; gap: 10px; }
+.rc-selsum .rc-selsum-actions .rc-linkbtn { margin-inline-start: 0; }

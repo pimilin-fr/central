@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.8.0",
+        version: "v1.9.3",
         appName: "Central"
     },
 
@@ -554,7 +554,6 @@ const App = {
             const isNew = root.hasAttribute('data-rc-new');
             const money = new Intl.NumberFormat('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-            let cursor = null;   // ligne après laquelle iront les prochaines lignes (null = fin)
             let dirty = false;
             let drag = null;     // {part, line} en cours de glissement
             let msgTimer = null;
@@ -633,18 +632,12 @@ const App = {
             const insertLine = (line, before) => {
                 if (before !== undefined) {
                     list.insertBefore(line, before);
-                } else if (cursor && list.contains(cursor)) {
-                    cursor.after(line);
-                    cursor = line; // les ajouts suivants se placent à la suite
                 } else {
                     list.append(line);
                 }
             };
 
             const dropLine = line => {
-                if (cursor === line) {
-                    cursor = line.previousElementSibling || null;
-                }
                 line.remove();
             };
 
@@ -691,7 +684,7 @@ const App = {
                         '<span class="rc-amount ' + (total < 0 ? 'amount-expense' : 'amount-income') + '">' + signed(total) + '</span>' +
                         '<span class="rc-balance" title="Solde cumulé après cette ligne">' + money.format(running) + ' €</span>' +
                         '<span class="rc-tools">' +
-                        '<button type="button" class="rc-btn' + (line === cursor ? ' is-on' : '') + '" data-rc-here title="Insérer les prochaines lignes juste après celle-ci" aria-label="Insérer après cette ligne">⤓</button>' +
+                                                '<button type="button" class="rc-btn" data-rc-bring title="Placer cette ligne juste après la dernière ligne pointée (en premier si aucune n\'est pointée)" aria-label="Placer après la dernière ligne pointée">⤒</button>' +
                         '<button type="button" class="rc-btn" data-rc-up title="Monter" aria-label="Monter">▲</button>' +
                         '<button type="button" class="rc-btn" data-rc-down title="Descendre" aria-label="Descendre">▼</button>' +
                         (parts.length > 1 ? '<button type="button" class="rc-btn" data-rc-split title="Dégrouper : une ligne par opération" aria-label="Dégrouper">⧉</button>' : '') +
@@ -711,7 +704,6 @@ const App = {
                 all.forEach((line, index) => {
                     running += partsOf(line).reduce((sum, part) => sum + (parseFloat(part.dataset.amount) || 0), 0);
                     renderHead(line, index, running);
-                    line.classList.toggle('is-cursor', line === cursor);
                     line.classList.toggle('is-done', isDone(line));
                     partsOf(line).forEach(part => {
                         part.querySelector('[data-rc-input]').name = 'lines[' + index + '][]';
@@ -769,6 +761,29 @@ const App = {
                         ? pending + ' ligne' + (pending > 1 ? 's ne sont pas pointées' : ' n\'est pas pointée') + ' (vérifiées sur le relevé de compte). Finaliser quand même ?\n\n'
                         : '') + finalizeBtn.dataset.confirmBase;
                 saveDone();
+                updateSelection();
+            };
+
+            /* ---- sélection multiple : nombre et montant cumulé des éléments cochés ---- */
+            const selectedPool = () => poolRows().filter(row => !row.hidden && row.querySelector('[data-rc-check]')?.checked);
+            const updateSelection = () => {
+                const fill = (box, count, label, amount) => {
+                    if (!box) {
+                        return;
+                    }
+                    box.hidden = count === 0;
+                    if (count > 0) {
+                        const text = box.querySelector('[data-rc-sel-text]');
+                        text.innerHTML = esc(count + ' ' + label + ' : ') + '<strong class="' + (amount < 0 ? 'amount-expense' : 'amount-income') + '">' + esc(signed(amount)) + '</strong>';
+                    }
+                };
+                const rows = selectedPool();
+                fill(root.querySelector('[data-rc-sel-pool]'), rows.length, rows.length > 1 ? 'sélectionnées' : 'sélectionnée',
+                        rows.reduce((sum, row) => sum + (parseFloat(row.dataset.amount) || 0), 0));
+                const chosen = checkedLines();
+                const parts = chosen.flatMap(partsOf);
+                fill(root.querySelector('[data-rc-sel-lines]'), chosen.length, chosen.length > 1 ? 'lignes sélectionnées' : 'ligne sélectionnée',
+                        parts.reduce((sum, part) => sum + (parseFloat(part.dataset.amount) || 0), 0));
             };
 
             const changed = () => {
@@ -878,6 +893,37 @@ const App = {
                 });
             }
 
+            /* ---- cases à cocher : Maj+clic coche une plage ; le total des éléments cochés se met à jour ---- */
+            const lastPicked = {pool: null, line: null};
+            root.addEventListener('click', event => {
+                const box = event.target.closest('input[data-rc-check], input[data-rc-check-line]');
+                if (!box) {
+                    const clear = event.target.closest('[data-rc-sel-clear]');
+                    if (clear) {
+                        const scope = clear.closest('[data-rc-sel-pool]') ? 'pool' : 'line';
+                        (scope === 'pool' ? poolRows().map(r => r.querySelector('[data-rc-check]')) : lines().map(l => l.querySelector('[data-rc-check-line]')))
+                                .forEach(cb => { if (cb) { cb.checked = false; } });
+                        updateSelection();
+                    }
+                    return;
+                }
+                const kind = box.hasAttribute('data-rc-check') ? 'pool' : 'line';
+                const item = box.closest(kind === 'pool' ? '[data-rc-op]' : '[data-rc-line]');
+                const items = kind === 'pool' ? poolRows().filter(r => !r.hidden) : lines();
+                const last = lastPicked[kind];
+                if (event.shiftKey && last && items.includes(last) && items.includes(item)) {
+                    const [from, to] = [items.indexOf(last), items.indexOf(item)].sort((a, b) => a - b);
+                    items.slice(from, to + 1).forEach(it => {
+                        const cb = it.querySelector(kind === 'pool' ? '[data-rc-check]' : '[data-rc-check-line]');
+                        if (cb) {
+                            cb.checked = box.checked;
+                        }
+                    });
+                }
+                lastPicked[kind] = item;
+                updateSelection();
+            });
+
             /* ---- clics ---- */
             root.addEventListener('click', event => {
                 const target = event.target;
@@ -915,7 +961,7 @@ const App = {
                     poolRows().filter(row => groupKey(row) === groupKey(part)).forEach(row => {
                         row.querySelector('[data-rc-check]').checked = true;
                     });
-                    return;
+                    return updateSelection();
                 }
 
                 if (target.closest('[data-rc-add-group]')) {
@@ -966,18 +1012,24 @@ const App = {
                 }
 
                 if (!line) {
-                    const sortBtn = target.closest('[data-rc-sort]');
-                    if (sortBtn) {
-                        const sign = sortBtn.dataset.rcSort === 'desc' ? -1 : 1;
-                        lines().sort((a, b) => sign * (lineKey(a) < lineKey(b) ? -1 : 1)).forEach(l => list.append(l));
-                        cursor = null;
-                        return changed();
-                    }
                     return;
                 }
 
                 if (target.closest('[data-rc-remove-line]')) {
                     partsOf(line).forEach(toPool);
+                    return changed();
+                }
+                if (target.closest('[data-rc-bring]')) {
+                    // « remonter » : juste après la dernière ligne pointée (hors celle-ci), ou en tête si aucune
+                    const others = lines().filter(l => l !== line);
+                    let lastDone = -1;
+                    others.forEach((l, i) => { if (isDone(l)) { lastDone = i; } });
+                    if (lastDone >= 0) {
+                        others[lastDone].after(line);
+                    } else {
+                        list.prepend(line);
+                    }
+                    setDone(line, true); // placée à la main : pointée
                     return changed();
                 }
                 if (target.closest('[data-rc-up]')) {
@@ -996,10 +1048,6 @@ const App = {
                     }
                     return changed();
                 }
-                if (target.closest('[data-rc-here]')) {
-                    cursor = cursor === line ? null : line;
-                    return refresh();
-                }
                 if (target.closest('[data-rc-split]')) {
                     const parts = partsOf(line);
                     let after = line;
@@ -1016,7 +1064,6 @@ const App = {
             sortBtns.forEach(btn => btn.addEventListener('click', event => {
                 const sign = btn.dataset.rcSort === 'desc' ? -1 : 1;
                 lines().sort((a, b) => sign * (lineKey(a) < lineKey(b) ? -1 : 1)).forEach(l => list.append(l));
-                cursor = null;
                 event.stopPropagation();
                 changed();
             }));
@@ -1028,6 +1075,7 @@ const App = {
                     poolRows().forEach(row => {
                         row.hidden = query !== '' && !(row.dataset.search || '').includes(query);
                     });
+                    updateSelection();
                 });
             }
 
