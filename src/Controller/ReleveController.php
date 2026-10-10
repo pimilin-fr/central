@@ -45,8 +45,8 @@ final class ReleveController extends AbstractController {
         $manager = new ReleveManager($em);
 
         $releve = null;
-        if ($request->query->getInt('releve') > 0) {
-            $releve = $releveRepo->find($request->query->getInt('releve'));
+        if ($this->intParam($request->query->get('releve')) > 0) {
+            $releve = $releveRepo->find($this->intParam($request->query->get('releve')));
             if ($releve === null || $releve->getPortefeuille()->getId() !== $portefeuille->getId()) {
                 throw $this->createNotFoundException('Relevé introuvable pour ce portefeuille');
             }
@@ -205,7 +205,7 @@ final class ReleveController extends AbstractController {
         }
 
         try {
-            $releveId = $request->request->getInt('releve');
+            $releveId = $this->intParam($request->request->get('releve'));
             if ($releveId > 0) {
                 $releve = $releveRepo->find($releveId);
                 if ($releve === null || $releve->getPortefeuille()->getId() !== $portefeuille->getId()) {
@@ -280,7 +280,7 @@ final class ReleveController extends AbstractController {
 
             return $this->redirectToRoute('app_releve_compose', array_filter([
                         'id' => $portefeuille->getId(),
-                        'releve' => $request->request->getInt('releve') ?: null,
+                        'releve' => $this->intParam($request->request->get('releve')) ?: null,
                         'date' => $date->format('Y-m-d'),
             ]));
         }
@@ -298,6 +298,11 @@ final class ReleveController extends AbstractController {
                     'id' => $releve->getPortefeuille()->getId(),
                     'releve' => $releve->getId(),
         ]);
+    }
+
+    /** Entier tolérant : '' / null / non numérique => 0 (getInt() lève une exception sur une chaîne vide). */
+    private function intParam(mixed $value): int {
+        return is_scalar($value) && ctype_digit((string) $value) ? (int) $value : 0;
     }
 
     private function parseDate(mixed $value): ?DateTime {
