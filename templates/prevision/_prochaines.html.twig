@@ -1,34 +1,35 @@
 {#
     Panneau latéral rétractable « Prochaines échéances », superposé à la fiche portefeuille.
     Replié : une languette au bord droit affiche le nombre d'échéances et le montant net.
-    Paramètres : portefeuille, retard, proches, total, brut, pondere, today, back
+    Paramètres : portefeuille, retard, proches, total, brut, pondere, today, back, mode ('page' | 'releve')
 #}
 {% set nb = retard|length + proches|length %}
-<aside class="pv-drawer" data-pv-drawer aria-label="Prochaines échéances">
+{% set mode = mode|default('page') %}
+<aside class="pv-drawer{{ mode == 'releve' ? ' is-releve' : '' }}" data-pv-drawer data-pv-mode="{{ mode }}" aria-label="Prochaines échéances">
     <button type="button" class="pv-drawer-handle" data-pv-toggle aria-expanded="false" aria-controls="pv-drawer-panel"
             title="Prochaines échéances : {{ nb }} · net {{ brut < 0 ? '−' : '+' }} {{ brut|abs|number_format(2, ',', ' ') }} € (pondéré {{ pondere < 0 ? '−' : '+' }} {{ pondere|abs|number_format(2, ',', ' ') }} €)">
         <twig:ux:icon name="lucide:calendar-clock" />
-        <span class="pv-drawer-count">{{ nb }}</span>
-        <span class="pv-drawer-sum {{ brut < 0 ? 'amount-expense' : 'amount-income' }}">{{ brut < 0 ? '−' : '+' }}{{ brut|abs|number_format(0, ',', ' ') }} €</span>
+        <span class="pv-drawer-count" data-pv-nb>{{ nb }}</span>
+        <span class="pv-drawer-sum {{ brut < 0 ? 'amount-expense' : 'amount-income' }}" data-pv-net>{{ brut < 0 ? '−' : '+' }}{{ brut|abs|number_format(0, ',', ' ') }} €</span>
         {% if retard is not empty %}<span class="pv-drawer-late" title="{{ retard|length }} en retard">!</span>{% endif %}
     </button>
 
     <div class="pv-drawer-panel" id="pv-drawer-panel">
         <header class="pv-drawer-head">
             <div>
-                <h2>Prochaines échéances</h2>
-                <p class="pv-range">{{ nb }} · net <strong class="{{ brut < 0 ? 'amount-expense' : 'amount-income' }}">{{ brut < 0 ? '−' : '+' }} {{ brut|abs|number_format(2, ',', ' ') }} €</strong>
+                <h2>{{ mode == 'releve' ? 'Prévu à ajouter au relevé' : 'Prochaines échéances' }}</h2>
+                <p class="pv-range"><span data-pv-nb2>{{ nb }}</span> · net <strong data-pv-net2 class="{{ brut < 0 ? 'amount-expense' : 'amount-income' }}">{{ brut < 0 ? '−' : '+' }} {{ brut|abs|number_format(2, ',', ' ') }} €</strong>
                     · pondéré {{ pondere < 0 ? '−' : '+' }} {{ pondere|abs|number_format(2, ',', ' ') }} €</p>
             </div>
             <button type="button" class="pv-remove" data-pv-toggle title="Replier">✕</button>
         </header>
         <ul class="pv-cards">
-            {% for e in retard %}{% include 'prevision/_echeance_card.html.twig' with { e: e, late: true, today: today, back: back } only %}{% endfor %}
-            {% for e in proches %}{% include 'prevision/_echeance_card.html.twig' with { e: e, late: false, today: today, back: back } only %}{% endfor %}
+            {% for e in retard %}{% include 'prevision/_echeance_card.html.twig' with { e: e, late: true, today: today, back: back, mode: mode } only %}{% endfor %}
+            {% for e in proches %}{% include 'prevision/_echeance_card.html.twig' with { e: e, late: false, today: today, back: back, mode: mode } only %}{% endfor %}
         </ul>
         <footer class="pv-drawer-foot">
-            <a class="pv-link-btn" href="{{ path('app_portefeuille_show', { id: portefeuille.id, tab: 'prevision' }) }}">Tout voir{% if total > nb %} ({{ total }}){% endif %}</a>
-            <a class="pv-link-btn" href="{{ path('app_prevision_new', { portefeuille: portefeuille.id }) }}">+ Nouvelle règle</a>
+            <a class="pv-link-btn" href="{{ path('app_portefeuille_show', { id: portefeuille.id, tab: 'prevision' }) }}"{% if mode == 'releve' %} target="_blank" rel="noopener"{% endif %}>Tout voir{% if total > nb %} ({{ total }}){% endif %}</a>
+            <a class="pv-link-btn" href="{{ path('app_prevision_new', { portefeuille: portefeuille.id }) }}"{% if mode == 'releve' %} target="_blank" rel="noopener"{% endif %}>+ Nouvelle règle</a>
         </footer>
     </div>
 </aside>

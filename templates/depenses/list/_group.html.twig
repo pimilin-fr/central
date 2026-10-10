@@ -85,10 +85,42 @@
 
         {# DETAILS #}
         <div id="group-{{ groupKey }}" class="hidden">
-            {{ include('depenses/list/_table.html.twig', {
-                depenses: group.depenses,
-                numbered: group.statementOrder
-            }) }}
+            {# « Tri : Relevé » : un sous-groupe par relevé (même visuel que les groupes), sauf si le groupe EST déjà un relevé #}
+            {% set runs = (app.request.query.get('tri') == 'releve' and not isReleve) ? group.releveRuns : [] %}
+            {% if runs|length > 1 or (runs|length == 1 and runs[0].releve is not null) %}
+                {% for run in runs %}
+                    {% set releve = run.releve %}
+                    <section class="ops-subgroup{{ releve ? ' is-releve ' ~ (releve.closed ? 'is-closed' : 'is-open') : ' is-none' }}">
+                        <header class="ops-group-header ops-subgroup-header">
+                            <div class="ops-group-title">
+                                {% if releve %}
+                                    <span class="ops-group-label">Relevé du {{ releve.date|date('d/m/Y') }}</span>
+                                    {% if releve.closed %}
+                                        <span class="ops-group-badge is-closed" title="Relevé clos : opérations dans l'ordre du relevé de compte"><twig:ux:icon name="lucide:lock" /> Clos</span>
+                                    {% else %}
+                                        <span class="ops-group-badge is-open" title="Relevé non clos"><twig:ux:icon name="lucide:lock-open" /> Non clos</span>
+                                    {% endif %}
+                                    <a class="ops-group-link" href="{{ path('app_releve_compose', { id: releve.portefeuille.id, releve: releve.id }) }}"
+                                       title="{{ releve.closed ? 'Voir le relevé' : 'Ordonner / compléter / clore le relevé' }}">{{ releve.closed ? 'Voir' : 'Compléter' }}</a>
+                                {% else %}
+                                    <span class="ops-group-label is-unassigned">Hors relevé</span>
+                                {% endif %}
+                                <span class="ops-group-count">{{ run.depenses|length }} opération{{ run.depenses|length > 1 ? 's' : '' }}</span>
+                            </div>
+                            <div class="ops-group-totals">
+                                {% if run.totalDepense > 0 %}<span class="amount-expense font-medium">- {{ run.totalDepense|number_format(2, ',', ' ') }} €</span>{% endif %}
+                                {% if run.totalRevenu > 0 %}<span class="amount-income font-medium">+ {{ run.totalRevenu|number_format(2, ',', ' ') }} €</span>{% endif %}
+                            </div>
+                        </header>
+                        {{ include('depenses/list/_table.html.twig', { depenses: run.depenses, numbered: run.numbered }) }}
+                    </section>
+                {% endfor %}
+            {% else %}
+                {{ include('depenses/list/_table.html.twig', {
+                    depenses: group.depenses,
+                    numbered: group.statementOrder
+                }) }}
+            {% endif %}
         </div>
 
     </div>

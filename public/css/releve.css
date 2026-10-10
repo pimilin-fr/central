@@ -398,3 +398,13 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 /* Filtres de la vue « Tous les relevés » */
 .rc-filters { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
 .rc-filters .modern-form-control { width: auto; min-width: 11rem; }
+
+
+/* « Tri : Relevé » : sous-groupes par relevé, même langage visuel que les groupes (en-tête, badges, totaux) */
+.ops-subgroup { margin: 6px 10px 10px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.ops-subgroup-header { cursor: default; padding: 8px 12px; background: var(--surface-hover, transparent); border-bottom: 1px solid var(--border); }
+.ops-subgroup-header:hover { background: var(--surface-hover, transparent); }
+.ops-subgroup.is-releve.is-closed { border-left: 3px solid var(--success); }
+.ops-subgroup.is-releve.is-open { border-left: 3px solid var(--warning); }
+.ops-subgroup.is-none { border-left: 3px dashed var(--border); }
+.ops-subgroup .ops-table { margin: 0; }

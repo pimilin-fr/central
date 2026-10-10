@@ -73,6 +73,42 @@ class DepenseGroup {
         return $this;
     }
 
+    /**
+     * Opérations découpées en séries consécutives par relevé (« Tri : Relevé ») : un sous-groupe par relevé,
+     * « hors relevé » compris. Chaque série porte ses totaux et sait si ses lignes sont numérotées (ordre du relevé de compte).
+     *
+     * @return list<array{releve: ?\App\Entity\Releve, depenses: list<Depenses>, totalDepense: float, totalRevenu: float, net: float, numbered: bool}>
+     */
+    public function getReleveRuns(): array {
+        $runs = [];
+        foreach ($this->depenses as $depense) {
+            $releve = $depense->getReleve();
+            $id = $releve?->getId() ?? 0;
+            if ($runs === [] || $runs[array_key_last($runs)]['id'] !== $id) {
+                $runs[] = ['id' => $id, 'releve' => $releve, 'depenses' => [], 'totalDepense' => 0.0, 'totalRevenu' => 0.0];
+            }
+            $last = array_key_last($runs);
+            $runs[$last]['depenses'][] = $depense;
+            if ($depense->getCategorie()->isDepense()) {
+                $runs[$last]['totalDepense'] += (float) $depense->getMontant();
+            } else {
+                $runs[$last]['totalRevenu'] += (float) $depense->getMontant();
+            }
+        }
+
+        foreach ($runs as &$run) {
+            $ranked = $run['releve'] !== null;
+            foreach ($run['depenses'] as $depense) {
+                $ranked = $ranked && $depense->getReleveOrdre() !== null;
+            }
+            $run['numbered'] = $run['releve'] !== null && ($run['releve']->isClosed() || $ranked);
+            $run['net'] = $run['totalRevenu'] - $run['totalDepense'];
+        }
+        unset($run);
+
+        return $runs;
+    }
+
     /** Informations complémentaires de la stratégie (voir GroupExtraInterface). */
     public function getExtra(): array {
         return $this->extra;

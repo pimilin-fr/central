@@ -216,6 +216,34 @@ final class PrevisionController extends AbstractController {
         return $this->back($request);
     }
 
+    /**
+     * Depuis l'écran du relevé : crée l'opération à partir de l'échéance et renvoie la ligne HTML à placer
+     * dans « À pointer » / dans le relevé (même réponse que le mini formulaire « Nouvelle opération »).
+     */
+    #[Route('/echeance/{id}/concretiser-releve', name: 'app_prevision_concretiser_releve', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function concretiserReleve(PrevisionEcheance $echeance, Request $request, EntityManagerInterface $em, PrevisionManager $manager): JsonResponse {
+        if (!$this->isCsrfTokenValid(self::TOKEN, (string) $request->request->get('_token'))) {
+            return $this->json(['ok' => false, 'error' => 'Jeton de sécurité invalide, rechargez la page.'], 400);
+        }
+        $date = DateTime::createFromFormat('!Y-m-d', (string) $request->request->get('date'));
+        $montant = str_replace([' ', ','], ['', '.'], (string) $request->request->get('montant'));
+        if ($date === false || !is_numeric($montant) || (float) $montant <= 0) {
+            return $this->json(['ok' => false, 'error' => 'Date ou montant invalide.'], 422);
+        }
+        try {
+            $depense = $manager->concretiser($echeance, $date, $montant);
+            $em->flush();
+        } catch (Throwable $e) {
+            return $this->json(['ok' => false, 'error' => $e->getMessage()], 409);
+        }
+
+        return $this->json([
+                    'ok' => true,
+                    'id' => $depense->getId(),
+                    'html' => $this->renderView('releve/_composer_row.html.twig', ['op' => $depense, 'inList' => false]),
+        ]);
+    }
+
     /** Ajuste une échéance (date / montant) sans toucher aux autres ; elle n'est plus recalculée par la règle. */
     #[Route('/echeance/{id}/ajuster', name: 'app_prevision_ajuster', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function ajuster(PrevisionEcheance $echeance, Request $request, EntityManagerInterface $em): Response {
@@ -288,7 +316,7 @@ final class PrevisionController extends AbstractController {
      * Échéances en retard + celles des 45 prochains jours ; rien d'affiché s'il n'y en a pas.
      * Le nombre et le montant net restent visibles panneau replié.
      */
-    public function prochaines(Portefeuille $portefeuille, PrevisionEcheanceRepository $echeanceRepo, \Symfony\Component\HttpFoundation\RequestStack $requests): Response {
+    public function prochaines(Portefeuille $portefeuille, PrevisionEcheanceRepository $echeanceRepo, \Symfony\Component\HttpFoundation\RequestStack $requests, string $mode = 'page'): Response {
         $today = new DateTime('today');
         $limite = (clone $today)->modify('+45 days');
         $debutMois = (clone $today)->modify('first day of this month');
@@ -324,6 +352,7 @@ final class PrevisionController extends AbstractController {
                     'pondere' => $pondere,
                     'today' => $today,
                     'back' => $main ? $main->getRequestUri() : '/portefeuille',
+                    'mode' => $mode === 'releve' ? 'releve' : 'page',
         ]);
     }
 

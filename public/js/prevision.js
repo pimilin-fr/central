@@ -66,6 +66,59 @@ const CentralPrevision = {
                 set(false);
             }
         });
+
+        // Écran du relevé : « Ajouter au relevé » crée l'opération SANS recharger la page (le relevé en cours reste intact),
+        // puis prévient le module relevé (événement) qui place la ligne dans le relevé.
+        drawer.addEventListener('submit', async e => {
+            const form = e.target.closest('form[data-pv-ajax]');
+            if (!form) {
+                return;
+            }
+            e.preventDefault();
+            const card = form.closest('[data-pv-card]');
+            const error = card.querySelector('[data-pv-error]');
+            const button = form.querySelector('button[type="submit"]');
+            const oops = text => {
+                error.textContent = text;
+                error.hidden = !text;
+            };
+            oops('');
+            button.disabled = true;
+            try {
+                const response = await fetch(form.action, {method: 'POST', body: new FormData(form), headers: {'X-Requested-With': 'XMLHttpRequest'}});
+                const data = await response.json();
+                if (!data.ok) {
+                    return oops(data.error || 'Ajout impossible.');
+                }
+                card.remove();
+                this.refreshTotals(drawer);
+                document.dispatchEvent(new CustomEvent('prevision:operation-created', {detail: {id: data.id, html: data.html}}));
+            } catch (err) {
+                oops('Erreur réseau : ' + err.message);
+            } finally {
+                button.disabled = false;
+            }
+        });
+    },
+
+    /** Recalcule nombre et montant net du panneau (languette et en-tête) d'après les cartes restantes. */
+    refreshTotals(drawer) {
+        const cards = [...drawer.querySelectorAll('[data-pv-card]')];
+        const net = cards.reduce((sum, card) => sum + parseFloat(card.dataset.pvSigned || '0'), 0);
+        const sign = net < 0 ? '−' : '+';
+        const short = new Intl.NumberFormat('fr-FR', {maximumFractionDigits: 0}).format(Math.abs(net));
+        const full = new Intl.NumberFormat('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(Math.abs(net));
+        drawer.querySelectorAll('[data-pv-nb], [data-pv-nb2]').forEach(el => el.textContent = cards.length);
+        drawer.querySelectorAll('[data-pv-net]').forEach(el => {
+            el.textContent = sign + short + ' €';
+            el.classList.toggle('amount-expense', net < 0);
+            el.classList.toggle('amount-income', net >= 0);
+        });
+        drawer.querySelectorAll('[data-pv-net2]').forEach(el => {
+            el.textContent = sign + ' ' + full + ' €';
+            el.classList.toggle('amount-expense', net < 0);
+            el.classList.toggle('amount-income', net >= 0);
+        });
     },
 
     /** Suggestions : « Masquer » est mémorisé dans ce navigateur uniquement (rien n'est écrit en base). */

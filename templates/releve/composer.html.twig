@@ -199,6 +199,9 @@
                 </div>
             </form>
 
+            {# Prévisions de ce portefeuille : « Ajouter au relevé » crée l'opération et la place dans les lignes #}
+            {{ render(controller('App\\Controller\\PrevisionController::prochaines', { id: portefeuille.id, mode: 'releve' })) }}
+
         {% endif %}
     </div>
 {% endblock %}

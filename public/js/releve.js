@@ -280,6 +280,20 @@ const CentralReleve = {
 
             const checkedLines = () => lines().filter(line => line.querySelector('[data-rc-check-line]')?.checked);
 
+            /* ---- prévision concrétisée depuis le panneau latéral : l'opération est créée, on la place dans le relevé ---- */
+            document.addEventListener('prevision:operation-created', event => {
+                const holder = document.createElement('ul');
+                holder.innerHTML = String(event.detail.html || '').trim();
+                const row = holder.firstElementChild;
+                if (!row) {
+                    return;
+                }
+                pool.insertBefore(row, poolRows().find(other => sortKey(other) > sortKey(row)) || null);
+                addParts([row]);
+                say('Prévision ajoutée au relevé.', 'info');
+                changed();
+            });
+
             /* ---- mini formulaire « Nouvelle opération » (panneau replié dans « À pointer ») ---- */
             const panel = root.querySelector('[data-rc-op-panel]');
             if (panel) {

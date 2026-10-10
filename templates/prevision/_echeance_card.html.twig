@@ -1,11 +1,12 @@
 {#
     Échéance prévue en version compacte (panneau latéral).
-    Paramètres : e (PrevisionEcheance), late (bool), today (DateTime), back (chemin de retour)
+    Paramètres : e (PrevisionEcheance), late (bool), today (DateTime), back (chemin de retour), mode ('page' | 'releve')
 #}
 {% set regle = e.regle %}
 {% set back = back|default('') %}
+{% set mode = mode|default('page') %}
 {% set signed = e.montantSigne %}
-<li class="pv-card {{ late ? 'is-late' : '' }}">
+<li class="pv-card {{ late ? 'is-late' : '' }}" data-pv-card data-pv-signed="{{ signed }}">
     <div class="pv-card-top">
         <span class="pv-card-date {{ late ? 'pv-late' : '' }}">{{ e.datePrevue|date('d/m') }}{% if e.dateFin %}–{{ e.dateFin|date('d/m') }}{% endif %}{% if late %} · retard{% endif %}{% if e.ajustee %} <span title="Ajustée à la main">✎</span>{% endif %}</span>
         <strong class="{{ signed < 0 ? 'amount-expense' : 'amount-income' }}">{{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €</strong>
@@ -16,15 +17,29 @@
     </div>
     <div class="pv-range">{{ regle.tiers.name }}{% if e.montantMin and e.montantMax %} · entre {{ e.montantMin|number_format(2, ',', ' ') }} et {{ e.montantMax|number_format(2, ',', ' ') }} €{% endif %}</div>
 
-    <form method="post" class="pv-concretise" action="{{ path('app_prevision_concretiser', { id: e.id }) }}">
-        <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
-        <label><span class="pv-range">Date réelle</span>
-            <input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
-        <label><span class="pv-range">Montant réel (€)</span>
-            <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
-        <button type="submit" class="page-action page-action-primary">Concrétiser</button>
-    </form>
+    {% if mode == 'releve' %}
+        {# Depuis l'écran du relevé : on crée l'opération et on la place dans le relevé, sans quitter la page #}
+        <form method="post" class="pv-concretise" data-pv-ajax action="{{ path('app_prevision_concretiser_releve', { id: e.id }) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">
+            <label><span class="pv-range">Date réelle</span>
+                <input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
+            <label><span class="pv-range">Montant réel (€)</span>
+                <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
+            <button type="submit" class="page-action page-action-primary" title="Crée l'opération et l'ajoute aux lignes du relevé">Ajouter au relevé</button>
+        </form>
+        <p class="pv-card-error" data-pv-error hidden></p>
+    {% else %}
+        <form method="post" class="pv-concretise" action="{{ path('app_prevision_concretiser', { id: e.id }) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
+            <label><span class="pv-range">Date réelle</span>
+                <input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
+            <label><span class="pv-range">Montant réel (€)</span>
+                <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
+            <button type="submit" class="page-action page-action-primary">Concrétiser</button>
+        </form>
+    {% endif %}
 
+    {% if mode != 'releve' %}
     <div class="pv-card-more">
         <details class="pv-inline-details">
             <summary class="pv-link-btn">Ajuster</summary>
@@ -40,4 +55,5 @@
             <button type="submit" class="pv-link-btn">Ignorer</button>
         </form>
     </div>
+    {% endif %}
 </li>

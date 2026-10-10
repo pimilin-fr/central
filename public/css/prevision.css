@@ -72,3 +72,6 @@
 .pv-drawer .pv-drawer-panel { transition: visibility 0s linear .25s; }
 .pv-drawer:not(.is-open) .pv-drawer-panel { visibility: hidden; box-shadow: none; }
 .pv-drawer.is-open .pv-drawer-panel { transition-delay: 0s; }
+
+.pv-card-error { margin: 0; font-size: .85rem; color: var(--danger, #dc2626); }
+.pv-drawer.is-releve { z-index: 28; }
