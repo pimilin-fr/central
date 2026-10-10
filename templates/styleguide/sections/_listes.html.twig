@@ -1,0 +1,152 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+<p class="sg-sub">Barre de regroupement</p>
+{% set code %}{% verbatim %}
+<div class="group-bar">
+    <span class="group-bar-title"><twig:ux:icon name="lucide:layers" /> Regrouper par</span>
+    <div class="group-bar-set">
+        <span class="group-bar-label">Date</span>
+        <div class="segmented" role="group">
+            <a href="#" class="segmented-item">Année</a>
+            <a href="#" class="segmented-item">Trimestre</a>
+            <a href="#" class="segmented-item is-active" aria-current="true">Mois</a>
+            <a href="#" class="segmented-item">Semaine</a>
+        </div>
+    </div>
+    <div class="group-bar-set">
+        <span class="group-bar-label">Élément</span>
+        <div class="segmented" role="group">
+            <a href="#" class="segmented-item">Relevé</a>
+            <a href="#" class="segmented-item">Catégorie</a>
+            <a href="#" class="segmented-item">Tiers</a>
+            <a href="#" class="segmented-item">Projet</a>
+        </div>
+    </div>
+    <div class="group-bar-set">
+        <span class="group-bar-label">Tri</span>
+        <div class="segmented" role="group">
+            <a href="#" class="segmented-item is-active" aria-current="true">Date</a>
+            <a href="#" class="segmented-item">Relevé</a>
+        </div>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('group-bar', code, 'Inclure <code>depenses/list/_grouping.html.twig</code> dans les pages de liste (paramètres : <code>groupBy</code>, <code>route</code>, <code>routeParams</code>).') }}
+
+<p class="sg-sub">Groupe d'opérations</p>
+{% set code %}{% verbatim %}
+<div class="ops-group">
+    <div class="ops-group-header">
+        <div class="ops-group-title">
+            <span class="ops-group-label">Septembre 2026</span>
+            <span class="ops-group-count">3 opérations</span>
+        </div>
+        <div class="ops-group-totals">
+            <span class="amount-expense font-medium">- 154,60 €</span>
+            <span class="amount-income font-medium">+ 1 800,00 €</span>
+            <span class="ops-balance-prev">1 100,00 €</span><strong>→</strong>
+            <span class="ops-balance amount-income">2 745,40 €</span>
+        </div>
+    </div>
+    <div>
+        <table class="ops-table">
+            <thead><tr>
+                <th class="px-4 py-3 text-left"><input type="checkbox" class="select-all"></th>
+                <th class="px-4 py-3 text-left">Date</th><th class="px-4 py-3 text-left">Catégorie</th>
+                <th class="px-4 py-3 text-left">Tiers</th><th class="px-4 py-3 text-left">Projet</th>
+                <th class="px-4 py-3 text-right">Montant</th>
+            </tr></thead>
+            <tbody>
+                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td class="px-4 py-2">02/09/2026</td><td class="px-4 py-2">Courses</td>
+                    <td class="px-4 py-2"><span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full" style="background-color: {{ '@a3'|entity_color }}; color: {{ '@a3'|entity_text }}"><span class="w-2 h-2 rounded-full" style="background-color: {{ '@a3'|entity_color }}"></span><span>Leclerc</span></span></td>
+                    <td class="px-4 py-2">-</td><td class="px-4 py-2 text-right amount-expense font-medium">- 42,10 €</td></tr>
+                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td class="px-4 py-2">05/09/2026</td><td class="px-4 py-2">Salaire</td>
+                    <td class="px-4 py-2">Employeur</td><td class="px-4 py-2">-</td><td class="px-4 py-2 text-right amount-income font-medium">+ 1 800,00 €</td></tr>
+                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td class="px-4 py-2">08/09/2026</td><td class="px-4 py-2">Remboursement</td>
+                    <td class="px-4 py-2">Mutuelle</td><td class="px-4 py-2">-</td><td class="px-4 py-2 text-right amount-refund font-medium">+ 19,00 €</td></tr>
+                <tr class="ops-detail-row detail-row"><td colspan="6" class="ops-detail-cell">Ligne de détail (affichée au clic sur une opération) : commande, portefeuille, relevé, note.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('ops-group + ops-table', code, 'Un groupe = en-tête cliquable (<code>toggleGroup(clé)</code>) + tableau. Montants : dépense rouge, revenu vert, remboursement bleu. Le groupe « non défini » prend <code>is-unassigned</code> sur son libellé.') }}
+
+<p class="sg-sub">Groupe = relevé</p>
+{% set code %}{% verbatim %}
+<div class="ops-group is-releve is-closed">
+    <div class="ops-group-header">
+        <div class="ops-group-title">
+            <span class="ops-group-label">Relevé du 05/10/2026</span>
+            <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
+            <a class="ops-group-link" href="#">Voir</a>
+            <span class="ops-group-count">4 opérations</span>
+        </div>
+        <div class="ops-group-totals"><span class="amount-expense font-medium">- 154,60 €</span></div>
+    </div>
+</div>
+<div class="ops-group is-releve is-open">
+    <div class="ops-group-header">
+        <div class="ops-group-title">
+            <span class="ops-group-label">Relevé du 05/11/2026</span>
+            <span class="ops-group-badge is-open"><twig:ux:icon name="lucide:lock-open" /> Non clos · en cours</span>
+            <a class="ops-group-link" href="#">Compléter</a>
+            <span class="ops-group-count">2 opérations</span>
+        </div>
+        <div class="ops-group-totals"><span class="amount-expense font-medium">- 60,00 €</span></div>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('ops-group is-releve (is-closed / is-open)', code, 'Bordure verte = relevé clos, orange = en cours.') }}
+
+<p class="sg-sub">Liste d'un relevé (même rendu que l'écran du relevé)</p>
+{% set code %}{% verbatim %}
+{# En réel : {{ include('depenses/list/_table.html.twig', { depenses: group.depenses, numbered: group.statementOrder, before: soldeAvant }) }} #}
+<ol class="rc-list is-readonly is-inline is-selectable">
+    <li class="rc-line is-readonly">
+        <div class="rc-line-head">
+            <input type="checkbox" class="row-checkbox">
+            <span class="rc-rank">1</span><span class="rc-date">02/09/2026</span>
+            <span class="rc-main"><strong>Leclerc</strong><small>Courses</small></span>
+            <span></span>
+            <span class="rc-amount amount-expense">− 42,10 €</span>
+            <span class="rc-balance is-visible">957,90 €</span>
+        </div>
+    </li>
+    <li class="rc-line is-readonly">
+        <div class="rc-line-head">
+            <input type="checkbox" class="line-check">
+            <span class="rc-rank">2</span><span class="rc-date">03/09/2026</span>
+            <span class="rc-main"><strong>Amazon</strong></span>
+            <span class="rc-chip is-detail">Détail × 2</span>
+            <span class="rc-amount amount-expense">− 42,50 €</span>
+            <span class="rc-balance is-visible">915,40 €</span>
+        </div>
+        <ul class="rc-parts is-open">
+            <li class="rc-op"><input type="checkbox" class="row-checkbox"><span class="rc-main"><small>Courses</small></span><span class="rc-amount amount-expense">− 30,00 €</span></li>
+            <li class="rc-op"><input type="checkbox" class="row-checkbox"><span class="rc-main"><small>Maison</small></span><span class="rc-amount amount-expense">− 12,50 €</span></li>
+        </ul>
+    </li>
+</ol>
+{% endverbatim %}{% endset %}
+{{ sg.ex('rc-line (relevé clos / numéroté)', code, 'Une ligne du relevé de compte = une opération ou un « détail » (plusieurs opérations de même rang). Les détails sont toujours dépliés.') }}
+
+<p class="sg-sub">Sous-groupes par relevé</p>
+{% set code %}{% verbatim %}
+<section class="ops-subgroup is-releve is-closed">
+    <header class="ops-group-header ops-subgroup-header">
+        <div class="ops-group-title">
+            <span class="ops-group-label">Relevé du 05/10/2026</span>
+            <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
+            <span class="ops-group-count">4 opérations</span>
+        </div>
+        <div class="ops-group-totals"><span class="amount-expense font-medium">- 154,60 €</span></div>
+    </header>
+</section>
+<section class="ops-subgroup is-none">
+    <header class="ops-group-header ops-subgroup-header">
+        <div class="ops-group-title"><span class="ops-group-label is-unassigned">Hors relevé</span><span class="ops-group-count">2 opérations</span></div>
+    </header>
+</section>
+{% endverbatim %}{% endset %}
+{{ sg.ex('ops-subgroup', code, 'Bloc imbriqué dans un groupe de date ou d\'élément quand « Tri : Relevé » est actif.') }}

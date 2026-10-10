@@ -1,0 +1,68 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+<p class="sg-sub">Boutons d'action de page</p>
+{% set code %}{% verbatim %}
+{% include 'layout/modern/components/_btns.html.twig' with { btns: [
+    { label: 'Primary', path: '#', icon: 'gridicons:add', color: 'primary' },
+    { label: 'Neutral', path: '#', icon: 'lucide:pencil', color: 'neutral' },
+    { label: 'Info', path: '#', icon: 'lucide:info', color: 'info' },
+    { label: 'Danger', path: '#', icon: 'lucide:trash-2', color: 'danger' },
+    { label: 'Success', path: '#', icon: 'lucide:check', color: 'success' },
+    { label: 'Warning', path: '#', icon: 'lucide:triangle-alert', color: 'warning' }
+] } %}
+{% endverbatim %}{% endset %}
+{{ sg.ex('page-action — variantes de couleur', code, 'Passer par <code>_btns.html.twig</code> : un lien par défaut, <code>type: \'submit\'</code> pour un bouton de formulaire, <code>removeContainer: true</code> pour un bouton seul.') }}
+
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <a href="#" class="page-action page-action-primary"><span>Sans icône</span></a>
+    <button type="button" class="page-action page-action-primary" disabled><span>Désactivé</span></button>
+    <button type="button" class="page-action page-action-neutral" disabled><span>Désactivé</span></button>
+    <a href="#" class="page-action"><span>Neutre (classe seule)</span></a>
+    <a href="#" class="btn">.btn</a>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('page-action — sans icône, désactivé, classe seule', code) }}
+
+<p class="sg-sub">Boutons de carte</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <a href="#" class="entity-action"><twig:ux:icon name="lucide:star-off" /> Défaut</a>
+    <a href="#" class="entity-action is-active"><twig:ux:icon name="material-symbols:star-rounded" /> Actif</a>
+    <a href="#" class="entity-action is-danger"><twig:ux:icon name="lucide:unlink" /> Danger</a>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('entity-action', code, 'Petits boutons en bas d\'une carte d\'entité. <code>is-active</code> = état courant ; <code>is-danger</code> = rouge au survol.') }}
+
+<p class="sg-sub">Choix exclusif</p>
+{% set code %}{% verbatim %}
+<div class="segmented" role="group" aria-label="Période">
+    <a href="#" class="segmented-item is-active" aria-current="true">Mois</a>
+    <a href="#" class="segmented-item">Trimestre</a>
+    <a href="#" class="segmented-item">Année</a>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('segmented', code, 'Utilisé pour la barre de regroupement (Date / Élément / Tri).') }}
+
+<p class="sg-sub">Boutons de l'écran de relevé et des prévisions</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <button type="button" class="rc-btn" title="Trier">↑</button>
+    <button type="button" class="rc-btn is-on" title="Actif">↓</button>
+    <button type="button" class="rc-btn rc-add" title="Ajouter">＋</button>
+    <button type="button" class="rc-linkbtn">Désélectionner</button>
+    <button type="button" class="rc-chip">rc-chip (bouton)</button>
+    <button type="button" class="pv-link-btn">Ajuster</button>
+    <button type="button" class="pv-remove" title="Replier">✕</button>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('rc-btn, rc-linkbtn, rc-chip, pv-link-btn', code, 'Boutons compacts : outils de ligne (<code>rc-btn</code>), liens-boutons (<code>rc-linkbtn</code>, <code>pv-link-btn</code>), puces cliquables (<code>rc-chip</code>).') }}
+
+<p class="sg-sub">Bouton « Appliquer » de la barre en masse</p>
+{% set code %}{% verbatim %}
+{% include 'layout/modern/components/_btns.html.twig' with {
+    removeContainer: true,
+    btns: [{ type: 'submit', label: 'Appliquer', icon: 'lucide:check', color: 'primary', class: 'bulk-submit' }]
+} %}
+{% endverbatim %}{% endset %}
+{{ sg.ex('bulk-submit', code) }}

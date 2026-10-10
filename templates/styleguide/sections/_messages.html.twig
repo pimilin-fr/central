@@ -1,0 +1,33 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+<p class="sg-sub">Messages (toasts)</p>
+{% set code %}{% verbatim %}
+<div class="sg-grid" style="--sg-min: 320px">
+    <div class="flash-message flash-success"><div class="flash-icon"><twig:ux:icon name="lucide:check-circle-2" /></div><div class="flash-content"><span class="flash-label">Succès</span><span class="flash-text">Enregistrement effectué.</span></div><button type="button" class="flash-close" aria-label="Fermer"><twig:ux:icon name="lucide:x" /></button></div>
+    <div class="flash-message flash-info"><div class="flash-icon"><twig:ux:icon name="lucide:info" /></div><div class="flash-content"><span class="flash-label">Information</span><span class="flash-text">Message d'information.</span></div><button type="button" class="flash-close" aria-label="Fermer"><twig:ux:icon name="lucide:x" /></button></div>
+    <div class="flash-message flash-warning"><div class="flash-icon"><twig:ux:icon name="lucide:triangle-alert" /></div><div class="flash-content"><span class="flash-label">Attention</span><span class="flash-text">Vérifiez ce point.</span></div><button type="button" class="flash-close" aria-label="Fermer"><twig:ux:icon name="lucide:x" /></button></div>
+    <div class="flash-message flash-error"><div class="flash-icon"><twig:ux:icon name="lucide:circle-x" /></div><div class="flash-content"><span class="flash-label">Erreur</span><span class="flash-text">Une erreur est survenue.</span></div><button type="button" class="flash-close" aria-label="Fermer"><twig:ux:icon name="lucide:x" /></button></div>
+</div>
+{# En PHP : $this->addFlash('success', 'Enregistrement effectué.'); — _flash.html.twig affiche la pile (fermeture, disparition auto, pause au survol). #}
+{% endverbatim %}{% endset %}
+{{ sg.ex('flash-message', code, 'Types Symfony : <code>success</code>, <code>error</code>, <code>warning</code>, <code>info</code>. Dans l\'application ils s\'empilent en haut à droite.', 'sg-stage') }}
+
+<p class="sg-sub">Messages dans une page</p>
+{% set code %}{% verbatim %}
+<p class="rc-msg" role="alert">Message d'erreur (rc-msg) — par défaut.</p>
+<p class="rc-msg" data-tone="info" role="status">Message d'information (data-tone="info").</p>
+<p class="rc-msg" data-tone="success" role="status">Message de réussite (data-tone="success").</p>
+<p class="pv-card-error">Erreur dans une carte de prévision (pv-card-error).</p>
+{% endverbatim %}{% endset %}
+{{ sg.ex('rc-msg, pv-card-error', code, 'Messages en ligne : le JS les remplit et les masque (attribut <code>hidden</code>).') }}
+
+<p class="sg-sub">États vides</p>
+{% set code %}{% verbatim %}
+<div class="empty-state">
+    <div class="empty-state-icon"><twig:ux:icon name="lucide:map-pin-off" /></div>
+    <div><h2>Aucun élément</h2><p>Texte d'explication de l'état vide.</p></div>
+</div>
+<p class="rc-empty">Aucune opération pour l'instant (rc-empty).</p>
+<p class="ops-empty" style="padding: 12px">Pas de dépenses (ops-empty)</p>
+{% endverbatim %}{% endset %}
+{{ sg.ex('empty-state, rc-empty, ops-empty', code) }}

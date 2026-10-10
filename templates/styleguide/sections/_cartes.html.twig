@@ -1,0 +1,169 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+<p class="sg-sub">Carte d'entité</p>
+{% set code %}{% verbatim %}
+<div class="entity-grid">
+    <article class="entity-card" style="--entity-color: #f97316; --entity-text: #fff;">
+        <a href="#" class="entity-card-link">
+            <div class="entity-circle"><twig:ux:icon name="lucide:map-pin" /></div>
+            <div class="entity-ribbon"><span class="entity-ribbon-label">Libellé</span></div>
+            <div class="entity-body">
+                <div class="entity-head">
+                    <h2 class="entity-title">Titre</h2>
+                    <span class="entity-sub">Sous-titre</span>
+                </div>
+                <div class="sep sep-inset"><span class="sep-dot"></span><span class="sep-line"></span></div>
+                <div class="entity-lines">
+                    <div class="entity-line is-primary">
+                        <span class="entity-line-icon"><twig:ux:icon name="material-symbols:star-rounded" /></span>
+                        <span class="entity-line-body"><span class="entity-line-label">Statut</span><span class="entity-line-value">Ligne mise en avant</span></span>
+                    </div>
+                    <div class="entity-line">
+                        <span class="entity-line-icon"><twig:ux:icon name="lucide:map" /></span>
+                        <span class="entity-line-body"><span class="entity-line-label">Adresse</span><span class="entity-line-value">12 rue de l'Exemple, 75000 Paris</span></span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <div class="entity-actions">
+            <a href="#" class="entity-action is-active"><twig:ux:icon name="material-symbols:star-rounded" /> Principale</a>
+            <a href="#" class="entity-action is-danger"><twig:ux:icon name="lucide:unlink" /> Délier</a>
+        </div>
+    </article>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('entity-card', code, 'Carte de liste générique. La couleur vient de <code>--entity-color</code> / <code>--entity-text</code> (cf. filtres <code>entity_color</code> et <code>entity_text</code>).') }}
+
+{% set code %}{% verbatim %}
+<div class="entity-grid">
+    <article class="entity-card is-archived" style="--entity-color: #64748b; --entity-text: #fff;">
+        <a href="#" class="entity-card-link">
+            <div class="entity-circle"><twig:ux:icon name="lucide:archive" /></div>
+            <div class="entity-ribbon"><span class="entity-ribbon-label">Archivé</span></div>
+            <div class="entity-body"><div class="entity-head"><h2 class="entity-title">Entité archivée</h2><span class="entity-sub">is-archived</span></div></div>
+        </a>
+    </article>
+    <article class="entity-card is-compact" style="--entity-color: #3b82f6; --entity-text: #fff;">
+        <a href="#" class="entity-card-link">
+            <div class="entity-circle"><twig:ux:icon name="reicon:money-send3-filled" /></div>
+            <div class="entity-ribbon"><span class="entity-ribbon-label">Dépense</span></div>
+            <div class="entity-body"><div class="entity-head"><h3 class="entity-title">Carte compacte</h3><span class="entity-sub is-plain">Racine / Enfant</span></div></div>
+        </a>
+    </article>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('is-archived, is-compact', code, 'Archivée : estompée. Compacte : sans lignes, utilisée dans les arbres de catégories et de types.') }}
+
+{% set code %}{% verbatim %}
+<div class="entity-grid">
+    <article class="entity-card" style="--entity-color: #22a06b; --entity-text: #fff;">
+        <a href="#" class="entity-card-link">
+            <div class="entity-circle"><twig:ux:icon name="lucide:building-2" /></div>
+            <div class="entity-ribbon"><span class="entity-ribbon-label">Fournisseur</span></div>
+            <div class="entity-body">
+                <div class="entity-head">
+                    <h2 class="entity-title">EDF</h2>
+                    <span class="entity-sub is-plain entity-sub-row">
+                        <span class="entity-nature"><twig:ux:icon name="lucide:building-2" /></span>
+                        <span class="entity-sub-text">EDF01</span>
+                    </span>
+                </div>
+                <div class="sep sep-inset"><span class="sep-dot"></span><span class="sep-line"></span></div>
+                <div class="entity-meta"><span class="entity-meta-main">Énergie</span><span class="entity-meta-sep">/</span><span>Électricité</span></div>
+                <div class="entity-lines is-flow">
+                    <div class="entity-line is-primary"><span class="entity-line-icon"><twig:ux:icon name="material-symbols:star-rounded" /></span><span class="entity-line-body"><span class="entity-line-label">Principale</span><span class="entity-line-value">Paris</span></span></div>
+                    <div class="entity-line"><span class="entity-line-icon"><twig:ux:icon name="lucide:map-pin" /></span><span class="entity-line-body"><span class="entity-line-label">Adresse</span><span class="entity-line-value">Lyon</span></span></div>
+                    <div class="entity-line is-more"><span class="entity-line-icon">+2</span><span class="entity-line-body"><span class="entity-line-value">autres</span></span></div>
+                </div>
+            </div>
+        </a>
+    </article>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('Carte de tiers (entity-meta, entity-lines is-flow)', code, 'Type N1 / N2 et adresses en grille compacte (<code>is-flow</code>) avec « +N autres ».') }}
+
+<p class="sg-sub">Chiffres clés et surfaces</p>
+{% set code %}{% verbatim %}
+<div class="sg-grid" style="--sg-min: 260px">
+    <div class="panel" style="padding: 16px">
+        <div class="kpi">
+            <p class="kpi-label">Solde actuel</p>
+            <p class="kpi-value amount-income">1 250,00 €</p>
+            <div class="kpi-lines">
+                <div class="kpi-line"><span>Dernier relevé</span><strong class="is-neutral">1 100,00 €</strong></div>
+                <div class="kpi-line"><span>Revenus non relevés</span><strong class="amount-income">+ 200,00 €</strong></div>
+                <div class="kpi-line"><span>Dépenses non relevées</span><strong class="amount-expense">- 84,90 €</strong></div>
+            </div>
+        </div>
+    </div>
+    <div class="card" style="padding: 16px">.card — surface, bordure et ombre du thème</div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('kpi, panel, card', code) }}
+
+<p class="sg-sub">Carte de résumé (fiche)</p>
+{% set code %}{% verbatim %}
+<section class="summary-card" style="--entity-color: #f97316; --entity-text: #fff;">
+    <div class="entity-circle"><twig:ux:icon name="lucide:wallet" /></div>
+    <div class="summary-body">
+        <div class="summary-head">
+            <h2 class="summary-name">Compte courant</h2>
+            <span class="entity-pill" style="--entity-color: #f97316"><span class="entity-pill-dot"></span><span>Courant</span></span>
+        </div>
+        <div class="summary-grid-2-cols">
+            <div class="summary-field"><p class="summary-label">Libellé</p><p class="summary-value">Compte courant</p></div>
+            <div class="summary-field"><p class="summary-label">Origine</p><p class="summary-value">Banque</p></div>
+            <div class="summary-field"><p class="summary-label">Par défaut</p><p class="summary-value"><span class="flag is-on"><twig:ux:icon name="lucide:circle-check" /> Oui</span></p></div>
+            <div class="summary-field"><p class="summary-label">Dépenses réelles</p><p class="summary-value"><span class="flag"><twig:ux:icon name="lucide:circle-x" /> Non</span></p></div>
+        </div>
+    </div>
+    <div class="summary-aside">
+        <div class="kpi"><p class="kpi-label">Solde actuel</p><p class="kpi-value amount-income">1 250,00 €</p></div>
+    </div>
+    <div class="summary-ribbon"><span class="summary-ribbon-label">Compte courant</span></div>
+</section>
+{% endverbatim %}{% endset %}
+{{ sg.ex('summary-card', code, 'Haut des fiches : cercle, identité + champs, chiffre clé, liseré.') }}
+
+<p class="sg-sub">Carte de localisation</p>
+{% set code %}{% verbatim %}
+<section class="geo-card">
+    <div class="geo-card-ribbon"></div>
+    <div class="geo-card-body">
+        <div class="geo-card-head">
+            <p class="summary-label">Localisation</p>
+            <p class="geo-card-count"><twig:ux:icon name="lucide:map-pinned" /> 3 adresses</p>
+        </div>
+        <div class="geo-map" style="height: 120px; min-height: 0"></div>
+    </div>
+</section>
+{% endverbatim %}{% endset %}
+{{ sg.ex('geo-card', code, 'Conteneur de carte multipoint (le JS <code>maps.js</code> y dessine la carte via <code>data-map</code>).') }}
+
+<p class="sg-sub">Branche d'arbre (catégories, types)</p>
+{% set code %}{% verbatim %}
+<div class="categorie-tree">
+    <section class="categorie-branch level-0">
+        <header class="categorie-branch-header">
+            <div class="categorie-branch-heading">
+                <span class="categorie-branch-index">01</span>
+                <div class="categorie-branch-copy">
+                    <span class="categorie-branch-kicker">Racine</span>
+                    <h2 class="categorie-branch-title">Logement</h2>
+                </div>
+            </div>
+            <div class="categorie-branch-meta"><span class="categorie-branch-count">2 enfants</span><twig:ux:icon name="lucide:layers-3" /></div>
+        </header>
+        <div class="categorie-branch-children">
+            <article class="entity-card is-compact" style="--entity-color: #3b82f6; --entity-text: #fff;">
+                <a href="#" class="entity-card-link">
+                    <div class="entity-circle"><twig:ux:icon name="reicon:money-send3-filled" /></div>
+                    <div class="entity-ribbon"><span class="entity-ribbon-label">Dépense</span></div>
+                    <div class="entity-body"><div class="entity-head"><h3 class="entity-title">Loyer</h3><span class="entity-sub is-plain">Logement / Loyer</span></div></div>
+                </a>
+            </article>
+        </div>
+    </section>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('categorie-branch', code, 'Niveaux <code>level-0</code>, <code>level-1</code>, <code>level-2</code> ; feuilles = cartes compactes.') }}

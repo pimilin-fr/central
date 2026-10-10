@@ -1,0 +1,91 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+<p class="sg-sub">Pastilles d'entité</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span class="entity-pill" style="--entity-color: #f97316"><span class="entity-pill-dot"></span>Orange</span>
+    <span class="entity-pill" style="--entity-color: #22a06b"><span class="entity-pill-dot"></span>Vert</span>
+    <span class="entity-pill" style="--entity-color: #3b82f6"><span class="entity-pill-dot"></span>Bleu</span>
+    <span class="entity-pill" style="--entity-color: #8b5cf6"><span class="entity-pill-dot"></span>Violet</span>
+</div>
+<div class="sg-row">
+    <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full" style="background-color: {{ '@a3'|entity_color }}; color: {{ '@a3'|entity_text }}">
+        <span class="w-2 h-2 rounded-full" style="background-color: {{ '@a3'|entity_color }}"></span><span>Pastille de liste (tiers, projet)</span>
+    </span>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('entity-pill', code, 'Dans les listes d\'opérations, les tiers et projets utilisent la variante en ligne : fond = <code>entity_color</code>, texte = <code>entity_text</code> (seules les couleurs en ligne s\'appliquent, les autres classes sont des restes sans style).') }}
+
+<p class="sg-sub">Mode démo</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span class="demo-pill" style="--entity-color: var(--info)"><twig:ux:icon name="lucide:copy" /> Copie</span>
+    <span class="demo-pill" style="--entity-color: var(--warning)"><twig:ux:icon name="lucide:venetian-mask" /> Anonymisé</span>
+    <span class="demo-pill" style="--entity-color: var(--danger)"><twig:ux:icon name="lucide:eye-off" /> Exclue</span>
+    <span class="demo-pill" style="--entity-color: var(--text-muted)"><twig:ux:icon name="lucide:circle-help" /> Erreur</span>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('demo-pill', code, 'Stratégie de démo d\'une entité (la couleur vient de <code>--entity-color</code>).') }}
+
+<p class="sg-sub">Indicateurs et compteurs</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span class="flag is-on"><twig:ux:icon name="lucide:check-circle-2" /> Actif</span>
+    <span class="flag"><twig:ux:icon name="lucide:circle" /> Inactif</span>
+    <span class="tab-badge">12</span>
+    <span class="rc-count">3</span>
+    <span class="toolbar-info"><span class="toolbar-dot"></span><span><strong>24</strong> éléments</span></span>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('flag, tab-badge, rc-count, toolbar-info', code) }}
+
+<p class="sg-sub">Montants</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <strong class="amount-income">+ 1 250,00 €</strong>
+    <strong class="amount-expense">- 84,90 €</strong>
+    <strong class="amount-refund">+ 19,00 €</strong>
+</div>
+{# Règle : dépense = rouge (amount-expense), revenu = vert (amount-income), dépense négative (remboursement) = bleu (amount-refund) #}
+{% endverbatim %}{% endset %}
+{{ sg.ex('amount-income / amount-expense / amount-refund', code) }}
+
+<p class="sg-sub">État d'un relevé</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
+    <span class="ops-group-badge is-open"><twig:ux:icon name="lucide:lock-open" /> Non clos · en cours</span>
+    <span class="ops-group-badge is-open is-legacy"><twig:ux:icon name="lucide:lock-open" /> Non clos</span>
+    <span class="ops-group-badge is-draft"><twig:ux:icon name="lucide:pencil-line" /> En cours</span>
+    <a class="ops-group-link" href="#">Compléter</a>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('ops-group-badge, ops-group-link', code, 'Vert = clos (ordre figé), orange = en cours, gris = ancien relevé sans ordre.') }}
+
+<p class="sg-sub">Certitude d'une prévision</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span class="pv-badge is-certain">Certain</span>
+    <span class="pv-badge is-probable">Probable</span>
+    <span class="pv-badge is-estime">Estimé</span>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('pv-badge', code, 'Les classes <code>is-…</code> suivent la valeur de l\'enum <code>Certitude</code>.') }}
+
+<p class="sg-sub">Puces du relevé</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span class="rc-chip">Neutre</span>
+    <span class="rc-chip is-detail">Détail × 3</span>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('rc-chip', code, '<code>is-detail</code> signale une ligne de relevé regroupant plusieurs opérations.') }}
+
+<p class="sg-sub">Nature d'un tiers</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span class="entity-nature" title="Société"><twig:ux:icon name="lucide:building-2" /></span>
+    <span class="entity-nature is-person" title="Personne"><twig:ux:icon name="lucide:user-round" /></span>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('entity-nature', code) }}

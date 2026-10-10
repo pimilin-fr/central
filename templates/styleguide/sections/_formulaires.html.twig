@@ -1,0 +1,200 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+<p class="sg-sub">Champs</p>
+{% set code %}{% verbatim %}
+<div class="form-stack">
+    <div>
+        <label class="modern-form-label required">Champ obligatoire</label>
+        <input class="modern-form-control" placeholder="Texte" required>
+    </div>
+    <div>
+        <label class="modern-form-label">Champ facultatif</label>
+        <input class="modern-form-control" placeholder="Texte">
+        <p class="form-hint">Texte d'aide sous le champ.</p>
+    </div>
+    <div>
+        <label class="modern-form-label">Désactivé</label>
+        <input class="modern-form-control" value="Valeur" disabled>
+    </div>
+    <div>
+        <label class="modern-form-label">Liste déroulante</label>
+        <select class="modern-form-control"><option>Option A</option><option>Option B</option></select>
+    </div>
+    <div>
+        <label class="modern-form-label">Zone de texte</label>
+        <textarea class="modern-form-control" rows="3" placeholder="Texte long"></textarea>
+    </div>
+    <div>
+        <label class="modern-form-label">Date</label>
+        <input type="date" class="modern-form-control" value="2026-10-05">
+    </div>
+    <div>
+        <label class="modern-form-label">Recherche</label>
+        <input type="search" class="modern-form-control" placeholder="Filtrer…">
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('modern-form-control', code, 'Tous les champs passent par <code>modern-form-label</code> + <code>modern-form-control</code>. <code>required</code> ajoute l\'astérisque au libellé.') }}
+
+{% set code %}{% verbatim %}
+<div class="form-stack">
+    <div>
+        <label class="modern-form-label">Champ valide</label>
+        <input class="modern-form-control is-valid" value="Valeur correcte">
+    </div>
+    <div>
+        <label class="modern-form-label">Champ en erreur</label>
+        <input class="modern-form-control is-invalid" value="Valeur incorrecte">
+        <p class="form-hint" style="color: var(--danger)">Message d'erreur sous le champ.</p>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('États valide / invalide', code) }}
+
+<p class="sg-sub">Choix</p>
+{% set code %}{% verbatim %}
+<div class="form-stack">
+    <div>
+        <label class="modern-form-label">entity-select (couleur de l'option)</label>
+        <select class="modern-form-control" data-entity-select>
+            <option value="">— Choisir —</option>
+            <option value="1" data-color="#f97316" data-text-color="#fff">Orange</option>
+            <option value="2" data-color="#22a06b" data-text-color="#fff">Vert</option>
+            <option value="3" data-color="#3b82f6" data-text-color="#fff">Bleu</option>
+        </select>
+    </div>
+    <div>
+        <label class="modern-form-label">choice-card</label>
+        <div class="choice-list">
+            <label class="choice-card"><input type="radio" name="sg-a" checked><span>Choix simple</span></label>
+            <label class="choice-card"><input type="radio" name="sg-a"><span>Autre choix</span></label>
+        </div>
+    </div>
+    <div>
+        <label class="modern-form-label">choice-card colorée</label>
+        <div class="choice-list">
+            <label class="choice-card is-colored" style="--entity-color: #f97316; --entity-text: #fff;"><input type="radio" name="sg-b" checked><span class="choice-dot" aria-hidden="true"></span><span>Orange</span></label>
+            <label class="choice-card is-colored" style="--entity-color: #22a06b; --entity-text: #fff;"><input type="radio" name="sg-b"><span class="choice-dot" aria-hidden="true"></span><span>Vert</span></label>
+            <label class="choice-card is-colored" style="--entity-color: #3b82f6; --entity-text: #fff;"><input type="radio" name="sg-b"><span class="choice-dot" aria-hidden="true"></span><span>Bleu</span></label>
+        </div>
+    </div>
+    <div>
+        <label class="inline-check"><input type="checkbox" checked> Case à cocher (inline-check)</label>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('entity-select, choice-card, inline-check', code) }}
+
+<p class="sg-sub">Saisie assistée</p>
+{% set code %}{% verbatim %}
+<form onsubmit="return false">
+    <label class="modern-form-label">Tiers (autocomplétion réelle)</label>
+    <input type="text" name="tiers" class="modern-form-control autocomplete" placeholder="Rechercher un tiers" autocomplete="off" data-endpoint="/tiers/search">
+    <input type="hidden" name="tiers_id">
+</form>
+{# Le JS (App.autocomplete) enveloppe le champ dans .ac-wrapper et crée la liste .ac-results ; il a besoin d'un <form> parent et d'un champ caché <nom>_id. #}
+{% endverbatim %}{% endset %}
+{{ sg.ex('autocomplete', code, 'Classe <code>autocomplete</code> + <code>data-endpoint</code>. Écoutez l\'événement <code>autocomplete:selected</code> pour réagir au choix.') }}
+
+{% set code %}{% verbatim %}
+<div class="ac-wrapper" style="min-height: 150px">
+    <input type="text" class="modern-form-control autocomplete" value="ed" autocomplete="off">
+    <div class="ac-results is-open" style="position: static">
+        <div class="ac-option is-active">EDF - GDF Énergie</div>
+        <div class="ac-option">Edenred</div>
+        <div class="ac-empty">Aucun résultat</div>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('ac-wrapper / ac-results (rendu généré par le JS)', code, 'Aperçu statique de la liste ouverte. <code>is-active</code> = option survolée ou sélectionnée au clavier.') }}
+
+<p class="sg-sub">Mise en page de formulaire</p>
+{% set code %}{% verbatim %}
+<form class="modern-form" onsubmit="return false">
+    <div class="form-section-grid">
+        <div class="form-field-card">
+            <div class="form-field-heading"><span class="form-field-index">01</span><h3>Identité</h3></div>
+            <div class="form-stack">
+                <div><label class="modern-form-label required">Nom</label><input class="modern-form-control" required></div>
+                <div><label class="modern-form-label">Code</label><input class="modern-form-control"></div>
+            </div>
+        </div>
+        <div class="form-field-card form-field-card-wide">
+            <div class="form-field-heading"><span class="form-field-index">02</span><h3>Adresse (form-row)</h3></div>
+            <div class="form-row" style="--cols: 110px 90px 100px 160px">
+                <div><label class="modern-form-label">Préfixe</label><input class="modern-form-control"></div>
+                <div><label class="modern-form-label">Num</label><input class="modern-form-control"></div>
+                <div><label class="modern-form-label">Bis/Ter</label><input class="modern-form-control"></div>
+                <div><label class="modern-form-label">Type voie</label><input class="modern-form-control"></div>
+            </div>
+            <details class="form-more">
+                <summary>form-more — section repliable</summary>
+                <div class="coords-field">
+                    <div class="form-label-line"><label class="modern-form-label">Coordonnées (latitude, longitude)</label></div>
+                    <input class="modern-form-control" placeholder="48.8566, 2.3522">
+                    <p class="form-hint">Laisser vide pour une géolocalisation automatique.</p>
+                </div>
+            </details>
+        </div>
+    </div>
+    <div class="modern-form-footer">
+        <span class="modern-form-footer-copy"><span class="required-legend">Champ obligatoire</span></span>
+        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [
+            { label: 'Enregistrer', type: 'submit', icon: 'mdi:content-save-outline', color: 'primary' }
+        ] } %}
+    </div>
+</form>
+{% endverbatim %}{% endset %}
+{{ sg.ex('form-field-card, form-row, form-more, modern-form-footer', code, 'Cartes numérotées en grille (<code>form-section-grid</code>), lignes de champs (<code>form-row</code> avec <code>--cols</code>), section repliable, pied de formulaire avec légende.') }}
+
+{% set code %}{% verbatim %}
+<div class="form-layout is-single" style="max-width: 760px">
+    <div class="form-timeline">
+        <div class="form-field-card"><div class="form-field-heading"><span class="form-field-index">01</span><h3>Étape</h3></div><p class="form-hint">Contenu de l'étape.</p></div>
+        <div class="form-field-card"><div class="form-field-heading"><span class="form-field-index">02</span><h3>Étape suivante</h3></div><p class="form-hint">Contenu de l'étape.</p></div>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('form-timeline', code, 'Frise verticale. <code>form-layout</code> place le formulaire à gauche et <code>form-layout-aside</code> (aperçu en direct de la carte) à droite ; <code>is-single</code> = une seule colonne.') }}
+
+<p class="sg-sub">Modification en masse</p>
+{% set code %}{% verbatim %}
+<form class="bulk-form" onsubmit="return false">
+    <div class="bulk-bar">
+        <span class="bulk-bar-kicker">Modification en masse</span>
+        <div class="bulk-field bulk-field-action">
+            <label class="modern-form-label">Action</label>
+            <select class="modern-form-control">
+                <option value="">-- Choisir --</option>
+                <option>Faire un relevé…</option>
+                <option>Affecter à un projet</option>
+                <option data-tone="danger">Supprimer la ligne</option>
+            </select>
+        </div>
+        <div class="bulk-field bulk-field-date">
+            <label class="modern-form-label">Date</label>
+            <input type="date" class="modern-form-control">
+        </div>
+        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [
+            { type: 'submit', label: 'Appliquer', icon: 'lucide:check', color: 'primary', class: 'bulk-submit' }
+        ] } %}
+    </div>
+</form>
+{% endverbatim %}{% endset %}
+{{ sg.ex('bulk-bar', code, 'Barre au-dessus des listes d\'opérations. Les champs s\'affichent selon l\'action choisie (<code>data-fields</code> sur l\'option).') }}
+
+<p class="sg-sub">Champs du relevé</p>
+{% set code %}{% verbatim %}
+<section class="rc-panel rc-top">
+    <label class="rc-field">
+        <span class="modern-form-label">Date du relevé</span>
+        <input type="date" class="modern-form-control" value="2026-10-05">
+    </label>
+    <label class="rc-field">
+        <span class="modern-form-label">Solde avant <small>(calculé, modifiable)</small></span>
+        <input type="number" step="0.01" class="modern-form-control" placeholder="1250.00">
+    </label>
+    <details class="rc-helpbox"><summary>Aide</summary><p class="rc-help">Texte d'aide repliable.</p></details>
+</section>
+{% endverbatim %}{% endset %}
+{{ sg.ex('rc-field, rc-top', code) }}

@@ -10,7 +10,8 @@
 
 .pv-month { margin-bottom: 1.5rem; }
 .pv-month-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
-.pv-month-head h3 { margin: 0; text-transform: capitalize; }
+.pv-month-head h3 { margin: 0; }
+.pv-month-head h3::first-letter { text-transform: uppercase; }
 .pv-month-sums { font-size: .9rem; color: var(--text-muted, #6b7280); }
 .pv-month-sums strong { color: var(--text); }
 
@@ -83,7 +84,7 @@
 
 /* Règles repliées (nombre de règles actives visible) */
 .pv-rules { margin-bottom: 1.5rem; }
-.pv-rules > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; }
+.pv-rules > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: flex-start; gap: 8px; }
 .pv-rules > summary::-webkit-details-marker { display: none; }
 .pv-rules > summary::before { content: "▸"; color: var(--text-muted); }
 .pv-rules[open] > summary::before { content: "▾"; }

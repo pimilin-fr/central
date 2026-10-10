@@ -1,0 +1,93 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+<p class="sg-sub">Variables du thème</p>
+<p class="sg-lead">Valeur calculée en direct (mise à jour à chaque changement de thème). Un token « — » n'est pas défini dans ce thème. Dans le CSS, on n'écrit jamais une couleur en dur : on utilise ces variables.</p>
+
+{% for group, vars in tokenGroups %}
+    <p class="sg-sub">{{ group }}</p>
+    <div class="sg-grid" style="--sg-min: 230px">
+        {% for v in vars %}
+            <div class="sg-token">
+                <span class="sg-swatch" style="--sg-c: var({{ v }})"></span>
+                <span><b>{{ v }}</b><small data-sg-var="{{ v }}">—</small></span>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+<p class="sg-sub">Ombres</p>
+<div class="sg-grid" style="--sg-min: 200px">
+    <div class="sg-cell"><div class="sg-shadow" style="box-shadow: var(--shadow-sm)"></div><span class="sg-caption">--shadow-sm</span></div>
+    <div class="sg-cell"><div class="sg-shadow" style="box-shadow: var(--shadow-md)"></div><span class="sg-caption">--shadow-md</span></div>
+    <div class="sg-cell"><div class="sg-shadow" style="box-shadow: var(--shadow-lg)"></div><span class="sg-caption">--shadow-lg</span></div>
+    <div class="sg-cell"><div class="sg-shadow" style="box-shadow: var(--shadow-hover)"></div><span class="sg-caption">--shadow-hover</span></div>
+</div>
+
+{% for group in entity_color_families() %}
+    <p class="sg-sub">{{ group.title }} : 5 nuances par famille, du plus foncé (1) au plus clair (5), suivent le thème</p>
+    <div class="sg-grid" style="--sg-min: 220px">
+        {% for family in group.families %}
+            <div class="sg-cell">
+                <div class="color-family-strip">
+                    {% for shade in family.shades %}
+                        <span class="sg-shade" style="--sw: {{ shade.var }}; --sw-ink: {{ shade.var|replace({')': '-ink)'}) }};" title="{{ shade.label }}">{{ loop.index }}</span>
+                    {% endfor %}
+                </div>
+                <span class="sg-caption">{{ family.label }} · {{ family.shades[0].value }} … {{ family.shades[4].value }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span class="entity-pill" style="--entity-color: {{ '@a3'|entity_color }}"><span class="entity-pill-dot"></span>@a3 — accent, classique</span>
+    <span class="entity-pill" style="--entity-color: {{ '@s2'|entity_color }}"><span class="entity-pill-dot"></span>@s2 — succès, foncé</span>
+    <span class="entity-pill" style="--entity-color: {{ '@h120-3'|entity_color }}"><span class="entity-pill-dot"></span>@h120-3 — autre teinte</span>
+    <span class="entity-pill" style="--entity-color: {{ '#8b5cf6'|entity_color }}"><span class="entity-pill-dot"></span>#8b5cf6 — libre (figée)</span>
+</div>
+{# Avec une entité : #}
+{# style="--entity-color: {{ (entity.couleur ?? null)|entity_color }}; --entity-text: {{ (entity.couleur ?? null)|entity_text }}" #}
+{% endverbatim %}{% endset %}
+{{ sg.ex('Couleur d\'une entité', code, 'Valeur stockée : <code>@a1…@a5</code> (accent), <code>@i/@s/@w/@d/@n</code> (info, succès, alerte, danger, neutre), <code>@h60-1…@h300-5</code> (autres teintes) — elles suivent le thème — ou <code>#rrggbb</code> (figée). Filtres <code>entity_color</code> (fond) et <code>entity_text</code> (texte posé dessus).') }}
+
+<p class="sg-sub">Typographie</p>
+{% set code %}{% verbatim %}
+<p class="page-eyebrow">page-eyebrow — sur-titre</p>
+<h1 class="modern-form-title">modern-form-title — titre de formulaire</h1>
+<h1 class="page-title">page-title — titre de page</h1>
+<p class="page-subline">page-subline — ligne de contexte sous le titre</p>
+<p class="modern-form-kicker">modern-form-kicker</p>
+<p class="summary-label">summary-label — petit libellé en capitales</p>
+<p class="kpi-value">kpi-value 1 234,56 €</p>
+<p><strong>Texte courant</strong> — <span style="color: var(--text-soft)">text-soft</span> — <span style="color: var(--text-muted)">text-muted</span> — <a href="#" style="color: var(--accent)">lien accent</a></p>
+<p class="pv-range">pv-range — précision discrète sous une valeur</p>
+<p><code>code en ligne</code></p>
+{% endverbatim %}{% endset %}
+{{ sg.ex('Hiérarchie', code, null, 'sg-type') }}
+
+<p class="sg-sub">Icônes</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <twig:ux:icon name="lucide:check" />
+    <twig:ux:icon name="lucide:trash-2" />
+    <twig:ux:icon name="lucide:calendar-clock" />
+    <twig:ux:icon name="material-symbols:star-rounded" />
+    <twig:ux:icon name="solar:wallet-money-bold" />
+</div>
+{# Les icônes héritent de la couleur du texte (currentColor) et de la taille du conteneur. #}
+{% endverbatim %}{% endset %}
+{{ sg.ex('UX Icons', code, 'Une icône = <code>&lt;twig:ux:icon name="jeu:nom" /&gt;</code>. Jeux utilisés : lucide, material-symbols, mdi, solar, healthicons…') }}
+
+<p class="sg-sub">Utilitaires</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <span>Visible</span>
+    <span class="hidden">Masqué (classe .hidden, aussi basculée par le JS)</span>
+</div>
+<div class="empty-state">
+    <div class="empty-state-icon"><twig:ux:icon name="lucide:map-pin-off" /></div>
+    <div><h2>État vide</h2><p>Texte d'explication affiché quand une liste n'a aucun élément.</p></div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('.hidden et état vide', code) }}

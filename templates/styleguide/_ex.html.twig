@@ -1,0 +1,25 @@
+{#
+    Un exemple du styleguide : aperçu réel + code copiable (même source pour les deux).
+    Usage :
+        {% import 'styleguide/_ex.html.twig' as sg %}
+        {% set code %}{% verbatim %}…HTML / Twig…{% endverbatim %}{% endset %}
+        {{ sg.ex('Titre', code, 'Note facultative') }}
+#}
+{% macro ex(title, code, note = null, stage = null) %}
+    {% set src = ('' ~ code)|trim %}
+    <article class="sg-example">
+        <header class="sg-example-head">
+            <h4 class="sg-example-title">{{ title }}</h4>
+            {% if note %}<p class="sg-example-note">{{ note|raw }}</p>{% endif %}
+        </header>
+        <div class="sg-preview{{ stage ? ' ' ~ stage : '' }}">{{ sg_render(src) }}</div>
+        <details class="sg-code">
+            <summary>Voir le code</summary>
+            <div class="sg-code-bar">
+                <span>Twig / HTML</span>
+                <button type="button" class="rc-chip" data-sg-copy>Copier le code</button>
+            </div>
+            <pre class="sg-pre"><code>{{ src }}</code></pre>
+        </details>
+    </article>
+{% endmacro %}

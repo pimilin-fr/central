@@ -7,8 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Page temporaire : catalogue de tous les composants du design system,
- * rendus avec les variables du thème courant. À retirer une fois le paramétrage terminé.
+ * Styleguide : catalogue vivant du design system (accordéon, exemples avec code copiable),
+ * rendus avec les variables du thème courant.
  */
 #[Route('/styleguide')]
 class StyleguideController extends AbstractController

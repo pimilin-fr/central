@@ -1,0 +1,16 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+{% set code %}{% verbatim %}
+<div class="sep"><span class="sep-dot"></span><span class="sep-line"></span></div>
+<div class="sep sep-inset"><span class="sep-dot"></span><span class="sep-line"></span></div>
+<div class="sep" style="--sep-color: #8b5cf6"><span class="sep-dot"></span><span class="sep-line"></span></div>
+<div class="sep" style="--sep-color: var(--danger)"><span class="sep-dot"></span><span class="sep-line"></span></div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('sep — point + trait dégradé', code, 'Piloté par <code>--sep-color</code> (défaut : accent). <code>sep-inset</code> pour l\'intérieur d\'une carte. Survolez pour voir l\'effet.') }}
+
+{% set code %}{% verbatim %}
+<hr style="border: 0; border-top: 1px solid var(--border)">
+<hr style="border: 0; border-top: 1px dashed var(--border)">
+<div class="sidebar-separator"></div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('Traits simples', code, 'Trait plein, pointillé (<code>form-more</code>), séparateur de barre latérale.') }}

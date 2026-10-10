@@ -1,0 +1,21 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+{% set code %}{% verbatim %}
+{% include 'layout/modern/components/_tabs.html.twig' with {
+    activeTab: 'sg-a',
+    tabs: [
+        { id: 'sg-a', label: 'Résumé', icon: 'lucide:layout-dashboard', badge: 3, content: '<p style="padding:14px">Contenu de l’onglet « Résumé ».</p>' },
+        { id: 'sg-b', label: 'Opérations', icon: 'lucide:receipt', badge: 12, content: '<p style="padding:14px">Contenu de l’onglet « Opérations ».</p>' },
+        { id: 'sg-c', label: 'Sans badge', content: '<p style="padding:14px">Troisième onglet.</p>' }
+    ]
+} %}
+{% endverbatim %}{% endset %}
+{{ sg.ex('modern-tabs', code, 'Composant <code>_tabs.html.twig</code>. Un onglet peut charger son contenu à la demande avec <code>url</code> (chargé au premier clic). L\'onglet actif est mémorisé dans l\'URL.') }}
+
+{% set code %}{% verbatim %}
+<nav class="modern-tabs-nav" aria-label="Sections">
+    <button type="button" class="tab-button is-active"><span>Actif</span><span class="tab-badge">3</span></button>
+    <button type="button" class="tab-button"><span>Inactif</span></button>
+</nav>
+{% endverbatim %}{% endset %}
+{{ sg.ex('tab-button — états', code, 'Barre d\'onglets seule (sans le JS) pour voir l\'état actif.') }}

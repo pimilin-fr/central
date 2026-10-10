@@ -1,0 +1,130 @@
+{% import 'styleguide/_ex.html.twig' as sg %}
+
+<p class="sg-sub">En-tête de page</p>
+{% set code %}{% verbatim %}
+<div class="page-heading">
+    <div class="page-heading-copy">
+        <p class="page-eyebrow">Sur-titre</p>
+        <h1 class="page-title">Titre de la page</h1>
+        <div class="page-subline">
+            <span class="entity-pill" style="--entity-color: #f97316"><span class="entity-pill-dot"></span><span>Portefeuille</span></span>
+            <span class="ops-group-badge is-draft"><twig:ux:icon name="lucide:pencil-line" /> En cours</span>
+        </div>
+    </div>
+    {% include 'layout/modern/components/_btns.html.twig' with { btns: [
+        { label: 'Retour', path: '#', icon: 'mdi:arrow-left', color: 'neutral' },
+        { label: 'Nouveau', path: '#', icon: 'gridicons:add', color: 'primary' }
+    ] } %}
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('page-heading', code, 'Toutes les pages commencent par ce bloc, dans <code>&lt;div class="page-container"&gt;</code>. Les boutons passent par <code>_btns.html.twig</code>.') }}
+
+<p class="sg-sub">Fil d'Ariane (barre du haut)</p>
+{% set code %}{% verbatim %}
+{# Dans le template d'une page : #}
+{% set breadcrumb_current = 'Relevé du 05/10/2026' %}
+{% set breadcrumb_trail = [
+    { label: 'Compte courant', path: '/portefeuille/1' },
+    { label: 'Relevés', path: '/portefeuille/1/releve' }
+] %}
+{# Rendu : #}
+<nav class="topbar-breadcrumb" aria-label="Fil d'Ariane">
+    <span class="topbar-breadcrumb-root">Central</span>
+    <span class="topbar-breadcrumb-separator">/</span>
+    <a class="topbar-breadcrumb-link" href="#">Portefeuilles</a>
+    <span class="topbar-breadcrumb-separator">/</span>
+    <a class="topbar-breadcrumb-link" href="#">Compte courant</a>
+    <span class="topbar-breadcrumb-separator">/</span>
+    <span class="topbar-breadcrumb-current" aria-current="page">Relevé du 05/10/2026</span>
+</nav>
+{% endverbatim %}{% endset %}
+{{ sg.ex('topbar-breadcrumb', code, 'Les pages posent <code>breadcrumb_current</code> (et au besoin <code>breadcrumb_trail</code>) : la barre du haut fait le reste.') }}
+
+<p class="sg-sub">Barre d'outils d'une liste</p>
+{% set code %}{% verbatim %}
+<div class="sg-row" style="justify-content: space-between">
+    <div class="toolbar-info"><span class="toolbar-dot"></span><span><strong>24</strong> éléments</span></div>
+    {% include 'layout/modern/components/_search.html.twig' with { target: '#liste', placeholder: 'Rechercher…' } only %}
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('toolbar-info + toolbar-search', code, 'Le composant de recherche filtre les éléments portant <code>data-search-item</code> dans la cible.') }}
+
+<p class="sg-sub">Barre latérale</p>
+{% set code %}{% verbatim %}
+<aside class="central-sidebar" style="position: static; height: auto">
+    <div class="sidebar-header">
+        <div class="sidebar-context">
+            <span class="sidebar-context-indicator"></span>
+            <span class="sidebar-context-copy">
+                <span class="sidebar-context-label">Application</span>
+                <span class="sidebar-context-name">Central</span>
+            </span>
+        </div>
+        <button type="button" class="sidebar-collapse-button" aria-label="Réduire"><twig:ux:icon name="lucide:panel-left-close" /></button>
+    </div>
+    <div class="sidebar-separator"></div>
+    <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Gestion</div>
+        <a href="#" class="sidebar-link is-active"><span class="sidebar-link-icon"><twig:ux:icon name="solar:wallet-money-bold" /></span><span class="sidebar-link-copy">Portefeuilles</span></a>
+        <a href="#" class="sidebar-link"><span class="sidebar-link-icon"><twig:ux:icon name="lucide:calendar-clock" /></span><span class="sidebar-link-copy">Prévisions</span></a>
+        <a href="#" class="sidebar-link"><span class="sidebar-link-icon"><twig:ux:icon name="mage:user-fill" /></span><span class="sidebar-link-copy">Tiers</span></a>
+    </nav>
+    <div class="sidebar-bottom-card">
+        <twig:ux:icon name="solar:wallet-money-bold" />
+        <span class="sidebar-bottom-copy"><span class="sidebar-bottom-title">Central</span><span class="sidebar-bottom-text">Gestion financière</span></span>
+    </div>
+</aside>
+{% endverbatim %}{% endset %}
+{{ sg.ex('sidebar-*', code, 'Version statique (<code>position: static</code>) pour l\'exemple ; dans l\'application elle est fixe. Lien actif : <code>is-active</code>.', 'sg-frame') }}
+
+<p class="sg-sub">Barre du haut : actions, utilisateur, bandeau démo</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <button type="button" class="topbar-icon-button" aria-label="Notifications"><twig:ux:icon name="lucide:bell" /></button>
+    <button type="button" class="topbar-icon-button" aria-label="Réglages"><twig:ux:icon name="lucide:settings" /></button>
+    <div class="topbar-divider"></div>
+    <button type="button" class="topbar-user">
+        <span class="topbar-user-avatar">C</span>
+        <span class="topbar-user-copy"><span class="topbar-user-name">Central</span><span class="topbar-user-status">Production</span></span>
+        <twig:ux:icon name="lucide:chevron-down" class="topbar-user-chevron" />
+    </button>
+</div>
+<div class="env-banner" role="status" style="position: static">
+    <twig:ux:icon name="lucide:flask-conical" /> Base de démonstration — données fictives, jetables
+    <span class="env-banner-hint">retour à Central : menu en haut à droite</span>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('topbar-icon-button, topbar-user, env-banner', code) }}
+
+<p class="sg-sub">Sélecteurs de thème et d'environnement (menus)</p>
+{% set code %}{% verbatim %}
+<div class="sg-row" style="align-items: flex-start; gap: 24px">
+    <div class="theme-menu" style="position: static; display: block; opacity: 1; visibility: visible; transform: none; width: 280px">
+        <div class="theme-menu-header"><span class="theme-menu-title">Apparence</span><span class="theme-menu-subtitle">Choisissez votre ambiance</span></div>
+        <button type="button" class="theme-option is-active" aria-checked="true">
+            <span class="theme-option-preview" data-theme="light-orange"><span></span></span>
+            <span class="theme-option-copy"><strong>Clair orange</strong><small>Thème par défaut</small></span>
+            <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
+        </button>
+        <button type="button" class="theme-option" aria-checked="false">
+            <span class="theme-option-preview" data-theme="dark-electric"><span></span></span>
+            <span class="theme-option-copy"><strong>Sombre électrique</strong><small>Contraste élevé</small></span>
+            <span class="theme-option-check"><twig:ux:icon name="lucide:check" /></span>
+        </button>
+    </div>
+    <div class="env-menu" style="position: static; display: block; opacity: 1; visibility: visible; transform: none; width: 280px">
+        <div class="env-menu-header"><span class="env-menu-title">Environnement</span><span class="env-menu-subtitle">Choisissez la base utilisée</span></div>
+        <button type="button" class="env-option is-active" role="menuitemradio" aria-checked="true">
+            <span class="env-option-icon"><twig:ux:icon name="lucide:landmark" /></span>
+            <span class="env-option-copy"><strong>Central</strong><small>Production — vos vraies données</small></span>
+            <span class="env-option-check"><twig:ux:icon name="lucide:check" /></span>
+        </button>
+        <button type="button" class="env-option env-option-demo" role="menuitemradio" aria-checked="false">
+            <span class="env-option-icon"><twig:ux:icon name="lucide:flask-conical" /></span>
+            <span class="env-option-copy"><strong>Démo</strong><small>Données fictives, jetables</small></span>
+            <span class="env-option-check"><twig:ux:icon name="lucide:check" /></span>
+        </button>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('theme-menu / env-menu', code, 'Menus déroulants de la barre du haut, affichés ouverts. Les thèmes viennent du registre Twig (<code>themes</code>) : rien à déclarer dans le JS.') }}
