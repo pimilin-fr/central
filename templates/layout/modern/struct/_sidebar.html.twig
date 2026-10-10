@@ -39,7 +39,7 @@
         </a>
 
         <a href="{{ path('app_portefeuille_index') }}"
-           class="sidebar-link {{ route starts with 'app_portefeuille_' ? 'is-active' : '' }}">
+           class="sidebar-link {{ (route starts with 'app_portefeuille_' or route starts with 'app_releve_') ? 'is-active' : '' }}">
             <span class="sidebar-link-icon"><twig:ux:icon name="solar:wallet-money-bold" /></span>
             <span class="sidebar-link-copy">Portefeuilles</span>
         </a>

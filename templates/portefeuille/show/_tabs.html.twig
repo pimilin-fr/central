@@ -9,6 +9,14 @@
             groups: groups
         })
     },{
+        id: 'releves',
+        label: 'Relevés',
+        icon: 'lucide:list-ordered',
+        content: render(controller(
+            'App\\Controller\\ReleveController::fragment',
+            { id: entity.id }
+        ))
+    },{
         id: 'edit',
         label: 'Modifier',
         icon: 'mingcute:edit-2-fill',

@@ -676,7 +676,10 @@ const App = {
 
             const refresh = () => {
                 const all = lines();
-                const start = parseFloat((startInput && startInput.value ? startInput.value : '0').replace(',', '.')) || 0;
+                const cumulBefore = parseFloat(root.dataset.rcCumulBefore) || 0;
+                // solde avant ce relevé : saisi à la main, sinon calculé (somme des relevés précédents)
+                const typed = startInput && startInput.value !== '' ? parseFloat(String(startInput.value).replace(',', '.')) : NaN;
+                const start = Number.isNaN(typed) ? cumulBefore : typed;
                 let running = start;
                 let opsCount = 0;
 
@@ -698,13 +701,19 @@ const App = {
                     const chip = row.querySelector('[data-rc-siblings]');
                     const n = sizes[groupKey(row)];
                     chip.hidden = n < 2;
-                    chip.textContent = n > 1 ? 'même tiers/date × ' + n : '';
+                    chip.textContent = n > 1 ? '× ' + n : '';
+                    chip.title = n > 1 ? 'Même tiers et même date : ' + n + ' opérations. Cliquer pour les cocher ensemble.' : '';
                 });
 
                 root.querySelector('[data-rc-count]').textContent = all.length;
                 root.querySelector('[data-rc-ops-count]').textContent = opsCount !== all.length ? '(' + opsCount + ' opérations)' : '';
                 root.querySelector('[data-rc-pool-count]').textContent = rows.length;
-                root.querySelector('[data-rc-total]').textContent = money.format(running) + ' €';
+                const movement = running - start;
+                const totalBox = root.querySelector('[data-rc-total]');
+                totalBox.textContent = money.format(movement) + ' €';
+                totalBox.classList.toggle('amount-expense', movement < 0);
+                totalBox.classList.toggle('amount-income', movement > 0);
+                root.querySelector('[data-rc-cumul]').textContent = money.format(running) + ' €';
                 root.querySelector('[data-rc-empty]').hidden = all.length > 0;
                 root.querySelector('[data-rc-pool-empty]').hidden = rows.length > 0;
 
@@ -720,6 +729,106 @@ const App = {
             };
 
             const checkedLines = () => lines().filter(line => line.querySelector('[data-rc-check-line]')?.checked);
+
+            /* ---- mini formulaire « Nouvelle opération » (panneau replié dans « À pointer ») ---- */
+            const panel = root.querySelector('[data-rc-op-panel]');
+            if (panel) {
+                const field = name => panel.querySelector('[name="op[' + name + ']"]');
+                const opError = panel.querySelector('[data-rc-op-error]');
+                const direct = panel.querySelector('[data-rc-op-direct]');
+                const mainDate = root.querySelector('input[name="date"]');
+                const oops = text => { opError.textContent = text; opError.hidden = !text; };
+                const clear = (...names) => names.forEach(name => {
+                    field(name).value = '';
+                    const hidden = field(name + '_id');
+                    if (hidden) {
+                        hidden.value = '';
+                    }
+                });
+
+                root.addEventListener('click', event => {
+                    if (event.target.closest('[data-rc-open-op]')) {
+                        panel.hidden = !panel.hidden;
+                        if (!panel.hidden) {
+                            field('date').value = (mainDate && mainDate.value) || panel.dataset.defaultDate;
+                            oops('');
+                            field('montant').focus();
+                        }
+                    } else if (event.target.closest('[data-rc-op-cancel]')) {
+                        panel.hidden = true;
+                    }
+                });
+
+                field('adresse').addEventListener('change', event => {
+                    field('adresse_id').value = event.target.value;
+                });
+
+                const create = async () => {
+                    oops('');
+                    if (!field('date').value || !field('montant').value.trim()) {
+                        return oops('Renseignez la date et le montant.');
+                    }
+                    if (!field('categorie_id').value) {
+                        return oops('Choisissez la catégorie dans la liste proposée.');
+                    }
+                    if (!field('tiers_id').value) {
+                        return oops('Choisissez le tiers dans la liste proposée.');
+                    }
+
+                    const body = new FormData();
+                    body.append('_token', panel.dataset.token);
+                    panel.querySelectorAll('[name]').forEach(el => body.append(el.name, el.value));
+                    if (!field('adresse_id').value) {
+                        body.set('op[adresse_id]', field('adresse').value);
+                    }
+
+                    const submit = panel.querySelector('[data-rc-op-submit]');
+                    submit.disabled = true;
+                    try {
+                        const response = await fetch(panel.dataset.url, {
+                            method: 'POST',
+                            body,
+                            headers: {'X-Requested-With': 'XMLHttpRequest'}
+                        });
+                        const data = await response.json();
+                        if (!data.ok) {
+                            return oops(data.error || 'Enregistrement impossible.');
+                        }
+
+                        const holder = document.createElement('ul');
+                        holder.innerHTML = data.html.trim();
+                        const row = holder.firstElementChild;
+                        pool.insertBefore(row, poolRows().find(other => sortKey(other) > sortKey(row)) || null);
+                        if (direct.checked) {
+                            addParts([row]);
+                        }
+                        // prêt pour une autre opération (même date) ; le panneau reste ouvert
+                        clear('categorie', 'tiers');
+                        field('montant').value = '';
+                        field('numCommande').value = '';
+                        field('note').value = '';
+                        clear('projet');
+                        field('adresse').innerHTML = '<option value="">Choisir d\'abord le tiers</option>';
+                        field('adresse_id').value = '';
+                        say('Opération créée' + (direct.checked ? ' et ajoutée au relevé.' : ' : elle est dans « À pointer ».'), 'info');
+                        changed();
+                        field('montant').focus();
+                    } catch (error) {
+                        oops('Erreur réseau : ' + error.message);
+                    } finally {
+                        submit.disabled = false;
+                    }
+                };
+
+                panel.querySelector('[data-rc-op-submit]').addEventListener('click', create);
+                panel.addEventListener('keydown', event => {
+                    // Entrée = créer (sauf si la liste d'autocomplétion vient de la consommer, ou dans la note)
+                    if (event.key === 'Enter' && !event.defaultPrevented && event.target.tagName !== 'TEXTAREA') {
+                        event.preventDefault();
+                        create();
+                    }
+                });
+            }
 
             /* ---- clics ---- */
             root.addEventListener('click', event => {

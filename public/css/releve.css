@@ -57,14 +57,14 @@
     text-align: center;
 }
 
-.rc-meta { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); align-items: end; }
+.rc-meta { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); align-items: end; }
 .rc-field { display: grid; gap: 4px; min-inline-size: 0; }
 .rc-field-grow { grid-column: span 2; }
 .rc-field small { color: var(--text-muted); font-weight: 600; }
 .rc-drafts { margin: 0; color: var(--text-soft); font-size: 12px; }
 .rc-drafts a { color: var(--accent); font-weight: 750; }
 
-.rc-columns { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.5fr); gap: 14px; align-items: start; }
+.rc-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 14px; align-items: start; }
 @media (max-width: 960px) { .rc-columns { grid-template-columns: minmax(0, 1fr); } }
 
 .rc-help { margin: 0; color: var(--text-muted); font-size: 11.5px; }
@@ -222,7 +222,7 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 .ops-group.is-releve { border-inline-start: 4px solid var(--border); }
 .ops-group.is-releve.is-closed { border-inline-start-color: var(--success); }
 .ops-group.is-releve.is-open { border-inline-start-color: var(--warning); }
-.ops-group.is-releve.is-open .ops-group-header {}
+.ops-group.is-releve.is-open .ops-group-header { background: color-mix(in srgb, var(--warning) 6%, transparent); }
 .ops-group-badge.is-open { color: var(--warning); background: color-mix(in srgb, var(--warning) 12%, transparent); border-color: color-mix(in srgb, var(--warning) 40%, transparent); }
 .ops-group-badge.is-legacy { color: var(--text-muted); }
 .ops-rank.is-sub { color: var(--text-muted); text-align: right; }
@@ -232,3 +232,50 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 /* détail sur plusieurs tiers : on rappelle le tiers de chaque partie */
 .rc-line[data-multi-tiers="1"] .rc-parts .rc-op .rc-main strong { display: block; font-size: 11.5px; }
 .rc-line[data-multi-tiers="1"] .rc-parts .rc-op { grid-template-columns: minmax(0, 1fr) auto auto; }
+
+/* ---- Repères : relevé précédent + soldes ---- */
+.rc-recap {
+    margin-block-end: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+}
+.rc-recap-item { display: grid; gap: 2px; min-inline-size: 0; }
+.rc-recap-label { color: var(--text-muted); font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.rc-recap-label small { text-transform: none; letter-spacing: 0; font-weight: 600; }
+.rc-recap-item strong { display: inline-flex; align-items: center; gap: 8px; color: var(--text); font-size: 14px; font-variant-numeric: tabular-nums; }
+.rc-recap-item a { color: var(--accent); text-decoration: none; }
+.rc-recap-item a:hover { text-decoration: underline; }
+
+.rc-total-multi { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; }
+.rc-total-multi small { color: var(--text-muted); }
+
+/* ---- Liste des relevés ---- */
+.rc-table-wrap { overflow-x: auto; }
+.rc-releves .rc-sub { display: block; color: var(--text-muted); font-size: 11px; }
+.rc-releves tr.is-open td:first-child { box-shadow: inset 3px 0 0 var(--warning); }
+.rc-releves tr.is-closed td:first-child { box-shadow: inset 3px 0 0 var(--success); }
+
+/* ---- Mini formulaire « Nouvelle opération » (panneau replié dans « À pointer ») ---- */
+.rc-newop {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    background: var(--surface-soft);
+    border: 1px dashed var(--border-strong, var(--border));
+    border-radius: 12px;
+}
+.rc-newop[hidden] { display: none; }
+.rc-newop-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.rc-newop-grid .rc-field-wide { grid-column: 1 / -1; }
+@media (max-width: 520px) { .rc-newop-grid { grid-template-columns: minmax(0, 1fr); } }
+.rc-more > summary { cursor: pointer; color: var(--accent); font-size: 12px; font-weight: 750; padding: 2px 0 8px; }
+.rc-more > summary small { color: var(--text-muted); font-weight: 600; }
+.rc-newop-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; }
+.rc-check { display: inline-flex; align-items: center; gap: 6px; color: var(--text-soft); font-size: 12px; }
+.rc-newop-actions { display: inline-flex; gap: 8px; }

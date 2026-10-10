@@ -1,0 +1,36 @@
+{% extends 'modern.html.twig' %}
+
+{# Fil d'Ariane : Central > Portefeuilles > [portefeuille] > Relevés #}
+{% set breadcrumb_current = 'Relevés' %}
+{% set breadcrumb_trail = [
+    { label: portefeuille.libelle, path: path('app_portefeuille_show', { id: portefeuille.id }) }
+] %}
+
+{% block title %}Relevés — {{ portefeuille.libelle }}{% endblock %}
+
+{% block body %}
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">Relevés</h1>
+                <div class="page-subline">
+                    <span class="entity-pill" style="--entity-color: {{ (portefeuille.couleur ?? null)|entity_color }};">
+                        <span class="entity-pill-dot"></span>
+                        <span>{{ portefeuille.libelle }}</span>
+                    </span>
+                </div>
+            </div>
+
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                btns: [{
+                    label: 'Retour',
+                    path: path('app_portefeuille_show', { id: portefeuille.id }),
+                    icon: 'mdi:arrow-left',
+                    color: 'neutral'
+                }]
+            } %}
+        </div>
+
+        {% include 'releve/_list.html.twig' with { portefeuille: portefeuille, rows: rows } only %}
+    </div>
+{% endblock %}

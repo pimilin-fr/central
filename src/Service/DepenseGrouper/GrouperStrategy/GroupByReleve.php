@@ -17,7 +17,7 @@ class GroupByReleve implements GroupStrategyInterface, GroupExtraInterface {
 
     #[Override]
     public function getLabel(Depenses $depense): string {
-        return $depense->getReleve() ? $depense->getReleve()->getDate()->format('d/m/Y') : 'Non affecté';
+        return $depense->getReleve() ? 'Relevé du ' . $depense->getReleve()->getDate()->format('d/m/Y') : 'Non affecté';
     }
 
     #[\Override]

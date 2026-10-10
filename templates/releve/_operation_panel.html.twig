@@ -1,0 +1,67 @@
+{#
+    Mini formulaire « Nouvelle opération » (ex. frais bancaires, opération absente de la base), replié par défaut.
+    Visibles : date, montant, catégorie, tiers, adresse du tiers. Le portefeuille est celui de l'écran (non affiché).
+    Les autres champs existent mais restent repliés. Les champs ne sont PAS ceux du formulaire du relevé
+    (attribut form="rc-op-detached") : le JS les envoie à part, sans recharger la page.
+    Paramètres : portefeuille, releve, token
+#}
+<div class="rc-newop" data-rc-op-panel hidden
+     data-url="{{ path('app_releve_add_operation', { id: portefeuille.id }) }}"
+     data-token="{{ csrf_token(token) }}"
+     data-default-date="{{ releve.date|date('Y-m-d') }}">
+
+    <div class="rc-newop-grid">
+        <label class="rc-field">
+            <span class="modern-form-label">Date</span>
+            <input type="date" form="rc-op-detached" name="op[date]" class="modern-form-control" required value="{{ releve.date|date('Y-m-d') }}">
+        </label>
+        <label class="rc-field">
+            <span class="modern-form-label">Montant <small>(négatif = remboursement)</small></span>
+            <input type="text" form="rc-op-detached" inputmode="decimal" name="op[montant]" class="modern-form-control" required placeholder="0,00" autocomplete="off">
+        </label>
+        <label class="rc-field">
+            <span class="modern-form-label">Catégorie</span>
+            <input type="text" form="rc-op-detached" name="op[categorie]" class="modern-form-control autocomplete" data-endpoint="/categories/search" autocomplete="off" required>
+            <input type="hidden" form="rc-op-detached" name="op[categorie_id]">
+        </label>
+        <label class="rc-field">
+            <span class="modern-form-label">Tiers</span>
+            <input type="text" form="rc-op-detached" name="op[tiers]" class="modern-form-control autocomplete" data-endpoint="/tiers/search" autocomplete="off" required>
+            <input type="hidden" form="rc-op-detached" name="op[tiers_id]">
+        </label>
+        <label class="rc-field rc-field-wide">
+            <span class="modern-form-label">Adresse du tiers</span>
+            <select form="rc-op-detached" name="op[adresse]" class="modern-form-control"><option value="">Choisir d'abord le tiers</option></select>
+            <input type="hidden" form="rc-op-detached" name="op[adresse_id]">
+        </label>
+    </div>
+
+    <details class="rc-more">
+        <summary>Plus de champs <small>(projet, n° de commande, note)</small></summary>
+        <div class="rc-newop-grid">
+            <label class="rc-field">
+                <span class="modern-form-label">Projet</span>
+                <input type="text" form="rc-op-detached" name="op[projet]" class="modern-form-control autocomplete" data-endpoint="/projet/search" autocomplete="off">
+                <input type="hidden" form="rc-op-detached" name="op[projet_id]">
+            </label>
+            <label class="rc-field">
+                <span class="modern-form-label">N° de commande</span>
+                <input type="text" form="rc-op-detached" name="op[numCommande]" class="modern-form-control" maxlength="255">
+            </label>
+            <label class="rc-field rc-field-wide">
+                <span class="modern-form-label">Note</span>
+                <textarea form="rc-op-detached" name="op[note]" class="modern-form-control" rows="2"></textarea>
+            </label>
+        </div>
+    </details>
+
+    <p class="rc-msg" data-rc-op-error role="alert" hidden></p>
+
+    <div class="rc-newop-foot">
+        <label class="rc-check"><input type="checkbox" form="rc-op-detached" data-rc-op-direct checked> Ajouter directement au relevé</label>
+        <span class="rc-newop-actions">
+            <button type="button" class="page-action page-action-neutral" data-rc-op-cancel>Fermer</button>
+            <button type="button" class="page-action page-action-primary" data-rc-op-submit><twig:ux:icon name="lucide:plus" /><span>Créer l'opération</span></button>
+        </span>
+    </div>
+</div>

@@ -59,13 +59,87 @@ class ReleveManager {
             return [];
         }
 
-        $operations = $releve->getDepenses()->toArray();
+        // sécurité : seules les opérations DU portefeuille du relevé comptent (voir foreignOperations)
+        $operations = array_values(array_filter(
+                $releve->getDepenses()->toArray(),
+                fn (Depenses $d): bool => $this->belongs($releve, $d)
+        ));
         usort($operations, static function (Depenses $a, Depenses $b): int {
             return [$a->getReleveOrdre() ?? PHP_INT_MAX, $a->getDate(), $a->getId()]
                     <=> [$b->getReleveOrdre() ?? PHP_INT_MAX, $b->getDate(), $b->getId()];
         });
 
         return $operations;
+    }
+
+    private function belongs(Releve $releve, Depenses $operation): bool {
+        return $operation->getPortefeuille()?->getId() === $releve->getPortefeuille()->getId();
+    }
+
+    /**
+     * Opérations rattachées au relevé mais appartenant à UN AUTRE portefeuille (données incohérentes,
+     * ex. anciens relevés partagés entre comptes). Elles ne sont jamais affichées ni modifiées ici.
+     *
+     * @return list<Depenses>
+     */
+    public function foreignOperations(Releve $releve): array {
+        if ($releve->getId() === null) {
+            return [];
+        }
+
+        return array_values(array_filter(
+                $releve->getDepenses()->toArray(),
+                fn (Depenses $d): bool => !$this->belongs($releve, $d)
+        ));
+    }
+
+    /** Montant signé d'une opération : dépense négative, revenu positif (un remboursement inverse le signe). */
+    public static function signed(Depenses $operation): float {
+        $amount = (float) $operation->getMontant();
+
+        return $operation->getCategorie()->isDepense() ? -$amount : $amount;
+    }
+
+    /**
+     * Résumé de relevés (à passer par ordre CHRONOLOGIQUE) : mouvement du relevé, nombre de lignes / opérations
+     * et solde cumulé (somme des mouvements de tous les relevés jusqu'à celui-ci inclus).
+     *
+     * @param iterable<Releve> $relevesAsc
+     * @return list<array{releve: Releve, total: float, ops: int, lines: int, cumul: float}>
+     */
+    public function summarize(iterable $relevesAsc): array {
+        $rows = [];
+        $cumul = 0.0;
+        foreach ($relevesAsc as $releve) {
+            $operations = $this->orderedOperations($releve);
+            $total = 0.0;
+            foreach ($operations as $operation) {
+                $total += self::signed($operation);
+            }
+            $cumul += $total;
+            $rows[] = [
+                'releve' => $releve,
+                'total' => round($total, 2),
+                'ops' => count($operations),
+                'lines' => count($this->orderedLines($releve)),
+                'cumul' => round($cumul, 2),
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Repères pour composer un relevé à une date : le relevé précédent (mouvement) et le solde cumulé AVANT lui.
+     *
+     * @return array{previous: ?array{releve: Releve, total: float, ops: int, lines: int, cumul: float}, cumulBefore: float}
+     */
+    public function history(Releve $current): array {
+        $before = $this->repoReleve->findBefore($current->getPortefeuille(), $current->getDate(), $current->getId());
+        $rows = $this->summarize($before);
+        $last = $rows === [] ? null : $rows[array_key_last($rows)];
+
+        return ['previous' => $last, 'cumulBefore' => $last['cumul'] ?? 0.0];
     }
 
     /**
@@ -139,6 +213,9 @@ class ReleveManager {
         // retire du relevé les opérations qui n'y sont plus
         if ($releve->getId() !== null) {
             foreach ($releve->getDepenses() as $current) {
+                if (!$this->belongs($releve, $current)) {
+                    continue; // jamais touche aux opérations d'un autre portefeuille
+                }
                 if (!isset($seen[$current->getId()])) {
                     $current->setReleve(null); // remet aussi le rang à null
                 }

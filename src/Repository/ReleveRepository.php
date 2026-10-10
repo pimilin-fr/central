@@ -51,4 +51,45 @@ class ReleveRepository extends ServiceEntityRepository {
                         ->getQuery()
                         ->getResult();
     }
+
+    /**
+     * Relevés d'un portefeuille STRICTEMENT antérieurs à une date (ordre chronologique), avec opérations et catégories.
+     *
+     * @return list<Releve>
+     */
+    public function findBefore(Portefeuille $portefeuille, \DateTimeInterface $date, ?int $excludeId = null): array {
+        $qb = $this->createQueryBuilder('r')
+                ->leftJoin('r.depenses', 'd')
+                ->leftJoin('d.categorie', 'c')
+                ->addSelect('d', 'c')
+                ->andWhere('r.portefeuille = :p')
+                ->andWhere('r.date < :date')
+                ->setParameter('p', $portefeuille)
+                ->setParameter('date', $date, \Doctrine\DBAL\Types\Types::DATE_MUTABLE)
+                ->orderBy('r.date', 'ASC')
+                ->addOrderBy('r.id', 'ASC');
+        if ($excludeId !== null) {
+            $qb->andWhere('r.id != :self')->setParameter('self', $excludeId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Tous les relevés d'un portefeuille, du plus ancien au plus récent, avec opérations et catégories.
+     *
+     * @return list<Releve>
+     */
+    public function findAllAsc(Portefeuille $portefeuille): array {
+        return $this->createQueryBuilder('r')
+                        ->leftJoin('r.depenses', 'd')
+                        ->leftJoin('d.categorie', 'c')
+                        ->addSelect('d', 'c')
+                        ->andWhere('r.portefeuille = :p')
+                        ->setParameter('p', $portefeuille)
+                        ->orderBy('r.date', 'ASC')
+                        ->addOrderBy('r.id', 'ASC')
+                        ->getQuery()
+                        ->getResult();
+    }
 }

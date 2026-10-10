@@ -20,7 +20,7 @@
         <strong>{{ op.tiers.name }}</strong>
         <small>{{ op.categorie.name }}{% if op.numCommande %} · n° {{ op.numCommande }}{% endif %}{% if op.note %} · {{ op.note|slice(0, 40) }}{% endif %}</small>
     </span>
-    <button type="button" class="rc-chip rc-only-pool" data-rc-siblings hidden title="Cocher les opérations du même tiers et de la même date"></button>
+    <button type="button" class="rc-chip rc-only-pool" data-rc-siblings hidden></button>
     <span class="rc-amount {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">{{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €</span>
     <span class="rc-tools">
         <button type="button" class="rc-btn rc-add rc-only-pool" data-rc-add title="Ajouter au relevé" aria-label="Ajouter au relevé">＋</button>
