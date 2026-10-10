@@ -44,6 +44,9 @@
             } %}
         </div>
 
+        {# Prochaines échéances prévues (visible quel que soit l'onglet) #}
+        {{ render(controller('App\\Controller\\PrevisionController::prochaines', { id: entity.id })) }}
+
         {# Onglets fonctionnels #}
         {% include 'portefeuille/show/_tabs.html.twig' %}
     </div>

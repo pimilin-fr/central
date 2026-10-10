@@ -36,3 +36,39 @@
 .pv-serie { margin-top: .25rem; }
 .pv-serie summary { cursor: pointer; list-style: none; }
 .pv-serie ul { margin: .25rem 0 0; padding-left: 1.1rem; font-size: .85rem; columns: 2; }
+
+/* Concrétisation en place : date et montant réels dans la ligne */
+.pv-concretise { display: flex; gap: .5rem; align-items: flex-end; flex-wrap: wrap; }
+.pv-concretise label { display: grid; gap: .15rem; }
+.pv-concretise input[type="date"] { min-width: 9.5rem; }
+.pv-concretise input[type="text"] { width: 6.5rem; text-align: right; }
+.pv-month .rc-table-wrap { overflow: visible; }
+@media (max-width: 1000px) { .pv-month .rc-table-wrap { overflow-x: auto; } }
+
+/* Panneau latéral « Prochaines échéances » : superposé à la fiche, languette visible une fois replié */
+.pv-drawer { --pv-handle: 4.4rem; position: fixed; z-index: 25; right: 0; top: calc(var(--topbar-height, 72px) + 1rem); width: min(30rem, calc(100vw - var(--pv-handle) - .5rem)); transform: translateX(100%); transition: transform .25s ease; }
+.pv-drawer.is-open { transform: translateX(0); }
+.pv-drawer-handle { position: absolute; left: calc(-1 * var(--pv-handle)); top: 0; width: var(--pv-handle); display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .6rem .25rem; border: 1px solid var(--border, #e5e7eb); border-right: 0; border-radius: .75rem 0 0 .75rem; background: var(--surface, #fff); color: var(--text); box-shadow: -4px 4px 16px rgba(0, 0, 0, .12); cursor: pointer; font: inherit; }
+.pv-drawer-handle:hover { filter: brightness(.97); }
+.pv-drawer-count { font-size: 1.1rem; font-weight: 700; line-height: 1; }
+.pv-drawer-sum { font-size: .72rem; font-weight: 600; white-space: nowrap; }
+.pv-drawer-late { position: absolute; top: -.4rem; left: -.4rem; width: 1.2rem; height: 1.2rem; border-radius: 50%; background: var(--danger, #dc2626); color: #fff; font-size: .75rem; font-weight: 700; display: grid; place-items: center; }
+.pv-drawer-panel { display: flex; flex-direction: column; max-height: calc(100vh - var(--topbar-height, 72px) - 2rem); background: var(--surface, #fff); border: 1px solid var(--border, #e5e7eb); border-right: 0; border-radius: .75rem 0 0 .75rem; box-shadow: -8px 8px 28px rgba(0, 0, 0, .18); }
+.pv-drawer-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .75rem; padding: .85rem 1rem .5rem; border-bottom: 1px solid var(--border, #e5e7eb); }
+.pv-drawer-head h2 { margin: 0; font-size: 1rem; }
+.pv-drawer-head p { margin: .15rem 0 0; }
+.pv-cards { list-style: none; margin: 0; padding: .5rem; overflow-y: auto; display: grid; gap: .6rem; }
+.pv-card { display: grid; gap: .35rem; padding: .7rem .8rem; border: 1px solid var(--border, #e5e7eb); border-radius: .6rem; }
+.pv-card.is-late { border-color: var(--danger, #dc2626); }
+.pv-card-top, .pv-card-title { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.pv-card-more { display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap; }
+.pv-inline-details summary { cursor: pointer; list-style: none; }
+.pv-inline-details summary::-webkit-details-marker { display: none; }
+.pv-inline-details[open] { flex-basis: 100%; }
+.pv-inline-details .pv-concretise { margin-top: .4rem; }
+.pv-drawer-foot { display: flex; justify-content: space-between; padding: .6rem 1rem; border-top: 1px solid var(--border, #e5e7eb); }
+@media (prefers-reduced-motion: reduce) { .pv-drawer { transition: none; } }
+/* replié : pas d'ombre résiduelle, et rien de focalisable dans le panneau caché */
+.pv-drawer .pv-drawer-panel { transition: visibility 0s linear .25s; }
+.pv-drawer:not(.is-open) .pv-drawer-panel { visibility: hidden; box-shadow: none; }
+.pv-drawer.is-open .pv-drawer-panel { transition-delay: 0s; }

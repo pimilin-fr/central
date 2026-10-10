@@ -24,11 +24,48 @@ const CentralPrevision = {
             this.tranches(form);
             this.assist(form);
         }
+        const drawer = document.querySelector('[data-pv-drawer]');
+        if (drawer) {
+            this.log('Init prevision (panneau)');
+            this.drawer(drawer);
+        }
         const list = document.querySelector('[data-pv-suggestions]');
         if (list) {
             this.log('Init prevision (suggestions)');
             this.suggestions(list);
         }
+    },
+
+    /** Panneau latéral des prochaines échéances : replié par défaut, état mémorisé dans ce navigateur. */
+    drawer(drawer) {
+        const KEY = 'central-prevision-panneau';
+        const handle = drawer.querySelector('.pv-drawer-handle');
+        const set = open => {
+            drawer.classList.toggle('is-open', open);
+            handle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            try {
+                localStorage.setItem(KEY, open ? '1' : '0');
+            } catch (e) {
+            }
+        };
+        let open = false;
+        try {
+            open = localStorage.getItem(KEY) === '1';
+        } catch (e) {
+        }
+        drawer.classList.toggle('is-open', open);
+        handle.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+        drawer.addEventListener('click', e => {
+            if (e.target.closest('[data-pv-toggle]')) {
+                set(!drawer.classList.contains('is-open'));
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+                set(false);
+            }
+        });
     },
 
     /** Suggestions : « Masquer » est mémorisé dans ce navigateur uniquement (rien n'est écrit en base). */

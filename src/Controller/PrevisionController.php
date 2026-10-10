@@ -283,6 +283,50 @@ final class PrevisionController extends AbstractController {
         ]);
     }
 
+    /**
+     * Panneau latéral « Prochaines échéances » de la fiche portefeuille (pas de route : render(controller(...))).
+     * Échéances en retard + celles des 45 prochains jours ; rien d'affiché s'il n'y en a pas.
+     * Le nombre et le montant net restent visibles panneau replié.
+     */
+    public function prochaines(Portefeuille $portefeuille, PrevisionEcheanceRepository $echeanceRepo, \Symfony\Component\HttpFoundation\RequestStack $requests): Response {
+        $today = new DateTime('today');
+        $limite = (clone $today)->modify('+45 days');
+        $debutMois = (clone $today)->modify('first day of this month');
+        $retard = [];
+        $proches = [];
+        $total = 0;
+        $brut = 0.0;
+        $pondere = 0.0;
+        foreach ($echeanceRepo->findPrevues($portefeuille) as $echeance) {
+            $total++;
+            $date = $echeance->getDatePrevue();
+            if ($date < $today && $date < $debutMois) {
+                $retard[] = $echeance;
+            } elseif ($date <= $limite) {
+                $proches[] = $echeance;
+            } else {
+                continue;
+            }
+            $brut += $echeance->getMontantSigne();
+            $pondere += $echeance->getMontantSigne() * $echeance->getCertitude()->poids();
+        }
+        if ($retard === [] && $proches === []) {
+            return new Response('');
+        }
+        $main = $requests->getMainRequest();
+
+        return $this->render('prevision/_prochaines.html.twig', [
+                    'portefeuille' => $portefeuille,
+                    'retard' => $retard,
+                    'proches' => $proches,
+                    'total' => $total,
+                    'brut' => $brut,
+                    'pondere' => $pondere,
+                    'today' => $today,
+                    'back' => $main ? $main->getRequestUri() : '/portefeuille',
+        ]);
+    }
+
     /** Retour à la page d'où vient l'action (chemin interne uniquement), sinon la page Prévisions. */
     private function back(Request $request): Response {
         $back = (string) $request->request->get('_back');
