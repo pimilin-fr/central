@@ -36,4 +36,19 @@ class ReleveRepository extends ServiceEntityRepository {
                         ->getQuery()
                         ->getOneOrNullResult();
     }
+
+    /**
+     * Relevés non finalisés d'un portefeuille (à reprendre), du plus récent au plus ancien.
+     *
+     * @return list<Releve>
+     */
+    public function findOpen(Portefeuille $portefeuille): array {
+        return $this->createQueryBuilder('r')
+                        ->andWhere('r.portefeuille = :p')
+                        ->andWhere('r.closedAt IS NULL')
+                        ->setParameter('p', $portefeuille)
+                        ->orderBy('r.date', 'DESC')
+                        ->getQuery()
+                        ->getResult();
+    }
 }

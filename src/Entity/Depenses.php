@@ -57,6 +57,10 @@ class Depenses implements DemoEntityInterface {
     #[ORM\JoinColumn(nullable: true)]
     private ?Releve $releve = null;
 
+    /** Rang de l'opération sur le relevé de compte (1 = première ligne). Null : pas (encore) ordonnée. */
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $releveOrdre = null;
+
     // -- getter
     public function getId(): ?int {
         return $this->id;
@@ -104,6 +108,10 @@ class Depenses implements DemoEntityInterface {
 
     public function getReleve(): ?Releve {
         return $this->releve;
+    }
+
+    public function getReleveOrdre(): ?int {
+        return $this->releveOrdre;
     }
 
     /**
@@ -157,6 +165,15 @@ class Depenses implements DemoEntityInterface {
 
     public function setReleve(?Releve $releve) {
         $this->releve = $releve;
+        if ($releve === null) {
+            $this->releveOrdre = null; // hors relevé : plus de rang
+        }
+        return $this;
+    }
+
+    public function setReleveOrdre(?int $releveOrdre): static {
+        $this->releveOrdre = $releveOrdre;
+
         return $this;
     }
 

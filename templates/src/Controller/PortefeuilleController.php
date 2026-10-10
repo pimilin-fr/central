@@ -1,0 +1,192 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Depenses;
+use App\Entity\Depenses as Operation;
+use App\Entity\Portefeuille;
+use App\Entity\PortefeuilleView;
+use App\Form\AddDepensesType;
+use App\Form\PortefeuilleType;
+use App\Service\DepenseGrouper\DepenseGrouper;
+use App\Service\DepenseGrouper\DepenseGroupManager;
+use App\Service\DepenseGrouper\GrouperStrategy\GroupByReleve;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/portefeuille')]
+final class PortefeuilleController extends AbstractController {
+
+    #[Route(name: 'app_portefeuille_index', methods: ['GET'])]
+    public function index(EntityManagerInterface $entityManager): Response {
+        $ptfRepo = $entityManager->getRepository(PortefeuilleView::class);
+        $depRepo = $entityManager->getRepository(Operation::class);
+        $ptfList = $ptfRepo->findAll();
+        $groupingService = new DepenseGrouper();
+        $items = [];
+        foreach ($ptfList as $ptf) {
+            $groups = $groupingService->group(
+                    $depRepo->findBy([
+                        "portefeuille" => $ptf
+                            ], [
+                        "date" => "DESC",
+                        "id" => "DESC"
+                    ]),
+                    new GroupByReleve()
+            );
+
+            $items[$ptf->getId()] = [
+                "portefeuille" => $ptf,
+                "releves" => $groups
+            ];
+        }
+
+
+
+        return $this->render('portefeuille/index.html.twig', [
+                    'items' => $items,
+        ]);
+    }
+
+    #[Route('/new', name: 'app_portefeuille_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response {
+        $ptf = new Portefeuille();
+        $form = $this->createForm(PortefeuilleType::class, $ptf);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ptf->regenerateCode();
+            $entityManager->persist($ptf);
+            $entityManager->flush();
+            $this->addFlash('success', 'Portefeuille ajouté avec succès');
+            return $this->redirectToRoute('app_portefeuille_show', ['id' => $ptf->getId()], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('portefeuille/new.html.twig', [
+                    'portefeuille' => $ptf,
+                    'form' => $form
+        ]);
+    }
+
+    #[Route('/show/{id}', name: 'app_portefeuille_show', methods: ['GET', 'POST'])]
+    public function show(Request $request, Portefeuille $portefeuille, EntityManagerInterface $em): Response {
+        $depRepo = $em->getRepository(Depenses::class);
+        $ptfRepo = $em->getRepository(PortefeuilleView::class);
+        $ptfView = $ptfRepo->find($portefeuille->getId());
+
+        $depenses = $depRepo->findBy(
+                ["portefeuille" => $portefeuille],
+                ['date' => 'DESC', 'id' => 'DESC']// IMPORTANT
+        );
+
+        $groupManager = new DepenseGroupManager($request);
+        $groups = $groupManager->build(
+                $depenses,
+                0
+        );
+
+        return $this->render('portefeuille/show.html.twig', [
+                    'entity' => $ptfView,
+                    'entityType' => 'portefeuille',
+                    'groups' => $groups,
+                    'groupBy' => $groupManager->getGroupBy()
+        ]);
+    }
+
+    #[Route('/edit/{id}', name: 'app_portefeuille_edit', methods: ['GET', 'POST'])]
+    public function edit(Portefeuille $portefeuille, Request $request, EntityManagerInterface $em): Response {
+
+        $form = $this->createForm(
+                PortefeuilleType::class,
+                $portefeuille
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            $this->addFlash('success', 'Portefeuille modifié avec succès');
+
+            return $this->redirectToRoute(
+                            'app_portefeuille_show',
+                            [
+                                'id' => $portefeuille->getId(),
+                                'tab' => 'edit',
+                            ]
+                    );
+        }
+
+        return $this->render('portefeuille/_form.html.twig', [
+                    'form' => $form->createView(),
+                    'portefeuille' => $portefeuille,
+        ]);
+    }
+
+    #[Route('/add-operation/{id}', name: 'app_portefeuille_add_operation', methods: ['GET', 'POST'])]
+    public function addOperation(Portefeuille $portefeuille, Request $request, EntityManagerInterface $em): Response {
+        $operation = new Operation();
+
+        $form = $this->createForm(
+                AddDepensesType::class,
+                $operation,
+                [
+                    'portefeuille_entity' => $portefeuille,
+                ]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Si ton AddDepensesType ne fait pas déjà l'association,
+            // on force le portefeuille ici.
+            $operation->setPortefeuille($portefeuille);
+
+            $em->persist($operation);
+            $em->flush();
+
+            $this->addFlash('success', 'Opération ajoutée avec succès');
+
+            return $this->redirectToRoute(
+                            'app_portefeuille_show',
+                            [
+                                'id' => $portefeuille->getId(),
+                                'tab' => 'addoperation',
+                            ]
+                    );
+        }
+
+        return $this->render('depenses/form/_form.html.twig', [
+                    'form' => $form->createView(),
+                    'portefeuille' => $portefeuille,
+        ]);
+    }
+
+    #[Route('/delete/{id}', name: 'app_portefeuille_delete', methods: ['GET'])]
+    public function delete(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
+        $portefeuille->setDeleted(new DateTimeImmutable());
+        $em->flush();
+        $this->addFlash('success', 'Portefeuille supprimé avec succès');
+
+        return $this->redirectToRoute('app_portefeuille_show', [
+                    'id' => $portefeuille->getId(),
+                    'tab' => 'edit'
+        ]);
+    }
+
+    #[Route('/restore/{id}', name: 'app_portefeuille_restore', methods: ['GET'])]
+    public function restore(Portefeuille $portefeuille, EntityManagerInterface $em): Response {
+        $portefeuille->setDeleted(null);
+        $em->flush();
+        $this->addFlash('success', 'Portefeuille restauré avec succès');
+
+        return $this->redirectToRoute('app_portefeuille_show', [
+                    'id' => $portefeuille->getId(),
+                    'tab' => 'edit'
+        ]);
+    }
+}

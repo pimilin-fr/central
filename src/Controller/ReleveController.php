@@ -2,16 +2,203 @@
 
 namespace App\Controller;
 
+use App\Entity\Depenses;
+use App\Entity\Portefeuille;
+use App\Entity\Releve;
+use App\Repository\DepensesRepository;
+use App\Repository\ReleveRepository;
+use App\Service\ReleveManager;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Throwable;
 
+/**
+ * « Faire le relevé » : on choisit les opérations DANS L'ORDRE du relevé de compte.
+ * Peut se faire en plusieurs fois (relevé non finalisé) ; la finalisation fige l'ordre.
+ */
 #[Route('/releve')]
 final class ReleveController extends AbstractController {
 
-//    #[Route(name: 'app_releve_index', methods: ['GET'])]
-//    public function index(\App\Repository\ReleveRepository $repo, Depens): Response {
-//        return $this->render('adresse/index.html.twig', [
-//                    'adresses' => $adresseRepository->findAll(),
-//        ]);
-//    }
+    private const TOKEN = 'releve_compose';
 
-  
+    /**
+     * Écran de composition. Paramètres (tous facultatifs) :
+     *   releve = identifiant d'un relevé à reprendre · date = Y-m-d (relevé de cette date, créé si besoin)
+     *   ids[]  = opérations à pré-placer (ex. cases cochées dans la liste)
+     */
+    #[Route('/composer/{id}', name: 'app_releve_compose', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function compose(
+            Portefeuille $portefeuille,
+            Request $request,
+            EntityManagerInterface $em,
+            DepensesRepository $depRepo,
+            ReleveRepository $releveRepo
+    ): Response {
+        $manager = new ReleveManager($em);
+
+        $releve = null;
+        if ($request->query->getInt('releve') > 0) {
+            $releve = $releveRepo->find($request->query->getInt('releve'));
+            if ($releve === null || $releve->getPortefeuille()->getId() !== $portefeuille->getId()) {
+                throw $this->createNotFoundException('Relevé introuvable pour ce portefeuille');
+            }
+        } else {
+            $date = $this->parseDate($request->query->get('date')) ?? new DateTime('today');
+            $releve = $manager->findOrCreate($portefeuille, $date);
+        }
+
+        $selected = $manager->orderedOperations($releve);
+        $selectedIds = array_map(static fn (Depenses $d) => $d->getId(), $selected);
+
+        $pool = [];
+        foreach ($depRepo->findUnreleved($portefeuille) as $operation) {
+            $pool[] = $operation;
+        }
+
+        // opérations pré-placées (ex. cases cochées) : à la suite, dans l'ordre chronologique
+        if (!$releve->isClosed()) {
+            $wanted = array_map('intval', (array) $request->query->all('ids'));
+            if ($wanted !== []) {
+                $moved = [];
+                foreach ($pool as $i => $operation) {
+                    if (in_array($operation->getId(), $wanted, true)) {
+                        $moved[] = $operation;
+                        unset($pool[$i]);
+                    }
+                }
+                $selected = [...$selected, ...$moved];
+                $pool = array_values($pool);
+            }
+        }
+
+        return $this->render('releve/composer.html.twig', [
+                    'portefeuille' => $portefeuille,
+                    'releve' => $releve,
+                    'selected' => $selected,
+                    'pool' => $pool,
+                    'drafts' => $releveRepo->findOpen($portefeuille),
+                    'token' => self::TOKEN,
+        ]);
+    }
+
+    /** Enregistre (reste « en cours ») ou finalise. Corps : _token, releve?, date, label?, ops[] (dans l'ordre), action. */
+    #[Route('/composer/{id}', name: 'app_releve_save', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function save(
+            Portefeuille $portefeuille,
+            Request $request,
+            EntityManagerInterface $em,
+            DepensesRepository $depRepo,
+            ReleveRepository $releveRepo
+    ): Response {
+        if (!$this->isCsrfTokenValid(self::TOKEN, (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton de sécurité invalide, veuillez recommencer.');
+
+            return $this->redirectToRoute('app_releve_compose', ['id' => $portefeuille->getId()]);
+        }
+
+        $manager = new ReleveManager($em);
+        $date = $this->parseDate($request->request->get('date'));
+        if ($date === null) {
+            $this->addFlash('danger', 'Date de relevé invalide.');
+
+            return $this->redirectToRoute('app_releve_compose', ['id' => $portefeuille->getId()]);
+        }
+
+        try {
+            $releveId = $request->request->getInt('releve');
+            if ($releveId > 0) {
+                $releve = $releveRepo->find($releveId);
+                if ($releve === null || $releve->getPortefeuille()->getId() !== $portefeuille->getId()) {
+                    throw new \RuntimeException('Relevé introuvable pour ce portefeuille');
+                }
+                if ($releve->isClosed()) {
+                    throw new \RuntimeException('Ce relevé est finalisé : rouvrez-le pour le modifier.');
+                }
+                if ($releve->getDate()->format('Y-m-d') !== $date->format('Y-m-d')) {
+                    $clash = $releveRepo->findOneBy(['portefeuille' => $portefeuille, 'date' => $date]);
+                    if ($clash !== null) {
+                        throw new \RuntimeException('Il existe déjà un relevé à cette date pour ce portefeuille.');
+                    }
+                    $releve->setDate($date);
+                }
+            } else {
+                $releve = $manager->findOrCreate($portefeuille, $date);
+                if ($releve->isClosed()) {
+                    throw new \RuntimeException('Le relevé de cette date est finalisé : rouvrez-le pour le modifier.');
+                }
+            }
+
+            $label = trim((string) $request->request->get('label', ''));
+            if ($label !== '') {
+                $releve->setLabel(mb_substr($label, 0, 255));
+            }
+
+            // opérations dans l'ordre reçu
+            $ids = array_values(array_unique(array_map('intval', (array) $request->request->all('ops'))));
+            $found = [];
+            if ($ids !== []) {
+                foreach ($depRepo->findBy(['id' => $ids]) as $operation) {
+                    $found[$operation->getId()] = $operation;
+                }
+            }
+            $ordered = [];
+            foreach ($ids as $id) {
+                if (isset($found[$id])) {
+                    $ordered[] = $found[$id];
+                }
+            }
+
+            $finalize = $request->request->get('action') === 'finalize';
+            if ($ordered === [] && $releve->getId() === null) {
+                throw new \RuntimeException('Aucune opération choisie.');
+            }
+
+            $manager->compose($releve, $ordered);
+            if ($finalize) {
+                $manager->finalize($releve);
+                $this->addFlash('success', sprintf('Relevé du %s finalisé (%d opération(s)) : son ordre est figé.', $releve->getDate()->format('d/m/Y'), count($ordered)));
+
+                return $this->redirectToRoute('app_portefeuille_show', ['id' => $portefeuille->getId(), 'groupBy' => 'releve']);
+            }
+
+            $this->addFlash('success', sprintf('Relevé du %s enregistré (%d opération(s)) — en cours, à reprendre quand vous voulez.', $releve->getDate()->format('d/m/Y'), count($ordered)));
+
+            return $this->redirectToRoute('app_releve_compose', ['id' => $portefeuille->getId(), 'releve' => $releve->getId()]);
+        } catch (Throwable $e) {
+            $this->addFlash('danger', $e->getMessage());
+
+            return $this->redirectToRoute('app_releve_compose', array_filter([
+                        'id' => $portefeuille->getId(),
+                        'releve' => $request->request->getInt('releve') ?: null,
+                        'date' => $date->format('Y-m-d'),
+            ]));
+        }
+    }
+
+    /** Rouvre un relevé finalisé (correction d'un ordre). */
+    #[Route('/{id}/rouvrir', name: 'app_releve_reopen', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function reopen(Releve $releve, Request $request, EntityManagerInterface $em): Response {
+        if ($this->isCsrfTokenValid(self::TOKEN, (string) $request->request->get('_token'))) {
+            (new ReleveManager($em))->reopen($releve);
+            $this->addFlash('success', 'Relevé rouvert : vous pouvez corriger l\'ordre, puis le finaliser à nouveau.');
+        }
+
+        return $this->redirectToRoute('app_releve_compose', [
+                    'id' => $releve->getPortefeuille()->getId(),
+                    'releve' => $releve->getId(),
+        ]);
+    }
+
+    private function parseDate(mixed $value): ?DateTime {
+        if (!is_string($value) || $value === '') {
+            return null;
+        }
+        $date = DateTime::createFromFormat('!Y-m-d', $value);
+
+        return $date === false ? null : $date;
+    }
 }

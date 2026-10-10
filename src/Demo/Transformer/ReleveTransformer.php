@@ -42,6 +42,7 @@ class ReleveTransformer extends AbstractDemoTransformer {
         return (new Releve())
             ->setDate($date)
             ->setLabel($label)
+            ->setClosedAt($context->asImmutable($source->getClosedAt()))
             ->setPortefeuille($portefeuille);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Categorie;
 use App\Entity\Depenses;
+use App\Entity\Portefeuille;
 use App\Entity\Projet;
 use App\Entity\Tiers;
 use App\Entity\TypeTiers;
@@ -63,6 +64,26 @@ class DepensesRepository extends ServiceEntityRepository {
         return $this->findRealQueryBuilder()
                         ->andWhere('d.projet = :prj')
                         ->setParameter('prj', $projet)
+                        ->getQuery()
+                        ->getResult();
+    }
+
+    /**
+     * Opérations d'un portefeuille qui ne sont dans aucun relevé : le « stock » à pointer,
+     * dans l'ordre chronologique (celui dans lequel on les retrouve en général sur un relevé).
+     *
+     * @return list<Depenses>
+     */
+    public function findUnreleved(Portefeuille $portefeuille): array {
+        return $this->createQueryBuilder('d')
+                        ->addSelect('t', 'c')
+                        ->join('d.tiers', 't')
+                        ->join('d.categorie', 'c')
+                        ->andWhere('d.portefeuille = :p')
+                        ->andWhere('d.releve IS NULL')
+                        ->setParameter('p', $portefeuille)
+                        ->orderBy('d.date', 'ASC')
+                        ->addOrderBy('d.id', 'ASC')
                         ->getQuery()
                         ->getResult();
     }

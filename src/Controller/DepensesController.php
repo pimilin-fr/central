@@ -15,7 +15,6 @@ use App\Form\TiersType;
 use App\Repository\DepensesRepository;
 use App\Repository\PortefeuilleRepository;
 use App\Repository\TiersAdresseRepository;
-use App\Service\ReleveManager;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -210,8 +209,6 @@ final class DepensesController extends AbstractController {
 
     #[Route('/multiupdate', name: 'app_depenses_bulk_update', methods: ['POST'])]
     public function multiupdate(Request $request, EntityManagerInterface $entityManager) {
-        echo "<pre>";
-
         $depenses = $entityManager->getRepository(Depenses::class)
                 ->createQueryBuilder('d')
                 ->where('d.id IN (:ids)')
@@ -257,19 +254,25 @@ final class DepensesController extends AbstractController {
                 if (sizeof($depenses) < 1) {
                     break;
                 }
-                $manager = new ReleveManager($entityManager);
 
-                $date = DateTime::createFromFormat('Y-m-d', $request->request->get('date_value'));
+                // « Faire le relevé » n'est plus une simple modification en masse : on ouvre l'écran
+                // de composition, où l'on choisit les opérations DANS L'ORDRE du relevé de compte.
+                $portefeuilles = [];
+                foreach ($depenses as $depense) {
+                    $portefeuilles[$depense->getPortefeuille()?->getId()] = $depense->getPortefeuille();
+                }
+                if (count($portefeuilles) !== 1 || reset($portefeuilles) === null) {
+                    $this->addFlash('danger', 'Un relevé concerne un seul portefeuille : sélectionnez des opérations du même portefeuille.');
+                    break;
+                }
 
-                // relevé à cette date
-                $releve = $manager->addOperations($date, $depenses);
+                $date = DateTime::createFromFormat('!Y-m-d', (string) $request->request->get('date_value'));
 
-                $entityManager->persist($releve);
-                $i = sizeof($depenses);
-                $this->addFlash('success', $i . ' ligne(s) ajoutés au relevé du ' . $date->format('d/M/y') . ' avec succès');
-//                var_dump($projet, $depenses, $request->request->all());
-                $entityManager->flush();
-                break;
+                return $this->redirectToRoute('app_releve_compose', array_filter([
+                            'id' => reset($portefeuilles)->getId(),
+                            'date' => $date ? $date->format('Y-m-d') : null,
+                            'ids' => array_map(static fn (Depenses $d) => $d->getId(), $depenses),
+                ]));
             default :
                 var_dump($request->request->all());
                 die;

@@ -1,0 +1,92 @@
+/* =========================================================
+   THÈME 1 — CLAIR / ORANGE
+   Fichier autonome : toutes les variables du thème sont ici.
+   Pour créer un thème : copier ce fichier, changer le sélecteur
+   [data-theme="..."], l'ajouter dans _head.html.twig, _topbar.html.twig
+   et design.js.
+   ========================================================= */
+
+:where(:root),
+html[data-theme="light-orange"],
+.theme-option-preview[data-theme="light-orange"] {
+    color-scheme: light;
+
+    /* Fond & surfaces */
+    --bg: #f4f7fa;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --surface-hover: #f1f5f9;
+
+    /* Texte */
+    --text: #0f172a;
+    --text-soft: #64748b;
+    --text-muted: #94a3b8;
+
+    /* Bordures */
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+
+    /* Accent */
+    --accent: #f97316;
+    --accent-soft: rgba(249, 115, 22, .11);
+    --accent-strong: #ea580c;
+    --accent-contrast: #ffffff;
+
+    /* Information */
+    --info: #177494;
+    --info-strong: #004d66;
+    --info-soft: rgba(56, 189, 248, 0.13);
+    --on-info: #ffffff;
+
+    /* Succès */
+    --success: #10b981;
+    --success-strong: #357b55;
+    --success-soft: rgba(16, 185, 129, 0.10);
+    --on-success: #ffffff;
+
+    /* Alerte */
+    --warning: #f59e0b;
+    --warning-strong: #a36700;
+    --warning-soft: rgba(245, 158, 11, 0.10);
+    --on-warning: #2b1d02;
+
+    /* Danger */
+    --danger: #ef4444;
+    --danger-strong: #a30404;
+    --danger-soft: rgba(239, 68, 68, 0.10);
+    --on-danger: #ffffff;
+
+    /* Couleurs métier (revenu / dépense / remboursement) */
+    --category-income: #4f9b70;
+    --category-income-strong: #357b55;
+    --category-income-soft: rgba(79, 155, 112, .11);
+    --category-expense: #c76565;
+    --category-expense-strong: #a84747;
+    --category-expense-soft: rgba(199, 101, 101, .11);
+    --category-refund: #b18445;
+    --category-refund-strong: #8d682f;
+    --category-refund-soft: rgba(177, 132, 69, .11);
+
+    /* Montants */
+    --amount-income: var(--category-income-strong);
+    --amount-expense: var(--category-expense-strong);
+    --amount-refund: #2f7bbf;
+
+    /* Ombres, voiles, reflets */
+    --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 12px 35px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 20px 0 50px rgba(15, 23, 42, 0.18);
+    --shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.18);
+    --overlay: rgba(0, 0, 0, 0.45);
+    --shine: rgba(255, 255, 255, 0.85);
+    --page-glow: rgba(249, 115, 22, 0.04);
+    --preview-border: rgba(0, 0, 0, 0.12);
+
+    /* Texte posé sur une couleur d’entité */
+    --on-entity: #ffffff;
+    --on-entity-shadow: rgba(0, 0, 0, 0.28);
+
+    /* Carte (Leaflet) : filtre appliqué aux tuiles pour les fondre dans le thème.
+       --map-bg (optionnel) = fond visible pendant le chargement des tuiles. */
+    --map-tiles-filter: sepia(.18) saturate(.85) hue-rotate(-6deg) brightness(1.02);
+}

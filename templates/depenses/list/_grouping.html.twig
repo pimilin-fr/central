@@ -7,6 +7,8 @@
     semaine: 'Semaine'
 } %}
 
+{% set currentTri = app.request.query.get('tri') == 'releve' ? 'releve' : 'date' %}
+
 {% set elementOptions = {
     releve: 'Relevé',
     portefeuille: 'Portefeuille',
@@ -41,6 +43,20 @@
                    class="segmented-item {{ groupBy == key ? 'is-active' : '' }}"
                    {% if groupBy == key %}aria-current="true"{% endif %}>{{ label }}</a>
             {% endfor %}
+        </div>
+    </div>
+
+    <div class="group-bar-set">
+        <span class="group-bar-label">Tri</span>
+        <div class="segmented" role="group" aria-label="Tri des opérations">
+            <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ tri: 'date' })) }}"
+               class="segmented-item {{ currentTri == 'date' ? 'is-active' : '' }}"
+               title="Par date (habituel)"
+               {% if currentTri == 'date' %}aria-current="true"{% endif %}>Date</a>
+            <a href="{{ path(route, routeParams|merge(baseQuery)|merge({ tri: 'releve' })) }}"
+               class="segmented-item {{ currentTri == 'releve' ? 'is-active' : '' }}"
+               title="Par relevé, dans l'ordre du relevé de compte (les relevés finalisés sont toujours ainsi)"
+               {% if currentTri == 'releve' %}aria-current="true"{% endif %}>Relevé</a>
         </div>
     </div>
 </div>

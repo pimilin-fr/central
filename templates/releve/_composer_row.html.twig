@@ -1,0 +1,29 @@
+{#
+    Une opération de l'écran « Faire le relevé » (liste « À pointer » ou liste « Relevé »).
+    L'emplacement (rang, solde, boutons) est piloté par le CSS/JS selon la liste qui la contient.
+    Paramètres : op (Depenses), inList (bool)
+#}
+{% set signed = op.categorie.isDepense ? -(op.montant * 1) : (op.montant * 1) %}
+<li class="rc-op" data-rc-op draggable="true"
+    data-id="{{ op.id }}"
+    data-date="{{ op.date|date('Y-m-d') }}"
+    data-amount="{{ signed }}"
+    data-search="{{ (op.tiers.name ~ ' ' ~ op.categorie.name ~ ' ' ~ (op.numCommande ?? '') ~ ' ' ~ (op.note ?? '') ~ ' ' ~ op.date|date('d/m/Y') ~ ' ' ~ signed)|lower|e('html_attr') }}">
+    <span class="rc-grip" aria-hidden="true">⋮⋮</span>
+    <span class="rc-rank" data-rc-rank></span>
+    <span class="rc-date">{{ op.date|date('d/m/Y') }}</span>
+    <span class="rc-main">
+        <strong>{{ op.tiers.name }}</strong>
+        <small>{{ op.categorie.name }}{% if op.numCommande %} · n° {{ op.numCommande }}{% endif %}{% if op.note %} · {{ op.note|slice(0, 40) }}{% endif %}</small>
+    </span>
+    <span class="rc-amount {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">{{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €</span>
+    <span class="rc-balance" data-rc-balance title="Solde cumulé après cette ligne"></span>
+    <span class="rc-tools">
+        <button type="button" class="rc-btn rc-only-list" data-rc-here title="Insérer les prochaines opérations juste après cette ligne" aria-label="Insérer après cette ligne">⤓</button>
+        <button type="button" class="rc-btn rc-only-list" data-rc-up title="Monter" aria-label="Monter">▲</button>
+        <button type="button" class="rc-btn rc-only-list" data-rc-down title="Descendre" aria-label="Descendre">▼</button>
+        <button type="button" class="rc-btn rc-only-list" data-rc-remove title="Retirer du relevé" aria-label="Retirer du relevé">✕</button>
+        <button type="button" class="rc-btn rc-add rc-only-pool" data-rc-add title="Ajouter au relevé" aria-label="Ajouter au relevé">＋</button>
+    </span>
+    <input type="hidden" name="ops[]" value="{{ op.id }}" data-rc-input {{ inList ? '' : 'disabled' }}>
+</li>

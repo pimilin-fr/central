@@ -85,6 +85,7 @@ class DepensesTransformer extends AbstractDemoTransformer {
         $target = (new Depenses())
             ->setDate($context->asDateTime($source->getDate()))
             ->setDateReleve($context->asDateTime($source->getDateReleve()))
+            ->setReleveOrdre($source->getReleveOrdre())
             ->setMontant($montant)
             ->setNumCommande($numCommande)
             ->setNote($note)

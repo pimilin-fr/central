@@ -1,8 +1,11 @@
+{% set numbered = numbered|default(false) %}
+{% set colCount = numbered ? 7 : 6 %}
 {% set releveId = depense.releveId ?? 0 %}
 <table class="ops-table" data-releve="{{ releveId }}">
     <thead>
         <tr>
             <th class="px-4 py-3 text-left"><input type="checkbox" class="select-all"/></th>
+            {% if numbered %}<th class="px-4 py-3 text-right ops-rank-head" title="Ordre sur le relevé de compte">N°</th>{% endif %}
             <th class="px-4 py-3 text-left">Date</th>
             <th class="px-4 py-3 text-left">Catégorie</th>
             <th class="px-4 py-3 text-left">Tiers</th>
@@ -23,6 +26,8 @@
                            value="{{ depense.id }}"
                            class="row-checkbox">
                 </td>
+
+                {% if numbered %}<td class="px-4 py-2 text-right ops-rank">{{ depense.releveOrdre ?? '·' }}</td>{% endif %}
 
                 <td class="px-4 py-2">
                     {{ depense.date|date('d/m/Y') }}
@@ -93,7 +98,7 @@
 
             {# DETAILS (hidden) #}
             <tr class="hidden ops-detail-row detail-row" id="detail-{{ depense.id }}">
-                <td colspan="6" class="ops-detail-cell">
+                <td colspan="{{ colCount }}" class="ops-detail-cell">
 
                     <div class="grid grid-cols-3 gap-4">
 
@@ -120,7 +125,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="6" class="ops-empty">Pas de dépenses</td>
+                <td colspan="{{ colCount }}" class="ops-empty">Pas de dépenses</td>
             </tr>
         {% endfor %}
 

@@ -4,11 +4,15 @@ namespace App\Service\DepenseGrouper\GrouperStrategy;
 use App\Entity\Depenses;
 use Override;
 
-class GroupByReleve implements GroupStrategyInterface{
+/**
+ * Un groupe = un relevé (clé : son identifiant ; tri : sa date). Indique si le relevé est
+ * finalisé (ordre figé) ou en cours (group.extra.closed / group.extra.ordered).
+ */
+class GroupByReleve implements GroupStrategyInterface, GroupExtraInterface {
 
     #[Override]
     public function getKey(Depenses $depense): string {
-        return $depense->getReleve() ? 'releve_' . $depense->getReleve()->getDate()->format('Ymd') : '0';
+        return $depense->getReleve() ? 'releve_' . $depense->getReleve()->getId() : '0';
     }
 
     #[Override]
@@ -23,7 +27,10 @@ class GroupByReleve implements GroupStrategyInterface{
 
     #[\Override]
     public function getSortValue(Depenses $depense): mixed {
-        return $this->getKey($depense);
+        $releve = $depense->getReleve();
+
+        // date puis identifiant : l'ordre chronologique des relevés (comparaison texte)
+        return $releve ? $releve->getDate()->format('Ymd') . sprintf('%09d', $releve->getId()) : '0';
     }
 
     #[\Override]
@@ -34,5 +41,20 @@ class GroupByReleve implements GroupStrategyInterface{
     #[\Override]
     public function isNull(Depenses $depense): bool {
         return ($depense->getReleve() === null);
+    }
+
+    #[\Override]
+    public function getExtra(Depenses $depense): array {
+        $releve = $depense->getReleve();
+        if ($releve === null) {
+            return [];
+        }
+
+        return [
+            'releveId' => $releve->getId(),
+            'portefeuilleId' => $releve->getPortefeuille()->getId(),
+            'closed' => $releve->isClosed(),
+            'ordered' => $releve->hasOrderedOperations(),
+        ];
     }
 }

@@ -1,0 +1,86 @@
+html[data-theme="midnight-copper"],
+.theme-option-preview[data-theme="midnight-copper"] {
+    color-scheme: dark;
+
+    /* Fond & surfaces */
+    --bg: #0f1419;               /* bleu-noir profond */
+    --surface: #1a2128;          /* surface principale */
+    --surface-soft: #222a32;     /* cartes, panneaux */
+    --surface-hover: #2a333c;    /* hover subtil */
+
+    /* Texte */
+    --text: #e6e9ec;             /* texte principal */
+    --text-soft: #b8c0c7;        /* texte secondaire */
+    --text-muted: #8d969d;       /* texte très doux */
+
+    /* Bordures */
+    --border: #2f3942;
+    --border-strong: #46515b;
+
+    /* Accent (cuivre) */
+    --accent: #c47a3d;           /* cuivre chaud */
+    --accent-soft: rgba(196, 122, 61, 0.18);
+    --accent-strong: #a05f2f;
+    --accent-contrast: #ffffff;
+
+    /* Information (bleu glacier) */
+    --info: #4aa8d8;
+    --info-strong: #1f6f9a;
+    --info-soft: rgba(74, 168, 216, 0.18);
+    --on-info: #ffffff;
+
+    /* Succès (vert boréal) */
+    --success: #3aa87a;
+    --success-strong: #2a7b59;
+    --success-soft: rgba(58, 168, 122, 0.18);
+    --on-success: #ffffff;
+
+    /* Alerte (ambre) */
+    --warning: #d9a63f;
+    --warning-strong: #a87c2f;
+    --warning-soft: rgba(217, 166, 63, 0.18);
+    --on-warning: #2b1d02;
+
+    /* Danger (rouge rubis) */
+    --danger: #d94b4b;
+    --danger-strong: #a30404;
+    --danger-soft: rgba(217, 75, 75, 0.18);
+    --on-danger: #ffffff;
+
+    /* Couleurs métier */
+    --category-income: #3aa87a;
+    --category-income-strong: #2a7b59;
+    --category-income-soft: rgba(58, 168, 122, .18);
+
+    --category-expense: #d94b4b;
+    --category-expense-strong: #a30404;
+    --category-expense-soft: rgba(217, 75, 75, .18);
+
+    --category-refund: #c47a3d;
+    --category-refund-strong: #a05f2f;
+    --category-refund-soft: rgba(196, 122, 61, .18);
+
+    /* Montants */
+    --amount-income: var(--category-income-strong);
+    --amount-expense: var(--category-expense-strong);
+    --amount-refund: #4aa8d8;
+
+    /* Ombres, voiles, reflets */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 12px 35px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 20px 0 50px rgba(0, 0, 0, 0.55);
+    --shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.55);
+
+    --overlay: rgba(0, 0, 0, 0.55);
+    --shine: rgba(255, 255, 255, 0.12);
+    --page-glow: rgba(196, 122, 61, 0.06);
+    --preview-border: rgba(255, 255, 255, 0.08);
+
+    /* Texte posé sur une couleur d’entité */
+    --on-entity: #ffffff;
+    --on-entity-shadow: rgba(0, 0, 0, 0.35);
+
+    /* Carte (Leaflet) : filtre appliqué aux tuiles pour les fondre dans le thème.
+       --map-bg (optionnel) = fond visible pendant le chargement des tuiles. */
+    --map-tiles-filter: invert(1) hue-rotate(180deg) sepia(.35) brightness(.8) contrast(.9) saturate(.8);
+}

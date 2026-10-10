@@ -12,6 +12,25 @@
                     {{ group.label }}
                 </span>
 
+                {# Relevé : état (finalisé = ordre du relevé de compte figé) + accès à l'écran de composition #}
+                {% if group.extra.releveId is defined %}
+                    {% if group.extra.closed %}
+                        <span class="ops-group-badge is-closed" title="Relevé finalisé : opérations dans l'ordre du relevé de compte">
+                            <twig:ux:icon name="lucide:lock" /> Finalisé
+                        </span>
+                    {% elseif group.extra.ordered %}
+                        <span class="ops-group-badge is-draft" title="Relevé en cours : à compléter puis finaliser">
+                            <twig:ux:icon name="lucide:pencil-line" /> En cours
+                        </span>
+                    {% endif %}
+                    <a class="ops-group-link"
+                       href="{{ path('app_releve_compose', { id: group.extra.portefeuilleId, releve: group.extra.releveId }) }}"
+                       onclick="event.stopPropagation()"
+                       title="{{ group.extra.closed ? 'Voir le relevé' : 'Ordonner / compléter le relevé' }}">
+                        {{ group.extra.closed ? 'Voir' : (group.extra.ordered ? 'Compléter' : 'Ordonner') }}
+                    </a>
+                {% endif %}
+
                 <span class="ops-group-count">
                     {% if group.depenses is not empty %}
                         {{ group.depenses|length }} opération{{ group.depenses|length > 1 ? 's' : '' }}
@@ -62,7 +81,8 @@
         {# DETAILS #}
         <div id="group-{{ groupKey }}" class="hidden">
             {{ include('depenses/list/_table.html.twig', {
-                depenses: group.depenses
+                depenses: group.depenses,
+                numbered: group.statementOrder
             }) }}
         </div>
 

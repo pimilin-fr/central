@@ -16,6 +16,9 @@ class DepenseGroup {
     private bool $cumulative = false;
     private mixed $sortValue = null;
     private bool $nullGroup = false;
+    private bool $statementOrder = false;
+    /** @var array<string, mixed> */
+    private array $extra = [];
     // =========================================================
     // KEY
     // =========================================================
@@ -50,6 +53,35 @@ class DepenseGroup {
 
     public function getDepenses(): array {
         return $this->depenses;
+    }
+
+    /** Remplace la liste (réordonnée) : les totaux ne changent pas. */
+    public function setDepenses(array $depenses): self {
+        $this->depenses = array_values($depenses);
+
+        return $this;
+    }
+
+    /** Les opérations sont dans l'ordre du relevé de compte (affichage numéroté). */
+    public function isStatementOrder(): bool {
+        return $this->statementOrder;
+    }
+
+    public function setStatementOrder(bool $statementOrder): self {
+        $this->statementOrder = $statementOrder;
+
+        return $this;
+    }
+
+    /** Informations complémentaires de la stratégie (voir GroupExtraInterface). */
+    public function getExtra(): array {
+        return $this->extra;
+    }
+
+    public function setExtra(array $extra): self {
+        $this->extra = $extra;
+
+        return $this;
     }
 
     public function addDepense(Depenses $depense): self {

@@ -19,11 +19,13 @@ class DepenseGroupManager {
 
     private DepenseGrouper $grouper;
     private string $groupBy;
-    public static final $REQ_PARAM_NAME = 'groupBy';
+    private string $tri;
+    public const REQ_PARAM_NAME = 'groupBy';
 
     public function __construct(Request $request, DepenseGrouper $grouper = new DepenseGrouper()) {
         $this->grouper = $grouper;
         $this->groupBy = $request->query->get('groupBy', 'releve');
+        $this->tri = DepenseOrderer::normalize($request->query->get('tri'));
     }
 
     public function build(array $depenses, float $initialBalance = 0): array {
@@ -72,11 +74,21 @@ class DepenseGroupManager {
         $this->sortGroupsForDisplay($normalGroups, $strategy);
 
         // 6. NULL TOUJOURS EN PREMIER À L'AFFICHAGE
-        return array_merge($nullGroups, $normalGroups);
+        $result = array_merge($nullGroups, $normalGroups);
+
+        // 7. ORDRE DES OPÉRATIONS DANS CHAQUE GROUPE (relevé finalisé : ordre du relevé de compte)
+        DepenseOrderer::apply($result, $this->tri);
+
+        return $result;
     }
 
     public function getGroupBy(): string {
         return $this->groupBy;
+    }
+
+    /** Ordre des opérations demandé : 'date' (défaut) ou 'releve'. */
+    public function getTri(): string {
+        return $this->tri;
     }
 
     /**

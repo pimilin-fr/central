@@ -35,8 +35,12 @@ class Releve implements DemoEntityInterface {
     private Portefeuille $portefeuille;
 
     #[ORM\OneToMany(mappedBy: 'releve', targetEntity: Depenses::class)]
-    #[ORM\OrderBy(['date' => 'DESC', 'id' => 'DESC'])]
+    #[ORM\OrderBy(['releveOrdre' => 'ASC', 'date' => 'ASC', 'id' => 'ASC'])]
     private Collection $depenses;
+
+    /** Date de finalisation : à partir de là, l'ordre des opérations (celui du relevé de compte) est figé. */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $closedAt = null;
 
     public function __construct() {
         $this->date = new DateTime();
@@ -100,12 +104,41 @@ class Releve implements DemoEntityInterface {
         return $this;
     }
 
-    public function getIsClosed(): bool {
-        return $this->isClosed;
+    // -- finalisation du relevé
+
+    public function getClosedAt(): ?\DateTimeImmutable {
+        return $this->closedAt;
     }
 
-    public function setIsClosed(bool $isClosed) {
-        $this->isClosed = $isClosed;
+    public function setClosedAt(?\DateTimeImmutable $closedAt): static {
+        $this->closedAt = $closedAt;
+
         return $this;
+    }
+
+    /** Relevé finalisé : ordre figé, affiché tel le relevé de compte. */
+    public function isClosed(): bool {
+        return $this->closedAt !== null;
+    }
+
+    public function getIsClosed(): bool {
+        return $this->isClosed();
+    }
+
+    public function setIsClosed(bool $isClosed): static {
+        $this->closedAt = $isClosed ? ($this->closedAt ?? new \DateTimeImmutable()) : null;
+
+        return $this;
+    }
+
+    /** Au moins une opération a un rang : le relevé a été ordonné (sinon : relevé ancien, affiché par date). */
+    public function hasOrderedOperations(): bool {
+        foreach ($this->depenses as $depense) {
+            if ($depense->getReleveOrdre() !== null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

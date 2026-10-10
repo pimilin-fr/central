@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.8.0",
+        version: "v1.9.0",
         appName: "Central"
     },
 
@@ -35,6 +35,7 @@ const App = {
         this.tabs.init();
         this.bulk.init();
         this.grouper.init();
+        this.releveComposer.init();
         this.depenses.init();
         this.selectAll.init();
         this.adresse.init();
@@ -525,6 +526,236 @@ const App = {
                             target.classList.toggle('hidden');
                         }
                     };
+        }
+    },
+
+    /* =========================================================
+     * FAIRE LE RELEVÉ (templates/releve/composer.html.twig)
+     * Deux listes : « À pointer » (opérations hors relevé) et « Relevé » (dans l'ordre du relevé de compte).
+     * L'ordre du DOM de la liste « Relevé » EST l'ordre envoyé : chaque ligne porte un champ ops[]
+     * (désactivé tant qu'elle est dans « À pointer »). Rang, soldes et totaux sont recalculés à chaque changement.
+     * ========================================================= */
+
+    releveComposer: {
+        init() {
+            const root = document.querySelector('[data-releve-composer]');
+            if (!root) {
+                return;
+            }
+
+            App.log('Init releveComposer');
+
+            const pool = root.querySelector('[data-rc-pool]');
+            const list = root.querySelector('[data-rc-list]');
+            const startInput = root.querySelector('[data-rc-start]');
+            const filterInput = root.querySelector('[data-rc-filter]');
+            const isNew = root.hasAttribute('data-rc-new');
+            const money = new Intl.NumberFormat('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            let cursor = null; // ligne après laquelle iront les prochaines opérations (null = fin)
+            let dirty = false;
+            let dragging = null;
+
+            const rows = ul => [...ul.querySelectorAll(':scope > [data-rc-op]')];
+            const sortKey = li => li.dataset.date + String(li.dataset.id).padStart(12, '0');
+            const setInput = (li, enabled) => {
+                const input = li.querySelector('[data-rc-input]');
+                if (input) {
+                    input.disabled = !enabled;
+                }
+            };
+
+            const toPool = li => {
+                if (cursor === li) {
+                    cursor = li.previousElementSibling && list.contains(li.previousElementSibling) ? li.previousElementSibling : null;
+                }
+                setInput(li, false);
+                const key = sortKey(li);
+                pool.insertBefore(li, rows(pool).find(row => row !== li && sortKey(row) > key) || null);
+            };
+
+            const toList = (li, before = undefined) => {
+                setInput(li, true);
+                if (before !== undefined) {
+                    list.insertBefore(li, before);
+                } else if (cursor && list.contains(cursor)) {
+                    cursor.after(li);
+                    cursor = li; // les ajouts suivants se placent à la suite
+                } else {
+                    list.append(li);
+                }
+            };
+
+            const refresh = () => {
+                const selected = rows(list);
+                const start = parseFloat(startInput && startInput.value ? startInput.value.replace(',', '.') : '0') || 0;
+                let balance = start;
+
+                selected.forEach((li, index) => {
+                    li.querySelector('[data-rc-rank]').textContent = index + 1;
+                    balance += parseFloat(li.dataset.amount) || 0;
+                    const cell = li.querySelector('[data-rc-balance]');
+                    if (cell) {
+                        cell.textContent = money.format(balance) + ' €';
+                    }
+                    li.classList.toggle('is-cursor', li === cursor);
+                    const here = li.querySelector('[data-rc-here]');
+                    if (here) {
+                        here.classList.toggle('is-on', li === cursor);
+                    }
+                });
+
+                root.querySelector('[data-rc-count]').textContent = selected.length;
+                root.querySelector('[data-rc-pool-count]').textContent = rows(pool).length;
+                root.querySelector('[data-rc-total]').textContent = money.format(balance) + ' €';
+                root.querySelector('[data-rc-empty]').hidden = selected.length > 0;
+                root.querySelector('[data-rc-pool-empty]').hidden = rows(pool).length > 0;
+
+                root.querySelectorAll('[data-rc-submit]').forEach(btn => {
+                    btn.toggleAttribute('disabled', isNew && selected.length === 0);
+                });
+                root.querySelector('[data-rc-finalize]').toggleAttribute('disabled', selected.length === 0);
+            };
+
+            const changed = () => {
+                dirty = true;
+                refresh();
+            };
+
+            /* ---- clics ---- */
+            root.addEventListener('click', event => {
+                const li = event.target.closest('[data-rc-op]');
+
+                if (event.target.closest('[data-rc-add]') && li) {
+                    toList(li);
+                    return changed();
+                }
+                if (event.target.closest('[data-rc-remove]') && li) {
+                    toPool(li);
+                    return changed();
+                }
+                if (event.target.closest('[data-rc-up]') && li) {
+                    const prev = li.previousElementSibling;
+                    if (prev) {
+                        list.insertBefore(li, prev);
+                    }
+                    return changed();
+                }
+                if (event.target.closest('[data-rc-down]') && li) {
+                    const next = li.nextElementSibling;
+                    if (next) {
+                        list.insertBefore(next, li);
+                    }
+                    return changed();
+                }
+                if (event.target.closest('[data-rc-here]') && li) {
+                    cursor = cursor === li ? null : li;
+                    return refresh();
+                }
+                if (event.target.closest('[data-rc-add-all]')) {
+                    rows(pool).filter(row => !row.hidden).forEach(row => toList(row));
+                    return changed();
+                }
+
+                const sortBtn = event.target.closest('[data-rc-sort]');
+                if (sortBtn) {
+                    const sign = sortBtn.dataset.rcSort === 'desc' ? -1 : 1;
+                    rows(list)
+                            .sort((a, b) => sign * (sortKey(a) < sortKey(b) ? -1 : (sortKey(a) > sortKey(b) ? 1 : 0)))
+                            .forEach(row => list.append(row));
+                    cursor = null;
+                    return changed();
+                }
+            });
+
+            /* ---- filtre de la liste « À pointer » ---- */
+            if (filterInput) {
+                filterInput.addEventListener('input', () => {
+                    const query = filterInput.value.trim().toLowerCase();
+                    rows(pool).forEach(row => {
+                        row.hidden = query !== '' && !(row.dataset.search || '').includes(query);
+                    });
+                });
+            }
+
+            if (startInput) {
+                startInput.addEventListener('input', refresh);
+            }
+
+            // Entrée dans un champ de filtre / de solde ne doit pas envoyer le formulaire
+            [filterInput, startInput].forEach(input => input && input.addEventListener('keydown', event => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                }
+            }));
+
+            /* ---- glisser-déposer (entre les deux listes et à l'intérieur de « Relevé ») ---- */
+            root.addEventListener('dragstart', event => {
+                const li = event.target.closest('[data-rc-op]');
+                if (!li) {
+                    return;
+                }
+                dragging = li;
+                li.classList.add('is-dragging');
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', li.dataset.id);
+            });
+
+            root.addEventListener('dragend', () => {
+                if (!dragging) {
+                    return;
+                }
+                dragging.classList.remove('is-dragging');
+                setInput(dragging, dragging.parentElement === list);
+                dragging = null;
+                changed();
+            });
+
+            list.addEventListener('dragover', event => {
+                if (!dragging) {
+                    return;
+                }
+                event.preventDefault();
+                const after = rows(list).filter(row => row !== dragging).find(row => {
+                    const box = row.getBoundingClientRect();
+                    return event.clientY < box.top + box.height / 2;
+                });
+                setInput(dragging, true);
+                if (after !== dragging.nextElementSibling || dragging.parentElement !== list) {
+                    list.insertBefore(dragging, after || null);
+                }
+            });
+
+            pool.addEventListener('dragover', event => {
+                if (!dragging) {
+                    return;
+                }
+                event.preventDefault();
+                if (dragging.parentElement !== pool) {
+                    toPool(dragging);
+                }
+            });
+
+            [list, pool].forEach(zone => zone.addEventListener('drop', event => event.preventDefault()));
+
+            /* ---- envoi ---- */
+            root.addEventListener('submit', event => {
+                const submitter = event.submitter;
+                if (submitter && submitter.dataset.confirm && !window.confirm(submitter.dataset.confirm)) {
+                    event.preventDefault();
+                    return;
+                }
+                dirty = false;
+            });
+
+            window.addEventListener('beforeunload', event => {
+                if (dirty) {
+                    event.preventDefault();
+                    event.returnValue = '';
+                }
+            });
+
+            refresh();
         }
     },
 
