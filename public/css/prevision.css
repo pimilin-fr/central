@@ -46,9 +46,9 @@
 @media (max-width: 1000px) { .pv-month .rc-table-wrap { overflow-x: auto; } }
 
 /* Panneau latéral « Prochaines échéances » : superposé à la fiche, languette visible une fois replié */
-.pv-drawer { --pv-handle: 4.4rem; position: fixed; z-index: 25; right: 0; top: calc(var(--topbar-height, 72px) + 1rem); width: min(30rem, calc(100vw - var(--pv-handle) - .5rem)); transform: translateX(100%); transition: transform .25s ease; }
+.pv-drawer { --pv-handle: 3.6rem; position: fixed; z-index: 25; right: 0; top: calc(var(--topbar-height, 72px) + 1rem); width: min(30rem, calc(100vw - var(--pv-handle) - .5rem)); transform: translateX(100%); transition: transform .25s ease; }
 .pv-drawer.is-open { transform: translateX(0); }
-.pv-drawer-handle { position: absolute; left: calc(-1 * var(--pv-handle)); top: 0; width: var(--pv-handle); display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .6rem .25rem; border: 1px solid var(--border, #e5e7eb); border-right: 0; border-radius: .75rem 0 0 .75rem; background: var(--surface, #fff); color: var(--text); box-shadow: -4px 4px 16px rgba(0, 0, 0, .12); cursor: pointer; font: inherit; }
+.pv-drawer-handle { position: absolute; left: calc(-1 * var(--pv-handle)); top: max(6rem, calc(50vh - var(--topbar-height, 72px) - 3rem)); width: var(--pv-handle); display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .6rem .25rem; border: 1px solid var(--border, #e5e7eb); border-right: 0; border-radius: .75rem 0 0 .75rem; background: var(--surface, #fff); color: var(--text); box-shadow: -4px 4px 16px rgba(0, 0, 0, .12); cursor: pointer; font: inherit; }
 .pv-drawer-handle:hover { filter: brightness(.97); }
 .pv-drawer-count { font-size: 1.1rem; font-weight: 700; line-height: 1; }
 .pv-drawer-sum { font-size: .72rem; font-weight: 600; white-space: nowrap; }
@@ -75,3 +75,18 @@
 
 .pv-card-error { margin: 0; font-size: .85rem; color: var(--danger, #dc2626); }
 .pv-drawer.is-releve { z-index: 28; }
+
+/* « Afficher plus » : mois lointains repliés */
+.pv-more > summary { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 1rem; cursor: pointer; list-style: none; }
+.pv-more > summary::-webkit-details-marker { display: none; }
+.pv-more[open] > summary { margin-bottom: 1rem; }
+
+/* Règles repliées (nombre de règles actives visible) */
+.pv-rules { margin-bottom: 1.5rem; }
+.pv-rules > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; }
+.pv-rules > summary::-webkit-details-marker { display: none; }
+.pv-rules > summary::before { content: "▸"; color: var(--text-muted); }
+.pv-rules[open] > summary::before { content: "▾"; }
+.pv-rules[open] > summary { margin-bottom: 12px; }
+
+/* La languette est au milieu du bord droit : elle ne recouvre plus les boutons d'action en haut de page (dont « Supprimer »). */

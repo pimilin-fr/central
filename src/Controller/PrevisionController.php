@@ -34,9 +34,9 @@ final class PrevisionController extends AbstractController {
     private const TOKEN = 'prevision';
 
     #[Route(name: 'app_prevision_index', methods: ['GET'])]
-    public function index(PrevisionRegleRepository $regleRepo, PrevisionEcheanceRepository $echeanceRepo, PrevisionManager $manager): Response {
+    public function index(PrevisionRegleRepository $regleRepo, PrevisionEcheanceRepository $echeanceRepo, PrevisionManager $manager, EntityManagerInterface $em): Response {
         $today = new DateTime('today');
-        ['months' => $months, 'retard' => $retard] = $this->groupEcheances($echeanceRepo->findPrevues(), $today);
+        $periodes = $this->groupParPeriode($echeanceRepo->findPrevues(), $today, $this->ancrePeriodes($em, $today));
 
         $regles = $regleRepo->findAllWithTranches();
         $estimations = [];
@@ -47,8 +47,7 @@ final class PrevisionController extends AbstractController {
         }
 
         return $this->render('prevision/index.html.twig', [
-                    'months' => $months,
-                    'retard' => $retard,
+                    'periodes' => $periodes,
                     'regles' => $regles,
                     'estimations' => $estimations,
                     'today' => $today,
@@ -271,6 +270,76 @@ final class PrevisionController extends AbstractController {
         }
 
         return $this->back($request);
+    }
+
+    /**
+     * Repères des périodes « de relevé à relevé » (nos mois).
+     *  - début = date du dernier relevé (≤ aujourd'hui), tous portefeuilles confondus ;
+     *  - jour habituel du relevé = le plus fréquent parmi les 12 derniers (ex. le 5) ;
+     *  - chaque fin = ce jour du mois suivant, décalée au lundi si elle tombe un samedi ou un dimanche
+     *    (banque fermée ; d'après l'historique, un lundi reste le lundi).
+     * Sans relevé : mois civils. Les repères avancent mois par mois tant que la période ne contient pas aujourd'hui.
+     *
+     * @return array{start: \DateTimeImmutable, mois: \DateTimeImmutable, jour: int}
+     */
+    private function ancrePeriodes(EntityManagerInterface $em, DateTime $today): array {
+        $rows = $em->createQuery('SELECT DISTINCT r.date FROM App\\Entity\\Releve r WHERE r.date <= :t ORDER BY r.date DESC')
+                ->setParameter('t', $today)->setMaxResults(12)->getScalarResult();
+        $dates = array_map(static fn (array $r): \DateTimeImmutable => new \DateTimeImmutable((string) $r['date']), $rows);
+        $todayI = \DateTimeImmutable::createFromMutable($today)->setTime(0, 0);
+
+        if ($dates === []) {
+            $ctx = ['start' => $todayI->modify('last day of last month'), 'mois' => $todayI->modify('first day of last month'), 'jour' => 1];
+        } else {
+            $jours = array_count_values(array_map(static fn (\DateTimeImmutable $d): int => (int) $d->format('j'), $dates));
+            arsort($jours);
+            $ctx = ['start' => $dates[0]->setTime(0, 0), 'mois' => $dates[0]->modify('first day of this month')->setTime(0, 0), 'jour' => (int) array_key_first($jours)];
+        }
+        while ($this->borne($ctx, 1) < $todayI) {
+            $ctx = ['start' => $this->borne($ctx, 1), 'mois' => $ctx['mois']->modify('+1 month'), 'jour' => $ctx['jour']];
+        }
+
+        return $ctx;
+    }
+
+    /** Fin de la k-ième période (k = 0 : début de la période en cours, c'est-à-dire le dernier relevé). */
+    private function borne(array $ctx, int $k): \DateTimeImmutable {
+        if ($k === 0) {
+            return $ctx['start'];
+        }
+        $mois = $ctx['mois']->modify('+' . $k . ' month');
+        $date = $mois->setDate((int) $mois->format('Y'), (int) $mois->format('n'), min($ctx['jour'], (int) $mois->format('t')));
+        $weekday = (int) $date->format('N'); // 6 samedi, 7 dimanche
+
+        return $weekday >= 6 ? $date->modify('+' . (8 - $weekday) . ' day') : $date;
+    }
+
+    /**
+     * Échéances prévues regroupées par période « de relevé à relevé ». La première période reprend aussi tout ce qui est
+     * plus ancien et pas encore concrétisé (le retard n'est pas mis en avant).
+     *
+     * @param list<PrevisionEcheance> $echeances
+     * @param array{start: \DateTimeImmutable, mois: \DateTimeImmutable, jour: int} $ctx
+     * @return list<array{debut: \DateTimeImmutable, fin: \DateTimeImmutable, echeances: list<PrevisionEcheance>, brut: float, pondere: float}>
+     */
+    private function groupParPeriode(array $echeances, DateTime $today, array $ctx): array {
+        $periodes = [];
+        $nouvelle = fn (int $k): array => ['debut' => $this->borne($ctx, $k)->modify('+1 day'), 'fin' => $this->borne($ctx, $k + 1), 'echeances' => [], 'brut' => 0.0, 'pondere' => 0.0];
+        foreach ($echeances as $echeance) {
+            $date = \DateTimeImmutable::createFromInterface($echeance->getDatePrevue());
+            $k = 0;
+            while ($date > $this->borne($ctx, $k + 1)) {
+                $k++;
+            }
+            $periodes[$k] ??= $nouvelle($k);
+            $periodes[$k]['echeances'][] = $echeance;
+            $periodes[$k]['brut'] += $echeance->getMontantSigne();
+            $periodes[$k]['pondere'] += $echeance->getMontantSigne() * $echeance->getCertitude()->poids();
+        }
+        $periodes[0] ??= $nouvelle(0);
+        ksort($periodes);
+
+        return array_values($periodes);
     }
 
     /**

@@ -7,19 +7,14 @@
 const CentralPrevision = {
     config: {
         debug: true,
-        version: 'v1.1.1',
+        version: 'v1.1.0',
         appName: 'Central-ModulePrevision'
     },
 
     log(...args) {
-        if (!this.config.debug) {
-            return;
+        if (this.config.debug) {
+            console.log(`[${this.config.appName}]`, ...args);
         }
-
-        console.log(
-                `[${this.config.appName}-${this.config.version}]`,
-                ...args
-                );
     },
 
     init() {

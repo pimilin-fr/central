@@ -1,0 +1,32 @@
+{#
+    Échéances prévues par « mois de relevé » (d'un relevé de compte au suivant), seules les non concrétisées.
+    La période en cours est ouverte ; les suivantes sont masquées jusqu'à « Afficher les mois suivants ».
+    Paramètres : periodes (liste), today
+#}
+{% macro periode(p, today, current) %}
+    <section class="rc-panel pv-month">
+        <header class="pv-month-head">
+            <h3>{{ current ? 'Période en cours' : 'Période' }} <span class="pv-range">du {{ p.debut|date('d/m') }} au {{ p.fin|date('d/m/Y') }}{% if current %} · fin estimée (dépend de votre relevé de compte){% endif %}</span></h3>
+            <span class="pv-month-sums">
+                {{ p.echeances|length }} à venir · Prévu : <strong>{{ p.brut < 0 ? '−' : '+' }} {{ p.brut|abs|number_format(2, ',', ' ') }} €</strong>
+                · pondéré : <strong>{{ p.pondere < 0 ? '−' : '+' }} {{ p.pondere|abs|number_format(2, ',', ' ') }} €</strong>
+            </span>
+        </header>
+        {% if p.echeances is empty %}
+            <p class="rc-empty">Tout est concrétisé pour cette période.</p>
+        {% else %}
+            <div class="rc-table-wrap"><table class="ops-table"><tbody>
+                {% for e in p.echeances %}{% include 'prevision/_echeance_row.html.twig' with { e: e, late: false, today: today, back: '' } only %}{% endfor %}
+            </tbody></table></div>
+        {% endif %}
+    </section>
+{% endmacro %}
+
+{{ _self.periode(periodes[0], today, true) }}
+
+{% if periodes|length > 1 %}
+    <details class="pv-more">
+        <summary class="page-action">Afficher les mois suivants <span class="pv-range">({{ periodes|length - 1 }})</span></summary>
+        {% for p in periodes|slice(1) %}{{ _self.periode(p, today, false) }}{% endfor %}
+    </details>
+{% endif %}

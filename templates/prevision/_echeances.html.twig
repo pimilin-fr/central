@@ -1,6 +1,7 @@
 {#
     Échéances prévues : « en retard » puis par mois.
-    Paramètres : retard, months, today, back (chemin de retour après une action, facultatif)
+    Paramètres : retard, months, today, back (chemin de retour après une action, facultatif),
+    jusqua (« Y-m » : les mois suivants sont repliés derrière « Afficher plus », facultatif)
 #}
 {% if retard is not empty %}
     <section class="rc-panel pv-month">
@@ -11,7 +12,14 @@
     </section>
 {% endif %}
 
+{% set jusqua = jusqua|default(null) %}
+{% set visibles = [] %}
+{% set caches = [] %}
 {% for key, month in months %}
+    {% if jusqua is null or key <= jusqua %}{% set visibles = visibles|merge([key]) %}{% else %}{% set caches = caches|merge([key]) %}{% endif %}
+{% endfor %}
+
+{% macro mois(month, today, back) %}
     <section class="rc-panel pv-month">
         <header class="pv-month-head">
             <h3>{{ ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][month.label|date('n') - 1] }} {{ month.label|date('Y') }}</h3>
@@ -21,9 +29,16 @@
             </span>
         </header>
         <div class="rc-table-wrap"><table class="ops-table"><tbody>
-            {% for e in month.echeances %}{% include 'prevision/_echeance_row.html.twig' with { e: e, late: false, today: today, back: back|default('') } only %}{% endfor %}
+            {% for e in month.echeances %}{% include 'prevision/_echeance_row.html.twig' with { e: e, late: false, today: today, back: back } only %}{% endfor %}
         </tbody></table></div>
     </section>
-{% else %}
-    {% if retard is empty %}<p class="rc-empty">Aucune échéance prévue.</p>{% endif %}
-{% endfor %}
+{% endmacro %}
+
+{% for key in visibles %}{{ _self.mois(months[key], today, back|default('')) }}{% endfor %}
+{% if caches is not empty %}
+    <details class="pv-more">
+        <summary class="page-action">Afficher plus <span class="pv-range">({{ caches|length }} mois)</span></summary>
+        {% for key in caches %}{{ _self.mois(months[key], today, back|default('')) }}{% endfor %}
+    </details>
+{% endif %}
+{% if months is empty and retard is empty %}<p class="rc-empty">Aucune échéance prévue.</p>{% endif %}

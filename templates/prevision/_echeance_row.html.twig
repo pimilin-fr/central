@@ -24,7 +24,7 @@
         <form method="post" class="pv-concretise" action="{{ path('app_prevision_concretiser', { id: e.id }) }}">
             <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
             <label><span class="pv-range">Date réelle</span>
-                <input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
+                <input type="date" name="date" class="modern-form-control" required value="{{ (late or e.datePrevue < today ? today : e.datePrevue)|date('Y-m-d') }}"></label>
             <label><span class="pv-range">Montant réel (€)</span>
                 <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"{% if e.montantMin and e.montantMax %} title="Prévu entre {{ e.montantMin }} et {{ e.montantMax }} €"{% endif %}></label>
             <button type="submit" class="page-action page-action-primary" title="Crée l'opération avec cette date et ce montant">Concrétiser</button>

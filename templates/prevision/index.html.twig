@@ -19,10 +19,8 @@
             </div>
         </div>
 
-        {% include 'prevision/_echeances.html.twig' with { retard: retard, months: months, today: today } only %}
-
-        <section class="rc-panel">
-            <header class="rc-panel-head"><h2>Règles <span class="rc-count">{{ regles|length }}</span></h2></header>
+        <details class="rc-panel pv-rules">
+            <summary class="rc-panel-head"><h2>Règles <span class="rc-count" title="Règles actives">{{ regles|filter(r => r.actif)|length }} active{{ regles|filter(r => r.actif)|length > 1 ? 's' : '' }}</span>{% if regles|filter(r => not r.actif) is not empty %} <span class="pv-range">· {{ regles|filter(r => not r.actif)|length }} inactive(s)</span>{% endif %}</h2></summary>
             {% if regles is empty %}
                 <p class="rc-empty">Aucune règle.</p>
             {% else %}
@@ -65,6 +63,8 @@
                     </table>
                 </div>
             {% endif %}
-        </section>
+        </details>
+
+        {% include 'prevision/_periodes.html.twig' with { periodes: periodes, today: today } only %}
     </div>
 {% endblock %}
