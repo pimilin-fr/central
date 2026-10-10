@@ -20,7 +20,7 @@
         </div>
 
         <details class="rc-panel pv-rules">
-            <summary class="rc-panel-head"><h2>Règles <span class="pill pill-solid" title="Règles actives">{{ regles|filter(r => r.actif)|length }} active{{ regles|filter(r => r.actif)|length > 1 ? 's' : '' }}</span>{% if regles|filter(r => not r.actif) is not empty %} <span class="pv-range">· {{ regles|filter(r => not r.actif)|length }} inactive(s)</span>{% endif %}</h2></summary>
+            <summary class="block-head"><h2>Règles <span class="pill pill-solid" title="Règles actives">{{ regles|filter(r => r.actif)|length }} active{{ regles|filter(r => r.actif)|length > 1 ? 's' : '' }}</span>{% if regles|filter(r => not r.actif) is not empty %} <span class="pv-range">· {{ regles|filter(r => not r.actif)|length }} inactive(s)</span>{% endif %}</h2></summary>
             {% if regles is empty %}
                 <p class="rc-empty">Aucune règle.</p>
             {% else %}

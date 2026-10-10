@@ -6,7 +6,7 @@
     <div class="ops-group{{ isReleve ? ' is-releve ' ~ (group.extra.closed ? 'is-closed' : 'is-open') : '' }}">
 
         {# HEADER DU GROUPE : couleurs des montants identiques à celles d'une ligne #}
-        <div class="ops-group-header" onclick="toggleGroup('{{ groupKey }}')">
+        <div class="block-head is-bar is-clickable ops-group-header" onclick="toggleGroup('{{ groupKey }}')">
 
             <div class="ops-group-title">
                 <span class="ops-group-label {{ groupKey == '0' ? 'is-unassigned' : '' }}">
@@ -91,7 +91,7 @@
                 {% for run in runs %}
                     {% set releve = run.releve %}
                     <section class="ops-subgroup{{ releve ? ' is-releve ' ~ (releve.closed ? 'is-closed' : 'is-open') : ' is-none' }}">
-                        <header class="ops-group-header ops-subgroup-header">
+                        <header class="block-head ops-group-header ops-subgroup-header">
                             <div class="ops-group-title">
                                 {% if releve %}
                                     <span class="ops-group-label">Relevé du {{ releve.date|date('d/m/Y') }}</span>

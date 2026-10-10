@@ -53,7 +53,7 @@
             {% include 'releve/_recap.html.twig' with { previous: previous, cumulBefore: cumulBefore } only %}
             {# ---------- RELEVÉ FINALISÉ : lecture seule, tel le relevé de compte ---------- #}
             <section class="rc-panel">
-                <header class="rc-panel-head">
+                <header class="block-head">
                     <h2>Relevé du {{ releve.date|date('d/m/Y') }}</h2>
                     <form method="post" action="{{ path('app_releve_reopen', { id: releve.id }) }}"
                           onsubmit="return confirm('Rouvrir ce relevé pour corriger l\'ordre des opérations ?');">
@@ -136,7 +136,7 @@
                 <div class="rc-columns">
                     {# ---- RELEVÉ : l'élément principal (pleine hauteur, c'est la page qui défile) ---- #}
                     <section class="rc-panel rc-panel-main">
-                        <header class="rc-panel-head rc-sticky">
+                        <header class="block-head rc-sticky">
                             <h2>Relevé <span class="pill pill-solid" data-rc-count title="Lignes du relevé">0</span> <small data-rc-ops-count></small></h2>
                             <div class="rc-progress" data-rc-progress-box hidden>
                                 <span class="rc-progress-text" data-rc-progress-text></span>
@@ -161,7 +161,7 @@
 
                     {# ---- À POINTER : colonne latérale qui reste en vue ---- #}
                     <aside class="rc-panel rc-pool-panel">
-                        <header class="rc-panel-head">
+                        <header class="block-head">
                             <h2>À pointer <span class="pill pill-solid" data-rc-pool-count>{{ pool|length }}</span></h2>
                             <div class="rc-pool-actions">
                                 <button type="button" class="btn btn-neutral" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>En un détail</span></button>

@@ -3,7 +3,7 @@
     Paramètres : portefeuille, rows (résumés : releve, total, ops, lines, cumul)
 #}
 <section class="rc-panel">
-    <header class="rc-panel-head">
+    <header class="block-head">
         <h2>Relevés <span class="pill pill-solid">{{ rows|length }}</span></h2>
         <a class="btn btn-primary" href="{{ path('app_releve_compose', { id: portefeuille.id }) }}">
             <twig:ux:icon name="lucide:list-ordered" /><span>Faire un relevé</span>

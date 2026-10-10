@@ -43,9 +43,6 @@
     box-shadow: var(--shadow-sm);
     min-inline-size: 0;
 }
-.rc-panel-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; }
-.rc-panel-head h2 { margin: 0; color: var(--text); font-size: 14px; font-weight: 850; }
-.rc-panel-head h2 small { color: var(--text-muted); font-weight: 600; }
 
 .rc-field { display: grid; gap: 4px; min-inline-size: 0; }
 

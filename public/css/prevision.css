@@ -7,11 +7,8 @@
 @media (max-width: 720px) { .pv-tranche { grid-template-columns: 1fr 1fr; } }
 
 .pv-month { margin-bottom: 1.5rem; }
-.pv-month-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
-.pv-month-head h3 { margin: 0; }
-.pv-month-head h3::first-letter { text-transform: uppercase; }
-.pv-month-sums { font-size: .9rem; color: var(--text-muted, #6b7280); }
-.pv-month-sums strong { color: var(--text); }
+.pv-month .block-head { margin-bottom: .5rem; }
+.pv-month .block-head h3::first-letter { text-transform: uppercase; }
 
 .pv-late { color: var(--danger, #dc2626); font-weight: 600; }
 .pv-range { font-size: .8rem; color: var(--text-muted, #6b7280); }

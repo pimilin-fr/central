@@ -5,9 +5,9 @@
 #}
 {% macro periode(p, today, current) %}
     <section class="rc-panel pv-month">
-        <header class="pv-month-head">
+        <header class="block-head block-head-lg">
             <h3>{{ current ? 'Période en cours' : 'Période' }} <span class="pv-range">du {{ p.debut|date('d/m') }} au {{ p.fin|date('d/m/Y') }}{% if current %} · fin estimée (dépend de votre relevé de compte){% endif %}</span></h3>
-            <span class="pv-month-sums">
+            <span class="block-head-meta">
                 {{ p.echeances|length }} à venir · Prévu : <strong>{{ p.brut < 0 ? '−' : '+' }} {{ p.brut|abs|number_format(2, ',', ' ') }} €</strong>
                 · pondéré : <strong>{{ p.pondere < 0 ? '−' : '+' }} {{ p.pondere|abs|number_format(2, ',', ' ') }} €</strong>
             </span>

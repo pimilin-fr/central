@@ -13,7 +13,7 @@
 <p class="sg-sub">Panneaux, en-tête et progression</p>
 {% set code %}{% verbatim %}
 <section class="rc-panel">
-    <header class="rc-panel-head">
+    <header class="block-head">
         <h2>Relevé <span class="pill pill-solid">4</span> <small>6 opérations</small></h2>
         <div class="rc-progress">
             <span class="rc-progress-text">2 / 4 pointées</span>
@@ -35,7 +35,7 @@
     <p class="rc-empty">Aucune opération pour l'instant : choisissez-les dans « À pointer ».</p>
 </section>
 {% endverbatim %}{% endset %}
-{{ sg.ex('rc-panel, rc-panel-head, rc-progress, rc-selsum', code, 'Le JS du relevé (<code>releve.js</code>) remplit les compteurs et affiche/masque ces blocs (attribut <code>hidden</code>).') }}
+{{ sg.ex('rc-panel, block-head, rc-progress, rc-selsum', code, 'Le JS du relevé (<code>releve.js</code>) remplit les compteurs et affiche/masque ces blocs (attribut <code>hidden</code>).') }}
 
 <p class="sg-sub">Lignes du relevé en cours de composition</p>
 {% set code %}{% verbatim %}

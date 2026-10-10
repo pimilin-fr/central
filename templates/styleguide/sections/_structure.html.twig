@@ -1,5 +1,29 @@
 {% import 'styleguide/_ex.html.twig' as sg %}
 
+<p class="sg-sub">En-têtes de bloc</p>
+{% set code %}{% verbatim %}
+<section class="rc-panel">
+    <header class="block-head">
+        <h2>Titre de bloc <span class="pill pill-solid">4</span> <small>6 éléments</small></h2>
+        <span class="block-head-meta">Informations à droite · <strong>− 154,60 €</strong></span>
+    </header>
+</section>
+<section class="rc-panel">
+    <header class="block-head block-head-lg">
+        <h3>Titre en grand (périodes)</h3>
+        <span class="block-head-meta">Prévu : <strong>− 96,30 €</strong></span>
+    </header>
+</section>
+<section class="rc-panel" style="padding:0">
+    <div class="block-head is-bar is-clickable">
+        <h3>Barre cliquable (groupe d'opérations)</h3>
+        <span class="block-head-meta">12 opérations</span>
+    </div>
+</section>
+{% endverbatim %}{% endset %}
+{{ sg.ex('block-head, block-head-lg, block-head-meta, is-bar, is-clickable', code, 'Un seul en-tête pour les panneaux du relevé, les périodes de prévisions et les groupes d\'opérations. Le padding vient du conteneur, sauf pour <code>is-bar</code>.') }}
+
+
 <p class="sg-sub">En-tête de page</p>
 {% set code %}{% verbatim %}
 <div class="page-heading">

@@ -352,22 +352,6 @@
     margin-bottom: 8px;
 }
 
-.ops-group-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px 24px;
-    padding: 12px 14px;
-    
-    cursor: pointer;
-    transition: background 150ms ease;
-}
-
-.ops-group-header:hover {
-    background: var(--surface-hover);
-}
-
 .ops-group-title,
 .ops-group-totals {
     display: flex;

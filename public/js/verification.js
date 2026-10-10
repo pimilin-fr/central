@@ -5,7 +5,7 @@
  * À supprimer en fin de chantier.
  */
 const CentralVerification = {
-    config: { appName: 'CentralVerification', version: 'v2.3.0', debug: false },
+    config: { appName: 'CentralVerification', version: 'v2.4.0', debug: false },
 
     STEPS: [
         {
@@ -24,6 +24,11 @@ const CentralVerification = {
                 'form-grid-4', 'form-grid-5', 'form-span-2', 'form-span-3', 'form-section-grid-3', 'form-inline-btn',
                 'form-legend', 'form-preview', 'geo-stack', 'is-grid', 'app-logo-core', 'theme-current-icon'],
             requises: ['pill-entity'],
+        },
+        {
+            id: 'e3a', titre: 'Étape 3a — en-têtes de bloc (.block-head)',
+            interdites: ['rc-panel-head', 'pv-month-head', 'pv-month-sums'],
+            requises: ['block-head', 'block-head-lg', 'block-head-meta', 'is-bar', 'is-clickable'],
         },
     ],
 

@@ -123,3 +123,17 @@ button.pill:hover { color: var(--accent); border-color: var(--accent); }
 
 /* pastille d'entité (tiers, projet…) : fond et texte posés en ligne par entity_color / entity_text */
 .pill-entity { padding: 2px 10px; border-color: transparent; font-size: 11px; font-weight: 700; }
+
+/* ---------- EN-TÊTE DE BLOC : .block-head (titre à gauche, infos/actions à droite) ----------
+   .block-head-lg   titre plus grand (périodes)       .block-head-meta  texte d'accompagnement à droite
+   .is-bar          en-tête « barre » avec padding (groupes d'opérations)
+   .is-clickable    ligne cliquable (survol)                                                       */
+.block-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; min-width: 0; }
+.block-head h2, .block-head h3, .block-head-title { margin: 0; color: var(--text); font-size: 14px; font-weight: 850; }
+.block-head h2 small { color: var(--text-muted); font-weight: 600; }
+.block-head-lg h3, .block-head-lg h2 { font-size: 17px; }
+.block-head-meta { color: var(--text-muted); font-size: 12.5px; }
+.block-head-meta strong { color: var(--text); }
+.block-head.is-bar { padding: 12px 14px; }
+.block-head.is-clickable { cursor: pointer; transition: background 150ms ease; }
+.block-head.is-clickable:hover { background: var(--surface-hover); }

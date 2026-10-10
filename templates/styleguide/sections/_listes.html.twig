@@ -36,7 +36,7 @@
 <p class="sg-sub">Groupe d'opérations</p>
 {% set code %}{% verbatim %}
 <div class="ops-group">
-    <div class="ops-group-header">
+    <div class="block-head is-bar is-clickable ops-group-header">
         <div class="ops-group-title">
             <span class="ops-group-label">Septembre 2026</span>
             <span class="ops-group-count">3 opérations</span>
@@ -75,7 +75,7 @@
 <p class="sg-sub">Groupe = relevé</p>
 {% set code %}{% verbatim %}
 <div class="ops-group is-releve is-closed">
-    <div class="ops-group-header">
+    <div class="block-head is-bar is-clickable ops-group-header">
         <div class="ops-group-title">
             <span class="ops-group-label">Relevé du 05/10/2026</span>
             <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
@@ -86,7 +86,7 @@
     </div>
 </div>
 <div class="ops-group is-releve is-open">
-    <div class="ops-group-header">
+    <div class="block-head is-bar is-clickable ops-group-header">
         <div class="ops-group-title">
             <span class="ops-group-label">Relevé du 05/11/2026</span>
             <span class="ops-group-badge is-open"><twig:ux:icon name="lucide:lock-open" /> Non clos · en cours</span>
@@ -134,7 +134,7 @@
 <p class="sg-sub">Sous-groupes par relevé</p>
 {% set code %}{% verbatim %}
 <section class="ops-subgroup is-releve is-closed">
-    <header class="ops-group-header ops-subgroup-header">
+    <header class="block-head ops-group-header ops-subgroup-header">
         <div class="ops-group-title">
             <span class="ops-group-label">Relevé du 05/10/2026</span>
             <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
@@ -144,7 +144,7 @@
     </header>
 </section>
 <section class="ops-subgroup is-none">
-    <header class="ops-group-header ops-subgroup-header">
+    <header class="block-head ops-group-header ops-subgroup-header">
         <div class="ops-group-title"><span class="ops-group-label is-unassigned">Hors relevé</span><span class="ops-group-count">2 opérations</span></div>
     </header>
 </section>
