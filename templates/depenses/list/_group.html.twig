@@ -2,7 +2,8 @@
 
     {% set groupKey = group.key %}
 
-    <div class="ops-group">
+    {% set isReleve = group.extra.releveId is defined %}
+    <div class="ops-group{{ isReleve ? ' is-releve ' ~ (group.extra.closed ? 'is-closed' : 'is-open') : '' }}">
 
         {# HEADER DU GROUPE : couleurs des montants identiques à celles d'une ligne #}
         <div class="ops-group-header" onclick="toggleGroup('{{ groupKey }}')">
@@ -15,19 +16,23 @@
                 {# Relevé : état (finalisé = ordre du relevé de compte figé) + accès à l'écran de composition #}
                 {% if group.extra.releveId is defined %}
                     {% if group.extra.closed %}
-                        <span class="ops-group-badge is-closed" title="Relevé finalisé : opérations dans l'ordre du relevé de compte">
-                            <twig:ux:icon name="lucide:lock" /> Finalisé
+                        <span class="ops-group-badge is-closed" title="Relevé clos : opérations dans l'ordre du relevé de compte">
+                            <twig:ux:icon name="lucide:lock" /> Clos
                         </span>
                     {% elseif group.extra.ordered %}
-                        <span class="ops-group-badge is-draft" title="Relevé en cours : à compléter puis finaliser">
-                            <twig:ux:icon name="lucide:pencil-line" /> En cours
+                        <span class="ops-group-badge is-open" title="Relevé non clos, en cours de pointage : à compléter puis finaliser">
+                            <twig:ux:icon name="lucide:lock-open" /> Non clos · en cours
+                        </span>
+                    {% else %}
+                        <span class="ops-group-badge is-open is-legacy" title="Relevé non clos (ancien relevé, sans ordre)">
+                            <twig:ux:icon name="lucide:lock-open" /> Non clos
                         </span>
                     {% endif %}
                     <a class="ops-group-link"
                        href="{{ path('app_releve_compose', { id: group.extra.portefeuilleId, releve: group.extra.releveId }) }}"
                        onclick="event.stopPropagation()"
-                       title="{{ group.extra.closed ? 'Voir le relevé' : 'Ordonner / compléter le relevé' }}">
-                        {{ group.extra.closed ? 'Voir' : (group.extra.ordered ? 'Compléter' : 'Ordonner') }}
+                       title="{{ group.extra.closed ? 'Voir le relevé' : 'Ordonner / compléter / clore le relevé' }}">
+                        {{ group.extra.closed ? 'Voir' : (group.extra.ordered ? 'Compléter' : 'Ordonner / clore') }}
                     </a>
                 {% endif %}
 

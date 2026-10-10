@@ -51,26 +51,23 @@ final class ReleveController extends AbstractController {
             $releve = $manager->findOrCreate($portefeuille, $date);
         }
 
-        $selected = $manager->orderedOperations($releve);
-        $selectedIds = array_map(static fn (Depenses $d) => $d->getId(), $selected);
+        $lines = $manager->orderedLines($releve);
 
         $pool = [];
         foreach ($depRepo->findUnreleved($portefeuille) as $operation) {
             $pool[] = $operation;
         }
 
-        // opérations pré-placées (ex. cases cochées) : à la suite, dans l'ordre chronologique
+        // opérations pré-placées (ex. cases cochées) : une ligne chacune, à la suite, dans l'ordre chronologique
         if (!$releve->isClosed()) {
             $wanted = array_map('intval', (array) $request->query->all('ids'));
             if ($wanted !== []) {
-                $moved = [];
                 foreach ($pool as $i => $operation) {
                     if (in_array($operation->getId(), $wanted, true)) {
-                        $moved[] = $operation;
+                        $lines[] = [$operation];
                         unset($pool[$i]);
                     }
                 }
-                $selected = [...$selected, ...$moved];
                 $pool = array_values($pool);
             }
         }
@@ -78,14 +75,14 @@ final class ReleveController extends AbstractController {
         return $this->render('releve/composer.html.twig', [
                     'portefeuille' => $portefeuille,
                     'releve' => $releve,
-                    'selected' => $selected,
+                    'lines' => $lines,
                     'pool' => $pool,
                     'drafts' => $releveRepo->findOpen($portefeuille),
                     'token' => self::TOKEN,
         ]);
     }
 
-    /** Enregistre (reste « en cours ») ou finalise. Corps : _token, releve?, date, label?, ops[] (dans l'ordre), action. */
+    /** Enregistre (reste « en cours ») ou finalise. Corps : _token, releve?, date, label?, lines[i][] (opérations de la ligne i, dans l'ordre ; plusieurs = un détail), action. */
     #[Route('/composer/{id}', name: 'app_releve_save', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function save(
             Portefeuille $portefeuille,
@@ -137,18 +134,31 @@ final class ReleveController extends AbstractController {
                 $releve->setLabel(mb_substr($label, 0, 255));
             }
 
-            // opérations dans l'ordre reçu
-            $ids = array_values(array_unique(array_map('intval', (array) $request->request->all('ops'))));
+            // lignes dans l'ordre reçu : lines[0][]=12&lines[0][]=14&lines[1][]=7 …
+            $received = (array) $request->request->all('lines');
+            ksort($received, SORT_NUMERIC);
+            $wantedIds = [];
+            foreach ($received as $line) {
+                foreach ((array) $line as $id) {
+                    $wantedIds[] = (int) $id;
+                }
+            }
             $found = [];
-            if ($ids !== []) {
-                foreach ($depRepo->findBy(['id' => $ids]) as $operation) {
+            if ($wantedIds !== []) {
+                foreach ($depRepo->findBy(['id' => array_values(array_unique($wantedIds))]) as $operation) {
                     $found[$operation->getId()] = $operation;
                 }
             }
             $ordered = [];
-            foreach ($ids as $id) {
-                if (isset($found[$id])) {
-                    $ordered[] = $found[$id];
+            foreach ($received as $line) {
+                $group = [];
+                foreach ((array) $line as $id) {
+                    if (isset($found[(int) $id])) {
+                        $group[] = $found[(int) $id];
+                    }
+                }
+                if ($group !== []) {
+                    $ordered[] = $group;
                 }
             }
 
@@ -160,12 +170,12 @@ final class ReleveController extends AbstractController {
             $manager->compose($releve, $ordered);
             if ($finalize) {
                 $manager->finalize($releve);
-                $this->addFlash('success', sprintf('Relevé du %s finalisé (%d opération(s)) : son ordre est figé.', $releve->getDate()->format('d/m/Y'), count($ordered)));
+                $this->addFlash('success', sprintf('Relevé du %s finalisé (%d ligne(s)) : son ordre est figé.', $releve->getDate()->format('d/m/Y'), count($ordered)));
 
                 return $this->redirectToRoute('app_portefeuille_show', ['id' => $portefeuille->getId(), 'groupBy' => 'releve']);
             }
 
-            $this->addFlash('success', sprintf('Relevé du %s enregistré (%d opération(s)) — en cours, à reprendre quand vous voulez.', $releve->getDate()->format('d/m/Y'), count($ordered)));
+            $this->addFlash('success', sprintf('Relevé du %s enregistré (%d ligne(s)) — en cours, à reprendre quand vous voulez.', $releve->getDate()->format('d/m/Y'), count($ordered)));
 
             return $this->redirectToRoute('app_releve_compose', ['id' => $portefeuille->getId(), 'releve' => $releve->getId()]);
         } catch (Throwable $e) {

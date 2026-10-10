@@ -16,8 +16,12 @@
 
     <tbody>
 
+        {% set prevRank = null %}
         {% for depense in depenses %}
-            <tr class="ops-row depense-row"
+            {% set sub = numbered and depense.releveOrdre is not null and depense.releveOrdre == prevRank %}
+            {% set rankCount = 0 %}
+            {% if numbered and depense.releveOrdre is not null %}{% for o in depenses %}{% if o.releveOrdre == depense.releveOrdre %}{% set rankCount = rankCount + 1 %}{% endif %}{% endfor %}{% endif %}
+            <tr class="ops-row depense-row{{ sub ? ' is-sub' : '' }}{{ rankCount > 1 ? ' is-multi' : '' }}"
                 data-id="{{ depense.id }}">
 
                 <td onclick="event.stopPropagation()">
@@ -27,7 +31,7 @@
                            class="row-checkbox">
                 </td>
 
-                {% if numbered %}<td class="px-4 py-2 text-right ops-rank">{{ depense.releveOrdre ?? '·' }}</td>{% endif %}
+                {% if numbered %}<td class="px-4 py-2 text-right ops-rank{{ sub ? ' is-sub' : '' }}"{% if rankCount > 1 and not sub %} title="Détail : {{ rankCount }} opérations pointées ensemble"{% endif %}>{{ sub ? '↳' : (depense.releveOrdre ?? '·') }}</td>{% endif %}
 
                 <td class="px-4 py-2">
                     {{ depense.date|date('d/m/Y') }}
@@ -96,6 +100,7 @@
                 {% endif %}
             </tr>
 
+            {% set prevRank = depense.releveOrdre %}
             {# DETAILS (hidden) #}
             <tr class="hidden ops-detail-row detail-row" id="detail-{{ depense.id }}">
                 <td colspan="{{ colCount }}" class="ops-detail-cell">

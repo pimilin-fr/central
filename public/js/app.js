@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.9.0",
+        version: "v1.8.0",
         appName: "Central"
     },
 
@@ -531,9 +531,10 @@ const App = {
 
     /* =========================================================
      * FAIRE LE RELEVÉ (templates/releve/composer.html.twig)
-     * Deux listes : « À pointer » (opérations hors relevé) et « Relevé » (dans l'ordre du relevé de compte).
-     * L'ordre du DOM de la liste « Relevé » EST l'ordre envoyé : chaque ligne porte un champ ops[]
-     * (désactivé tant qu'elle est dans « À pointer »). Rang, soldes et totaux sont recalculés à chaque changement.
+     * Deux listes : « À pointer » (opérations hors relevé) et « Relevé » (lignes du relevé de compte, dans l'ordre).
+     * Une LIGNE du relevé = une opération, ou un « détail » : plusieurs opérations du même tiers et de la même
+     * date pointées ensemble (ex. une commande de 50 € éclatée en plusieurs catégories) ; elles partagent le rang.
+     * Chaque opération d'une ligne porte un champ lines[i][] (i = rang − 1) : l'ordre du DOM EST l'ordre envoyé.
      * ========================================================= */
 
     releveComposer: {
@@ -549,15 +550,23 @@ const App = {
             const list = root.querySelector('[data-rc-list]');
             const startInput = root.querySelector('[data-rc-start]');
             const filterInput = root.querySelector('[data-rc-filter]');
+            const message = root.querySelector('[data-rc-msg]');
             const isNew = root.hasAttribute('data-rc-new');
             const money = new Intl.NumberFormat('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-            let cursor = null; // ligne après laquelle iront les prochaines opérations (null = fin)
+            let cursor = null;   // ligne après laquelle iront les prochaines lignes (null = fin)
             let dirty = false;
-            let dragging = null;
+            let drag = null;     // {part, line} en cours de glissement
+            let msgTimer = null;
 
-            const rows = ul => [...ul.querySelectorAll(':scope > [data-rc-op]')];
+            const esc = text => String(text ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+            const signed = value => (value < 0 ? '− ' : '+ ') + money.format(Math.abs(value)) + ' €';
+            const lines = () => [...list.querySelectorAll(':scope > [data-rc-line]')];
+            const partsOf = line => [...line.querySelectorAll(':scope > [data-rc-parts] > [data-rc-op]')];
+            const poolRows = () => [...pool.querySelectorAll(':scope > [data-rc-op]')];
             const sortKey = li => li.dataset.date + String(li.dataset.id).padStart(12, '0');
+            const groupKey = li => li.dataset.tiers + '|' + li.dataset.date;
+            const lineKey = line => sortKey(partsOf(line)[0]);
             const setInput = (li, enabled) => {
                 const input = li.querySelector('[data-rc-input]');
                 if (input) {
@@ -565,56 +574,144 @@ const App = {
                 }
             };
 
-            const toPool = li => {
-                if (cursor === li) {
-                    cursor = li.previousElementSibling && list.contains(li.previousElementSibling) ? li.previousElementSibling : null;
+            const say = (text, tone = 'danger') => {
+                if (!message) {
+                    return;
                 }
-                setInput(li, false);
-                const key = sortKey(li);
-                pool.insertBefore(li, rows(pool).find(row => row !== li && sortKey(row) > key) || null);
+                message.textContent = text;
+                message.dataset.tone = tone;
+                message.hidden = false;
+                clearTimeout(msgTimer);
+                msgTimer = setTimeout(() => { message.hidden = true; }, 6000);
             };
 
-            const toList = (li, before = undefined) => {
-                setInput(li, true);
+            /** Les opérations peuvent-elles former UN détail ? (même date ; les tiers peuvent différer) */
+            const sameGroup = parts => parts.length > 0 && parts.every(part => part.dataset.date === parts[0].dataset.date);
+            const NOT_SAME = 'Un détail regroupe des opérations de la MÊME date.';
+
+            const newLine = parts => {
+                const line = document.createElement('li');
+                line.className = 'rc-line';
+                line.setAttribute('data-rc-line', '');
+                line.draggable = true;
+                line.innerHTML = '<div class="rc-line-head" data-rc-head></div><ul class="rc-parts" data-rc-parts></ul>';
+                const ul = line.querySelector('[data-rc-parts]');
+                parts.forEach(part => {
+                    setInput(part, true);
+                    part.draggable = false;
+                    part.hidden = false;
+                    ul.append(part);
+                });
+
+                return line;
+            };
+
+            const insertLine = (line, before) => {
                 if (before !== undefined) {
-                    list.insertBefore(li, before);
+                    list.insertBefore(line, before);
                 } else if (cursor && list.contains(cursor)) {
-                    cursor.after(li);
-                    cursor = li; // les ajouts suivants se placent à la suite
+                    cursor.after(line);
+                    cursor = line; // les ajouts suivants se placent à la suite
                 } else {
-                    list.append(li);
+                    list.append(line);
                 }
+            };
+
+            const dropLine = line => {
+                if (cursor === line) {
+                    cursor = line.previousElementSibling || null;
+                }
+                line.remove();
+            };
+
+            const toPool = part => {
+                const line = part.closest('[data-rc-line]');
+                setInput(part, false);
+                part.draggable = true;
+                const checkbox = part.querySelector('[data-rc-check]');
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+                const key = sortKey(part);
+                pool.insertBefore(part, poolRows().find(row => row !== part && sortKey(row) > key) || null);
+                if (line && partsOf(line).length === 0) {
+                    dropLine(line);
+                }
+            };
+
+            const addParts = (parts, before) => {
+                parts.sort((a, b) => (sortKey(a) < sortKey(b) ? -1 : 1));
+                insertLine(newLine(parts), before);
+            };
+
+            const renderHead = (line, index, running) => {
+                const parts = partsOf(line);
+                const head = line.querySelector('[data-rc-head]');
+                const keepChecked = head.querySelector('[data-rc-check-line]')?.checked || false;
+                const total = parts.reduce((sum, part) => sum + (parseFloat(part.dataset.amount) || 0), 0);
+                const first = parts[0];
+                const categories = [...new Set(parts.map(part => part.dataset.category))].join(' · ');
+                const tiersNames = [...new Set(parts.map(part => part.dataset.tiersName))];
+                line.dataset.multiTiers = tiersNames.length > 1 ? '1' : '';
+
+                line.dataset.parts = parts.length;
+                line.dataset.total = total;
+                head.innerHTML =
+                        '<label class="rc-pick" title="Cocher pour regrouper des lignes en un détail"><input type="checkbox" data-rc-check-line' + (keepChecked ? ' checked' : '') + '></label>' +
+                        '<span class="rc-grip" aria-hidden="true">⋮⋮</span>' +
+                        '<span class="rc-rank">' + (index + 1) + '</span>' +
+                        '<span class="rc-date">' + esc(first.dataset.dateFr) + '</span>' +
+                        '<span class="rc-main"><strong>' + esc(tiersNames.join(' + ')) + '</strong><small>' + esc(categories) + '</small></span>' +
+                        (parts.length > 1 ? '<span class="rc-chip is-detail" title="Plusieurs opérations pointées ensemble">Détail × ' + parts.length + '</span>' : '<span></span>') +
+                        '<span class="rc-amount ' + (total < 0 ? 'amount-expense' : 'amount-income') + '">' + signed(total) + '</span>' +
+                        '<span class="rc-balance" title="Solde cumulé après cette ligne">' + money.format(running) + ' €</span>' +
+                        '<span class="rc-tools">' +
+                        '<button type="button" class="rc-btn' + (line === cursor ? ' is-on' : '') + '" data-rc-here title="Insérer les prochaines lignes juste après celle-ci" aria-label="Insérer après cette ligne">⤓</button>' +
+                        '<button type="button" class="rc-btn" data-rc-up title="Monter" aria-label="Monter">▲</button>' +
+                        '<button type="button" class="rc-btn" data-rc-down title="Descendre" aria-label="Descendre">▼</button>' +
+                        (parts.length > 1 ? '<button type="button" class="rc-btn" data-rc-split title="Dégrouper : une ligne par opération" aria-label="Dégrouper">⧉</button>' : '') +
+                        '<button type="button" class="rc-btn" data-rc-remove-line title="Retirer la ligne du relevé" aria-label="Retirer la ligne">✕</button>' +
+                        '</span>';
             };
 
             const refresh = () => {
-                const selected = rows(list);
-                const start = parseFloat(startInput && startInput.value ? startInput.value.replace(',', '.') : '0') || 0;
-                let balance = start;
+                const all = lines();
+                const start = parseFloat((startInput && startInput.value ? startInput.value : '0').replace(',', '.')) || 0;
+                let running = start;
+                let opsCount = 0;
 
-                selected.forEach((li, index) => {
-                    li.querySelector('[data-rc-rank]').textContent = index + 1;
-                    balance += parseFloat(li.dataset.amount) || 0;
-                    const cell = li.querySelector('[data-rc-balance]');
-                    if (cell) {
-                        cell.textContent = money.format(balance) + ' €';
-                    }
-                    li.classList.toggle('is-cursor', li === cursor);
-                    const here = li.querySelector('[data-rc-here]');
-                    if (here) {
-                        here.classList.toggle('is-on', li === cursor);
-                    }
+                all.forEach((line, index) => {
+                    running += partsOf(line).reduce((sum, part) => sum + (parseFloat(part.dataset.amount) || 0), 0);
+                    renderHead(line, index, running);
+                    line.classList.toggle('is-cursor', line === cursor);
+                    partsOf(line).forEach(part => {
+                        part.querySelector('[data-rc-input]').name = 'lines[' + index + '][]';
+                        opsCount++;
+                    });
                 });
 
-                root.querySelector('[data-rc-count]').textContent = selected.length;
-                root.querySelector('[data-rc-pool-count]').textContent = rows(pool).length;
-                root.querySelector('[data-rc-total]').textContent = money.format(balance) + ' €';
-                root.querySelector('[data-rc-empty]').hidden = selected.length > 0;
-                root.querySelector('[data-rc-pool-empty]').hidden = rows(pool).length > 0;
+                // opérations du même tiers et de la même date dans « À pointer » : proposer de les pointer ensemble
+                const rows = poolRows();
+                const sizes = {};
+                rows.forEach(row => { sizes[groupKey(row)] = (sizes[groupKey(row)] || 0) + 1; });
+                rows.forEach(row => {
+                    const chip = row.querySelector('[data-rc-siblings]');
+                    const n = sizes[groupKey(row)];
+                    chip.hidden = n < 2;
+                    chip.textContent = n > 1 ? 'même tiers/date × ' + n : '';
+                });
+
+                root.querySelector('[data-rc-count]').textContent = all.length;
+                root.querySelector('[data-rc-ops-count]').textContent = opsCount !== all.length ? '(' + opsCount + ' opérations)' : '';
+                root.querySelector('[data-rc-pool-count]').textContent = rows.length;
+                root.querySelector('[data-rc-total]').textContent = money.format(running) + ' €';
+                root.querySelector('[data-rc-empty]').hidden = all.length > 0;
+                root.querySelector('[data-rc-pool-empty]').hidden = rows.length > 0;
 
                 root.querySelectorAll('[data-rc-submit]').forEach(btn => {
-                    btn.toggleAttribute('disabled', isNew && selected.length === 0);
+                    btn.toggleAttribute('disabled', isNew && all.length === 0);
                 });
-                root.querySelector('[data-rc-finalize]').toggleAttribute('disabled', selected.length === 0);
+                root.querySelector('[data-rc-finalize]').toggleAttribute('disabled', all.length === 0);
             };
 
             const changed = () => {
@@ -622,57 +719,131 @@ const App = {
                 refresh();
             };
 
+            const checkedLines = () => lines().filter(line => line.querySelector('[data-rc-check-line]')?.checked);
+
             /* ---- clics ---- */
             root.addEventListener('click', event => {
-                const li = event.target.closest('[data-rc-op]');
+                const target = event.target;
+                const part = target.closest('[data-rc-op]');
+                const line = target.closest('[data-rc-line]');
 
-                if (event.target.closest('[data-rc-add]') && li) {
-                    toList(li);
+                if (target.closest('[data-rc-add]') && part) {
+                    addParts([part]);
                     return changed();
                 }
-                if (event.target.closest('[data-rc-remove]') && li) {
-                    toPool(li);
+
+                if (target.closest('[data-rc-siblings]') && part) {
+                    poolRows().filter(row => groupKey(row) === groupKey(part)).forEach(row => {
+                        row.querySelector('[data-rc-check]').checked = true;
+                    });
+                    return;
+                }
+
+                if (target.closest('[data-rc-add-group]')) {
+                    const picked = poolRows().filter(row => !row.hidden && row.querySelector('[data-rc-check]')?.checked);
+                    if (picked.length === 0) {
+                        return say('Cochez d\'abord les opérations à pointer ensemble.', 'info');
+                    }
+                    if (!sameGroup(picked)) {
+                        return say(NOT_SAME);
+                    }
+                    addParts(picked);
                     return changed();
                 }
-                if (event.target.closest('[data-rc-up]') && li) {
-                    const prev = li.previousElementSibling;
+
+                if (target.closest('[data-rc-add-all]')) {
+                    poolRows().filter(row => !row.hidden).forEach(row => addParts([row]));
+                    return changed();
+                }
+
+                if (target.closest('[data-rc-merge]')) {
+                    const picked = checkedLines();
+                    if (picked.length < 2) {
+                        return say('Cochez au moins deux lignes du relevé à regrouper.', 'info');
+                    }
+                    const parts = picked.flatMap(partsOf);
+                    if (!sameGroup(parts)) {
+                        return say(NOT_SAME);
+                    }
+                    const keep = picked[0];
+                    const ul = keep.querySelector('[data-rc-parts]');
+                    parts.filter(p => !ul.contains(p)).forEach(p => ul.append(p));
+                    picked.slice(1).forEach(dropLine);
+                    keep.querySelector('[data-rc-check-line]').checked = false;
+                    return changed();
+                }
+
+                if (target.closest('[data-rc-remove-part]') && part) {
+                    toPool(part);
+                    return changed();
+                }
+
+                if (target.closest('[data-rc-detach]') && part) {
+                    const owner = part.closest('[data-rc-line]');
+                    const alone = newLine([part]);
+                    owner.after(alone);
+                    return changed();
+                }
+
+                if (!line) {
+                    const sortBtn = target.closest('[data-rc-sort]');
+                    if (sortBtn) {
+                        const sign = sortBtn.dataset.rcSort === 'desc' ? -1 : 1;
+                        lines().sort((a, b) => sign * (lineKey(a) < lineKey(b) ? -1 : 1)).forEach(l => list.append(l));
+                        cursor = null;
+                        return changed();
+                    }
+                    return;
+                }
+
+                if (target.closest('[data-rc-remove-line]')) {
+                    partsOf(line).forEach(toPool);
+                    return changed();
+                }
+                if (target.closest('[data-rc-up]')) {
+                    const prev = line.previousElementSibling;
                     if (prev) {
-                        list.insertBefore(li, prev);
+                        list.insertBefore(line, prev);
                     }
                     return changed();
                 }
-                if (event.target.closest('[data-rc-down]') && li) {
-                    const next = li.nextElementSibling;
+                if (target.closest('[data-rc-down]')) {
+                    const next = line.nextElementSibling;
                     if (next) {
-                        list.insertBefore(next, li);
+                        list.insertBefore(next, line);
                     }
                     return changed();
                 }
-                if (event.target.closest('[data-rc-here]') && li) {
-                    cursor = cursor === li ? null : li;
+                if (target.closest('[data-rc-here]')) {
+                    cursor = cursor === line ? null : line;
                     return refresh();
                 }
-                if (event.target.closest('[data-rc-add-all]')) {
-                    rows(pool).filter(row => !row.hidden).forEach(row => toList(row));
-                    return changed();
-                }
-
-                const sortBtn = event.target.closest('[data-rc-sort]');
-                if (sortBtn) {
-                    const sign = sortBtn.dataset.rcSort === 'desc' ? -1 : 1;
-                    rows(list)
-                            .sort((a, b) => sign * (sortKey(a) < sortKey(b) ? -1 : (sortKey(a) > sortKey(b) ? 1 : 0)))
-                            .forEach(row => list.append(row));
-                    cursor = null;
+                if (target.closest('[data-rc-split]')) {
+                    const parts = partsOf(line);
+                    let after = line;
+                    parts.slice(1).forEach(p => {
+                        const alone = newLine([p]);
+                        after.after(alone);
+                        after = alone;
+                    });
                     return changed();
                 }
             });
+
+            const sortBtns = root.querySelectorAll('[data-rc-sort]');
+            sortBtns.forEach(btn => btn.addEventListener('click', event => {
+                const sign = btn.dataset.rcSort === 'desc' ? -1 : 1;
+                lines().sort((a, b) => sign * (lineKey(a) < lineKey(b) ? -1 : 1)).forEach(l => list.append(l));
+                cursor = null;
+                event.stopPropagation();
+                changed();
+            }));
 
             /* ---- filtre de la liste « À pointer » ---- */
             if (filterInput) {
                 filterInput.addEventListener('input', () => {
                     const query = filterInput.value.trim().toLowerCase();
-                    rows(pool).forEach(row => {
+                    poolRows().forEach(row => {
                         row.hidden = query !== '' && !(row.dataset.search || '').includes(query);
                     });
                 });
@@ -689,50 +860,65 @@ const App = {
                 }
             }));
 
-            /* ---- glisser-déposer (entre les deux listes et à l'intérieur de « Relevé ») ---- */
+            /* ---- glisser-déposer : lignes du relevé et opérations de « À pointer » ---- */
             root.addEventListener('dragstart', event => {
-                const li = event.target.closest('[data-rc-op]');
-                if (!li) {
+                const line = event.target.closest('[data-rc-line]');
+                const part = event.target.closest('[data-rc-op]');
+                if (line && event.target === line) {
+                    drag = {part: null, line};
+                    line.classList.add('is-dragging');
+                } else if (part && pool.contains(part)) {
+                    drag = {part, line: null};
+                    part.classList.add('is-dragging');
+                } else {
                     return;
                 }
-                dragging = li;
-                li.classList.add('is-dragging');
                 event.dataTransfer.effectAllowed = 'move';
-                event.dataTransfer.setData('text/plain', li.dataset.id);
+                event.dataTransfer.setData('text/plain', 'rc');
             });
 
             root.addEventListener('dragend', () => {
-                if (!dragging) {
+                if (!drag) {
                     return;
                 }
-                dragging.classList.remove('is-dragging');
-                setInput(dragging, dragging.parentElement === list);
-                dragging = null;
+                drag.part?.classList.remove('is-dragging');
+                drag.line?.classList.remove('is-dragging');
+                drag = null;
                 changed();
             });
 
             list.addEventListener('dragover', event => {
-                if (!dragging) {
+                if (!drag) {
                     return;
                 }
                 event.preventDefault();
-                const after = rows(list).filter(row => row !== dragging).find(row => {
-                    const box = row.getBoundingClientRect();
+                if (!drag.line) { // une opération de « À pointer » entre dans le relevé : elle devient une ligne
+                    drag.line = newLine([drag.part]);
+                    drag.line.classList.add('is-dragging');
+                    list.append(drag.line);
+                }
+                const after = lines().filter(line => line !== drag.line).find(line => {
+                    const box = line.getBoundingClientRect();
                     return event.clientY < box.top + box.height / 2;
                 });
-                setInput(dragging, true);
-                if (after !== dragging.nextElementSibling || dragging.parentElement !== list) {
-                    list.insertBefore(dragging, after || null);
+                if (after !== drag.line.nextElementSibling || drag.line.parentElement !== list) {
+                    list.insertBefore(drag.line, after || null);
                 }
             });
 
             pool.addEventListener('dragover', event => {
-                if (!dragging) {
+                if (!drag) {
                     return;
                 }
                 event.preventDefault();
-                if (dragging.parentElement !== pool) {
-                    toPool(dragging);
+                if (drag.line && drag.line.parentElement === list) { // la ligne repart dans « À pointer »
+                    const parts = partsOf(drag.line);
+                    parts.forEach(toPool);
+                    if (drag.part === null) { // c'était une ligne du relevé : fin du glissement
+                        drag.line = null;
+                    } else {
+                        drag.line = null;
+                    }
                 }
             });
 
@@ -745,6 +931,7 @@ const App = {
                     event.preventDefault();
                     return;
                 }
+                refresh();
                 dirty = false;
             });
 
@@ -755,6 +942,9 @@ const App = {
                 }
             });
 
+            lines().forEach(line => {
+                line.draggable = true;
+            });
             refresh();
         }
     },

@@ -16,7 +16,7 @@
                         <span>{{ portefeuille.libelle }}</span>
                     </span>
                     {% if closed %}
-                        <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Finalisé le {{ releve.closedAt|date('d/m/Y') }}</span>
+                        <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos le {{ releve.closedAt|date('d/m/Y') }}</span>
                     {% elseif not isNew %}
                         <span class="ops-group-badge is-draft"><twig:ux:icon name="lucide:pencil-line" /> En cours</span>
                     {% endif %}
@@ -46,15 +46,31 @@
                 </header>
                 <ol class="rc-list is-readonly">
                     {% set run = 0 %}
-                    {% for op in selected %}
-                        {% set signed = op.categorie.isDepense ? -(op.montant * 1) : (op.montant * 1) %}
-                        {% set run = run + signed %}
-                        <li class="rc-op">
-                            <span class="rc-rank">{{ op.releveOrdre ?? loop.index }}</span>
-                            <span class="rc-date">{{ op.date|date('d/m/Y') }}</span>
-                            <span class="rc-main"><strong>{{ op.tiers.name }}</strong><small>{{ op.categorie.name }}</small></span>
-                            <span class="rc-amount {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">{{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €</span>
-                            <span class="rc-balance is-visible">{{ run|number_format(2, ',', ' ') }} €</span>
+                    {% for line in lines %}
+                        {% set total = 0 %}
+                        {% for op in line %}
+                            {% set total = total + (op.categorie.isDepense ? -(op.montant * 1) : (op.montant * 1)) %}
+                        {% endfor %}
+                        {% set run = run + total %}
+                        {% set names = [] %}
+                        {% for op in line %}{% if op.tiers.name not in names %}{% set names = names|merge([op.tiers.name]) %}{% endif %}{% endfor %}
+                        <li class="rc-line is-readonly" {{ names|length > 1 ? 'data-multi-tiers=1' : '' }}>
+                            <div class="rc-line-head">
+                                <span class="rc-rank">{{ line[0].releveOrdre ?? loop.index }}</span>
+                                <span class="rc-date">{{ line[0].date|date('d/m/Y') }}</span>
+                                <span class="rc-main"><strong>{{ names|join(' + ') }}</strong>{% if line|length == 1 %}<small>{{ line[0].categorie.name }}</small>{% endif %}</span>
+                                {% if line|length > 1 %}<span class="rc-chip is-detail">Détail × {{ line|length }}</span>{% endif %}
+                                <span class="rc-amount {{ total < 0 ? 'amount-expense' : 'amount-income' }}">{{ total < 0 ? '−' : '+' }} {{ total|abs|number_format(2, ',', ' ') }} €</span>
+                                <span class="rc-balance is-visible">{{ run|number_format(2, ',', ' ') }} €</span>
+                            </div>
+                            {% if line|length > 1 %}
+                                <ul class="rc-parts is-open">
+                                    {% for op in line %}
+                                        {% set signed = op.categorie.isDepense ? -(op.montant * 1) : (op.montant * 1) %}
+                                        <li class="rc-op"><span class="rc-main">{% if names|length > 1 %}<strong>{{ op.tiers.name }}</strong>{% endif %}<small>{{ op.categorie.name }}</small></span><span class="rc-amount {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">{{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €</span></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ol>
@@ -97,7 +113,10 @@
                     <section class="rc-panel">
                         <header class="rc-panel-head">
                             <h2>À pointer <span class="rc-count" data-rc-pool-count>{{ pool|length }}</span></h2>
-                            <button type="button" class="page-action page-action-neutral" data-rc-add-all title="Ajouter toutes les opérations affichées, par date"><twig:ux:icon name="lucide:list-plus" /><span>Tout ajouter</span></button>
+                            <div class="rc-pool-actions">
+                                <button type="button" class="page-action page-action-neutral" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>Ajouter en un détail</span></button>
+                                <button type="button" class="page-action page-action-neutral" data-rc-add-all title="Ajouter toutes les opérations affichées, une ligne chacune, par date"><twig:ux:icon name="lucide:list-plus" /><span>Tout ajouter</span></button>
+                            </div>
                         </header>
                         <input type="search" class="modern-form-control rc-filter" placeholder="Filtrer (tiers, catégorie, montant, date…)" data-rc-filter>
                         <ul class="rc-list is-pool" data-rc-pool>
@@ -111,17 +130,19 @@
                     {# ---- RELEVÉ ---- #}
                     <section class="rc-panel rc-panel-main">
                         <header class="rc-panel-head">
-                            <h2>Relevé <span class="rc-count" data-rc-count>0</span></h2>
-                            <div class="rc-sorts" role="group" aria-label="Trier automatiquement">
+                            <h2>Relevé <span class="rc-count" data-rc-count title="Lignes du relevé">0</span> <small data-rc-ops-count></small></h2>
+                            <div class="rc-sorts" role="group" aria-label="Outils du relevé">
+                                <button type="button" class="page-action page-action-neutral" data-rc-merge title="Regroupe les lignes cochées en un seul détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>Regrouper la sélection</span></button>
                                 <span class="group-bar-label">Trier par date</span>
                                 <button type="button" class="rc-btn" data-rc-sort="asc" title="Du plus ancien au plus récent (ex. espèces)">↑</button>
                                 <button type="button" class="rc-btn" data-rc-sort="desc" title="Du plus récent au plus ancien">↓</button>
                             </div>
                         </header>
-                        <p class="rc-help">Cliquez sur ＋ dans l'ordre d'apparition sur le relevé de compte, ou glissez-déposez. <strong>⤓</strong> place les prochaines opérations après une ligne donnée (pour reprendre un relevé en cours).</p>
+                        <p class="rc-help">Cliquez sur ＋ dans l'ordre d'apparition sur le relevé de compte, ou glissez-déposez. <strong>⤓</strong> place les prochaines lignes après une ligne donnée. Une commande éclatée en plusieurs catégories se pointe en <strong>un seul détail</strong> : cochez ses opérations (même date, tiers libres) puis « Ajouter en un détail ».</p>
+                        <p class="rc-msg" data-rc-msg role="status" hidden></p>
                         <ol class="rc-list is-selected" data-rc-list>
-                            {% for op in selected %}
-                                {% include 'releve/_composer_row.html.twig' with { op: op, inList: true } only %}
+                            {% for line in lines %}
+                                {% include 'releve/_composer_line.html.twig' with { line: line } only %}
                             {% endfor %}
                         </ol>
                         <p class="rc-empty" data-rc-empty hidden>Aucune opération pour l'instant : choisissez-les à gauche.</p>

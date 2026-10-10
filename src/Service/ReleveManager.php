@@ -14,8 +14,8 @@ use Exception;
 /**
  * Relevés de compte.
  *
- * Un relevé = un portefeuille + une date + une liste ORDONNÉE d'opérations (Depenses::releveOrdre,
- * 1 = première ligne du relevé de compte). Il se fait en plusieurs fois : tant qu'il n'est pas
+ * Un relevé = un portefeuille + une date + une liste ORDONNÉE de lignes (Depenses::releveOrdre,
+ * 1 = première ligne du relevé de compte ; plusieurs opérations de même rang = un détail de cette ligne). Il se fait en plusieurs fois : tant qu'il n'est pas
  * finalisé (Releve::closedAt), on peut ajouter, retirer et réordonner. Une fois finalisé, l'ordre
  * est figé et c'est toujours celui qui est affiché.
  */
@@ -69,33 +69,70 @@ class ReleveManager {
     }
 
     /**
-     * Enregistre la liste ORDONNÉE des opérations du relevé (rangs 1..n, sans trou).
-     * Les opérations qui étaient dans le relevé et n'y sont plus en sortent.
+     * Lignes du relevé de compte, dans l'ordre. Une ligne = une opération, ou un « détail » :
+     * plusieurs opérations (même date ; tiers libres) qui partagent le même rang parce qu'elles
+     * se pointent ensemble (ex. une commande de 50 € éclatée en 10 € vêtements + 25 € sport + …).
      *
-     * @param list<Depenses> $ordered
+     * @return list<list<Depenses>>
      */
-    public function compose(Releve $releve, array $ordered): Releve {
+    public function orderedLines(Releve $releve): array {
+        $lines = [];
+        $byRang = [];
+        foreach ($this->orderedOperations($releve) as $operation) {
+            $rang = $operation->getReleveOrdre();
+            if ($rang === null) {
+                $lines[] = [$operation]; // relevé ancien : une ligne par opération
+            } elseif (isset($byRang[$rang])) {
+                $lines[$byRang[$rang]][] = $operation;
+            } else {
+                $byRang[$rang] = count($lines);
+                $lines[] = [$operation];
+            }
+        }
+
+        return $lines;
+    }
+
+    /**
+     * Enregistre les LIGNES ordonnées du relevé (rangs 1..n sans trou ; les opérations d'un même
+     * détail ont le même rang). Les opérations qui étaient dans le relevé et n'y sont plus en sortent.
+     *
+     * @param list<Depenses|list<Depenses>> $lines une opération seule, ou une liste d'opérations (= un détail)
+     */
+    public function compose(Releve $releve, array $lines): Releve {
         if ($releve->isClosed()) {
             throw new Exception('RM 03 - Relevé finalisé : rouvrez-le pour le modifier');
         }
 
+        $lines = array_values(array_map(static fn ($line): array => $line instanceof Depenses ? [$line] : array_values($line), $lines));
+        $lines = array_values(array_filter($lines, static fn (array $line): bool => $line !== []));
+
         $portefeuille = $releve->getPortefeuille();
         $seen = [];
-        foreach ($ordered as $operation) {
-            if (isset($seen[$operation->getId()])) {
-                throw new Exception('RM 04 - Opération en double');
-            }
-            $seen[$operation->getId()] = true;
+        foreach ($lines as $line) {
+            foreach ($line as $operation) {
+                if (isset($seen[$operation->getId()])) {
+                    throw new Exception('RM 04 - Opération en double');
+                }
+                $seen[$operation->getId()] = true;
 
-            if ($operation->getPortefeuille()?->getId() !== $portefeuille->getId() && !$this->optionMultiplePtf) {
-                throw new Exception('RM 02 - Portefeuilles multiples interdits');
+                if ($operation->getPortefeuille()?->getId() !== $portefeuille->getId() && !$this->optionMultiplePtf) {
+                    throw new Exception('RM 02 - Portefeuilles multiples interdits');
+                }
+                $other = $operation->getReleve();
+                if ($other !== null && ($releve->getId() === null || $other->getId() !== $releve->getId())) {
+                    throw new Exception('RM 05 - Une opération appartient déjà à un autre relevé');
+                }
             }
-            $other = $operation->getReleve();
-            if ($other !== null && $releve->getId() !== null && $other->getId() !== $releve->getId()) {
-                throw new Exception('RM 05 - Une opération appartient déjà à un autre relevé');
-            }
-            if ($other !== null && $releve->getId() === null) {
-                throw new Exception('RM 05 - Une opération appartient déjà à un autre relevé');
+
+            // un détail regroupe des opérations d'une même date (les tiers peuvent différer : cas rare mais réel)
+            if (count($line) > 1) {
+                $day = $line[0]->getDate()->format('Y-m-d');
+                foreach ($line as $operation) {
+                    if ($operation->getDate()->format('Y-m-d') !== $day) {
+                        throw new Exception('RM 07 - Un détail ne regroupe que des opérations de la même date');
+                    }
+                }
             }
         }
 
@@ -109,8 +146,10 @@ class ReleveManager {
         }
 
         $this->em->persist($releve);
-        foreach (array_values($ordered) as $index => $operation) {
-            $operation->setReleve($releve)->setReleveOrdre($index + 1);
+        foreach ($lines as $index => $line) {
+            foreach ($line as $operation) {
+                $operation->setReleve($releve)->setReleveOrdre($index + 1);
+            }
         }
         $this->em->flush();
         $this->em->refresh($releve);
@@ -127,9 +166,11 @@ class ReleveManager {
             throw new Exception('RM 06 - Un relevé vide ne peut pas être finalisé');
         }
 
-        // rang sans trou, au cas où des opérations auraient été supprimées entre-temps
-        foreach ($this->orderedOperations($releve) as $index => $operation) {
-            $operation->setReleveOrdre($index + 1);
+        // rang sans trou (les opérations d'un même détail gardent le même rang)
+        foreach ($this->orderedLines($releve) as $index => $line) {
+            foreach ($line as $operation) {
+                $operation->setReleveOrdre($index + 1);
+            }
         }
         $releve->setClosedAt(new DateTimeImmutable());
         $this->em->flush();
@@ -160,14 +201,19 @@ class ReleveManager {
             return $releve->setDepenses(new ArrayCollection($operations));
         }
 
-        $ordered = $this->orderedOperations($releve);
-        $known = array_flip(array_map(static fn (Depenses $d) => $d->getId(), $ordered));
+        $lines = $this->orderedLines($releve);
+        $known = [];
+        foreach ($lines as $line) {
+            foreach ($line as $operation) {
+                $known[$operation->getId()] = true;
+            }
+        }
         foreach ($operations as $operation) {
             if (!isset($known[$operation->getId()])) {
-                $ordered[] = $operation;
+                $lines[] = [$operation];
             }
         }
 
-        return $this->compose($releve, $ordered);
+        return $this->compose($releve, $lines);
     }
 }
