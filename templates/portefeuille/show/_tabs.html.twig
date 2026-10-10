@@ -17,6 +17,14 @@
             { id: entity.id }
         ))
     },{
+        id: 'prevision',
+        label: 'Prévisions',
+        icon: 'lucide:calendar-clock',
+        content: render(controller(
+            'App\\Controller\\PrevisionController::fragment',
+            { id: entity.id }
+        ))
+    },{
         id: 'edit',
         label: 'Modifier',
         icon: 'mingcute:edit-2-fill',

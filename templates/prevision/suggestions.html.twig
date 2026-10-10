@@ -51,7 +51,8 @@
                                 max: s.max,
                                 estime: s.estime ? 1 : 0,
                                 certitude: s.certitude.value,
-                                debut: s.prochaine|date('Y-m-d')
+                                debut: s.prochaine|date('Y-m-d'),
+                                libelle: s.tiers.name ~ ' – ' ~ (s.categorie.libelle ?: s.categorie.name)
                             } %}
                             <tr class="ops-row" data-pv-suggestion="{{ s.tiers.id }}|{{ s.categorie.id }}|{{ s.portefeuille.id }}">
                                 <td class="px-4 py-2">
@@ -61,6 +62,9 @@
                                 <td class="px-4 py-2">
                                     {{ s.resume }}
                                     <div class="pv-range">dernière le {{ s.derniere|date('d/m/Y') }} · régularité {{ (s.regularite * 100)|round }} %</div>
+                                    <details class="pv-serie"><summary class="pv-link-btn">voir les {{ s.serie|length }} opérations</summary>
+                                        <ul>{% for o in s.serie %}<li>{{ o.date|date('d/m/Y') }} · {{ o.montant|number_format(2, ',', ' ') }} € <span class="pv-range">{{ o.categorie }}</span></li>{% endfor %}</ul>
+                                    </details>
                                 </td>
                                 <td class="px-4 py-2">{{ s.prochaine|date('d/m/Y') }} <span class="pv-badge is-{{ s.certitude.value }}">{{ s.certitude.label }}</span></td>
                                 <td class="px-4 py-2 text-right font-medium">
@@ -83,7 +87,7 @@
         <section class="rc-panel">
             <details>
                 <summary class="rc-panel-head"><h2>Non retenues <span class="rc-count">{{ rejets|length }}</span></h2></summary>
-                <p class="pv-hint">Groupes (même tiers, catégorie et portefeuille) avec au moins 2 opérations qui n'ont pas été retenus, et pourquoi. Les plus nombreux d'abord.</p>
+                <p class="pv-hint">Opérations d'un même tiers et portefeuille qui n'ont été rattachées à aucune récurrence (opérations ponctuelles, rythme irrégulier, série terminée…), et pourquoi. Les plus nombreuses d'abord.</p>
                 {% if rejets is empty %}
                     <p class="rc-empty">Rien d'écarté.</p>
                 {% else %}
@@ -103,7 +107,11 @@
                                     <td class="px-4 py-2">{{ r.categorie.libelle ?: r.categorie.name }} · {{ r.portefeuille.libelle }}</td>
                                     <td class="px-4 py-2 text-right">{{ r.occurrences }}</td>
                                     <td class="px-4 py-2">{{ r.derniere|date('d/m/Y') }}</td>
-                                    <td class="px-4 py-2">{{ r.raison }}</td>
+                                    <td class="px-4 py-2">{{ r.raison }}
+                                        <details class="pv-serie"><summary class="pv-link-btn">voir les {{ r.serie|length }} opérations</summary>
+                                            <ul>{% for o in r.serie %}<li>{{ o.date|date('d/m/Y') }} · {{ o.montant|number_format(2, ',', ' ') }} € <span class="pv-range">{{ o.categorie }}</span></li>{% endfor %}</ul>
+                                        </details>
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>

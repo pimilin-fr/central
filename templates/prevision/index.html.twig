@@ -19,31 +19,7 @@
             </div>
         </div>
 
-        {% if retard is not empty %}
-            <section class="rc-panel pv-month">
-                <header class="pv-month-head"><h3 class="pv-late">En retard · {{ retard|length }}</h3><span class="pv-month-sums">dates dépassées, à concrétiser ou ignorer</span></header>
-                <div class="rc-table-wrap"><table class="ops-table"><tbody>
-                    {% for e in retard %}{% include 'prevision/_echeance_row.html.twig' with { e: e, late: true, today: today } only %}{% endfor %}
-                </tbody></table></div>
-            </section>
-        {% endif %}
-
-        {% for key, month in months %}
-            <section class="rc-panel pv-month">
-                <header class="pv-month-head">
-                    <h3>{{ ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][month.label|date('n') - 1] }} {{ month.label|date('Y') }}</h3>
-                    <span class="pv-month-sums">
-                        Prévu : <strong>{{ month.brut < 0 ? '−' : '+' }} {{ month.brut|abs|number_format(2, ',', ' ') }} €</strong>
-                        · pondéré : <strong>{{ month.pondere < 0 ? '−' : '+' }} {{ month.pondere|abs|number_format(2, ',', ' ') }} €</strong>
-                    </span>
-                </header>
-                <div class="rc-table-wrap"><table class="ops-table"><tbody>
-                    {% for e in month.echeances %}{% include 'prevision/_echeance_row.html.twig' with { e: e, late: false, today: today } only %}{% endfor %}
-                </tbody></table></div>
-            </section>
-        {% else %}
-            {% if retard is empty %}<p class="rc-empty">Aucune échéance prévue. Créez une règle pour commencer.</p>{% endif %}
-        {% endfor %}
+        {% include 'prevision/_echeances.html.twig' with { retard: retard, months: months, today: today } only %}
 
         <section class="rc-panel">
             <header class="rc-panel-head"><h2>Règles <span class="rc-count">{{ regles|length }}</span></h2></header>

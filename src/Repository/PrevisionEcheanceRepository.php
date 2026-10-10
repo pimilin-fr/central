@@ -19,8 +19,8 @@ class PrevisionEcheanceRepository extends ServiceEntityRepository {
      *
      * @return list<PrevisionEcheance>
      */
-    public function findPrevues(): array {
-        return $this->createQueryBuilder('e')
+    public function findPrevues(?\App\Entity\Portefeuille $portefeuille = null): array {
+        $qb = $this->createQueryBuilder('e')
                         ->innerJoin('e.regle', 'r')
                         ->innerJoin('r.categorie', 'c')
                         ->innerJoin('r.tiers', 't')
@@ -30,8 +30,11 @@ class PrevisionEcheanceRepository extends ServiceEntityRepository {
                         ->andWhere('r.actif = true')
                         ->setParameter('s', StatutEcheance::PREVUE)
                         ->orderBy('e.datePrevue', 'ASC')
-                        ->addOrderBy('e.id', 'ASC')
-                        ->getQuery()
-                        ->getResult();
+                        ->addOrderBy('e.id', 'ASC');
+        if ($portefeuille !== null) {
+            $qb->andWhere('r.portefeuille = :ptf')->setParameter('ptf', $portefeuille);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

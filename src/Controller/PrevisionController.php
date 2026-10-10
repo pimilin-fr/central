@@ -36,22 +36,7 @@ final class PrevisionController extends AbstractController {
     #[Route(name: 'app_prevision_index', methods: ['GET'])]
     public function index(PrevisionRegleRepository $regleRepo, PrevisionEcheanceRepository $echeanceRepo, PrevisionManager $manager): Response {
         $today = new DateTime('today');
-        $debutMois = (clone $today)->modify('first day of this month');
-
-        $months = [];
-        $retard = [];
-        foreach ($echeanceRepo->findPrevues() as $echeance) {
-            $date = $echeance->getDatePrevue();
-            if ($date < $today && $date < $debutMois) {
-                $retard[] = $echeance;
-                continue;
-            }
-            $key = $date->format('Y-m');
-            $months[$key]['label'] = $date;
-            $months[$key]['echeances'][] = $echeance;
-            $months[$key]['brut'] = ($months[$key]['brut'] ?? 0.0) + $echeance->getMontantSigne();
-            $months[$key]['pondere'] = ($months[$key]['pondere'] ?? 0.0) + $echeance->getMontantSigne() * $echeance->getCertitude()->poids();
-        }
+        ['months' => $months, 'retard' => $retard] = $this->groupEcheances($echeanceRepo->findPrevues(), $today);
 
         $regles = $regleRepo->findAllWithTranches();
         $estimations = [];
@@ -92,6 +77,9 @@ final class PrevisionController extends AbstractController {
         if ($q->get('tiers')) {
             $tiers = $em->getRepository(Tiers::class)->find((string) $q->get('tiers'));
             $regle->setTiers($tiers)->setLibelle($tiers?->getName() ?? '');
+        }
+        if (trim((string) $q->get('libelle')) !== '') {
+            $regle->setLibelle(mb_substr(trim((string) $q->get('libelle')), 0, 255));
         }
         if ($this->intParam($q->get('categorie')) > 0) {
             $regle->setCategorie($em->getRepository(Categorie::class)->find($this->intParam($q->get('categorie'))));
@@ -225,7 +213,7 @@ final class PrevisionController extends AbstractController {
             $this->addFlash('danger', $e->getMessage());
         }
 
-        return $this->redirectToRoute('app_prevision_index', [], Response::HTTP_SEE_OTHER);
+        return $this->back($request);
     }
 
     /** Ajuste une échéance (date / montant) sans toucher aux autres ; elle n'est plus recalculée par la règle. */
@@ -242,7 +230,7 @@ final class PrevisionController extends AbstractController {
             $this->addFlash('danger', 'Ajustement impossible (date ou montant invalide).');
         }
 
-        return $this->redirectToRoute('app_prevision_index', [], Response::HTTP_SEE_OTHER);
+        return $this->back($request);
     }
 
     #[Route('/echeance/{id}/ignorer', name: 'app_prevision_ignorer', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -252,6 +240,54 @@ final class PrevisionController extends AbstractController {
             $echeance->setStatut(StatutEcheance::IGNOREE);
             $em->flush();
             $this->addFlash('success', 'Échéance ignorée.');
+        }
+
+        return $this->back($request);
+    }
+
+    /**
+     * Échéances prévues → « en retard » (mois précédents) et regroupement par mois avec totaux brut / pondéré.
+     *
+     * @param list<PrevisionEcheance> $echeances
+     * @return array{months: array<string, array<string, mixed>>, retard: list<PrevisionEcheance>}
+     */
+    private function groupEcheances(array $echeances, DateTime $today): array {
+        $debutMois = (clone $today)->modify('first day of this month');
+        $months = [];
+        $retard = [];
+        foreach ($echeances as $echeance) {
+            $date = $echeance->getDatePrevue();
+            if ($date < $today && $date < $debutMois) {
+                $retard[] = $echeance;
+                continue;
+            }
+            $key = $date->format('Y-m');
+            $months[$key]['label'] = $date;
+            $months[$key]['echeances'][] = $echeance;
+            $months[$key]['brut'] = ($months[$key]['brut'] ?? 0.0) + $echeance->getMontantSigne();
+            $months[$key]['pondere'] = ($months[$key]['pondere'] ?? 0.0) + $echeance->getMontantSigne() * $echeance->getCertitude()->poids();
+        }
+
+        return ['months' => $months, 'retard' => $retard];
+    }
+
+    /** Onglet « Prévisions » de la fiche portefeuille (pas de route : appelé via render(controller(...))). */
+    public function fragment(Portefeuille $portefeuille, PrevisionEcheanceRepository $echeanceRepo, \Symfony\Component\HttpFoundation\RequestStack $requests): Response {
+        $today = new DateTime('today');
+        $main = $requests->getMainRequest();
+
+        return $this->render('prevision/_portefeuille.html.twig', $this->groupEcheances($echeanceRepo->findPrevues($portefeuille), $today) + [
+                    'portefeuille' => $portefeuille,
+                    'today' => $today,
+                    'back' => ($main ? $main->getPathInfo() : '/portefeuille') . '?tab=prevision',
+        ]);
+    }
+
+    /** Retour à la page d'où vient l'action (chemin interne uniquement), sinon la page Prévisions. */
+    private function back(Request $request): Response {
+        $back = (string) $request->request->get('_back');
+        if ($back !== '' && str_starts_with($back, '/') && !str_starts_with($back, '//') && !str_contains($back, '\\')) {
+            return $this->redirect($back, Response::HTTP_SEE_OTHER);
         }
 
         return $this->redirectToRoute('app_prevision_index', [], Response::HTTP_SEE_OTHER);

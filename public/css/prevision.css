@@ -29,3 +29,10 @@
 .pv-pop label { font-size: .8rem; }
 .pv-inline { display: inline; }
 .pv-link-btn { border: 0; background: none; padding: 0; cursor: pointer; color: var(--text-muted, #6b7280); text-decoration: underline; font-size: .85rem; }
+
+.pv-ptf-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.pv-ptf-head .pv-hint { margin: 0; }
+
+.pv-serie { margin-top: .25rem; }
+.pv-serie summary { cursor: pointer; list-style: none; }
+.pv-serie ul { margin: .25rem 0 0; padding-left: 1.1rem; font-size: .85rem; columns: 2; }

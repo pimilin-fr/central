@@ -47,8 +47,12 @@ class PrevisionDetector {
 
     /**
      * Détection + explication de ce qui a été écarté (« non retenues », avec la raison).
-     * Passes successives : (1) tiers + catégorie + portefeuille ; (2) flux distincts séparés par montant quand un tiers
-     * a plusieurs opérations par mois ; (3) tiers + portefeuille sans tenir compte de la catégorie (catégorie qui change).
+     *
+     * Principe : pour chaque couple tiers + portefeuille, on cherche des CHAÎNES d'opérations séparées par un rythme
+     * régulier (mois, trimestre…), quelles que soient les catégories. Les opérations ponctuelles (frais de déménagement,
+     * régularisation…) sont simplement ignorées, un changement de montant ne casse pas la chaîne, et plusieurs flux
+     * d'un même tiers (internet + mobile, électricité + gaz) donnent plusieurs chaînes : à date égale, c'est le montant
+     * le plus proche qui départage.
      *
      * @return array{suggestions: list<array<string, mixed>>, rejets: list<array<string, mixed>>, derniere: ?DateTimeImmutable, total: int}
      */
@@ -67,102 +71,181 @@ class PrevisionDetector {
                 ->andWhere('d.date >= :since')
                 ->setParameter('since', $since)
                 ->orderBy('d.date', 'ASC')
+                ->addOrderBy('d.id', 'ASC')
                 ->getQuery()
                 ->getResult();
 
-        $couvertes = [];
-        foreach ($this->em->getRepository(PrevisionRegle::class)->findBy(['actif' => true]) as $regle) {
-            $couvertes[$this->key($regle->getTiers()?->getId(), $regle->getCategorie()?->getId(), $regle->getPortefeuille()?->getId())] = true;
-        }
+        /** @var list<PrevisionRegle> $regles */
+        $regles = $this->em->getRepository(PrevisionRegle::class)->findBy(['actif' => true]);
 
-        $strict = [];
-        $parTiers = [];
+        $groupes = [];
         $derniere = null;
         foreach ($depenses as $d) {
             $derniere = $d->getDate();
-            $strict[$this->key($d->getTiers()->getId(), $d->getCategorie()->getId(), $d->getPortefeuille()?->getId())][] = $d;
-            $parTiers[$this->key($d->getTiers()->getId(), '*', $d->getPortefeuille()?->getId())][] = $d;
+            $groupes[$d->getTiers()->getId() . '|' . $d->getPortefeuille()?->getId()][] = $d;
         }
 
         $out = [];
         $rejets = [];
-        $tiersTrouves = [];
+        foreach ($groupes as $list) {
+            if (count($list) < 2) {
+                continue;
+            }
+            $utilisees = [];
+            $echecs = [];
+            foreach ($this->series($list) as $serie) {
+                $r = self::evaluer($this->points($serie), $today);
+                if (isset($r['raison'])) {
+                    $echecs[] = count($serie) . ' opérations en série : ' . $r['raison'];
+                    continue;
+                }
+                foreach ($serie as $d) {
+                    $utilisees[spl_object_id($d)] = true;
+                }
+                if ($this->couverte($r, $list[0], $regles, true)) {
+                    continue;
+                }
+                $categories = array_unique(array_map(static fn (Depenses $d) => $d->getCategorie()->getId(), $serie));
+                if (count($categories) > 1) {
+                    $r['resume'] .= ' (' . count($categories) . ' catégories différentes)';
+                }
+                $out[] = $this->suggestion($r, $serie) + ['serie' => $this->detail($serie)];
+            }
 
-        // passe 1 + 2
-        foreach ($strict as $key => $list) {
-            if (isset($couvertes[$key])) {
-                continue;
-            }
-            $r = self::evaluer($this->points($list), $today);
-            if (!isset($r['raison'])) {
-                $out[] = $this->suggestion($r, $list);
-                $tiersTrouves[$this->key($list[0]->getTiers()->getId(), '*', $list[0]->getPortefeuille()?->getId())] = true;
-                continue;
-            }
-            $trouve = false;
-            if (!empty($r['frequent'])) { // plusieurs flux mélangés : on sépare par montant
-                foreach ($this->flux($list) as $sub) {
-                    $rs = self::evaluer($this->points($sub), $today);
-                    if (!isset($rs['raison'])) {
-                        $rs['resume'] = 'flux d\'environ ' . number_format($rs['montant'], 2, ',', ' ') . ' € — ' . $rs['resume'];
-                        $out[] = $this->suggestion($rs, $sub);
-                        $trouve = true;
-                    }
-                }
-            }
-            if ($trouve) {
-                $tiersTrouves[$this->key($list[0]->getTiers()->getId(), '*', $list[0]->getPortefeuille()?->getId())] = true;
-            } elseif (count($list) >= 2) {
-                $rejets[$key] = ['list' => $list, 'raison' => $r['raison']];
-            }
-        }
-
-        // passe 3 : catégorie qui change au fil du temps
-        foreach ($parTiers as $key => $list) {
-            if (isset($tiersTrouves[$key]) || count($list) < 3) {
-                continue;
-            }
-            $r = self::evaluer($this->points($list), $today);
-            if (!isset($r['raison'])) {
-                $already = false;
-                foreach (array_unique(array_map(static fn (Depenses $d) => $d->getCategorie()->getId(), $list)) as $cid) {
-                    $already = $already || isset($couvertes[$this->key($list[0]->getTiers()->getId(), $cid, $list[0]->getPortefeuille()?->getId())]);
-                }
-                if (!$already) {
-                    $r['resume'] .= ' (catégories variables : ' . count(array_unique(array_map(static fn (Depenses $d) => $d->getCategorie()->getId(), $list))) . ')';
-                    $out[] = $this->suggestion($r, $list);
-                    // ces groupes ne sont plus « rejetés »
-                    foreach (array_keys($rejets) as $rk) {
-                        if (str_starts_with($rk, $list[0]->getTiers()->getId() . '|') && str_ends_with($rk, '|' . $list[0]->getPortefeuille()?->getId())) {
-                            unset($rejets[$rk]);
-                        }
-                    }
-                }
+            $reste = array_values(array_filter($list, static fn (Depenses $d): bool => !isset($utilisees[spl_object_id($d)])));
+            if (count($reste) >= 2) {
+                $last = $reste[array_key_last($reste)];
+                $raison = $echecs !== [] ? $echecs[0] : (self::evaluer($this->points($reste), $today)['raison'] ?? 'opérations isolées, sans rythme commun');
+                $rejets[] = [
+                    'tiers' => $last->getTiers(),
+                    'categorie' => $last->getCategorie(),
+                    'portefeuille' => $last->getPortefeuille(),
+                    'occurrences' => count($reste),
+                    'derniere' => $last->getDate(),
+                    'raison' => $raison,
+                    'serie' => $this->detail($reste),
+                ];
             }
         }
 
         usort($out, static fn (array $a, array $b): int => $b['score'] <=> $a['score']);
-
-        $rows = [];
-        foreach ($rejets as $item) {
-            $last = $item['list'][array_key_last($item['list'])];
-            $rows[] = [
-                'tiers' => $last->getTiers(),
-                'categorie' => $last->getCategorie(),
-                'portefeuille' => $last->getPortefeuille(),
-                'occurrences' => count($item['list']),
-                'derniere' => $last->getDate(),
-                'raison' => $item['raison'],
-            ];
-        }
-        usort($rows, static fn (array $a, array $b): int => $b['occurrences'] <=> $a['occurrences']);
+        usort($rejets, static fn (array $a, array $b): int => $b['occurrences'] <=> $a['occurrences']);
 
         return [
             'suggestions' => $out,
-            'rejets' => array_slice($rows, 0, 150),
+            'rejets' => array_slice($rejets, 0, 150),
             'derniere' => $derniere ? DateTimeImmutable::createFromInterface($derniere) : null,
             'total' => count($depenses),
         ];
+    }
+
+    /**
+     * Extrait les chaînes régulières d'une liste d'opérations (ordre chronologique), les plus longues d'abord.
+     * Une chaîne = au moins 3 opérations (2 pour un rythme annuel) espacées d'un rythme à ±20 % près,
+     * en tolérant un mois manquant.
+     *
+     * @param list<Depenses> $ops
+     * @return list<list<Depenses>>
+     */
+    public function series(array $ops): array {
+        $ops = array_values($ops);
+        $n = count($ops);
+        $pris = [];
+        $series = [];
+
+        while (true) {
+            $best = null;
+            for ($i = 0; $i < $n; $i++) {
+                if (isset($pris[$i])) {
+                    continue;
+                }
+                foreach (self::RYTHMES as $r) {
+                    [$chaine, $cout] = $this->chaine($ops, $i, $r['jours'], $pris);
+                    $len = count($chaine);
+                    if ($len < 3 && !($len >= 2 && $r['jours'] > 300)) {
+                        continue;
+                    }
+                    $cout /= max(1, $len - 1);
+                    if ($best === null || $len > $best['len'] || ($len === $best['len'] && $cout < $best['cout'])) {
+                        $best = ['len' => $len, 'cout' => $cout, 'chaine' => $chaine];
+                    }
+                }
+            }
+            if ($best === null) {
+                break;
+            }
+            foreach ($best['chaine'] as $idx) {
+                $pris[$idx] = true;
+            }
+            $series[] = array_map(static fn (int $idx): Depenses => $ops[$idx], $best['chaine']);
+        }
+
+        return $series;
+    }
+
+    /**
+     * Chaîne gloutonne à partir de $start : à chaque pas, l'opération la mieux placée dans la fenêtre « précédente + rythme ».
+     * Le coût mêle l'écart de date et, en second, l'écart de montant (sépare deux flux le même jour).
+     *
+     * @param list<Depenses> $ops
+     * @param array<int, bool> $pris
+     * @return array{0: list<int>, 1: float}
+     */
+    private function chaine(array $ops, int $start, float $f, array $pris): array {
+        $n = count($ops);
+        $chaine = [$start];
+        $cout = 0.0;
+        $cur = $start;
+        $tolerance = 0.2 * $f;
+
+        while (true) {
+            $curDate = $ops[$cur]->getDate();
+            $curMontant = (float) $ops[$cur]->getMontant();
+            $trouve = null;
+            $meilleur = INF;
+            foreach ([1, 2] as $k) { // 2 = un cycle manquant (toléré hors annuel, une fois la chaîne amorcée)
+                if ($k === 2 && ($f > 100 || count($chaine) < 2)) {
+                    break;
+                }
+                for ($j = $cur + 1; $j < $n; $j++) {
+                    if (isset($pris[$j])) {
+                        continue;
+                    }
+                    $dd = (float) $curDate->diff($ops[$j]->getDate())->days;
+                    if ($dd > $k * $f + $tolerance) {
+                        break;
+                    }
+                    if (abs($dd - $k * $f) > $tolerance) {
+                        continue;
+                    }
+                    $c = abs($dd - $k * $f) / $f + 0.25 * abs((float) $ops[$j]->getMontant() - $curMontant) / max(1.0, $curMontant) + ($k - 1) * 0.5;
+                    if ($c < $meilleur) {
+                        $meilleur = $c;
+                        $trouve = $j;
+                    }
+                }
+                if ($trouve !== null) {
+                    break;
+                }
+            }
+            if ($trouve === null) {
+                break;
+            }
+            $chaine[] = $trouve;
+            $cout += $meilleur;
+            $cur = $trouve;
+        }
+
+        return [$chaine, $cout];
+    }
+
+    /** @param list<Depenses> $list @return list<array{date: DateTimeImmutable, montant: float, categorie: string}> */
+    private function detail(array $list): array {
+        return array_map(static fn (Depenses $d): array => [
+            'date' => DateTimeImmutable::createFromInterface($d->getDate()),
+            'montant' => (float) $d->getMontant(),
+            'categorie' => $d->getCategorie()->getLibelle() ?: $d->getCategorie()->getName(),
+        ], $list);
     }
 
     /** @param list<Depenses> $list @return list<array{date: DateTimeImmutable, montant: float}> */
@@ -183,40 +266,37 @@ class PrevisionDetector {
     }
 
     /**
-     * Sépare plusieurs flux d'un même tiers (ex. internet 30 € + mobile 15 €) par montants voisins (±12 %).
+     * Cette récurrence est-elle déjà couverte par une règle ? Même tiers + portefeuille, ET même flux :
+     * jour du mois voisin (±6) et montant voisin (±15 % d'une tranche) — sauf montants variables.
+     * C'est ce qui permet d'avoir plusieurs règles pour un même tiers (internet ET mobile).
      *
-     * @param list<Depenses> $list
-     * @return list<list<Depenses>>
+     * @param array<string, mixed> $analyse
+     * @param list<PrevisionRegle> $regles
      */
-    private function flux(array $list): array {
-        $sorted = $list;
-        usort($sorted, static fn (Depenses $a, Depenses $b): int => (float) $a->getMontant() <=> (float) $b->getMontant());
-        $clusters = [];
-        foreach ($sorted as $d) {
-            $m = (float) $d->getMontant();
-            $placed = false;
-            foreach ($clusters as &$cluster) {
-                $mean = array_sum(array_map(static fn (Depenses $x): float => (float) $x->getMontant(), $cluster)) / count($cluster);
-                if ($mean > 0 && abs($m - $mean) / $mean <= 0.12) {
-                    $cluster[] = $d;
-                    $placed = true;
-                    break;
+    private function couverte(array $analyse, Depenses $ref, array $regles, bool $toutesCategories): bool {
+        foreach ($regles as $regle) {
+            if ($regle->getTiers()?->getId() !== $ref->getTiers()->getId() || $regle->getPortefeuille()?->getId() !== $ref->getPortefeuille()?->getId()) {
+                continue;
+            }
+            if (!$toutesCategories && $regle->getCategorie()?->getId() !== $ref->getCategorie()->getId()) {
+                continue;
+            }
+            $ecart = abs($regle->getJour() - $analyse['jour']);
+            if (min($ecart, 31 - $ecart) > 6) {
+                continue;
+            }
+            if ($regle->isEstime() || $analyse['estime']) {
+                return true;
+            }
+            foreach ($regle->getTranches() as $tranche) {
+                $m = (float) $tranche->getMontant();
+                if ($m > 0 && abs($m - $analyse['montant']) / $m <= 0.15) {
+                    return true;
                 }
-            }
-            unset($cluster);
-            if (!$placed) {
-                $clusters[] = [$d];
-            }
-        }
-        $out = [];
-        foreach ($clusters as $cluster) {
-            if (count($cluster) >= 3) {
-                usort($cluster, static fn (Depenses $a, Depenses $b): int => $a->getDate() <=> $b->getDate());
-                $out[] = $cluster;
             }
         }
 
-        return $out;
+        return false;
     }
 
     /**
@@ -389,7 +469,4 @@ class PrevisionDetector {
         return $c % 2 ? $values[$mid] : ($values[$mid - 1] + $values[$mid]) / 2;
     }
 
-    private function key(mixed $tiers, mixed $categorie, mixed $portefeuille): string {
-        return $tiers . '|' . $categorie . '|' . $portefeuille;
-    }
 }
