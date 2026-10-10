@@ -13,7 +13,7 @@ use Twig\TwigFunction;
  *   {{ (entity.couleur ?? null)|entity_color('var(--border)') }} → avec une autre valeur par défaut
  *   {{ (entity.couleur ?? null)|entity_text }}                  → couleur du texte posé dessus
  *   {{ entity_palette_slots() }}                                → [1..12]
- *   {{ entity_vivid_slots() }} / {{ entity_neutral_slots() }}   → [clé => libellé] des couleurs vives / neutres du thème
+ *   {{ entity_color_families() }}                               → groupes → familles → 5 nuances (foncé → clair) du sélecteur
  */
 final class EntityColorExtension extends AbstractExtension {
 
@@ -27,8 +27,7 @@ final class EntityColorExtension extends AbstractExtension {
     public function getFunctions(): array {
         return [
             new TwigFunction('entity_palette_slots', static fn (): array => range(1, EntityColor::SLOTS)),
-            new TwigFunction('entity_vivid_slots', static fn (): array => EntityColor::VIVID),
-            new TwigFunction('entity_neutral_slots', static fn (): array => EntityColor::NEUTRAL),
+            new TwigFunction('entity_color_families', static fn (): array => EntityColor::families()),
         ];
     }
 }

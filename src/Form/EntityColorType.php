@@ -21,7 +21,7 @@ class EntityColorType extends AbstractType {
             'attr' => ['data-entity-color' => '1'],
             'constraints' => [
                 new Regex(
-                        pattern: '/^(@([1-9]|1[0-2]|n[1-5]|info|ok|warn|danger|text|soft|muted|line)|#[0-9A-Fa-f]{6})$/',
+                        pattern: '/^(@([aisdwn][1-5]|h(60|120|180|240|300)-[1-5]|[1-9]|1[0-2]|info|ok|warn|danger|text|soft|muted|line)|#[0-9A-Fa-f]{6})$/',
                         message: 'Couleur invalide : choisissez une couleur du thème ou une couleur libre.'
                 ),
             ],

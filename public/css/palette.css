@@ -1,142 +1,313 @@
 /* =========================================================
-   PALETTE DU THÈME — couleurs d'entités liées au thème
+   COULEURS D'ENTITÉS LIÉES AU THÈME
 
-   Une entité (type de tiers, portefeuille, projet…) peut choisir :
-     - « @nN »     → un neutre du thème (n1 à n5, gris qui suivent le thème)
-   - rien        → l'accent du thème
-     - « @N »      → l'emplacement N de cette palette (1 à 12) : la couleur
-                     suit le thème (--palette-N, texte posé dessus : --palette-N-ink)
-     - « #rrggbb » → une couleur libre, figée
+   Une entité (type de tiers, portefeuille, projet…) choisit :
+     - rien          → l'accent du thème
+     - « @a3 » etc.  → une NUANCE d'une famille de couleurs du thème
+     - « #rrggbb »   → une couleur libre, figée
 
-   La palette est CALCULÉE à partir de l'accent du thème (--accent) :
-   emplacement 1 = l'accent, les 11 suivants = même luminosité/saturation
-   (bornées), teinte décalée de 30° chacun. Rien à écrire pour un nouveau thème.
-   Pour affiner un emplacement dans un thème, il suffit de le redéfinir dans le
-   fichier du thème : --palette-4: #2f9e6b; (le texte se recalcule seul si
-   --palette-4-ink n'est pas redéfini).
+   Chaque famille = 5 nuances, de la plus FONCÉE (1) à la plus CLAIRE (5) :
+     1 très foncé · 2 foncé · 3 classique (= la couleur de base) · 4 clair · 5 très clair
+   Familles du thème (leur couleur de base est déjà définie dans chaque thème) :
+     a Accent (--accent) · i Info (--info) · s Succès (--success)
+     w Alerte (--warning) · d Danger (--danger) · n Neutre (--text-soft)
+   Autres teintes (calculées depuis l'accent, décalées de 60°…300°) :
+     h60 · h120 · h180 · h240 · h300   (jetons « @h60-1 » … « @h300-5 »)
+
+   Tout suit le thème : rien à écrire pour un nouveau thème. Pour affiner une nuance dans
+   un thème, la redéfinir dans son fichier (ex. --palette-i3: #1d8fb8;). Le texte posé
+   dessus (--palette-XX-ink) se recalcule seul s'il n'est pas redéfini.
    ========================================================= */
 
 :root,
 [data-theme] {
-    --palette-l-min: .48;
+    --palette-l-min: .48;      /* bornes des « autres teintes » */
     --palette-l-max: .66;
     --palette-c-min: .11;
     --palette-c-max: .16;
-    --palette-ink-cut: .70;   /* au-dessus de cette clarté, le texte passe en sombre */
+    --palette-ink-cut: .70;    /* au-dessus de cette clarté, le texte passe en sombre */
 }
 
+/* Familles du thème (1 = très foncé … 5 = très clair) */
 :root,
 [data-theme] {
+    --palette-a1: color-mix(in oklab, var(--accent) 45%, black);
+    --palette-a2: color-mix(in oklab, var(--accent) 72%, black);
+    --palette-a3: var(--accent);
+    --palette-a4: color-mix(in oklab, var(--accent) 62%, white);
+    --palette-a5: color-mix(in oklab, var(--accent) 28%, white);
+    --palette-a1-ink: oklch(from var(--palette-a1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-a2-ink: oklch(from var(--palette-a2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-a3-ink: var(--accent-contrast, #ffffff);
+    --palette-a4-ink: oklch(from var(--palette-a4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-a5-ink: oklch(from var(--palette-a5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-i1: color-mix(in oklab, var(--info) 45%, black);
+    --palette-i2: color-mix(in oklab, var(--info) 72%, black);
+    --palette-i3: var(--info);
+    --palette-i4: color-mix(in oklab, var(--info) 62%, white);
+    --palette-i5: color-mix(in oklab, var(--info) 28%, white);
+    --palette-i1-ink: oklch(from var(--palette-i1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-i2-ink: oklch(from var(--palette-i2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-i3-ink: oklch(from var(--palette-i3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-i4-ink: oklch(from var(--palette-i4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-i5-ink: oklch(from var(--palette-i5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-s1: color-mix(in oklab, var(--success) 45%, black);
+    --palette-s2: color-mix(in oklab, var(--success) 72%, black);
+    --palette-s3: var(--success);
+    --palette-s4: color-mix(in oklab, var(--success) 62%, white);
+    --palette-s5: color-mix(in oklab, var(--success) 28%, white);
+    --palette-s1-ink: oklch(from var(--palette-s1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-s2-ink: oklch(from var(--palette-s2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-s3-ink: oklch(from var(--palette-s3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-s4-ink: oklch(from var(--palette-s4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-s5-ink: oklch(from var(--palette-s5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-w1: color-mix(in oklab, var(--warning) 45%, black);
+    --palette-w2: color-mix(in oklab, var(--warning) 72%, black);
+    --palette-w3: var(--warning);
+    --palette-w4: color-mix(in oklab, var(--warning) 62%, white);
+    --palette-w5: color-mix(in oklab, var(--warning) 28%, white);
+    --palette-w1-ink: oklch(from var(--palette-w1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-w2-ink: oklch(from var(--palette-w2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-w3-ink: oklch(from var(--palette-w3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-w4-ink: oklch(from var(--palette-w4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-w5-ink: oklch(from var(--palette-w5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-d1: color-mix(in oklab, var(--danger) 45%, black);
+    --palette-d2: color-mix(in oklab, var(--danger) 72%, black);
+    --palette-d3: var(--danger);
+    --palette-d4: color-mix(in oklab, var(--danger) 62%, white);
+    --palette-d5: color-mix(in oklab, var(--danger) 28%, white);
+    --palette-d1-ink: oklch(from var(--palette-d1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-d2-ink: oklch(from var(--palette-d2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-d3-ink: oklch(from var(--palette-d3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-d4-ink: oklch(from var(--palette-d4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-d5-ink: oklch(from var(--palette-d5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-n1: color-mix(in oklab, var(--text-soft) 45%, black);
+    --palette-n2: color-mix(in oklab, var(--text-soft) 72%, black);
+    --palette-n3: var(--text-soft);
+    --palette-n4: color-mix(in oklab, var(--text-soft) 62%, white);
+    --palette-n5: color-mix(in oklab, var(--text-soft) 28%, white);
+    --palette-n1-ink: oklch(from var(--palette-n1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-n2-ink: oklch(from var(--palette-n2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-n3-ink: oklch(from var(--palette-n3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-n4-ink: oklch(from var(--palette-n4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-n5-ink: oklch(from var(--palette-n5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+}
+
+/* Autres teintes (calculées depuis l'accent) */
+:root,
+[data-theme] {
+    --palette-h60-base: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 60));
+    --palette-h60-1: color-mix(in oklab, var(--palette-h60-base) 45%, black);
+    --palette-h60-2: color-mix(in oklab, var(--palette-h60-base) 72%, black);
+    --palette-h60-3: var(--palette-h60-base);
+    --palette-h60-4: color-mix(in oklab, var(--palette-h60-base) 62%, white);
+    --palette-h60-5: color-mix(in oklab, var(--palette-h60-base) 28%, white);
+    --palette-h60-1-ink: oklch(from var(--palette-h60-1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h60-2-ink: oklch(from var(--palette-h60-2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h60-3-ink: oklch(from var(--palette-h60-3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h60-4-ink: oklch(from var(--palette-h60-4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h60-5-ink: oklch(from var(--palette-h60-5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h120-base: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 120));
+    --palette-h120-1: color-mix(in oklab, var(--palette-h120-base) 45%, black);
+    --palette-h120-2: color-mix(in oklab, var(--palette-h120-base) 72%, black);
+    --palette-h120-3: var(--palette-h120-base);
+    --palette-h120-4: color-mix(in oklab, var(--palette-h120-base) 62%, white);
+    --palette-h120-5: color-mix(in oklab, var(--palette-h120-base) 28%, white);
+    --palette-h120-1-ink: oklch(from var(--palette-h120-1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h120-2-ink: oklch(from var(--palette-h120-2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h120-3-ink: oklch(from var(--palette-h120-3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h120-4-ink: oklch(from var(--palette-h120-4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h120-5-ink: oklch(from var(--palette-h120-5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h180-base: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 180));
+    --palette-h180-1: color-mix(in oklab, var(--palette-h180-base) 45%, black);
+    --palette-h180-2: color-mix(in oklab, var(--palette-h180-base) 72%, black);
+    --palette-h180-3: var(--palette-h180-base);
+    --palette-h180-4: color-mix(in oklab, var(--palette-h180-base) 62%, white);
+    --palette-h180-5: color-mix(in oklab, var(--palette-h180-base) 28%, white);
+    --palette-h180-1-ink: oklch(from var(--palette-h180-1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h180-2-ink: oklch(from var(--palette-h180-2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h180-3-ink: oklch(from var(--palette-h180-3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h180-4-ink: oklch(from var(--palette-h180-4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h180-5-ink: oklch(from var(--palette-h180-5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h240-base: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 240));
+    --palette-h240-1: color-mix(in oklab, var(--palette-h240-base) 45%, black);
+    --palette-h240-2: color-mix(in oklab, var(--palette-h240-base) 72%, black);
+    --palette-h240-3: var(--palette-h240-base);
+    --palette-h240-4: color-mix(in oklab, var(--palette-h240-base) 62%, white);
+    --palette-h240-5: color-mix(in oklab, var(--palette-h240-base) 28%, white);
+    --palette-h240-1-ink: oklch(from var(--palette-h240-1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h240-2-ink: oklch(from var(--palette-h240-2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h240-3-ink: oklch(from var(--palette-h240-3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h240-4-ink: oklch(from var(--palette-h240-4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h240-5-ink: oklch(from var(--palette-h240-5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h300-base: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 300));
+    --palette-h300-1: color-mix(in oklab, var(--palette-h300-base) 45%, black);
+    --palette-h300-2: color-mix(in oklab, var(--palette-h300-base) 72%, black);
+    --palette-h300-3: var(--palette-h300-base);
+    --palette-h300-4: color-mix(in oklab, var(--palette-h300-base) 62%, white);
+    --palette-h300-5: color-mix(in oklab, var(--palette-h300-base) 28%, white);
+    --palette-h300-1-ink: oklch(from var(--palette-h300-1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h300-2-ink: oklch(from var(--palette-h300-2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h300-3-ink: oklch(from var(--palette-h300-3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h300-4-ink: oklch(from var(--palette-h300-4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-h300-5-ink: oklch(from var(--palette-h300-5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+}
+
+/* Compatibilité */
+:root,
+[data-theme] {
+    /* Anciens jetons toujours acceptés (non proposés dans le sélecteur) */
     --palette-1: var(--accent);
     --palette-1-ink: var(--accent-contrast, #ffffff);
     --palette-2: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 30));
+    --palette-2-ink: oklch(from var(--palette-2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-3: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 60));
+    --palette-3-ink: oklch(from var(--palette-3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-4: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 90));
+    --palette-4-ink: oklch(from var(--palette-4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-5: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 120));
+    --palette-5-ink: oklch(from var(--palette-5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-6: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 150));
+    --palette-6-ink: oklch(from var(--palette-6) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-7: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 180));
+    --palette-7-ink: oklch(from var(--palette-7) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-8: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 210));
+    --palette-8-ink: oklch(from var(--palette-8) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-9: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 240));
+    --palette-9-ink: oklch(from var(--palette-9) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-10: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 270));
+    --palette-10-ink: oklch(from var(--palette-10) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-11: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 300));
+    --palette-11-ink: oklch(from var(--palette-11) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-12: oklch(from var(--accent) clamp(var(--palette-l-min), l, var(--palette-l-max)) clamp(var(--palette-c-min), c, var(--palette-c-max)) calc(h + 330));
-    --palette-2-ink: oklch(from var(--palette-2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-3-ink: oklch(from var(--palette-3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-4-ink: oklch(from var(--palette-4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-5-ink: oklch(from var(--palette-5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-6-ink: oklch(from var(--palette-6) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-7-ink: oklch(from var(--palette-7) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-8-ink: oklch(from var(--palette-8) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-9-ink: oklch(from var(--palette-9) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-10-ink: oklch(from var(--palette-10) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-11-ink: oklch(from var(--palette-11) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-    --palette-12-ink: oklch(from var(--palette-12) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 260);
-}
-
-/* Neutres : mélange texte / fond du thème (gris qui s'adaptent au clair et au sombre),
-   de n1 (discret) à n5 (marqué). Légère teinte de l'accent. */
-:root,
-[data-theme] {
-    --palette-n1: color-mix(in oklab, var(--text) 35%, var(--bg));
-    --palette-n2: color-mix(in oklab, var(--text) 50%, var(--bg));
-    --palette-n3: color-mix(in oklab, var(--text) 62%, var(--bg));
-    --palette-n4: color-mix(in oklab, var(--text) 76%, var(--bg));
-    --palette-n5: color-mix(in oklab, var(--text) 90%, var(--bg));
-    --palette-n1-ink: oklch(from var(--palette-n1) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) 0 0);
-    --palette-n2-ink: oklch(from var(--palette-n2) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) 0 0);
-    --palette-n3-ink: oklch(from var(--palette-n3) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) 0 0);
-    --palette-n4-ink: oklch(from var(--palette-n4) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) 0 0);
-    --palette-n5-ink: oklch(from var(--palette-n5) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) 0 0);
-}
-
-/* Couleurs DÉJÀ DÉFINIES par le thème, proposées comme choix d'entité.
-   Vives : info / succès / alerte / danger (avec leur « on-* » existant pour le texte).
-   Neutres : texte / texte secondaire / texte discret / bordure marquée.
-   Elles suivent le thème telles que le thème les définit (aucune valeur ici). */
-:root,
-[data-theme] {
+    --palette-12-ink: oklch(from var(--palette-12) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
     --palette-info: var(--info);
     --palette-info-ink: var(--on-info, #ffffff);
     --palette-ok: var(--success);
     --palette-ok-ink: var(--on-success, #ffffff);
     --palette-warn: var(--warning);
-    --palette-warn-ink: var(--on-warning, #2b1d02);
+    --palette-warn-ink: var(--on-warning, #ffffff);
     --palette-danger: var(--danger);
     --palette-danger-ink: var(--on-danger, #ffffff);
-
     --palette-text: var(--text);
-    --palette-soft: var(--text-soft);
-    --palette-muted: var(--text-muted);
-    --palette-line: var(--border-strong);
     --palette-text-ink: var(--surface);
-    --palette-soft-ink: oklch(from var(--text-soft) clamp(.2, calc((var(--palette-ink-cut) - l) * 100), 1) 0 0);
-    --palette-muted-ink: oklch(from var(--text-muted) clamp(.2, calc((var(--palette-ink-cut) - l) * 100), 1) 0 0);
-    --palette-line-ink: oklch(from var(--border-strong) clamp(.2, calc((var(--palette-ink-cut) - l) * 100), 1) 0 0);
+    --palette-soft: var(--text-soft);
+    --palette-soft-ink: oklch(from var(--palette-soft) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-muted: var(--text-muted);
+    --palette-muted-ink: oklch(from var(--palette-muted) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
+    --palette-line: var(--border-strong);
+    --palette-line-ink: oklch(from var(--palette-line) clamp(.28, calc((var(--palette-ink-cut) - l) * 100), 1) .015 h);
 }
 
-/* Navigateurs sans « couleurs relatives » CSS : palette fixe de secours (non liée au thème). */
+/* Navigateurs sans « couleurs relatives » CSS : seules les encres (texte posé dessus) et les teintes calculées sont simplifiées. */
 @supports not (color: oklch(from red l c h)) {
     :root,
     [data-theme] {
-        --palette-2: #e8a317;
-        --palette-2-ink: #ffffff;
-        --palette-3: #8cb21a;
-        --palette-3-ink: #ffffff;
-        --palette-4: #2fa84f;
-        --palette-4-ink: #ffffff;
-        --palette-5: #14a38b;
-        --palette-5-ink: #ffffff;
-        --palette-6: #1a9fc4;
-        --palette-6-ink: #ffffff;
-        --palette-7: #3b82f6;
-        --palette-7-ink: #ffffff;
-        --palette-8: #6366f1;
-        --palette-8-ink: #ffffff;
-        --palette-9: #a855f7;
-        --palette-9-ink: #ffffff;
-        --palette-10: #d946ef;
-        --palette-10-ink: #ffffff;
-        --palette-11: #ec4899;
-        --palette-11-ink: #ffffff;
-        --palette-12: #ef4444;
-        --palette-12-ink: #ffffff;
-        --palette-soft-ink: #ffffff;
-        --palette-muted-ink: #ffffff;
-        --palette-line-ink: var(--text);
-        --palette-n1-ink: var(--text);
-        --palette-n2-ink: var(--text);
-        --palette-n3-ink: var(--text);
-        --palette-n4-ink: var(--bg);
-        --palette-n5-ink: var(--bg);
+        --palette-a1-ink: #ffffff;
+        --palette-a2-ink: #ffffff;
+        --palette-a3-ink: var(--accent-contrast, #fff);
+        --palette-a4-ink: var(--text);
+        --palette-a5-ink: var(--text);
+        --palette-i1-ink: #ffffff;
+        --palette-i2-ink: #ffffff;
+        --palette-i3-ink: #ffffff;
+        --palette-i4-ink: var(--text);
+        --palette-i5-ink: var(--text);
+        --palette-s1-ink: #ffffff;
+        --palette-s2-ink: #ffffff;
+        --palette-s3-ink: #ffffff;
+        --palette-s4-ink: var(--text);
+        --palette-s5-ink: var(--text);
+        --palette-w1-ink: #ffffff;
+        --palette-w2-ink: #ffffff;
+        --palette-w3-ink: #ffffff;
+        --palette-w4-ink: var(--text);
+        --palette-w5-ink: var(--text);
+        --palette-d1-ink: #ffffff;
+        --palette-d2-ink: #ffffff;
+        --palette-d3-ink: #ffffff;
+        --palette-d4-ink: var(--text);
+        --palette-d5-ink: var(--text);
+        --palette-n1-ink: #ffffff;
+        --palette-n2-ink: #ffffff;
+        --palette-n3-ink: #ffffff;
+        --palette-n4-ink: var(--text);
+        --palette-n5-ink: var(--text);
+        --palette-h60-base: var(--accent);
+        --palette-h60-1-ink: #ffffff;
+        --palette-h60-2-ink: #ffffff;
+        --palette-h60-3-ink: #ffffff;
+        --palette-h60-4-ink: var(--text);
+        --palette-h60-5-ink: var(--text);
+        --palette-h120-base: var(--accent);
+        --palette-h120-1-ink: #ffffff;
+        --palette-h120-2-ink: #ffffff;
+        --palette-h120-3-ink: #ffffff;
+        --palette-h120-4-ink: var(--text);
+        --palette-h120-5-ink: var(--text);
+        --palette-h180-base: var(--accent);
+        --palette-h180-1-ink: #ffffff;
+        --palette-h180-2-ink: #ffffff;
+        --palette-h180-3-ink: #ffffff;
+        --palette-h180-4-ink: var(--text);
+        --palette-h180-5-ink: var(--text);
+        --palette-h240-base: var(--accent);
+        --palette-h240-1-ink: #ffffff;
+        --palette-h240-2-ink: #ffffff;
+        --palette-h240-3-ink: #ffffff;
+        --palette-h240-4-ink: var(--text);
+        --palette-h240-5-ink: var(--text);
+        --palette-h300-base: var(--accent);
+        --palette-h300-1-ink: #ffffff;
+        --palette-h300-2-ink: #ffffff;
+        --palette-h300-3-ink: #ffffff;
+        --palette-h300-4-ink: var(--text);
+        --palette-h300-5-ink: var(--text);
     }
 }
 
 /* =========================================================
    SÉLECTEUR DE COULEUR (templates/layout/modern/components/_color_picker.html.twig)
    ========================================================= */
-.color-picker { display: grid; gap: .5rem; }
+.color-picker { display: grid; gap: .75rem; }
 .color-picker input[type="hidden"] { display: none; }
-.color-picker-swatches { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+
+.color-picker-top { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.color-picker-group-title {
+    margin: 0 0 .35rem;
+    font-size: .6875rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.color-picker-families {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+    gap: .5rem .75rem;
+}
+.color-family { display: grid; gap: .2rem; min-inline-size: 0; }
+.color-family-label { font-size: .75rem; color: var(--text-soft); }
+.color-family-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-radius: .5rem;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px var(--border-strong, var(--border));
+}
+.color-family-strip .color-swatch {
+    inline-size: auto;
+    block-size: 1.75rem;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+.color-family-strip .color-swatch:hover { transform: none; filter: brightness(1.08); }
+.color-family-strip .color-swatch.is-selected {
+    transform: none;
+    box-shadow: inset 0 0 0 2px var(--surface), inset 0 0 0 4px var(--text);
+}
+.color-family-scale { display: flex; justify-content: space-between; font-size: .625rem; color: var(--text-muted); }
 
 .color-swatch {
     position: relative;
@@ -151,12 +322,10 @@
     transition: transform .12s ease, box-shadow .12s ease;
 }
 .color-swatch:hover { transform: scale(1.12); }
-.color-swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.color-swatch.is-selected {
-    box-shadow: 0 0 0 2px var(--text);
-    transform: scale(1.08);
-}
-/* « Par défaut » : pastille accent avec une petite coche de repère */
+.color-swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; z-index: 1; }
+.color-swatch.is-selected { box-shadow: 0 0 0 2px var(--text); transform: scale(1.08); }
+
+/* « Par défaut » : pastille accent avec un petit point de repère */
 .color-swatch.is-default::after {
     content: "";
     position: absolute;
@@ -171,8 +340,7 @@
 /* « Libre » : roue de couleurs tant qu'aucune couleur libre n'est choisie */
 .color-swatch.is-custom {
     overflow: hidden;
-    background:
-        conic-gradient(from 0deg, #f43f5e, #f59e0b, #84cc16, #06b6d4, #6366f1, #d946ef, #f43f5e);
+    background: conic-gradient(from 0deg, #f43f5e, #f59e0b, #84cc16, #06b6d4, #6366f1, #d946ef, #f43f5e);
 }
 .color-swatch.is-custom.is-selected { background: var(--sw); }
 .color-swatch.is-custom input[type="color"] {
@@ -183,5 +351,6 @@
     opacity: 0;
     cursor: pointer;
 }
-.color-picker-sep { inline-size: 1px; block-size: 1.25rem; background: var(--border-strong, var(--border)); margin-inline: .15rem; }
+.color-picker-option { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; color: var(--text-soft); }
+.color-picker-scale { margin: 0; font-size: .6875rem; color: var(--text-muted); }
 .color-picker-hint { margin: 0; font-size: .75rem; color: var(--text-muted); }

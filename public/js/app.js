@@ -701,7 +701,7 @@ const App = {
     /* =========================================================
      * COULEURS D'ENTITÉ — valeurs liées au thème
      *   ''        → accent du thème
-     *   '@N'      → emplacement N de la palette du thème (var(--palette-N))
+     *   '@a3'/'@h60-2' → nuance d'une famille du thème (var(--palette-a3)) ; anciens '@N' acceptés
      *   '#rrggbb' → couleur libre (figée)
      * colors.resolve(raw) → {color, text} prêts pour --entity-color / --entity-text
      * ========================================================= */
@@ -709,7 +709,7 @@ const App = {
     colors: {
         resolve(raw) {
             const value = (raw || '').trim();
-            const slot = /^@(\d{1,2}|n[1-5]|info|ok|warn|danger|text|soft|muted|line)$/.exec(value);
+            const slot = /^@(\d{1,2}|[aisdwn][1-5]|h(?:60|120|180|240|300)-[1-5]|info|ok|warn|danger|text|soft|muted|line)$/.exec(value);
 
             if (slot) {
                 return {color: `var(--palette-${slot[1]})`, text: `var(--palette-${slot[1]}-ink)`};
@@ -761,7 +761,7 @@ const App = {
 
                 const refresh = () => {
                     const value = input.value || '';
-                    const kind = /^@[a-z0-9]+$/.test(value) ? 'slot' : (/^#[0-9a-f]{6}$/i.test(value) ? 'custom' : 'default');
+                    const kind = /^@[a-z0-9-]+$/.test(value) ? 'slot' : (/^#[0-9a-f]{6}$/i.test(value) ? 'custom' : 'default');
 
                     swatches.forEach(swatch => {
                         const own = swatch.dataset.value;
