@@ -103,7 +103,7 @@
         {% else %}
             {# ---------- COMPOSITION ---------- #}
             <form method="post" action="{{ path('app_releve_save', { id: portefeuille.id }) }}"
-                  class="rc" data-releve-composer data-rc-cumul-before="{{ cumulBefore }}" {{ isNew ? 'data-rc-new' : '' }}>
+                  class="rc" data-releve-composer data-rc-ptf="{{ portefeuille.id }}" data-rc-cumul-before="{{ cumulBefore }}" {{ isNew ? 'data-rc-new' : '' }}>
                 <input type="hidden" name="_token" value="{{ csrf_token(token) }}">
                 <input type="hidden" name="releve" value="{{ releve.id }}">
 
@@ -161,7 +161,13 @@
                                 <button type="button" class="rc-btn" data-rc-sort="desc" title="Du plus récent au plus ancien">↓</button>
                             </div>
                         </header>
-                        <p class="rc-help">Cliquez sur ＋ dans l'ordre d'apparition sur le relevé de compte, ou glissez-déposez. <strong>⤓</strong> place les prochaines lignes après une ligne donnée. Une commande éclatée en plusieurs catégories se pointe en <strong>un seul détail</strong> : cochez ses opérations (même date, tiers libres) puis « Ajouter en un détail ».</p>
+                        <p class="rc-help">Cliquez sur ＋ dans l'ordre d'apparition sur le relevé de compte, ou glissez-déposez. <strong>⤓</strong> place les prochaines lignes après une ligne donnée. Une commande éclatée en plusieurs catégories se pointe en <strong>un seul détail</strong> : cochez ses opérations (même date, tiers libres) puis « Ajouter en un détail ».<br><strong>✓</strong> = ligne vérifiée sur ton relevé de compte : automatique quand tu ajoutes ou déplaces une ligne, manuel sinon (<strong>✓↑</strong> : pointer tout jusqu'ici). Ce suivi n'est pas enregistré en base : il est gardé dans ce navigateur.</p>
+                        <div class="rc-progress" data-rc-progress-box hidden>
+                            <span class="rc-progress-text" data-rc-progress-text></span>
+                            <span class="rc-bar" aria-hidden="true"><i data-rc-progress-bar></i></span>
+                            <button type="button" class="rc-linkbtn" data-rc-done-all></button>
+                            <button type="button" class="rc-linkbtn" data-rc-hide-done aria-pressed="false">Masquer les pointées</button>
+                        </div>
                         <p class="rc-msg" data-rc-msg role="status" hidden></p>
                         <ol class="rc-list is-selected" data-rc-list>
                             {% for line in lines %}

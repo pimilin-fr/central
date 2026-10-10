@@ -117,10 +117,11 @@
 }
 .rc-line[data-parts]:not([data-parts="1"]) { border-inline-start: 3px solid var(--accent); }
 .rc-line-head {
+    column-gap: 7px;
     display: grid;
-    grid-template-columns: auto auto 1.6rem auto minmax(0, 1fr) auto auto auto auto;
+    grid-template-columns: auto auto 1.6rem auto auto minmax(0, 1fr) auto auto auto auto;
     align-items: center;
-    gap: 4px 10px;
+    gap: 4px 7px;
     padding: 7px 8px;
 }
 .rc-line.is-readonly .rc-line-head { grid-template-columns: 1.6rem auto minmax(0, 1fr) auto auto auto; }
@@ -279,3 +280,33 @@ button.rc-chip:hover { color: var(--accent); border-color: var(--accent); }
 .rc-newop-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; }
 .rc-check { display: inline-flex; align-items: center; gap: 6px; color: var(--text-soft); font-size: 12px; }
 .rc-newop-actions { display: inline-flex; gap: 8px; }
+
+/* ---- Pointage : lignes vérifiées sur le relevé de compte (jamais stocké en base) ---- */
+.rc-done {
+    inline-size: 22px;
+    block-size: 22px;
+    padding: 0;
+    color: transparent;
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong, var(--border));
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+}
+.rc-done:hover { color: var(--success); border-color: var(--success); }
+.rc-done.is-on { color: #fff; background: var(--success); border-color: var(--success); }
+.rc-line.is-done { border-inline-start: 3px solid var(--success); background: color-mix(in srgb, var(--success) 5%, var(--surface-soft)); }
+.rc-line.is-done[data-parts]:not([data-parts="1"]) { border-inline-start-color: var(--success); }
+.rc-line:not(.is-done) .rc-rank { color: var(--text-muted); }
+
+.rc-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--text-soft); }
+.rc-progress-text { font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+.rc-bar { flex: 1 1 6rem; min-inline-size: 5rem; max-inline-size: 14rem; block-size: 6px; background: var(--surface-hover, var(--border)); border-radius: 999px; overflow: hidden; }
+.rc-bar > i { display: block; block-size: 100%; inline-size: 0; background: var(--success); border-radius: inherit; transition: inline-size 200ms ease; }
+.rc-progress.is-complete .rc-progress-text { color: var(--success); }
+.rc-linkbtn { padding: 0; color: var(--accent); background: none; border: 0; font: inherit; font-weight: 750; cursor: pointer; }
+.rc-linkbtn:hover { text-decoration: underline; }
+.rc-linkbtn[aria-pressed="true"] { color: var(--text); text-decoration: underline; }
+.is-hide-done > .rc-line.is-done { display: none; }

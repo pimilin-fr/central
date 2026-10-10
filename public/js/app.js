@@ -558,6 +558,7 @@ const App = {
             let dirty = false;
             let drag = null;     // {part, line} en cours de glissement
             let msgTimer = null;
+            let hideDone = false; // masquer les lignes déjà pointées
 
             const esc = text => String(text ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
             const signed = value => (value < 0 ? '− ' : '+ ') + money.format(Math.abs(value)) + ' €';
@@ -589,11 +590,34 @@ const App = {
             const sameGroup = parts => parts.length > 0 && parts.every(part => part.dataset.date === parts[0].dataset.date);
             const NOT_SAME = 'Un détail regroupe des opérations de la MÊME date.';
 
-            const newLine = parts => {
+            /* « pointé » = ligne vérifiée sur le relevé de compte. Jamais envoyé au serveur : gardé dans ce navigateur. */
+            const doneKey = 'central-releve-pointe:' + (root.dataset.rcPtf || '0');
+            const loadDone = () => {
+                try {
+                    return new Set(JSON.parse(window.localStorage.getItem(doneKey) || '[]').map(String));
+                } catch (error) {
+                    return new Set();
+                }
+            };
+            const saveDone = () => {
+                try {
+                    const set = loadDone();
+                    lines().forEach(line => partsOf(line).forEach(p => (line.dataset.done === '1' ? set.add(p.dataset.id) : set.delete(p.dataset.id))));
+                    poolRows().forEach(row => set.delete(row.dataset.id));
+                    window.localStorage.setItem(doneKey, JSON.stringify([...set]));
+                } catch (error) {
+                    /* stockage indisponible : le pointage reste valable le temps de la page */
+                }
+            };
+            const isDone = line => line.dataset.done === '1';
+            const setDone = (line, value = true) => { line.dataset.done = value ? '1' : '0'; };
+
+            const newLine = (parts, done = true) => {
                 const line = document.createElement('li');
                 line.className = 'rc-line';
                 line.setAttribute('data-rc-line', '');
                 line.draggable = true;
+                setDone(line, done); // une ligne placée à la main est considérée pointée
                 line.innerHTML = '<div class="rc-line-head" data-rc-head></div><ul class="rc-parts" data-rc-parts></ul>';
                 const ul = line.querySelector('[data-rc-parts]');
                 parts.forEach(part => {
@@ -639,9 +663,9 @@ const App = {
                 }
             };
 
-            const addParts = (parts, before) => {
+            const addParts = (parts, before, done = true) => {
                 parts.sort((a, b) => (sortKey(a) < sortKey(b) ? -1 : 1));
-                insertLine(newLine(parts), before);
+                insertLine(newLine(parts, done), before);
             };
 
             const renderHead = (line, index, running) => {
@@ -660,12 +684,14 @@ const App = {
                         '<label class="rc-pick" title="Cocher pour regrouper des lignes en un détail"><input type="checkbox" data-rc-check-line' + (keepChecked ? ' checked' : '') + '></label>' +
                         '<span class="rc-grip" aria-hidden="true">⋮⋮</span>' +
                         '<span class="rc-rank">' + (index + 1) + '</span>' +
+                        '<button type="button" class="rc-done' + (isDone(line) ? ' is-on' : '') + '" data-rc-done aria-pressed="' + (isDone(line) ? 'true' : 'false') + '" title="' + (isDone(line) ? 'Pointée : cliquer pour dépointer' : 'À pointer : cliquer quand la ligne est vérifiée sur le relevé de compte') + '">✓</button>' +
                         '<span class="rc-date">' + esc(first.dataset.dateFr) + '</span>' +
                         '<span class="rc-main"><strong>' + esc(tiersNames.join(' + ')) + '</strong><small>' + esc(categories) + '</small></span>' +
                         (parts.length > 1 ? '<span class="rc-chip is-detail" title="Plusieurs opérations pointées ensemble">Détail × ' + parts.length + '</span>' : '<span></span>') +
                         '<span class="rc-amount ' + (total < 0 ? 'amount-expense' : 'amount-income') + '">' + signed(total) + '</span>' +
                         '<span class="rc-balance" title="Solde cumulé après cette ligne">' + money.format(running) + ' €</span>' +
                         '<span class="rc-tools">' +
+                        '<button type="button" class="rc-btn" data-rc-upto title="Pointer toutes les lignes jusqu\'ici (là où j\'en suis)" aria-label="Pointer jusqu\'ici">✓↑</button>' +
                         '<button type="button" class="rc-btn' + (line === cursor ? ' is-on' : '') + '" data-rc-here title="Insérer les prochaines lignes juste après celle-ci" aria-label="Insérer après cette ligne">⤓</button>' +
                         '<button type="button" class="rc-btn" data-rc-up title="Monter" aria-label="Monter">▲</button>' +
                         '<button type="button" class="rc-btn" data-rc-down title="Descendre" aria-label="Descendre">▼</button>' +
@@ -687,6 +713,7 @@ const App = {
                     running += partsOf(line).reduce((sum, part) => sum + (parseFloat(part.dataset.amount) || 0), 0);
                     renderHead(line, index, running);
                     line.classList.toggle('is-cursor', line === cursor);
+                    line.classList.toggle('is-done', isDone(line));
                     partsOf(line).forEach(part => {
                         part.querySelector('[data-rc-input]').name = 'lines[' + index + '][]';
                         opsCount++;
@@ -721,6 +748,28 @@ const App = {
                     btn.toggleAttribute('disabled', isNew && all.length === 0);
                 });
                 root.querySelector('[data-rc-finalize]').toggleAttribute('disabled', all.length === 0);
+
+                // avancement du pointage
+                const doneCount = all.filter(isDone).length;
+                const pending = all.length - doneCount;
+                const box = root.querySelector('[data-rc-progress-box]');
+                if (box) {
+                    box.hidden = all.length === 0;
+                    box.querySelector('[data-rc-progress-text]').textContent = 'Pointé : ' + doneCount + ' / ' + all.length;
+                    box.querySelector('[data-rc-progress-bar]').style.width = (all.length ? Math.round(100 * doneCount / all.length) : 0) + '%';
+                    box.querySelector('[data-rc-done-all]').textContent = pending === 0 ? 'Tout dépointer' : 'Tout pointer';
+                    box.classList.toggle('is-complete', all.length > 0 && pending === 0);
+                    list.classList.toggle('is-hide-done', hideDone);
+                    box.querySelector('[data-rc-hide-done]').setAttribute('aria-pressed', hideDone ? 'true' : 'false');
+                }
+                const finalizeBtn = root.querySelector('[data-rc-finalize]');
+                if (!finalizeBtn.dataset.confirmBase) {
+                    finalizeBtn.dataset.confirmBase = finalizeBtn.dataset.confirm || '';
+                }
+                finalizeBtn.dataset.confirm = (pending > 0
+                        ? pending + ' ligne' + (pending > 1 ? 's ne sont pas pointées' : ' n\'est pas pointée') + ' (vérifiées sur le relevé de compte). Finaliser quand même ?\n\n'
+                        : '') + finalizeBtn.dataset.confirmBase;
+                saveDone();
             };
 
             const changed = () => {
@@ -836,6 +885,29 @@ const App = {
                 const part = target.closest('[data-rc-op]');
                 const line = target.closest('[data-rc-line]');
 
+                if (target.closest('[data-rc-done-all]')) {
+                    const all = lines();
+                    const value = !all.every(isDone);
+                    all.forEach(l => setDone(l, value));
+                    return refresh();
+                }
+
+                if (target.closest('[data-rc-hide-done]')) {
+                    hideDone = !hideDone;
+                    return refresh();
+                }
+
+                if (target.closest('[data-rc-done]') && line) {
+                    setDone(line, !isDone(line));
+                    return refresh();
+                }
+
+                if (target.closest('[data-rc-upto]') && line) {
+                    const all = lines();
+                    all.slice(0, all.indexOf(line) + 1).forEach(l => setDone(l, true));
+                    return refresh();
+                }
+
                 if (target.closest('[data-rc-add]') && part) {
                     addParts([part]);
                     return changed();
@@ -861,7 +933,7 @@ const App = {
                 }
 
                 if (target.closest('[data-rc-add-all]')) {
-                    poolRows().filter(row => !row.hidden).forEach(row => addParts([row]));
+                    poolRows().filter(row => !row.hidden).forEach(row => addParts([row], undefined, false)); // ajout en bloc : à vérifier
                     return changed();
                 }
 
@@ -879,6 +951,7 @@ const App = {
                     parts.filter(p => !ul.contains(p)).forEach(p => ul.append(p));
                     picked.slice(1).forEach(dropLine);
                     keep.querySelector('[data-rc-check-line]').checked = false;
+                    setDone(keep, true);
                     return changed();
                 }
 
@@ -913,6 +986,7 @@ const App = {
                     const prev = line.previousElementSibling;
                     if (prev) {
                         list.insertBefore(line, prev);
+                        setDone(line, true); // déplacée à la main : pointée
                     }
                     return changed();
                 }
@@ -920,6 +994,7 @@ const App = {
                     const next = line.nextElementSibling;
                     if (next) {
                         list.insertBefore(next, line);
+                        setDone(line, true);
                     }
                     return changed();
                 }
@@ -928,6 +1003,7 @@ const App = {
                     return refresh();
                 }
                 if (target.closest('[data-rc-split]')) {
+                    setDone(line, true);
                     const parts = partsOf(line);
                     let after = line;
                     parts.slice(1).forEach(p => {
@@ -974,7 +1050,7 @@ const App = {
                 const line = event.target.closest('[data-rc-line]');
                 const part = event.target.closest('[data-rc-op]');
                 if (line && event.target === line) {
-                    drag = {part: null, line};
+                    drag = {part: null, line, from: lines().indexOf(line)};
                     line.classList.add('is-dragging');
                 } else if (part && pool.contains(part)) {
                     drag = {part, line: null};
@@ -992,6 +1068,10 @@ const App = {
                 }
                 drag.part?.classList.remove('is-dragging');
                 drag.line?.classList.remove('is-dragging');
+                // ligne déplacée (ou venue de « À pointer ») : pointée automatiquement
+                if (drag.line && drag.line.parentElement === list && (drag.from === undefined || lines().indexOf(drag.line) !== drag.from)) {
+                    setDone(drag.line, true);
+                }
                 drag = null;
                 changed();
             });
@@ -1040,6 +1120,9 @@ const App = {
                     event.preventDefault();
                     return;
                 }
+                if (submitter && submitter.hasAttribute('data-rc-finalize')) {
+                    lines().forEach(l => setDone(l, false)); // relevé finalisé : on oublie le pointage
+                }
                 refresh();
                 dirty = false;
             });
@@ -1051,8 +1134,12 @@ const App = {
                 }
             });
 
+            const savedDone = loadDone();
             lines().forEach(line => {
                 line.draggable = true;
+                // lignes déjà en base : pointées seulement si on les avait pointées dans ce navigateur
+                const parts = partsOf(line);
+                setDone(line, parts.length > 0 && parts.every(p => savedDone.has(String(p.dataset.id))));
             });
             refresh();
         }
