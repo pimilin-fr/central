@@ -70,9 +70,11 @@ class PrevisionDetector {
                 ->getQuery()
                 ->getResult();
 
-        $couvertes = [];
-        foreach ($this->em->getRepository(PrevisionRegle::class)->findBy(['actif' => true]) as $regle) {
-            $couvertes[$this->key($regle->getTiers()?->getId(), $regle->getCategorie()?->getId(), $regle->getPortefeuille()?->getId())] = true;
+        /** @var list<PrevisionRegle> $regles */
+        $regles = $this->em->getRepository(PrevisionRegle::class)->findBy(['actif' => true]);
+        $avecRegle = []; // groupes (tiers|catégorie|portefeuille) déjà touchés par au moins une règle
+        foreach ($regles as $regle) {
+            $avecRegle[$this->key($regle->getTiers()?->getId(), $regle->getCategorie()?->getId(), $regle->getPortefeuille()?->getId())] = true;
         }
 
         $strict = [];
@@ -90,29 +92,27 @@ class PrevisionDetector {
 
         // passe 1 + 2
         foreach ($strict as $key => $list) {
-            if (isset($couvertes[$key])) {
-                continue;
-            }
             $r = self::evaluer($this->points($list), $today);
             if (!isset($r['raison'])) {
-                $out[] = $this->suggestion($r, $list);
                 $tiersTrouves[$this->key($list[0]->getTiers()->getId(), '*', $list[0]->getPortefeuille()?->getId())] = true;
+                if (!$this->couverte($r, $list[0], $regles, false)) {
+                    $out[] = $this->suggestion($r, $list);
+                }
                 continue;
             }
             $trouve = false;
-            if (!empty($r['frequent'])) { // plusieurs flux mélangés : on sépare par montant
-                foreach ($this->flux($list) as $sub) {
-                    $rs = self::evaluer($this->points($sub), $today);
-                    if (!isset($rs['raison'])) {
-                        $rs['resume'] = 'flux d\'environ ' . number_format($rs['montant'], 2, ',', ' ') . ' € — ' . $rs['resume'];
+            if (!empty($r['frequent'])) { // plusieurs flux mélangés (électricité + gaz, internet + mobile…) : on les sépare
+                foreach ($this->fluxValides($list, $today) as [$sub, $rs]) {
+                    $trouve = true;
+                    if (!$this->couverte($rs, $list[0], $regles, false)) {
+                        $rs['resume'] = 'flux vers le ' . $rs['jour'] . ', env. ' . number_format($rs['montant'], 2, ',', ' ') . ' € — ' . $rs['resume'];
                         $out[] = $this->suggestion($rs, $sub);
-                        $trouve = true;
                     }
                 }
             }
             if ($trouve) {
                 $tiersTrouves[$this->key($list[0]->getTiers()->getId(), '*', $list[0]->getPortefeuille()?->getId())] = true;
-            } elseif (count($list) >= 2) {
+            } elseif (count($list) >= 2 && !isset($avecRegle[$key])) {
                 $rejets[$key] = ['list' => $list, 'raison' => $r['raison']];
             }
         }
@@ -124,10 +124,7 @@ class PrevisionDetector {
             }
             $r = self::evaluer($this->points($list), $today);
             if (!isset($r['raison'])) {
-                $already = false;
-                foreach (array_unique(array_map(static fn (Depenses $d) => $d->getCategorie()->getId(), $list)) as $cid) {
-                    $already = $already || isset($couvertes[$this->key($list[0]->getTiers()->getId(), $cid, $list[0]->getPortefeuille()?->getId())]);
-                }
+                $already = $this->couverte($r, $list[0], $regles, true);
                 if (!$already) {
                     $r['resume'] .= ' (catégories variables : ' . count(array_unique(array_map(static fn (Depenses $d) => $d->getCategorie()->getId(), $list))) . ')';
                     $out[] = $this->suggestion($r, $list);
@@ -183,12 +180,68 @@ class PrevisionDetector {
     }
 
     /**
-     * Sépare plusieurs flux d'un même tiers (ex. internet 30 € + mobile 15 €) par montants voisins (±12 %).
+     * Sépare plusieurs flux d'un même tiers et ne garde que ceux qui forment une vraie récurrence.
+     * Stratégie A : par jour du mois (électricité le 3, gaz le 17) ; stratégie B : par montants voisins (±12 %)
+     * quand les flux tombent le même jour (internet 30 € et mobile 15 € le 5).
      *
      * @param list<Depenses> $list
-     * @return list<list<Depenses>>
+     * @return list<array{0: list<Depenses>, 1: array<string, mixed>}>
      */
-    private function flux(array $list): array {
+    private function fluxValides(array $list, DateTimeImmutable $today): array {
+        $essai = function (array $clusters) use ($today): array {
+            $ok = [];
+            foreach ($clusters as $sub) {
+                if (count($sub) < 3) {
+                    continue;
+                }
+                usort($sub, static fn (Depenses $a, Depenses $b): int => $a->getDate() <=> $b->getDate());
+                $r = self::evaluer($this->points($sub), $today);
+                if (!isset($r['raison'])) {
+                    $ok[] = [$sub, $r];
+                }
+            }
+
+            return $ok;
+        };
+
+        $a = $essai($this->clustersParJour($list));
+        if (count($a) >= 2) {
+            return $a;
+        }
+        $b = $essai($this->clustersParMontant($list));
+
+        return count($b) >= max(1, count($a)) ? $b : $a;
+    }
+
+    /** @param list<Depenses> $list @return list<list<Depenses>> */
+    private function clustersParJour(array $list): array {
+        $sorted = $list;
+        usort($sorted, static fn (Depenses $a, Depenses $b): int => (int) $a->getDate()->format('j') <=> (int) $b->getDate()->format('j'));
+        $clusters = [];
+        $prev = null;
+        foreach ($sorted as $d) {
+            $day = (int) $d->getDate()->format('j');
+            if ($prev === null || $day - $prev > 5) {
+                $clusters[] = [];
+            }
+            $clusters[array_key_last($clusters)][] = $d;
+            $prev = $day;
+        }
+        // fin / début de mois : le 30 et le 2 sont voisins
+        if (count($clusters) > 1) {
+            $lastDay = (int) end($clusters)[array_key_last(end($clusters))]->getDate()->format('j');
+            $firstDay = (int) $clusters[0][0]->getDate()->format('j');
+            if ($firstDay + 31 - $lastDay <= 5) {
+                $tail = array_pop($clusters);
+                $clusters[0] = array_merge($clusters[0], $tail);
+            }
+        }
+
+        return $clusters;
+    }
+
+    /** @param list<Depenses> $list @return list<list<Depenses>> */
+    private function clustersParMontant(array $list): array {
         $sorted = $list;
         usort($sorted, static fn (Depenses $a, Depenses $b): int => (float) $a->getMontant() <=> (float) $b->getMontant());
         $clusters = [];
@@ -208,15 +261,42 @@ class PrevisionDetector {
                 $clusters[] = [$d];
             }
         }
-        $out = [];
-        foreach ($clusters as $cluster) {
-            if (count($cluster) >= 3) {
-                usort($cluster, static fn (Depenses $a, Depenses $b): int => $a->getDate() <=> $b->getDate());
-                $out[] = $cluster;
+
+        return $clusters;
+    }
+
+    /**
+     * Cette récurrence est-elle déjà couverte par une règle ? Même tiers + portefeuille (+ catégorie), ET même flux :
+     * jour du mois voisin (±6) et montant voisin (±15 % d'une tranche) — sauf montants variables.
+     * C'est ce qui permet d'avoir plusieurs règles pour un même tiers (internet ET mobile).
+     *
+     * @param array<string, mixed> $analyse
+     * @param list<PrevisionRegle> $regles
+     */
+    private function couverte(array $analyse, Depenses $ref, array $regles, bool $toutesCategories): bool {
+        foreach ($regles as $regle) {
+            if ($regle->getTiers()?->getId() !== $ref->getTiers()->getId() || $regle->getPortefeuille()?->getId() !== $ref->getPortefeuille()?->getId()) {
+                continue;
+            }
+            if (!$toutesCategories && $regle->getCategorie()?->getId() !== $ref->getCategorie()->getId()) {
+                continue;
+            }
+            $ecart = abs($regle->getJour() - $analyse['jour']);
+            if (min($ecart, 31 - $ecart) > 6) {
+                continue;
+            }
+            if ($regle->isEstime() || $analyse['estime']) {
+                return true;
+            }
+            foreach ($regle->getTranches() as $tranche) {
+                $m = (float) $tranche->getMontant();
+                if ($m > 0 && abs($m - $analyse['montant']) / $m <= 0.15) {
+                    return true;
+                }
             }
         }
 
-        return $out;
+        return false;
     }
 
     /**

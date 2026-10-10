@@ -1,0 +1,34 @@
+/* Prévisions : règles récurrentes et échéances */
+.pv-hint { margin: .5rem 0 0; font-size: .85rem; color: var(--text-muted, #6b7280); }
+.pv-check { display: flex; align-items: center; gap: .5rem; }
+.pv-tranches { display: flex; flex-direction: column; gap: .75rem; margin: 1rem 0; }
+.pv-tranche { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: .75rem; align-items: end; }
+.pv-tranche > div[id] { display: contents; }
+.pv-remove { border: 0; background: transparent; cursor: pointer; font-size: 1.1rem; color: var(--text-muted, #6b7280); padding: .5rem; }
+.pv-remove:hover { color: var(--danger, #dc2626); }
+@media (max-width: 720px) { .pv-tranche { grid-template-columns: 1fr 1fr; } }
+
+.pv-month { margin-bottom: 1.5rem; }
+.pv-month-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.pv-month-head h3 { margin: 0; text-transform: capitalize; }
+.pv-month-sums { font-size: .9rem; color: var(--text-muted, #6b7280); }
+.pv-month-sums strong { color: var(--text); }
+
+.pv-badge { display: inline-block; padding: .1rem .55rem; border-radius: 999px; font-size: .75rem; font-weight: 600; border: 1px solid currentColor; }
+.pv-badge.is-certain { color: var(--success, #15803d); }
+.pv-badge.is-probable { color: var(--warning, #b45309); }
+.pv-badge.is-estime { color: var(--text-muted, #6b7280); border-style: dashed; }
+.pv-late { color: var(--danger, #dc2626); font-weight: 600; }
+.pv-range { font-size: .8rem; color: var(--text-muted, #6b7280); }
+
+.pv-actions { display: flex; gap: .5rem; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+.pv-actions details { position: relative; }
+.pv-actions summary { cursor: pointer; list-style: none; }
+.pv-actions summary::-webkit-details-marker { display: none; }
+.pv-pop { position: absolute; right: 0; z-index: 5; margin-top: .25rem; padding: .75rem; min-width: 17rem; background: var(--surface, #fff); border: 1px solid var(--border, #e5e7eb); border-radius: .5rem; box-shadow: 0 8px 24px rgba(0, 0, 0, .15); display: grid; gap: .5rem; text-align: left; }
+.pv-pop label { font-size: .8rem; }
+.pv-inline { display: inline; }
+.pv-link-btn { border: 0; background: none; padding: 0; cursor: pointer; color: var(--text-muted, #6b7280); text-decoration: underline; font-size: .85rem; }
+
+.pv-ptf-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.pv-ptf-head .pv-hint { margin: 0; }

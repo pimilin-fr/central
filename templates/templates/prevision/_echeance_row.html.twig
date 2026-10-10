@@ -1,0 +1,48 @@
+{#
+    Ligne d'une échéance prévue. Paramètres : e (PrevisionEcheance), late (bool), today (DateTime), back (chemin de retour, facultatif)
+#}
+{% set regle = e.regle %}
+{% set back = back|default('') %}
+{% set signed = e.montantSigne %}
+<tr class="ops-row">
+    <td class="px-4 py-2 {{ late ? 'pv-late' : '' }}">
+        {{ e.datePrevue|date('d/m') }}{% if e.dateFin %} – {{ e.dateFin|date('d/m') }}{% endif %}
+        {% if late %}<span title="Date dépassée, pas encore concrétisée"> · en retard</span>{% endif %}
+        {% if e.ajustee %}<span class="pv-range" title="Ajustée à la main"> ✎</span>{% endif %}
+    </td>
+    <td class="px-4 py-2">
+        <a class="ops-group-link" href="{{ path('app_prevision_edit', { id: regle.id }) }}">{{ regle.libelle }}</a>
+        <div class="pv-range">{{ regle.tiers.name }} · {{ regle.portefeuille.libelle }}</div>
+    </td>
+    <td class="px-4 py-2"><span class="pv-badge is-{{ e.certitude.value }}">{{ e.certitude.label }}</span></td>
+    <td class="px-4 py-2 text-right font-medium {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">
+        {{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €
+        {% if e.montantMin and e.montantMax %}<div class="pv-range">entre {{ e.montantMin|number_format(2, ',', ' ') }} et {{ e.montantMax|number_format(2, ',', ' ') }} €</div>{% endif %}
+    </td>
+    <td class="px-4 py-2">
+        <div class="pv-actions">
+            <details>
+                <summary class="page-action page-action-primary">Concrétiser</summary>
+                <form method="post" class="pv-pop" action="{{ path('app_prevision_concretiser', { id: e.id }) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
+                    <label>Date réelle<input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
+                    <label>Montant réel (€)<input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
+                    <button type="submit" class="page-action page-action-primary">Créer l'opération</button>
+                </form>
+            </details>
+            <details>
+                <summary class="pv-link-btn">Ajuster</summary>
+                <form method="post" class="pv-pop" action="{{ path('app_prevision_ajuster', { id: e.id }) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
+                    <label>Nouvelle date<input type="date" name="date" class="modern-form-control" required value="{{ e.datePrevue|date('Y-m-d') }}"></label>
+                    <label>Nouveau montant (€)<input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
+                    <button type="submit" class="page-action">Enregistrer</button>
+                </form>
+            </details>
+            <form method="post" class="pv-inline" action="{{ path('app_prevision_ignorer', { id: e.id }) }}" onsubmit="return confirm('Ignorer cette échéance ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
+                <button type="submit" class="pv-link-btn">Ignorer</button>
+            </form>
+        </div>
+    </td>
+</tr>

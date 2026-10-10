@@ -45,6 +45,8 @@ const App = {
         this.coords.init();
 
         CentralMaps.init();
+        CentralReleve.init();
+        CentralPrevision.init();
     },
 
     /* =========================================================
