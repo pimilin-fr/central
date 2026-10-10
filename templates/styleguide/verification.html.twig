@@ -4,34 +4,67 @@
 
 {#
     TEMPORAIRE — vérification du chantier « kit UI ».
-    Mise à jour à chaque étape : ajouter l'étape dans public/js/verification.js (const STEPS),
-    puis les liens/cases manuelles ci-dessous. Suppression en fin de chantier (voir StyleguideController).
+    À chaque étape : (1) compléter const STEPS dans public/js/verification.js (contrôles automatiques),
+    (2) remplacer la liste « À vérifier à l'œil » ci-dessous. Chaque ligne a un VRAI lien, construit par
+    StyleguideController::verification() sur des enregistrements existants (lecture seule).
+    Suppression en fin de chantier : voir StyleguideController.
 #}
 {% set breadcrumb_current = 'Vérification' %}
 
+{% set pages = [
+    { label: 'Portefeuilles', url: path('app_portefeuille_index') },
+    { label: 'Tous les relevés', url: path('app_releve_all') },
+    { label: 'Prévisions', url: path('app_prevision_index') },
+    { label: 'Suggestions de prévisions', url: path('app_prevision_suggestions') },
+    { label: 'Tiers', url: path('app_tiers_index') },
+    { label: 'Adresses', url: path('app_adresse_index') },
+    { label: 'Catégories', url: path('app_categorie_index') },
+    { label: 'Types de tiers', url: path('app_type_tiers_index') },
+    { label: 'Projets', url: path('app_projet_index') },
+    { label: 'Types de projet', url: path('app_projet_type_index') },
+    { label: 'Nouveau tiers', url: path('app_tiers_new') },
+    { label: 'Nouveau projet', url: path('app_projet_new') },
+    { label: 'Nouvelle adresse', url: path('app_adresse_new') },
+    { label: 'Nouvelle règle de prévision', url: path('app_prevision_new') },
+    { label: 'Styleguide', url: path('app_styleguide') }
+] %}
+{% set urlPtf = ptf ? path('app_portefeuille_show', { id: ptf.id }) : null %}
+{% set urlPtfPrev = ptf ? path('app_portefeuille_show', { id: ptf.id, tab: 'prevision' }) : null %}
+{% set urlComposer = (ptf and releve) ? path('app_releve_compose', { id: ptf.id, releve: releve.id }) : null %}
+{% set urlTiers = tiers ? path('app_tiers_show', { id: tiers.id }) : null %}
+{% set urlProjet = projet ? path('app_projet_show', { id: projet.id }) : null %}
+{% set urlCat = categorie ? path('app_categorie_show', { id: categorie.id }) : null %}
+{% set urlAdr = adresse ? path('app_adresse_show', { id: adresse.id }) : null %}
+{% set pages = pages|merge([urlPtf, urlPtfPrev, urlComposer, urlTiers, urlProjet, urlCat, urlAdr]|filter(u => u)|map(u => { label: u, url: u })) %}
+
+{# Liste « à l'œil » de l'étape en cours : [texte, url] — url nulle = enregistrement inexistant #}
+{% set manual = [
+    ['Fiche portefeuille : dans la liste des opérations, les pastilles tiers et projet sont colorées et arrondies (texte lisible)', urlPtf],
+    ['Fiche portefeuille : déplier le détail d’une opération — mise en page inchangée', urlPtf],
+    ['Fiche portefeuille : tableau des opérations et onglets inchangés', urlPtf],
+    ['Fiche portefeuille, onglet Prévision : rien ne bouge', urlPtfPrev],
+    ['Composeur de relevé (relevé le plus récent du premier portefeuille) : aucun changement', urlComposer],
+    ['Fiche tiers : tableaux et blocs inchangés', urlTiers],
+    ['Fiche projet : inchangée', urlProjet],
+    ['Fiche catégorie : inchangée (arbre, en-têtes)', urlCat],
+    ['Fiche adresse : inchangée', urlAdr],
+    ['Formulaire tiers : champs, grilles et boutons inchangés', path('app_tiers_new')],
+    ['Formulaire projet : inchangé', path('app_projet_new')],
+    ['Barre du haut : logo, sélecteur de thème (barre du haut, toutes pages) identiques', path('app_portefeuille_index')],
+    ['Styleguide › Pastilles : « Pastille de liste » est arrondie et colorée', path('app_styleguide') ~ '#pastilles'],
+    ['Styleguide › Listes : le tableau d’exemple est inchangé', path('app_styleguide') ~ '#listes']
+] %}
+
 {% block body %}
     <link rel="stylesheet" href="{{ asset('css/styleguide.css') }}?v=2">
-    <div class="page-container" id="vf"
-         data-pages='{{ [
-            { label: 'Portefeuilles', url: path('app_portefeuille_index') },
-            { label: 'Opérations', url: path('app_depenses_index') },
-            { label: 'Tous les relevés', url: path('app_releve_all') },
-            { label: 'Prévisions', url: path('app_prevision_index') },
-            { label: 'Suggestions de prévisions', url: path('app_prevision_suggestions') },
-            { label: 'Tiers', url: path('app_tiers_index') },
-            { label: 'Adresses', url: path('app_adresse_index') },
-            { label: 'Catégories', url: path('app_categorie_index') },
-            { label: 'Types de tiers', url: path('app_type_tiers_index') },
-            { label: 'Projets', url: path('app_projet_index') },
-            { label: 'Types de projet', url: path('app_projet_type_index') },
-            { label: 'Styleguide', url: path('app_styleguide') }
-         ]|json_encode|e('html_attr') }}'
+    <div class="page-container" id="vf" data-sources="{{ path('app_styleguide_verification_sources') }}"
+         data-pages='{{ pages|json_encode|e('html_attr') }}'
          data-scripts='{{ [asset('js/app.js'), asset('js/releve.js'), asset('js/prevision.js')]|json_encode|e('html_attr') }}'>
 
         <div class="page-heading">
             <div class="page-heading-copy">
                 <h1 class="page-title">Vérification du kit UI <span class="pill pill-accent">temporaire</span></h1>
-                <p>Contrôles automatiques (lus dans vos vraies pages) + liste de vérifications à faire à l'œil, étape par étape.</p>
+                <p>Étape en cours : <strong>2 — classes mortes supprimées</strong>. Contrôles automatiques sur vos vraies pages, puis liste à vérifier à l'œil.</p>
             </div>
             <div class="page-heading-actions">
                 <button type="button" class="btn btn-primary" data-vf-run><twig:ux:icon name="lucide:play" /><span>Lancer les contrôles</span></button>
@@ -39,26 +72,34 @@
         </div>
 
         <section class="rc-panel" style="margin-bottom:16px">
-            <div class="rc-panel-head"><h2>Pages supplémentaires à scanner</h2></div>
-            <p class="pv-range">Une URL par ligne, pour les pages qui demandent un identifiant : par exemple <code>/portefeuille/show/1</code>, <code>/releve/composer/1</code>, <code>/portefeuille/show/1?tab=prevision</code>. Mémorisé dans ce navigateur.</p>
-            <textarea class="form-control" rows="3" data-vf-extra style="width:100%" placeholder="/portefeuille/show/1&#10;/releve/composer/1"></textarea>
-        </section>
-
-        <section class="rc-panel" style="margin-bottom:16px">
             <div class="rc-panel-head"><h2>Contrôles automatiques <span class="pill pill-solid" data-vf-score>–</span></h2></div>
-            <div data-vf-results><p class="pv-range">Cliquez sur « Lancer les contrôles ».</p></div>
+            <div data-vf-results><p class="pv-range">Cliquez sur « Lancer les contrôles » : {{ pages|length }} pages sont lues (liens ci-dessous pour les ouvrir).</p></div>
         </section>
 
         <section class="rc-panel" style="margin-bottom:16px">
             <div class="rc-panel-head"><h2>Classes utilisées mais sans aucun style</h2></div>
-            <p class="pv-range">Classes trouvées dans le HTML et le JS des pages scannées mais absentes de toutes les feuilles de style chargées. Certaines sont normales (accroches JS, états posés par script) ; celles qui ressemblent à du Tailwind (<code>px-4</code>…) sont à nettoyer.</p>
+            <p class="pv-range">Présentes dans le HTML ou le JS mais absentes de toutes les feuilles de style. Certaines sont normales (accroches JS, états posés par script) ; en rouge : celles qui ressemblent à du Tailwind.</p>
             <div data-vf-undef><p class="pv-range">—</p></div>
         </section>
 
-        <section class="rc-panel" data-vf-manual>
-            <div class="rc-panel-head"><h2>À vérifier à l'œil</h2></div>
-            <div data-vf-manual-body></div>
+        <section class="rc-panel" style="margin-bottom:16px">
+            <div class="rc-panel-head"><h2>À vérifier à l'œil — étape 2</h2></div>
+            <p class="pv-range">Rien ne doit changer visuellement, sauf les pastilles tiers/projet des opérations (désormais arrondies). Les liens ouvrent de vrais enregistrements, en lecture seule.</p>
+            {% for item in manual %}
+                <label style="display:flex;gap:8px;align-items:baseline;padding:3px 0">
+                    <input type="checkbox" data-vf-check="e2-{{ loop.index }}">
+                    <span>{{ item[0] }}
+                        {% if item[1] %} — <a class="btn-link" href="{{ item[1] }}" target="_blank" rel="noopener">ouvrir</a>
+                        {% else %} — <em class="pv-range">aucun enregistrement : lien indisponible</em>{% endif %}
+                    </span>
+                </label>
+            {% endfor %}
+        </section>
+
+        <section class="rc-panel">
+            <div class="rc-panel-head"><h2>Pages lues par les contrôles <span class="pill pill-solid">{{ pages|length }}</span></h2></div>
+            <p>{% for p in pages %}<a class="btn-link is-muted" href="{{ p.url }}" target="_blank" rel="noopener" style="margin-right:12px">{{ p.label }}</a>{% endfor %}</p>
         </section>
     </div>
-    <script src="{{ asset('js/verification.js') }}?v=1" defer></script>
+    <script src="{{ asset('js/verification.js') }}?v=5" defer></script>
 {% endblock %}

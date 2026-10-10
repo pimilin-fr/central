@@ -46,9 +46,9 @@
 .rc-panel-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; }
 .rc-panel-head h2 { margin: 0; color: var(--text); font-size: 14px; font-weight: 850; }
 .rc-panel-head h2 small { color: var(--text-muted); font-weight: 600; }
-.rc-meta { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); align-items: end; }
+
 .rc-field { display: grid; gap: 4px; min-inline-size: 0; }
-.rc-field-grow { grid-column: span 2; }
+
 .rc-field small { color: var(--text-muted); font-weight: 600; }
 .rc-drafts { margin: 0; color: var(--text-soft); font-size: 12px; }
 .rc-drafts a { color: var(--accent); font-weight: 750; }

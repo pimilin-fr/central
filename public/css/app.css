@@ -298,14 +298,6 @@ APPLICATION SWITCHER
     background: color-mix(in srgb, var(--accent) 9%, var(--surface));
 }
 
-.app-logo-core {
-    width: 11px;
-    height: 11px;
-    border: 2px solid var(--accent);
-    border-radius: 3px;
-    transform: rotate(45deg);
-    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
-}
 
 .app-switcher-kicker {
     color: var(--text-muted);
@@ -744,15 +736,6 @@ THEME SWITCHER
     padding: 0 10px;
 }
 
-.theme-current-icon {
-    display: grid;
-    place-items: center;
-}
-
-.theme-current-icon svg {
-    width: 17px;
-    height: 17px;
-}
 
 .theme-current-name {
     font-size: 10px;
@@ -983,7 +966,6 @@ PAGE HEADINGS / TOOLBARS
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
-
 
 
 .toolbar {
@@ -1418,8 +1400,7 @@ body,
     border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 
-.app-logo svg,
-.app-logo-core {
+.app-logo svg{
     color: var(--accent);
     border-color: var(--accent);
 }
@@ -1531,14 +1512,5 @@ body,
 .sidebar-bottom-card svg {
     background: transparent;
 }
-
-
-
-
-
-
-
-
-
 
 

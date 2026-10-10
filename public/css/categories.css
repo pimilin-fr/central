@@ -2,22 +2,6 @@
    CATEGORIES — ARBRE + CARTES ENFANTS
    ========================================================= */
 
-.categorie-page {
-    position: relative;
-}
-
-.categorie-page-heading {
-    margin-bottom: 18px;
-}
-
-.categorie-toolbar {
-    margin-bottom: 24px;
-    padding: 10px;
-    background: color-mix(in srgb, var(--surface) 82%, transparent);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow-sm);
-}
 
 .categorie-tree {
     display: flex;
@@ -172,14 +156,9 @@
 }
 
 @media (max-width: 640px) {
-    .categorie-toolbar {
-        align-items: stretch;
-        flex-direction: column;
-    }
+    
 
-    .categorie-toolbar .toolbar-search {
-        max-width: none;
-    }
+    
 
     .categorie-branch,
     .categorie-branch.level-0 {

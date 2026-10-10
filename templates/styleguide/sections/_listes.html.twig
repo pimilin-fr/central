@@ -42,8 +42,8 @@
             <span class="ops-group-count">3 opérations</span>
         </div>
         <div class="ops-group-totals">
-            <span class="amount-expense font-medium">- 154,60 €</span>
-            <span class="amount-income font-medium">+ 1 800,00 €</span>
+            <span class="amount-expense">- 154,60 €</span>
+            <span class="amount-income">+ 1 800,00 €</span>
             <span class="ops-balance-prev">1 100,00 €</span><strong>→</strong>
             <span class="ops-balance amount-income">2 745,40 €</span>
         </div>
@@ -51,19 +51,19 @@
     <div>
         <table class="ops-table">
             <thead><tr>
-                <th class="px-4 py-3 text-left"><input type="checkbox" class="select-all"></th>
-                <th class="px-4 py-3 text-left">Date</th><th class="px-4 py-3 text-left">Catégorie</th>
-                <th class="px-4 py-3 text-left">Tiers</th><th class="px-4 py-3 text-left">Projet</th>
-                <th class="px-4 py-3 text-right">Montant</th>
+                <th><input type="checkbox" class="select-all"></th>
+                <th>Date</th><th>Catégorie</th>
+                <th>Tiers</th><th>Projet</th>
+                <th>Montant</th>
             </tr></thead>
             <tbody>
-                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td class="px-4 py-2">02/09/2026</td><td class="px-4 py-2">Courses</td>
-                    <td class="px-4 py-2"><span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full" style="background-color: {{ '@a3'|entity_color }}; color: {{ '@a3'|entity_text }}"><span class="w-2 h-2 rounded-full" style="background-color: {{ '@a3'|entity_color }}"></span><span>Leclerc</span></span></td>
-                    <td class="px-4 py-2">-</td><td class="px-4 py-2 text-right amount-expense font-medium">- 42,10 €</td></tr>
-                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td class="px-4 py-2">05/09/2026</td><td class="px-4 py-2">Salaire</td>
-                    <td class="px-4 py-2">Employeur</td><td class="px-4 py-2">-</td><td class="px-4 py-2 text-right amount-income font-medium">+ 1 800,00 €</td></tr>
-                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td class="px-4 py-2">08/09/2026</td><td class="px-4 py-2">Remboursement</td>
-                    <td class="px-4 py-2">Mutuelle</td><td class="px-4 py-2">-</td><td class="px-4 py-2 text-right amount-refund font-medium">+ 19,00 €</td></tr>
+                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td>02/09/2026</td><td>Courses</td>
+                    <td><span class="pill pill-entity" style="background-color: {{ '@a3'|entity_color }}; color: {{ '@a3'|entity_text }}"><span>Leclerc</span></span></td>
+                    <td>-</td><td class="amount-expense">- 42,10 €</td></tr>
+                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td>05/09/2026</td><td>Salaire</td>
+                    <td>Employeur</td><td>-</td><td class="amount-income">+ 1 800,00 €</td></tr>
+                <tr class="ops-row depense-row"><td><input type="checkbox" class="row-checkbox"></td><td>08/09/2026</td><td>Remboursement</td>
+                    <td>Mutuelle</td><td>-</td><td class="amount-refund">+ 19,00 €</td></tr>
                 <tr class="ops-detail-row detail-row"><td colspan="6" class="ops-detail-cell">Ligne de détail (affichée au clic sur une opération) : commande, portefeuille, relevé, note.</td></tr>
             </tbody>
         </table>
@@ -82,7 +82,7 @@
             <a class="ops-group-link" href="#">Voir</a>
             <span class="ops-group-count">4 opérations</span>
         </div>
-        <div class="ops-group-totals"><span class="amount-expense font-medium">- 154,60 €</span></div>
+        <div class="ops-group-totals"><span class="amount-expense">- 154,60 €</span></div>
     </div>
 </div>
 <div class="ops-group is-releve is-open">
@@ -93,7 +93,7 @@
             <a class="ops-group-link" href="#">Compléter</a>
             <span class="ops-group-count">2 opérations</span>
         </div>
-        <div class="ops-group-totals"><span class="amount-expense font-medium">- 60,00 €</span></div>
+        <div class="ops-group-totals"><span class="amount-expense">- 60,00 €</span></div>
     </div>
 </div>
 {% endverbatim %}{% endset %}
@@ -140,7 +140,7 @@
             <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
             <span class="ops-group-count">4 opérations</span>
         </div>
-        <div class="ops-group-totals"><span class="amount-expense font-medium">- 154,60 €</span></div>
+        <div class="ops-group-totals"><span class="amount-expense">- 154,60 €</span></div>
     </header>
 </section>
 <section class="ops-subgroup is-none">

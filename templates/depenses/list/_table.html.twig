@@ -7,13 +7,13 @@
 <table class="ops-table" data-releve="{{ releveId }}">
     <thead>
         <tr>
-            <th class="px-4 py-3 text-left"><input type="checkbox" class="select-all"/></th>
-            {% if numbered %}<th class="px-4 py-3 text-right ops-rank-head" title="Ordre sur le relevé de compte">N°</th>{% endif %}
-            <th class="px-4 py-3 text-left">Date</th>
-            <th class="px-4 py-3 text-left">Catégorie</th>
-            <th class="px-4 py-3 text-left">Tiers</th>
-            <th class="px-4 py-3 text-left">Projet</th>
-            <th class="px-4 py-3 text-right">Montant</th>
+            <th><input type="checkbox" class="select-all"/></th>
+            {% if numbered %}<th class="ops-rank-head" title="Ordre sur le relevé de compte">N°</th>{% endif %}
+            <th>Date</th>
+            <th>Catégorie</th>
+            <th>Tiers</th>
+            <th>Projet</th>
+            <th>Montant</th>
         </tr>
     </thead>
 
@@ -34,40 +34,34 @@
                            class="row-checkbox">
                 </td>
 
-                {% if numbered %}<td class="px-4 py-2 text-right ops-rank{{ sub ? ' is-sub' : '' }}"{% if rankCount > 1 and not sub %} title="Détail : {{ rankCount }} opérations pointées ensemble"{% endif %}>{{ sub ? '↳' : (depense.releveOrdre ?? '·') }}</td>{% endif %}
+                {% if numbered %}<td class="ops-rank{{ sub ? ' is-sub' : '' }}"{% if rankCount > 1 and not sub %} title="Détail : {{ rankCount }} opérations pointées ensemble"{% endif %}>{{ sub ? '↳' : (depense.releveOrdre ?? '·') }}</td>{% endif %}
 
-                <td class="px-4 py-2">
+                <td>
                     {{ depense.date|date('d/m/Y') }}
                 </td>
 
-                <td class="px-4 py-2">
+                <td>
                     {{ depense.categorie.name ?? '-' }}
                 </td>
 
-                <td class="px-4 py-2">
-                    <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full"
+                <td>
+                    <span class="pill pill-entity"
                           style="
                           background-color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_color }};
                           color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_text }};
                           ">
 
-                        <span class="w-2 h-2 rounded-full"
-                              style="background-color: {{ (depense.tiers.tiersType.couleur ?? null)|entity_color }}"></span>
-
                         <span>{{ depense.tiers.name }}</span>
                     </span>
                 </td>
 
-                <td class="px-4 py-2">
+                <td>
                     {% if (depense.projet) %}
-                        <span class="inline-flex items-center gap-2 pr-3 py-1 text-xs font-medium rounded-full"
+                        <span class="pill pill-entity"
                               style="
                               background-color: {{ (depense.projet.couleur ?? null)|entity_color }};
                               color: {{ (depense.projet.couleur ?? null)|entity_text }};
                               ">
-
-                            <span class="w-2 h-2 rounded-full"
-                                  style="background-color: {{ (depense.projet.couleur ?? null)|entity_color }}"></span>
 
                             <span>{{ depense.projet.name }}</span>
                         </span>
@@ -76,14 +70,13 @@
                     {% endif %}
                 </td>
 
-                {#<td class="px-4 py-2 text-right font-medium
-                    {{ depense.categorie.isDepense ? 'text-red-500' : 'text-green-500' }}">
+                {#<td class="{{ depense.categorie.isDepense ? 'text-red-500' : 'text-green-500' }}">
                     {{ depense.montant|number_format(2, ',', ' ') }} €
                 </td>#}
 
                 {% if depense.categorie.isDepense %}
                     {% if  depense.montant < 0 %}
-                        <td class="px-4 py-2 text-right amount-refund font-medium">
+                        <td class="amount-refund">
                             + {{ 
                             (
                                 (depense.montant|default('0')|replace({' ': '', ',': '.'})) * -1
@@ -92,12 +85,12 @@
                             }} €
                         </td>
                     {% else %}
-                        <td class="px-4 py-2 text-right amount-expense font-medium">
+                        <td class="amount-expense">
                             - {{ depense.montant|number_format(2, ',', ' ') }} €
                         </td>
                     {% endif %}
                 {% else %}
-                    <td class="px-4 py-2 text-right amount-income font-medium">
+                    <td class="amount-income">
                         + {{ depense.montant|number_format(2, ',', ' ') }} €
                     </td>
                 {% endif %}
@@ -108,7 +101,7 @@
             <tr class="hidden ops-detail-row detail-row" id="detail-{{ depense.id }}">
                 <td colspan="{{ colCount }}" class="ops-detail-cell">
 
-                    <div class="grid grid-cols-3 gap-4">
+                    <div>
 
                         <div>
                             <strong>Commande :</strong> {{ depense.numCommande ?? '-' }}
@@ -123,7 +116,7 @@
                             {{ depense.releve ? depense.releve.date|date('d/m/Y') : '-' }}
                         </div>
                         
-                        <div class="md:row-span-3">
+                        <div>
                             <strong>Note :</strong> {{ depense.note ? depense.note  : '-' }}
                         </div>
 

@@ -31,11 +31,11 @@
                 <div class="rc-table-wrap">
                     <table class="ops-table">
                         <thead><tr>
-                            <th class="px-4 py-3 text-left">Tiers</th>
-                            <th class="px-4 py-3 text-left">Ce qui a été constaté</th>
-                            <th class="px-4 py-3 text-left">Prochaine</th>
-                            <th class="px-4 py-3 text-right">Montant</th>
-                            <th class="px-4 py-3"></th>
+                            <th>Tiers</th>
+                            <th>Ce qui a été constaté</th>
+                            <th>Prochaine</th>
+                            <th>Montant</th>
+                            <th></th>
                         </tr></thead>
                         <tbody>
                         {% for s in suggestions %}
@@ -55,22 +55,22 @@
                                 libelle: s.tiers.name ~ ' – ' ~ (s.categorie.libelle ?: s.categorie.name)
                             } %}
                             <tr class="ops-row" data-pv-suggestion="{{ s.tiers.id }}|{{ s.categorie.id }}|{{ s.portefeuille.id }}">
-                                <td class="px-4 py-2">
+                                <td>
                                     <strong>{{ s.tiers.name }}</strong>
                                     <div class="pv-range">{{ s.categorie.libelle ?: s.categorie.name }} · {{ s.portefeuille.libelle }}</div>
                                 </td>
-                                <td class="px-4 py-2">
+                                <td>
                                     {{ s.resume }}
                                     <div class="pv-range">dernière le {{ s.derniere|date('d/m/Y') }} · régularité {{ (s.regularite * 100)|round }} %</div>
                                     <details class="pv-serie"><summary class="btn-link is-muted">voir les {{ s.serie|length }} opérations</summary>
                                         <ul>{% for o in s.serie %}<li>{{ o.date|date('d/m/Y') }} · {{ o.montant|number_format(2, ',', ' ') }} € <span class="pv-range">{{ o.categorie }}</span></li>{% endfor %}</ul>
                                     </details>
                                 </td>
-                                <td class="px-4 py-2">{{ s.prochaine|date('d/m/Y') }} <span class="pill pill-{{ {certain:'success',probable:'warning',estime:'muted'}[s.certitude.value] }}">{{ s.certitude.label }}</span></td>
-                                <td class="px-4 py-2 text-right font-medium">
+                                <td>{{ s.prochaine|date('d/m/Y') }} <span class="pill pill-{{ {certain:'success',probable:'warning',estime:'muted'}[s.certitude.value] }}">{{ s.certitude.label }}</span></td>
+                                <td>
                                     {{ s.estime ? '≈ ' : '' }}{{ s.montant|number_format(2, ',', ' ') }} €
                                 </td>
-                                <td class="px-4 py-2">
+                                <td>
                                     <div class="pv-actions">
                                         <a class="btn btn-primary" href="{{ path('app_prevision_new', params) }}">Créer la règle</a>
                                         <button type="button" class="btn-link is-muted" data-pv-hide>Masquer</button>
@@ -94,20 +94,20 @@
                     <div class="rc-table-wrap">
                         <table class="ops-table">
                             <thead><tr>
-                                <th class="px-4 py-3 text-left">Tiers</th>
-                                <th class="px-4 py-3 text-left">Catégorie · portefeuille</th>
-                                <th class="px-4 py-3 text-right">Opérations</th>
-                                <th class="px-4 py-3 text-left">Dernière</th>
-                                <th class="px-4 py-3 text-left">Pourquoi pas</th>
+                                <th>Tiers</th>
+                                <th>Catégorie · portefeuille</th>
+                                <th>Opérations</th>
+                                <th>Dernière</th>
+                                <th>Pourquoi pas</th>
                             </tr></thead>
                             <tbody>
                             {% for r in rejets %}
                                 <tr class="ops-row">
-                                    <td class="px-4 py-2">{{ r.tiers.name }}</td>
-                                    <td class="px-4 py-2">{{ r.categorie.libelle ?: r.categorie.name }} · {{ r.portefeuille.libelle }}</td>
-                                    <td class="px-4 py-2 text-right">{{ r.occurrences }}</td>
-                                    <td class="px-4 py-2">{{ r.derniere|date('d/m/Y') }}</td>
-                                    <td class="px-4 py-2">{{ r.raison }}
+                                    <td>{{ r.tiers.name }}</td>
+                                    <td>{{ r.categorie.libelle ?: r.categorie.name }} · {{ r.portefeuille.libelle }}</td>
+                                    <td>{{ r.occurrences }}</td>
+                                    <td>{{ r.derniere|date('d/m/Y') }}</td>
+                                    <td>{{ r.raison }}
                                         <details class="pv-serie"><summary class="btn-link is-muted">voir les {{ r.serie|length }} opérations</summary>
                                             <ul>{% for o in r.serie %}<li>{{ o.date|date('d/m/Y') }} · {{ o.montant|number_format(2, ',', ' ') }} € <span class="pv-range">{{ o.categorie }}</span></li>{% endfor %}</ul>
                                         </details>

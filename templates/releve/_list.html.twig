@@ -17,34 +17,34 @@
             <table class="ops-table rc-releves">
                 <thead>
                     <tr>
-                        <th class="px-4 py-3 text-left">Relevé</th>
-                        <th class="px-4 py-3 text-left">État</th>
-                        <th class="px-4 py-3 text-right">Lignes</th>
-                        <th class="px-4 py-3 text-right">Opérations</th>
-                        <th class="px-4 py-3 text-right" title="Somme des opérations du relevé">Mouvement</th>
-                        <th class="px-4 py-3 text-right" title="Somme des mouvements de tous les relevés jusqu'à celui-ci">Solde cumulé</th>
-                        <th class="px-4 py-3"></th>
+                        <th>Relevé</th>
+                        <th>État</th>
+                        <th>Lignes</th>
+                        <th>Opérations</th>
+                        <th  title="Somme des opérations du relevé">Mouvement</th>
+                        <th  title="Somme des mouvements de tous les relevés jusqu'à celui-ci">Solde cumulé</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in rows %}
                         {% set releve = row.releve %}
                         <tr class="ops-row {{ releve.closed ? 'is-closed' : 'is-open' }}">
-                            <td class="px-4 py-2">
+                            <td>
                                 <a class="ops-group-link" href="{{ path('app_releve_compose', { id: portefeuille.id, releve: releve.id }) }}">{{ releve.date|date('d/m/Y') }}</a>
                             </td>
-                            <td class="px-4 py-2">
+                            <td>
                                 {% if releve.closed %}
                                     <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
                                 {% else %}
                                     <span class="ops-group-badge is-open"><twig:ux:icon name="lucide:lock-open" /> Non clos</span>
                                 {% endif %}
                             </td>
-                            <td class="px-4 py-2 text-right">{{ row.lines }}</td>
-                            <td class="px-4 py-2 text-right">{{ row.ops }}</td>
-                            <td class="px-4 py-2 text-right font-medium {{ row.total < 0 ? 'amount-expense' : 'amount-income' }}">{{ row.total < 0 ? '−' : '+' }} {{ row.total|abs|number_format(2, ',', ' ') }} €</td>
-                            <td class="px-4 py-2 text-right font-medium">{{ row.cumul|number_format(2, ',', ' ') }} €</td>
-                            <td class="px-4 py-2 text-right">
+                            <td>{{ row.lines }}</td>
+                            <td>{{ row.ops }}</td>
+                            <td class="{{ row.total < 0 ? 'amount-expense' : 'amount-income' }}">{{ row.total < 0 ? '−' : '+' }} {{ row.total|abs|number_format(2, ',', ' ') }} €</td>
+                            <td>{{ row.cumul|number_format(2, ',', ' ') }} €</td>
+                            <td>
                                 <a class="ops-group-link" href="{{ path('app_releve_compose', { id: portefeuille.id, releve: releve.id }) }}">{{ releve.closed ? 'Voir' : 'Compléter / clore' }}</a>
                             </td>
                         </tr>

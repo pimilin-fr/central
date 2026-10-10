@@ -5,7 +5,7 @@
  * À supprimer en fin de chantier.
  */
 const CentralVerification = {
-    config: { appName: 'CentralVerification', version: 'v1.0.0', debug: false },
+    config: { appName: 'CentralVerification', version: 'v2.3.0', debug: false },
 
     STEPS: [
         {
@@ -15,14 +15,15 @@ const CentralVerification = {
                 'pv-link-btn', 'pv-remove', 'entity-action'],
             requises: ['btn', 'btn-primary', 'pill'],
             feuilles: ['ui-kit.css'],
-            manuel: [
-                ['Styleguide › Boutons & actions et Pastilles : tous les exemples sont stylés', '/styleguide'],
-                ['Relevé (composeur) : flèches ↑ ↓, « + », « ✕ », puce « Détail × n », compteurs, « Tout pointer »', '/releve/composer/1'],
-                ['Prévisions : pastilles Certain/Probable/Estimé, liens « Ajuster » / « Ignorer »', '/prevision'],
-                ['Formulaire de règle : le « ✕ » d’une tranche fonctionne', '/prevision/regle/new'],
-                ['Portefeuille : boutons du haut, compteur rond des onglets, boutons en bas des cartes', '/portefeuille'],
-                ['Listes (tiers, adresses, catégories, projets) : boutons de fin de ligne', '/tiers'],
-            ],
+        },
+        {
+            id: 'e2', titre: 'Étape 2 — classes mortes supprimées',
+            interdites: ['px-4', 'py-2', 'py-3', 'text-right', 'text-left', 'font-medium', 'rounded-full', 'inline-flex',
+                'items-center', 'gap-2', 'gap-4', 'pr-3', 'py-1', 'text-xs', 'w-2', 'h-2', 'grid-cols-3', 'md:row-span-3',
+                'rc-meta', 'rc-field-grow', 'categorie-page', 'categorie-toolbar', 'categorie-page-heading', 'form-grid-3',
+                'form-grid-4', 'form-grid-5', 'form-span-2', 'form-span-3', 'form-section-grid-3', 'form-inline-btn',
+                'form-legend', 'form-preview', 'geo-stack', 'is-grid', 'app-logo-core', 'theme-current-icon'],
+            requises: ['pill-entity'],
         },
     ],
 
@@ -56,6 +57,15 @@ const CentralVerification = {
         return { set, sheets };
     },
 
+    /** extrait de la 1re balise portant la classe (pour retrouver le fichier fautif) */
+    snippet(sources, cls) {
+        for (const s of sources) {
+            const m = new RegExp('<[^<>]*class\\s*=\\s*(["\'])[^"\']*(?<![\\w-])' + cls.replace(/[-:]/g, '\\$&') + '(?![\\w-])[^"\']*\\1[^<>]*>', 's').exec(s.html);
+            if (m) return m[0].replace(/\s+/g, ' ').slice(0, 140);
+        }
+        return '';
+    },
+
     esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); },
 
     row(ok, label, detail) {
@@ -66,17 +76,14 @@ const CentralVerification = {
         const resBox = root.querySelector('[data-vf-results]'), undefBox = root.querySelector('[data-vf-undef]'), score = root.querySelector('[data-vf-score]');
         resBox.innerHTML = '<p class="pv-range">Analyse en cours…</p>';
         const pages = JSON.parse(root.dataset.pages), scripts = JSON.parse(root.dataset.scripts);
-        const extra = root.querySelector('[data-vf-extra]').value.split('\n').map(s => s.trim()).filter(Boolean);
-        try { localStorage.setItem('vf-extra', extra.join('\n')); } catch (e) {}
-        extra.forEach(u => pages.push({ label: u, url: u }));
 
         const perSource = []; const errors = [];
         for (const p of pages) {
-            try { perSource.push({ label: p.label, url: p.url, tokens: this.tokensOfHtml(await this.fetchText(p.url)), kind: 'page' }); }
+            try { const html = await this.fetchText(p.url); perSource.push({ label: p.label, url: p.url, html, tokens: this.tokensOfHtml(html), kind: 'page' }); }
             catch (e) { errors.push(p.label + ' (' + e.message + ')'); }
         }
         for (const s of scripts) {
-            try { perSource.push({ label: s.split('/').pop().split('?')[0], url: s, tokens: this.tokensOfHtml((await this.fetchText(s)).replace(/\\"/g, '"')), kind: 'js' }); }
+            try { const txt = (await this.fetchText(s)).replace(/\\"/g, '"'); perSource.push({ label: s.split('/').pop().split('?')[0], url: s, html: txt, tokens: this.tokensOfHtml(txt), kind: 'js' }); }
             catch (e) { errors.push(s + ' (' + e.message + ')'); }
         }
         const all = new Set(); perSource.forEach(s => s.tokens.forEach(t => all.add(t)));
@@ -90,9 +97,25 @@ const CentralVerification = {
             const bad = st.interdites.map(c => ({ c, where: perSource.filter(s => s.tokens.has(c)).map(s => s.label) })).filter(x => x.where.length);
             total++; ok += !bad.length;
             html += this.row(!bad.length, 'Anciennes classes disparues (' + st.interdites.length + ' contrôlées)',
-                bad.map(b => '<code>' + this.esc(b.c) + '</code> dans ' + this.esc(b.where.join(', '))).join(' · '));
+                bad.map(b => '<br><code>' + this.esc(b.c) + '</code> dans ' + this.esc(b.where.join(', ')) + ' <span style="opacity:.7">› ' + this.esc(this.snippet(perSource, b.c)) + '</span>').join(''));
         }
         html += '<h3 style="margin:14px 0 4px">Pages analysées</h3><p class="pv-range">' + perSource.filter(s => s.kind === 'page').length + ' page(s), ' + perSource.filter(s => s.kind === 'js').length + ' script(s)' + (errors.length ? ' — <strong>non lues :</strong> ' + this.esc(errors.join(' · ')) : '') + '</p>';
+        // contrôle sur le DISQUE : fichier pas remplacé (→ liste) ou cache Twig périmé (→ rien sur disque)
+        const allBad = [...new Set(this.STEPS.flatMap(s => s.interdites))];
+        let disk = null, parasites = [];
+        try { const j = await (await fetch(root.dataset.sources + '?classes=' + encodeURIComponent(allBad.join(',')), { credentials: 'same-origin' })).json(); disk = j.fichiers; parasites = j.parasites || []; } catch (e) {}
+        const renderedBad = allBad.filter(c => perSource.some(s => s.tokens.has(c)));
+        html += '<h3 style="margin:14px 0 4px">Sources sur le disque</h3>';
+        if (disk === null) html += this.row(false, 'Lecture des fichiers impossible');
+        else if (!disk.length) html += this.row(true, 'Aucune ancienne classe dans les gabarits ni les scripts du disque',
+            renderedBad.length ? '— mais le HTML rendu en contient encore : <strong>cache Twig périmé</strong>. Lancez <code>php bin/console cache:clear</code> (ou videz <code>var/cache</code>).' : '');
+        else {
+            const byFile = {}; disk.forEach(h => { (byFile[h.fichier] = byFile[h.fichier] || new Set()).add(h.classe); });
+            html += this.row(false, Object.keys(byFile).length + ' fichier(s) du disque contiennent encore d’anciennes classes (non remplacés ou à nettoyer)',
+                '<br>' + Object.entries(byFile).map(([f, s]) => '<code>' + this.esc(f) + '</code> — ' + [...s].map(c => this.esc(c)).join(', ')).join('<br>'));
+        }
+        html += this.row(!parasites.length, 'Dossiers parasites (archives dézippées au mauvais endroit)',
+            parasites.length ? parasites.map(p => '<code>' + this.esc(p) + '</code>').join(', ') + ' — à supprimer à la main (ils ne sont pas lus par l’application)' : 'aucun');
         resBox.innerHTML = html; score.textContent = ok + '/' + total;
 
         const undef = [...all].filter(c => !defined.has(c)).sort();
@@ -102,15 +125,10 @@ const CentralVerification = {
             : '<p class="pv-range">Aucune.</p>';
     },
 
-    renderManual(root) {
-        const body = root.querySelector('[data-vf-manual-body]');
+    initManual(root) {
         let saved = {}; try { saved = JSON.parse(localStorage.getItem('vf-checks') || '{}'); } catch (e) {}
-        body.innerHTML = this.STEPS.map(st => '<h3 style="margin:10px 0 4px">' + this.esc(st.titre) + '</h3>' +
-            (st.manuel || []).map(([txt, url], i) => {
-                const id = st.id + '-' + i;
-                return '<label style="display:flex;gap:8px;align-items:baseline;padding:3px 0"><input type="checkbox" data-vf-check="' + id + '"' + (saved[id] ? ' checked' : '') + '><span>' + this.esc(txt) + (url ? ' — <a class="btn-link" href="' + url + '" target="_blank" rel="noopener">ouvrir</a>' : '') + '</span></label>';
-            }).join('')).join('');
-        body.addEventListener('change', e => {
+        root.querySelectorAll('[data-vf-check]').forEach(c => { c.checked = !!saved[c.dataset.vfCheck]; });
+        root.addEventListener('change', e => {
             const c = e.target.closest('[data-vf-check]'); if (!c) return;
             saved[c.dataset.vfCheck] = c.checked; try { localStorage.setItem('vf-checks', JSON.stringify(saved)); } catch (e2) {}
         });
@@ -118,8 +136,7 @@ const CentralVerification = {
 
     init() {
         const root = document.getElementById('vf'); if (!root) return;
-        try { root.querySelector('[data-vf-extra]').value = localStorage.getItem('vf-extra') || ''; } catch (e) {}
-        this.renderManual(root);
+        this.initManual(root);
         root.querySelector('[data-vf-run]').addEventListener('click', () => this.run(root));
         this.log('init');
     },

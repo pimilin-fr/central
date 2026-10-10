@@ -183,9 +183,6 @@
    FORMS — VARIANTES (opération, adresse)
    ========================================================= */
 
-.form-section-grid-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
 
 .form-stack {
     display: flex;
@@ -266,11 +263,6 @@
     accent-color: var(--accent);
 }
 
-@media (max-width: 900px) {
-    .form-section-grid-3 {
-        grid-template-columns: minmax(0, 1fr);
-    }
-}
 
 input[type="color"].modern-form-control {
     padding: 4px;
@@ -279,53 +271,6 @@ input[type="color"].modern-form-control {
 
 
 /* Grilles internes aux cartes de formulaire */
-
-.form-grid-3,
-.form-grid-4,
-.form-grid-5 {
-    display: grid;
-    gap: 12px;
-}
-
-.form-grid-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.form-grid-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.form-grid-5 {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.form-span-2 {
-    grid-column: span 2;
-}
-
-.form-span-3 {
-    grid-column: 1 / -1;
-}
-
-@media (max-width: 900px) {
-    .form-grid-3,
-    .form-grid-4,
-    .form-grid-5 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 560px) {
-    .form-grid-3,
-    .form-grid-4,
-    .form-grid-5 {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .form-span-2 {
-        grid-column: auto;
-    }
-}
 
 
 /* =========================================================
@@ -577,28 +522,7 @@ label.required::after,
 }
 
 /* Petit bouton d'action dans un champ */
-.form-inline-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 9px;
-    color: var(--accent-strong);
-    background: var(--accent-soft);
-    border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 800;
-    cursor: pointer;
-}
 
-.form-inline-btn:hover {
-    border-color: var(--accent);
-}
-
-.form-inline-btn svg {
-    width: 13px;
-    height: 13px;
-}
 
 .form-label-line {
     display: flex;
@@ -638,30 +562,10 @@ label.required::after,
 }
 
 
-
 /* Aperçu : la carte réelle, non cliquable */
-.form-preview .entity-card-link,
-.form-preview a {
-    pointer-events: none;
-}
 
-.form-preview .entity-card {
-    max-width: 360px;
-}
 
 /* Choix en grille (portefeuilles d'une opération…) */
-.choice-list.is-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    flex-direction: unset;
-}
-
-.form-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-}
 
 
 /* =========================================================

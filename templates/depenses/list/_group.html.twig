@@ -49,22 +49,22 @@
 
                 {# Dépenses : rouge ; négatives = remboursement, bleu #}
                 {% if group.totalDepense > 0 %}
-                    <span class="amount-expense font-medium">
+                    <span class="amount-expense">
                         - {{ group.totalDepense|number_format(2, ',', ' ') }} €
                     </span>
                 {% elseif group.totalDepense < 0 %}
-                    <span class="amount-refund font-medium">
+                    <span class="amount-refund">
                         + {{ group.totalDepense|abs|number_format(2, ',', ' ') }} €
                     </span>
                 {% endif %}
 
                 {# Revenus : vert ; négatifs = rouge #}
                 {% if group.totalRevenu > 0 %}
-                    <span class="amount-income font-medium">
+                    <span class="amount-income">
                         + {{ group.totalRevenu|number_format(2, ',', ' ') }} €
                     </span>
                 {% elseif group.totalRevenu < 0 %}
-                    <span class="amount-expense font-medium">
+                    <span class="amount-expense">
                         - {{ group.totalRevenu|abs|number_format(2, ',', ' ') }} €
                     </span>
                 {% endif %}
@@ -108,8 +108,8 @@
                                 <span class="ops-group-count">{{ run.depenses|length }} opération{{ run.depenses|length > 1 ? 's' : '' }}</span>
                             </div>
                             <div class="ops-group-totals">
-                                {% if run.totalDepense > 0 %}<span class="amount-expense font-medium">- {{ run.totalDepense|number_format(2, ',', ' ') }} €</span>{% endif %}
-                                {% if run.totalRevenu > 0 %}<span class="amount-income font-medium">+ {{ run.totalRevenu|number_format(2, ',', ' ') }} €</span>{% endif %}
+                                {% if run.totalDepense > 0 %}<span class="amount-expense">- {{ run.totalDepense|number_format(2, ',', ' ') }} €</span>{% endif %}
+                                {% if run.totalRevenu > 0 %}<span class="amount-income">+ {{ run.totalRevenu|number_format(2, ',', ' ') }} €</span>{% endif %}
                             </div>
                         </header>
                         {{ include('depenses/list/_table.html.twig', { depenses: run.depenses, numbered: run.numbered }) }}

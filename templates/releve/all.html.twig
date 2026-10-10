@@ -49,14 +49,14 @@
                     <table class="ops-table rc-releves">
                         <thead>
                             <tr>
-                                <th class="px-4 py-3 text-left">Relevé</th>
-                                <th class="px-4 py-3 text-left">Portefeuille</th>
-                                <th class="px-4 py-3 text-left">État</th>
-                                <th class="px-4 py-3 text-right">Lignes</th>
-                                <th class="px-4 py-3 text-right">Opérations</th>
-                                <th class="px-4 py-3 text-right" title="Somme des opérations du relevé">Mouvement</th>
-                                <th class="px-4 py-3 text-right" title="Somme des mouvements de tous les relevés du portefeuille jusqu'à celui-ci">Solde cumulé</th>
-                                <th class="px-4 py-3"></th>
+                                <th>Relevé</th>
+                                <th>Portefeuille</th>
+                                <th>État</th>
+                                <th>Lignes</th>
+                                <th>Opérations</th>
+                                <th  title="Somme des opérations du relevé">Mouvement</th>
+                                <th  title="Somme des mouvements de tous les relevés du portefeuille jusqu'à celui-ci">Solde cumulé</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,24 +65,24 @@
                                 {% set ptf = releve.portefeuille %}
                                 {% set url = path('app_releve_compose', { id: ptf.id, releve: releve.id }) %}
                                 <tr class="ops-row {{ releve.closed ? 'is-closed' : 'is-open' }}">
-                                    <td class="px-4 py-2"><a class="ops-group-link" href="{{ url }}">{{ releve.date|date('d/m/Y') }}</a></td>
-                                    <td class="px-4 py-2">
+                                    <td><a class="ops-group-link" href="{{ url }}">{{ releve.date|date('d/m/Y') }}</a></td>
+                                    <td>
                                         <a href="{{ path('app_releve_index', { id: ptf.id }) }}" class="entity-pill" style="--entity-color: {{ (ptf.couleur ?? null)|entity_color }};">
                                             <span class="entity-pill-dot"></span><span>{{ ptf.libelle }}</span>
                                         </a>
                                     </td>
-                                    <td class="px-4 py-2">
+                                    <td>
                                         {% if releve.closed %}
                                             <span class="ops-group-badge is-closed"><twig:ux:icon name="lucide:lock" /> Clos</span>
                                         {% else %}
                                             <span class="ops-group-badge is-open"><twig:ux:icon name="lucide:lock-open" /> Non clos</span>
                                         {% endif %}
                                     </td>
-                                    <td class="px-4 py-2 text-right">{{ row.lines }}</td>
-                                    <td class="px-4 py-2 text-right">{{ row.ops }}</td>
-                                    <td class="px-4 py-2 text-right font-medium {{ row.total < 0 ? 'amount-expense' : 'amount-income' }}">{{ row.total < 0 ? '−' : '+' }} {{ row.total|abs|number_format(2, ',', ' ') }} €</td>
-                                    <td class="px-4 py-2 text-right font-medium">{{ row.cumul|number_format(2, ',', ' ') }} €</td>
-                                    <td class="px-4 py-2 text-right"><a class="ops-group-link" href="{{ url }}">{{ releve.closed ? 'Voir' : 'Compléter / clore' }}</a></td>
+                                    <td>{{ row.lines }}</td>
+                                    <td>{{ row.ops }}</td>
+                                    <td class="{{ row.total < 0 ? 'amount-expense' : 'amount-income' }}">{{ row.total < 0 ? '−' : '+' }} {{ row.total|abs|number_format(2, ',', ' ') }} €</td>
+                                    <td>{{ row.cumul|number_format(2, ',', ' ') }} €</td>
+                                    <td><a class="ops-group-link" href="{{ url }}">{{ releve.closed ? 'Voir' : 'Compléter / clore' }}</a></td>
                                 </tr>
                             {% endfor %}
                         </tbody>

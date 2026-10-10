@@ -5,21 +5,21 @@
 {% set back = back|default('') %}
 {% set signed = e.montantSigne %}
 <tr class="ops-row">
-    <td class="px-4 py-2 {{ late ? 'pv-late' : '' }}">
+    <td class="{{ late ? 'pv-late' : '' }}">
         {{ e.datePrevue|date('d/m') }}{% if e.dateFin %} – {{ e.dateFin|date('d/m') }}{% endif %}
         {% if late %}<span title="Date dépassée, pas encore concrétisée"> · en retard</span>{% endif %}
         {% if e.ajustee %}<span class="pv-range" title="Ajustée à la main"> ✎</span>{% endif %}
     </td>
-    <td class="px-4 py-2">
+    <td>
         <a class="ops-group-link" href="{{ path('app_prevision_edit', { id: regle.id }) }}">{{ regle.libelle }}</a>
         <div class="pv-range">{{ regle.tiers.name }} · {{ regle.portefeuille.libelle }}</div>
     </td>
-    <td class="px-4 py-2"><span class="pill pill-{{ {certain:'success',probable:'warning',estime:'muted'}[e.certitude.value] }}">{{ e.certitude.label }}</span></td>
-    <td class="px-4 py-2 text-right font-medium {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">
+    <td><span class="pill pill-{{ {certain:'success',probable:'warning',estime:'muted'}[e.certitude.value] }}">{{ e.certitude.label }}</span></td>
+    <td class="{{ signed < 0 ? 'amount-expense' : 'amount-income' }}">
         {{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €
         {% if e.montantMin and e.montantMax %}<div class="pv-range">entre {{ e.montantMin|number_format(2, ',', ' ') }} et {{ e.montantMax|number_format(2, ',', ' ') }} €</div>{% endif %}
     </td>
-    <td class="px-4 py-2">
+    <td>
         {# Concrétiser en place : date et montant RÉELS visibles, pré-remplis avec la prévision #}
         <form method="post" class="pv-concretise" action="{{ path('app_prevision_concretiser', { id: e.id }) }}">
             <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
@@ -30,7 +30,7 @@
             <button type="submit" class="btn btn-primary" title="Crée l'opération avec cette date et ce montant">Concrétiser</button>
         </form>
     </td>
-    <td class="px-4 py-2">
+    <td>
         <div class="pv-actions">
             <details>
                 <summary class="btn-link is-muted">Ajuster</summary>
