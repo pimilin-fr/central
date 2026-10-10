@@ -4,8 +4,8 @@
 #}
 <section class="rc-panel">
     <header class="rc-panel-head">
-        <h2>Relevés <span class="rc-count">{{ rows|length }}</span></h2>
-        <a class="page-action page-action-primary" href="{{ path('app_releve_compose', { id: portefeuille.id }) }}">
+        <h2>Relevés <span class="pill pill-solid">{{ rows|length }}</span></h2>
+        <a class="btn btn-primary" href="{{ path('app_releve_compose', { id: portefeuille.id }) }}">
             <twig:ux:icon name="lucide:list-ordered" /><span>Faire un relevé</span>
         </a>
     </header>

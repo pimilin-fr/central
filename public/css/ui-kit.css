@@ -1,0 +1,122 @@
+/* =========================================================
+   UI-KIT v1 — primitives partagées : .btn et .pill
+   Chargé APRÈS app/forms/ui/detail/releve/prevision/entities.
+   Règle : toute nouvelle variante se déclare ICI et s'illustre dans /styleguide.
+
+   BOUTON   .btn  + taille (.btn-sm, .btn-xs) + forme (.btn-icon, .btn-link)
+                  + teinte (.btn-primary .btn-neutral .btn-info .btn-danger
+                            .btn-success .btn-warning .btn-soft .btn-ghost)
+   PASTILLE .pill + teinte (.pill-solid .pill-accent .pill-success
+                            .pill-warning .pill-muted) + .pill-count
+   ========================================================= */
+:root {
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-pill: 999px;
+    --h-btn: 38px;
+    --h-btn-sm: 32px;
+    --h-btn-xs: 24px;
+}
+
+/* ---------- BOUTON : base (géométrie unique) ---------- */
+.btn {
+    min-height: var(--h-btn);
+    padding: 0 13px;
+    border-radius: var(--r-md);
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1.2;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn-sm { min-height: var(--h-btn-sm); padding: 0 10px; gap: 6px; }
+.btn-xs { min-height: var(--h-btn-xs); padding: 0 8px; gap: 5px; border-radius: var(--r-sm); }
+.btn svg { flex: none; }
+.btn-sm svg { width: 15px; height: 15px; }
+
+/* ---------- teintes (anciennement .page-action-*) ---------- */
+.btn-neutral { color: var(--text); background: var(--surface); border-color: var(--border); }
+.btn-neutral:hover { color: var(--accent-strong); background: var(--surface-soft); }
+
+.btn-primary { color: var(--accent-contrast); background: var(--accent); border-color: var(--accent); }
+.btn-primary:hover { color: var(--accent-contrast); background: var(--accent-strong); border-color: var(--accent-strong); }
+
+.btn-info { color: var(--accent-contrast); background: var(--info); border-color: var(--info-soft); }
+.btn-info:hover { color: var(--accent-contrast); background: var(--info-strong); border-color: var(--info-soft); }
+
+.btn-danger { color: var(--accent-contrast); background: var(--danger); border-color: var(--danger-soft); }
+.btn-danger:hover { color: var(--accent-contrast); background: var(--danger-strong); border-color: var(--danger-soft); }
+
+.btn-success { color: var(--accent-contrast); background: var(--success); border-color: var(--success-soft); }
+.btn-success:hover { color: var(--accent-contrast); background: var(--success-strong); border-color: var(--success-soft); }
+
+.btn-warning { color: var(--accent-contrast); background: var(--warning); border-color: var(--warning-soft); }
+.btn-warning:hover { color: var(--accent-contrast); background: var(--warning-strong); border-color: var(--warning-soft); }
+
+/* discret, fond doux (actions de carte) */
+.btn-soft { color: var(--text-soft); background: var(--surface-soft); box-shadow: none; }
+.btn-soft:hover { color: var(--accent-strong); background: var(--accent-soft); transform: none; box-shadow: none; }
+.btn-soft.is-active { color: var(--accent); }
+.btn-soft.is-danger:hover { color: var(--danger); background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 30%, var(--border)); }
+
+/* sans cadre, sans ombre */
+.btn-ghost { color: var(--text-muted); background: transparent; border-color: transparent; box-shadow: none; }
+.btn-ghost:hover { color: var(--text); background: var(--surface-hover); transform: none; box-shadow: none; }
+.btn-ghost.is-danger:hover { color: var(--danger); }
+
+/* ---------- forme : carré à icône / caractère (outils de ligne) ---------- */
+.btn-icon {
+    inline-size: 22px; block-size: 22px; min-height: 0; padding: 0;
+    border-radius: var(--r-sm); box-shadow: none; line-height: 1;
+}
+.btn-icon:hover { transform: none; box-shadow: none; color: var(--text); background: var(--surface-hover); }
+.btn-icon.btn-primary, .btn-icon.is-on { color: var(--accent-contrast); background: var(--accent); border-color: var(--accent); }
+.btn-icon.btn-primary:hover, .btn-icon.is-on:hover { color: var(--accent-contrast); background: var(--accent); filter: brightness(1.08); }
+.btn-icon.rc-add { font-size: 14px; }
+.btn-icon.btn-ghost { inline-size: 28px; block-size: 28px; font-size: 1.1rem; color: var(--text-muted); background: transparent; }
+.btn-icon.btn-ghost:hover { background: var(--surface-hover); }
+.btn-icon.btn-ghost.is-danger:hover { color: var(--danger); }
+
+/* ---------- forme : lien (texte seul) ---------- */
+.btn-link {
+    display: inline;
+    min-height: 0; padding: 0; gap: 0;
+    color: var(--accent); background: none; border: 0; border-radius: 0; box-shadow: none;
+    font: inherit; font-weight: 750; text-decoration: none; cursor: pointer;
+}
+.btn-link:hover { color: var(--accent-strong); background: none; text-decoration: underline; transform: none; box-shadow: none; }
+.btn-link[aria-pressed="true"] { color: var(--text); text-decoration: underline; }
+.btn-link.is-muted { color: var(--text-muted); font-size: .85rem; font-weight: 600; text-decoration: underline; }
+.btn-link.is-muted:hover { color: var(--text); }
+summary.btn-link { list-style: none; }
+summary.btn-link::-webkit-details-marker { display: none; }
+
+/* ---------- PASTILLE : base ---------- */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 1px 8px;
+    color: var(--text-soft);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+.pill[hidden] { display: none; }
+button.pill { cursor: pointer; font-family: inherit; }
+button.pill:hover { color: var(--accent); border-color: var(--accent); }
+
+/* teintes */
+.pill-solid { min-inline-size: 22px; color: var(--accent-contrast); background: var(--accent); border-color: var(--accent); font-size: 11px; }
+.pill-accent { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.pill-success { color: var(--success); border-color: currentColor; background: transparent; }
+.pill-warning { color: var(--warning); border-color: currentColor; background: transparent; }
+.pill-muted { color: var(--text-muted); border-color: currentColor; border-style: dashed; background: transparent; }
+
+/* compteur rond (onglets) */
+.pill-count { display: inline-grid; place-items: center; min-inline-size: 19px; block-size: 19px; padding: 0 5px; font-size: 9px; font-weight: 850; }

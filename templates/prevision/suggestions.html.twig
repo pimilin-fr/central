@@ -21,8 +21,8 @@
 
         <section class="rc-panel" data-pv-suggestions>
             <header class="rc-panel-head">
-                <h2>Récurrences repérées <span class="rc-count" data-pv-count>{{ suggestions|length }}</span></h2>
-                <button type="button" class="pv-link-btn hidden" data-pv-reset>Réafficher les suggestions masquées</button>
+                <h2>Récurrences repérées <span class="pill pill-solid" data-pv-count>{{ suggestions|length }}</span></h2>
+                <button type="button" class="btn-link is-muted hidden" data-pv-reset>Réafficher les suggestions masquées</button>
             </header>
 
             {% if suggestions is empty %}
@@ -62,18 +62,18 @@
                                 <td class="px-4 py-2">
                                     {{ s.resume }}
                                     <div class="pv-range">dernière le {{ s.derniere|date('d/m/Y') }} · régularité {{ (s.regularite * 100)|round }} %</div>
-                                    <details class="pv-serie"><summary class="pv-link-btn">voir les {{ s.serie|length }} opérations</summary>
+                                    <details class="pv-serie"><summary class="btn-link is-muted">voir les {{ s.serie|length }} opérations</summary>
                                         <ul>{% for o in s.serie %}<li>{{ o.date|date('d/m/Y') }} · {{ o.montant|number_format(2, ',', ' ') }} € <span class="pv-range">{{ o.categorie }}</span></li>{% endfor %}</ul>
                                     </details>
                                 </td>
-                                <td class="px-4 py-2">{{ s.prochaine|date('d/m/Y') }} <span class="pv-badge is-{{ s.certitude.value }}">{{ s.certitude.label }}</span></td>
+                                <td class="px-4 py-2">{{ s.prochaine|date('d/m/Y') }} <span class="pill pill-{{ {certain:'success',probable:'warning',estime:'muted'}[s.certitude.value] }}">{{ s.certitude.label }}</span></td>
                                 <td class="px-4 py-2 text-right font-medium">
                                     {{ s.estime ? '≈ ' : '' }}{{ s.montant|number_format(2, ',', ' ') }} €
                                 </td>
                                 <td class="px-4 py-2">
                                     <div class="pv-actions">
-                                        <a class="page-action page-action-primary" href="{{ path('app_prevision_new', params) }}">Créer la règle</a>
-                                        <button type="button" class="pv-link-btn" data-pv-hide>Masquer</button>
+                                        <a class="btn btn-primary" href="{{ path('app_prevision_new', params) }}">Créer la règle</a>
+                                        <button type="button" class="btn-link is-muted" data-pv-hide>Masquer</button>
                                     </div>
                                 </td>
                             </tr>
@@ -86,7 +86,7 @@
 
         <section class="rc-panel">
             <details>
-                <summary class="rc-panel-head"><h2>Non retenues <span class="rc-count">{{ rejets|length }}</span></h2></summary>
+                <summary class="rc-panel-head"><h2>Non retenues <span class="pill pill-solid">{{ rejets|length }}</span></h2></summary>
                 <p class="pv-hint">Opérations d'un même tiers et portefeuille qui n'ont été rattachées à aucune récurrence (opérations ponctuelles, rythme irrégulier, série terminée…), et pourquoi. Les plus nombreuses d'abord.</p>
                 {% if rejets is empty %}
                     <p class="rc-empty">Rien d'écarté.</p>
@@ -108,7 +108,7 @@
                                     <td class="px-4 py-2 text-right">{{ r.occurrences }}</td>
                                     <td class="px-4 py-2">{{ r.derniere|date('d/m/Y') }}</td>
                                     <td class="px-4 py-2">{{ r.raison }}
-                                        <details class="pv-serie"><summary class="pv-link-btn">voir les {{ r.serie|length }} opérations</summary>
+                                        <details class="pv-serie"><summary class="btn-link is-muted">voir les {{ r.serie|length }} opérations</summary>
                                             <ul>{% for o in r.serie %}<li>{{ o.date|date('d/m/Y') }} · {{ o.montant|number_format(2, ',', ' ') }} € <span class="pv-range">{{ o.categorie }}</span></li>{% endfor %}</ul>
                                         </details>
                                     </td>

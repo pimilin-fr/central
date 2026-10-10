@@ -11,28 +11,39 @@
     { label: 'Warning', path: '#', icon: 'lucide:triangle-alert', color: 'warning' }
 ] } %}
 {% endverbatim %}{% endset %}
-{{ sg.ex('page-action — variantes de couleur', code, 'Passer par <code>_btns.html.twig</code> : un lien par défaut, <code>type: \'submit\'</code> pour un bouton de formulaire, <code>removeContainer: true</code> pour un bouton seul.') }}
+{{ sg.ex('btn — variantes de couleur', code, 'Passer par <code>_btns.html.twig</code> : un lien par défaut, <code>type: \'submit\'</code> pour un bouton de formulaire, <code>removeContainer: true</code> pour un bouton seul.') }}
 
 {% set code %}{% verbatim %}
 <div class="sg-row">
-    <a href="#" class="page-action page-action-primary"><span>Sans icône</span></a>
-    <button type="button" class="page-action page-action-primary" disabled><span>Désactivé</span></button>
-    <button type="button" class="page-action page-action-neutral" disabled><span>Désactivé</span></button>
-    <a href="#" class="page-action"><span>Neutre (classe seule)</span></a>
+    <a href="#" class="btn btn-primary"><span>Sans icône</span></a>
+    <button type="button" class="btn btn-primary" disabled><span>Désactivé</span></button>
+    <button type="button" class="btn btn-neutral" disabled><span>Désactivé</span></button>
+    <a href="#" class="btn"><span>Neutre (classe seule)</span></a>
     <a href="#" class="btn">.btn</a>
 </div>
 {% endverbatim %}{% endset %}
-{{ sg.ex('page-action — sans icône, désactivé, classe seule', code) }}
+{{ sg.ex('btn — sans icône, désactivé, classe seule', code) }}
+
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <button type="button" class="btn btn-primary">Normal · 38px</button>
+    <button type="button" class="btn btn-primary btn-sm">Small · 32px</button>
+    <button type="button" class="btn btn-primary btn-xs">XS · 24px</button>
+    <button type="button" class="btn btn-soft btn-sm">Soft</button>
+    <button type="button" class="btn btn-ghost btn-sm">Ghost</button>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('btn-sm, btn-xs, btn-soft, btn-ghost', code, 'Tailles et teintes complémentaires du kit (<code>public/css/ui-kit.css</code>). Rayon unique 8px (6px pour xs et icônes).') }}
 
 <p class="sg-sub">Boutons de carte</p>
 {% set code %}{% verbatim %}
 <div class="sg-row">
-    <a href="#" class="entity-action"><twig:ux:icon name="lucide:star-off" /> Défaut</a>
-    <a href="#" class="entity-action is-active"><twig:ux:icon name="material-symbols:star-rounded" /> Actif</a>
-    <a href="#" class="entity-action is-danger"><twig:ux:icon name="lucide:unlink" /> Danger</a>
+    <a href="#" class="btn btn-soft btn-sm"><twig:ux:icon name="lucide:star-off" /> Défaut</a>
+    <a href="#" class="btn btn-soft btn-sm is-active"><twig:ux:icon name="material-symbols:star-rounded" /> Actif</a>
+    <a href="#" class="btn btn-soft btn-sm is-danger"><twig:ux:icon name="lucide:unlink" /> Danger</a>
 </div>
 {% endverbatim %}{% endset %}
-{{ sg.ex('entity-action', code, 'Petits boutons en bas d\'une carte d\'entité. <code>is-active</code> = état courant ; <code>is-danger</code> = rouge au survol.') }}
+{{ sg.ex('btn btn-soft btn-sm', code, 'Petits boutons en bas d\'une carte d\'entité. <code>is-active</code> = état courant ; <code>is-danger</code> = rouge au survol.') }}
 
 <p class="sg-sub">Choix exclusif</p>
 {% set code %}{% verbatim %}
@@ -47,16 +58,16 @@
 <p class="sg-sub">Boutons de l'écran de relevé et des prévisions</p>
 {% set code %}{% verbatim %}
 <div class="sg-row">
-    <button type="button" class="rc-btn" title="Trier">↑</button>
-    <button type="button" class="rc-btn is-on" title="Actif">↓</button>
-    <button type="button" class="rc-btn rc-add" title="Ajouter">＋</button>
-    <button type="button" class="rc-linkbtn">Désélectionner</button>
-    <button type="button" class="rc-chip">rc-chip (bouton)</button>
-    <button type="button" class="pv-link-btn">Ajuster</button>
-    <button type="button" class="pv-remove" title="Replier">✕</button>
+    <button type="button" class="btn btn-icon" title="Trier">↑</button>
+    <button type="button" class="btn btn-icon is-on" title="Actif">↓</button>
+    <button type="button" class="btn btn-icon btn-primary rc-add" title="Ajouter">＋</button>
+    <button type="button" class="btn-link">Désélectionner</button>
+    <button type="button" class="pill">Puce cliquable</button>
+    <button type="button" class="btn-link is-muted">Ajuster</button>
+    <button type="button" class="btn btn-icon btn-ghost is-danger" title="Replier">✕</button>
 </div>
 {% endverbatim %}{% endset %}
-{{ sg.ex('rc-btn, rc-linkbtn, rc-chip, pv-link-btn', code, 'Boutons compacts : outils de ligne (<code>rc-btn</code>), liens-boutons (<code>rc-linkbtn</code>, <code>pv-link-btn</code>), puces cliquables (<code>rc-chip</code>).') }}
+{{ sg.ex('btn-icon, btn-link, pill (bouton)', code, 'Boutons compacts : outils de ligne (<code>btn btn-icon</code>), liens-boutons (<code>btn-link</code>, <code>is-muted</code> pour la version grise soulignée), puces cliquables (<code>button.pill</code>).') }}
 
 <p class="sg-sub">Bouton « Appliquer » de la barre en masse</p>
 {% set code %}{% verbatim %}

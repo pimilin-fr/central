@@ -10,17 +10,17 @@
                 <p class="page-subtitle">Ce qui va arriver : abonnements, LOA, paiements en plusieurs fois, factures variables. Pondéré par la certitude.</p>
             </div>
             <div class="pv-actions">
-                <a class="page-action" href="{{ path('app_prevision_suggestions') }}" title="Récurrences repérées dans vos opérations"><twig:ux:icon name="lucide:sparkles" /><span>Suggestions</span></a>
+                <a class="btn" href="{{ path('app_prevision_suggestions') }}" title="Récurrences repérées dans vos opérations"><twig:ux:icon name="lucide:sparkles" /><span>Suggestions</span></a>
                 <form method="post" action="{{ path('app_prevision_refresh') }}" class="pv-inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">
-                    <button type="submit" class="page-action" title="Ajoute les échéances des prochains mois">Actualiser</button>
+                    <button type="submit" class="btn" title="Ajoute les échéances des prochains mois">Actualiser</button>
                 </form>
-                <a class="page-action page-action-primary" href="{{ path('app_prevision_new') }}"><twig:ux:icon name="gridicons:add" /><span>Nouvelle règle</span></a>
+                <a class="btn btn-primary" href="{{ path('app_prevision_new') }}"><twig:ux:icon name="gridicons:add" /><span>Nouvelle règle</span></a>
             </div>
         </div>
 
         <details class="rc-panel pv-rules">
-            <summary class="rc-panel-head"><h2>Règles <span class="rc-count" title="Règles actives">{{ regles|filter(r => r.actif)|length }} active{{ regles|filter(r => r.actif)|length > 1 ? 's' : '' }}</span>{% if regles|filter(r => not r.actif) is not empty %} <span class="pv-range">· {{ regles|filter(r => not r.actif)|length }} inactive(s)</span>{% endif %}</h2></summary>
+            <summary class="rc-panel-head"><h2>Règles <span class="pill pill-solid" title="Règles actives">{{ regles|filter(r => r.actif)|length }} active{{ regles|filter(r => r.actif)|length > 1 ? 's' : '' }}</span>{% if regles|filter(r => not r.actif) is not empty %} <span class="pv-range">· {{ regles|filter(r => not r.actif)|length }} inactive(s)</span>{% endif %}</h2></summary>
             {% if regles is empty %}
                 <p class="rc-empty">Aucune règle.</p>
             {% else %}
@@ -42,7 +42,7 @@
                                     <div class="pv-range">{{ r.tiers.name }} · {{ r.portefeuille.libelle }}{% if not r.actif %} · inactive{% endif %}</div>
                                 </td>
                                 <td class="px-4 py-2">{{ r.frequence.label }}, le {{ r.jour }}{% if r.jourFin %}–{{ r.jourFin }}{% endif %}</td>
-                                <td class="px-4 py-2"><span class="pv-badge is-{{ r.certitude.value }}">{{ r.certitude.label }}</span>{% if r.estime %} <span class="pv-range">montant variable</span>{% endif %}</td>
+                                <td class="px-4 py-2"><span class="pill pill-{{ {certain:'success',probable:'warning',estime:'muted'}[r.certitude.value] }}">{{ r.certitude.label }}</span>{% if r.estime %} <span class="pv-range">montant variable</span>{% endif %}</td>
                                 <td class="px-4 py-2">
                                     {% for t in r.tranches %}
                                         <div>{{ t.montant|number_format(2, ',', ' ') }} €<span class="pv-range"> dès le {{ t.aPartirDe|date('d/m/Y') }}</span></div>

@@ -26,7 +26,7 @@
 
 {% if periodes|length > 1 %}
     <details class="pv-more">
-        <summary class="page-action">Afficher les mois suivants <span class="pv-range">({{ periodes|length - 1 }})</span></summary>
+        <summary class="btn">Afficher les mois suivants <span class="pv-range">({{ periodes|length - 1 }})</span></summary>
         {% for p in periodes|slice(1) %}{{ _self.periode(p, today, false) }}{% endfor %}
     </details>
 {% endif %}

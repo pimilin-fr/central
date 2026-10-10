@@ -58,7 +58,7 @@
                     <form method="post" action="{{ path('app_releve_reopen', { id: releve.id }) }}"
                           onsubmit="return confirm('Rouvrir ce relevé pour corriger l\'ordre des opérations ?');">
                         <input type="hidden" name="_token" value="{{ csrf_token(token) }}">
-                        <button type="submit" class="page-action page-action-neutral"><twig:ux:icon name="lucide:lock-open" /><span>Rouvrir</span></button>
+                        <button type="submit" class="btn btn-neutral"><twig:ux:icon name="lucide:lock-open" /><span>Rouvrir</span></button>
                     </form>
                 </header>
                 <ol class="rc-list is-readonly">
@@ -76,7 +76,7 @@
                                 <span class="rc-rank">{{ line[0].releveOrdre ?? loop.index }}</span>
                                 <span class="rc-date">{{ line[0].date|date('d/m/Y') }}</span>
                                 <span class="rc-main"><strong>{{ names|join(' + ') }}</strong>{% if line|length == 1 %}<small>{{ line[0].categorie.name }}</small>{% endif %}</span>
-                                {% if line|length > 1 %}<span class="rc-chip is-detail">Détail × {{ line|length }}</span>{% endif %}
+                                {% if line|length > 1 %}<span class="pill pill-accent">Détail × {{ line|length }}</span>{% endif %}
                                 <span class="rc-amount {{ total < 0 ? 'amount-expense' : 'amount-income' }}">{{ total < 0 ? '−' : '+' }} {{ total|abs|number_format(2, ',', ' ') }} €</span>
                                 <span class="rc-balance is-visible">{{ run|number_format(2, ',', ' ') }} €</span>
                             </div>
@@ -137,18 +137,18 @@
                     {# ---- RELEVÉ : l'élément principal (pleine hauteur, c'est la page qui défile) ---- #}
                     <section class="rc-panel rc-panel-main">
                         <header class="rc-panel-head rc-sticky">
-                            <h2>Relevé <span class="rc-count" data-rc-count title="Lignes du relevé">0</span> <small data-rc-ops-count></small></h2>
+                            <h2>Relevé <span class="pill pill-solid" data-rc-count title="Lignes du relevé">0</span> <small data-rc-ops-count></small></h2>
                             <div class="rc-progress" data-rc-progress-box hidden>
                                 <span class="rc-progress-text" data-rc-progress-text></span>
                                 <span class="rc-bar" aria-hidden="true"><i data-rc-progress-bar></i></span>
-                                <button type="button" class="rc-linkbtn" data-rc-done-all></button>
-                                <button type="button" class="rc-linkbtn" data-rc-hide-done aria-pressed="false">Masquer les pointées</button>
+                                <button type="button" class="btn-link" data-rc-done-all></button>
+                                <button type="button" class="btn-link" data-rc-hide-done aria-pressed="false">Masquer les pointées</button>
                             </div>
                             <div class="rc-sorts" role="group" aria-label="Outils du relevé">
-                                <button type="button" class="rc-btn" data-rc-sort="asc" title="Trier par date : du plus ancien au plus récent (ex. espèces)">↑</button>
-                                <button type="button" class="rc-btn" data-rc-sort="desc" title="Trier par date : du plus récent au plus ancien">↓</button>
+                                <button type="button" class="btn btn-icon" data-rc-sort="asc" title="Trier par date : du plus ancien au plus récent (ex. espèces)">↑</button>
+                                <button type="button" class="btn btn-icon" data-rc-sort="desc" title="Trier par date : du plus récent au plus ancien">↓</button>
                             </div>
-                            <div class="rc-selsum" data-rc-sel-lines hidden><span data-rc-sel-text></span><span class="rc-selsum-actions"><button type="button" class="page-action page-action-primary" data-rc-merge title="Regrouper les lignes cochées en un seul détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>Regrouper</span></button><button type="button" class="rc-linkbtn" data-rc-sel-clear>Désélectionner</button></span></div>
+                            <div class="rc-selsum" data-rc-sel-lines hidden><span data-rc-sel-text></span><span class="rc-selsum-actions"><button type="button" class="btn btn-primary" data-rc-merge title="Regrouper les lignes cochées en un seul détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>Regrouper</span></button><button type="button" class="btn-link" data-rc-sel-clear>Désélectionner</button></span></div>
                             <p class="rc-msg" data-rc-msg role="status" hidden></p>
                         </header>
                         <ol class="rc-list is-selected" data-rc-list>
@@ -162,15 +162,15 @@
                     {# ---- À POINTER : colonne latérale qui reste en vue ---- #}
                     <aside class="rc-panel rc-pool-panel">
                         <header class="rc-panel-head">
-                            <h2>À pointer <span class="rc-count" data-rc-pool-count>{{ pool|length }}</span></h2>
+                            <h2>À pointer <span class="pill pill-solid" data-rc-pool-count>{{ pool|length }}</span></h2>
                             <div class="rc-pool-actions">
-                                <button type="button" class="page-action page-action-neutral" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>En un détail</span></button>
-                                <button type="button" class="page-action page-action-neutral" data-rc-add-all title="Ajouter toutes les opérations affichées, une ligne chacune, par date"><twig:ux:icon name="lucide:list-plus" /><span>Tout ajouter</span></button>
-                                <button type="button" class="page-action page-action-neutral" data-rc-open-op title="Créer une opération qui n'existe pas encore (ex. frais bancaires)"><twig:ux:icon name="lucide:plus" /><span>Nouvelle</span></button>
+                                <button type="button" class="btn btn-neutral" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>En un détail</span></button>
+                                <button type="button" class="btn btn-neutral" data-rc-add-all title="Ajouter toutes les opérations affichées, une ligne chacune, par date"><twig:ux:icon name="lucide:list-plus" /><span>Tout ajouter</span></button>
+                                <button type="button" class="btn btn-neutral" data-rc-open-op title="Créer une opération qui n'existe pas encore (ex. frais bancaires)"><twig:ux:icon name="lucide:plus" /><span>Nouvelle</span></button>
                             </div>
                         </header>
                         {% include 'releve/_operation_panel.html.twig' with { portefeuille: portefeuille, releve: releve, token: token } only %}
-                        <div class="rc-selsum" data-rc-sel-pool hidden><span data-rc-sel-text></span><span class="rc-selsum-actions"><button type="button" class="page-action page-action-primary" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>En un détail</span></button><button type="button" class="rc-linkbtn" data-rc-sel-clear>Désélectionner</button></span></div>
+                        <div class="rc-selsum" data-rc-sel-pool hidden><span data-rc-sel-text></span><span class="rc-selsum-actions"><button type="button" class="btn btn-primary" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="lucide:layers" /><span>En un détail</span></button><button type="button" class="btn-link" data-rc-sel-clear>Désélectionner</button></span></div>
                         <input type="search" class="modern-form-control rc-filter" placeholder="Filtrer (tiers, catégorie, montant, date…)" data-rc-filter>
                         <ul class="rc-list is-pool" data-rc-pool>
                             {% for op in pool %}
@@ -188,10 +188,10 @@
                         <span>Solde cumulé <strong data-rc-cumul>0,00 €</strong></span>
                     </div>
                     <span class="rc-actions-buttons">
-                        <button type="submit" name="action" value="save" class="page-action page-action-neutral" data-rc-submit>
+                        <button type="submit" name="action" value="save" class="btn btn-neutral" data-rc-submit>
                             <twig:ux:icon name="lucide:save" /><span>Enregistrer</span>
                         </button>
-                        <button type="submit" name="action" value="finalize" class="page-action page-action-primary" data-rc-submit data-rc-finalize
+                        <button type="submit" name="action" value="finalize" class="btn btn-primary" data-rc-submit data-rc-finalize
                                 data-confirm="Finaliser ce relevé ? L'ordre des opérations sera figé (vous pourrez le rouvrir au besoin).">
                             <twig:ux:icon name="lucide:lock" /><span>Finaliser</span>
                         </button>

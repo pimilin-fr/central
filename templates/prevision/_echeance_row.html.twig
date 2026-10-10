@@ -14,7 +14,7 @@
         <a class="ops-group-link" href="{{ path('app_prevision_edit', { id: regle.id }) }}">{{ regle.libelle }}</a>
         <div class="pv-range">{{ regle.tiers.name }} · {{ regle.portefeuille.libelle }}</div>
     </td>
-    <td class="px-4 py-2"><span class="pv-badge is-{{ e.certitude.value }}">{{ e.certitude.label }}</span></td>
+    <td class="px-4 py-2"><span class="pill pill-{{ {certain:'success',probable:'warning',estime:'muted'}[e.certitude.value] }}">{{ e.certitude.label }}</span></td>
     <td class="px-4 py-2 text-right font-medium {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">
         {{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €
         {% if e.montantMin and e.montantMax %}<div class="pv-range">entre {{ e.montantMin|number_format(2, ',', ' ') }} et {{ e.montantMax|number_format(2, ',', ' ') }} €</div>{% endif %}
@@ -27,23 +27,23 @@
                 <input type="date" name="date" class="modern-form-control" required value="{{ (late or e.datePrevue < today ? today : e.datePrevue)|date('Y-m-d') }}"></label>
             <label><span class="pv-range">Montant réel (€)</span>
                 <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"{% if e.montantMin and e.montantMax %} title="Prévu entre {{ e.montantMin }} et {{ e.montantMax }} €"{% endif %}></label>
-            <button type="submit" class="page-action page-action-primary" title="Crée l'opération avec cette date et ce montant">Concrétiser</button>
+            <button type="submit" class="btn btn-primary" title="Crée l'opération avec cette date et ce montant">Concrétiser</button>
         </form>
     </td>
     <td class="px-4 py-2">
         <div class="pv-actions">
             <details>
-                <summary class="pv-link-btn">Ajuster</summary>
+                <summary class="btn-link is-muted">Ajuster</summary>
                 <form method="post" class="pv-pop" action="{{ path('app_prevision_ajuster', { id: e.id }) }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
                     <label>Nouvelle date<input type="date" name="date" class="modern-form-control" required value="{{ e.datePrevue|date('Y-m-d') }}"></label>
                     <label>Nouveau montant (€)<input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
-                    <button type="submit" class="page-action">Enregistrer</button>
+                    <button type="submit" class="btn">Enregistrer</button>
                 </form>
             </details>
             <form method="post" class="pv-inline" action="{{ path('app_prevision_ignorer', { id: e.id }) }}" onsubmit="return confirm('Ignorer cette échéance ?');">
                 <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
-                <button type="submit" class="pv-link-btn">Ignorer</button>
+                <button type="submit" class="btn-link is-muted">Ignorer</button>
             </form>
         </div>
     </td>

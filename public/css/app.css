@@ -951,7 +951,6 @@ PAGE HEADINGS / TOOLBARS
     flex-wrap: wrap;
 }
 
-.page-action,
 .btn {
     display: inline-flex;
     align-items: center;
@@ -974,7 +973,6 @@ PAGE HEADINGS / TOOLBARS
         box-shadow 150ms ease;
 }
 
-.page-action:hover,
 .btn:hover {
     color: var(--accent-strong);
     border-color: color-mix(
@@ -986,17 +984,7 @@ PAGE HEADINGS / TOOLBARS
     box-shadow: var(--shadow-md);
 }
 
-.page-action-primary {
-    color: var(--accent-contrast);
-    background: var(--accent);
-    border-color: var(--accent);
-}
 
-.page-action-primary:hover {
-    color: var(--accent-contrast);
-    background: var(--accent-strong);
-    border-color: var(--accent-strong);
-}
 
 .toolbar {
     display: flex;
@@ -1544,81 +1532,13 @@ body,
     background: transparent;
 }
 
-/* ---------------------------------------------------------
-   BOUTONS D'ACTION — ACCENT DU THÈME
-   --------------------------------------------------------- */
 
-.page-action:hover,
-.btn:hover {
-    color: var(--accent-strong);
-    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
-}
 
-.page-action-neutral {
-    color: var(--text);
-    background: var(--surface);
-    border-color: var(--border);
-}
 
-.page-action-neutral:hover {
-    color: var(--accent-strong);
-    background: var(--surface-soft);
-}
 
-.page-action-primary {
-    color: var(--accent-contrast);
-    background: var(--accent);
-    border-color: var(--accent);
-}
 
-.page-action-primary:hover {
-    color: var(--accent-contrast);
-    background: var(--accent-strong);
-    border-color: var(--accent-strong);
-}
 
-.page-action-info {
-    color: var(--accent-contrast);
-    background: var(--info);
-    border-color: var(--info-soft);
-}
-.page-action-info:hover {
-    color: var(--accent-contrast);
-    background: var(--info-strong);
-    border-color: var(--info-soft);
-}
 
-.page-action-danger {
-    color: var(--accent-contrast);
-    background: var(--danger);
-    border-color: var(--danger-soft);
-}
-.page-action-danger:hover {
-    color: var(--accent-contrast);
-    background: var(--danger-strong);
-    border-color: var(--danger-soft);
-}
 
-.page-action-success {
-    color: var(--accent-contrast);
-    background: var(--success);
-    border-color: var(--success-soft);
-}
-.page-action-success:hover {
-    color: var(--accent-contrast);
-    background: var(--success-strong);
-    border-color: var(--danger-soft);
-}
-
-.page-action-warning {
-    color: var(--accent-contrast);
-    background: var(--warning);
-    border-color: var(--warning-soft);
-}
-.page-action-warning:hover {
-    color: var(--accent-contrast);
-    background: var(--warning-strong);
-    border-color: var(--warning-soft);
-}
 
 

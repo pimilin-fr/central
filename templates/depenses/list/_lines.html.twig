@@ -38,7 +38,7 @@
                     <span class="rc-rank">{{ line[0].releveOrdre ?? loop.index }}</span>
                     <span class="rc-date">{{ line[0].date|date('d/m/Y') }}</span>
                     <span class="rc-main"><strong>{{ names|join(' + ') }}</strong>{% if line|length == 1 %}<small>{{ line[0].categorie.name }}</small>{% endif %}</span>
-                    {% if line|length > 1 %}<span class="rc-chip is-detail">Détail × {{ line|length }}</span>{% else %}<span></span>{% endif %}
+                    {% if line|length > 1 %}<span class="pill pill-accent">Détail × {{ line|length }}</span>{% else %}<span></span>{% endif %}
                     <span class="rc-amount {{ total < 0 ? 'amount-expense' : 'amount-income' }}">{{ total < 0 ? '−' : '+' }} {{ total|abs|number_format(2, ',', ' ') }} €</span>
                     {% if before is not null %}<span class="rc-balance is-visible">{{ run|number_format(2, ',', ' ') }} €</span>{% endif %}
                 </div>

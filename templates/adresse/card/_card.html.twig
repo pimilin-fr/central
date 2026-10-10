@@ -90,14 +90,14 @@
     {% if isAdresseTiers %}
         <div class="entity-actions">
             <a href="{{ path('app_tiers_adresse_toggle_principale', { id: tierAdresse.id, tiers: tierAdresse.tiers.id }) }}"
-               class="entity-action {{ isPrincipale ? 'is-active' : '' }}"
+               class="btn btn-soft btn-sm {{ isPrincipale ? 'is-active' : '' }}"
                title="{{ isPrincipale ? 'Retirer comme adresse principale' : 'Définir comme adresse principale' }}">
                 <twig:ux:icon name="{{ isPrincipale ? 'lucide:star' : 'lucide:star-off' }}" />
                 {{ isPrincipale ? 'Principale' : 'Définir principale' }}
             </a>
 
             <a href="{{ path('app_tiers_adresse_unlink', { id: tierAdresse.id }) }}"
-               class="entity-action is-danger"
+               class="btn btn-soft btn-sm is-danger"
                title="Délier l'adresse">
                 <twig:ux:icon name="lucide:unlink" />
                 Délier

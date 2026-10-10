@@ -14,22 +14,22 @@
 {% set code %}{% verbatim %}
 <section class="rc-panel">
     <header class="rc-panel-head">
-        <h2>Relevé <span class="rc-count">4</span> <small>6 opérations</small></h2>
+        <h2>Relevé <span class="pill pill-solid">4</span> <small>6 opérations</small></h2>
         <div class="rc-progress">
             <span class="rc-progress-text">2 / 4 pointées</span>
             <span class="rc-bar" aria-hidden="true"><i style="width: 50%"></i></span>
-            <button type="button" class="rc-linkbtn">Tout pointer</button>
-            <button type="button" class="rc-linkbtn" aria-pressed="false">Masquer les pointées</button>
+            <button type="button" class="btn-link">Tout pointer</button>
+            <button type="button" class="btn-link" aria-pressed="false">Masquer les pointées</button>
         </div>
         <div class="rc-sorts" role="group">
-            <button type="button" class="rc-btn" title="Du plus ancien au plus récent">↑</button>
-            <button type="button" class="rc-btn" title="Du plus récent au plus ancien">↓</button>
+            <button type="button" class="btn btn-icon" title="Du plus ancien au plus récent">↑</button>
+            <button type="button" class="btn btn-icon" title="Du plus récent au plus ancien">↓</button>
         </div>
     </header>
     <div class="rc-selsum"><span>2 lignes cochées : − 72,50 €</span>
         <span class="rc-selsum-actions">
-            <button type="button" class="page-action page-action-primary"><twig:ux:icon name="lucide:layers" /><span>Regrouper</span></button>
-            <button type="button" class="rc-linkbtn">Désélectionner</button>
+            <button type="button" class="btn btn-primary"><twig:ux:icon name="lucide:layers" /><span>Regrouper</span></button>
+            <button type="button" class="btn-link">Désélectionner</button>
         </span>
     </div>
     <p class="rc-empty">Aucune opération pour l'instant : choisissez-les dans « À pointer ».</p>
@@ -52,10 +52,10 @@
             <span class="rc-amount amount-expense">− 42,10 €</span>
             <span class="rc-balance">957,90 €</span>
             <span class="rc-tools">
-                <button type="button" class="rc-btn" title="Placer après la dernière ligne pointée">⤒</button>
-                <button type="button" class="rc-btn" title="Monter">▲</button>
-                <button type="button" class="rc-btn" title="Descendre">▼</button>
-                <button type="button" class="rc-btn" title="Retirer la ligne du relevé">✕</button>
+                <button type="button" class="btn btn-icon" title="Placer après la dernière ligne pointée">⤒</button>
+                <button type="button" class="btn btn-icon" title="Monter">▲</button>
+                <button type="button" class="btn btn-icon" title="Descendre">▼</button>
+                <button type="button" class="btn btn-icon" title="Retirer la ligne du relevé">✕</button>
             </span>
         </div>
     </li>
@@ -67,20 +67,20 @@
             <button type="button" class="rc-done" aria-pressed="false" title="Cliquer pour pointer">✓</button>
             <span class="rc-date">03/09/2026</span>
             <span class="rc-main"><strong>Amazon</strong><small>Courses · Maison</small></span>
-            <span class="rc-chip is-detail">Détail × 2</span>
+            <span class="pill pill-accent">Détail × 2</span>
             <span class="rc-amount amount-expense">− 42,50 €</span>
             <span class="rc-balance">915,40 €</span>
             <span class="rc-tools">
-                <button type="button" class="rc-btn" title="Placer après la dernière ligne pointée">⤒</button>
-                <button type="button" class="rc-btn" title="Monter">▲</button>
-                <button type="button" class="rc-btn" title="Descendre">▼</button>
-                <button type="button" class="rc-btn" title="Dégrouper : une ligne par opération">⧉</button>
-                <button type="button" class="rc-btn" title="Retirer la ligne du relevé">✕</button>
+                <button type="button" class="btn btn-icon" title="Placer après la dernière ligne pointée">⤒</button>
+                <button type="button" class="btn btn-icon" title="Monter">▲</button>
+                <button type="button" class="btn btn-icon" title="Descendre">▼</button>
+                <button type="button" class="btn btn-icon" title="Dégrouper : une ligne par opération">⧉</button>
+                <button type="button" class="btn btn-icon" title="Retirer la ligne du relevé">✕</button>
             </span>
         </div>
         <ul class="rc-parts">
-            <li class="rc-op"><span class="rc-main"><small>Courses</small></span><span class="rc-amount amount-expense">− 30,00 €</span><span class="rc-tools"><button type="button" class="rc-btn" title="Sortir du détail">✂</button><button type="button" class="rc-btn" title="Retirer du relevé">✕</button></span></li>
-            <li class="rc-op"><span class="rc-main"><small>Maison</small></span><span class="rc-amount amount-expense">− 12,50 €</span><span class="rc-tools"><button type="button" class="rc-btn" title="Sortir du détail">✂</button><button type="button" class="rc-btn" title="Retirer du relevé">✕</button></span></li>
+            <li class="rc-op"><span class="rc-main"><small>Courses</small></span><span class="rc-amount amount-expense">− 30,00 €</span><span class="rc-tools"><button type="button" class="btn btn-icon" title="Sortir du détail">✂</button><button type="button" class="btn btn-icon" title="Retirer du relevé">✕</button></span></li>
+            <li class="rc-op"><span class="rc-main"><small>Maison</small></span><span class="rc-amount amount-expense">− 12,50 €</span><span class="rc-tools"><button type="button" class="btn btn-icon" title="Sortir du détail">✂</button><button type="button" class="btn btn-icon" title="Retirer du relevé">✕</button></span></li>
         </ul>
     </li>
 </ol>
@@ -95,9 +95,9 @@
         <span class="rc-grip rc-only-pool" aria-hidden="true">⋮⋮</span>
         <span class="rc-date">06/09/2026</span>
         <span class="rc-main"><strong>Free</strong><small>Internet · n° 123</small></span>
-        <button type="button" class="rc-chip rc-only-pool">2 du même jour</button>
+        <button type="button" class="pill rc-only-pool">2 du même jour</button>
         <span class="rc-amount amount-expense">− 19,99 €</span>
-        <span class="rc-tools"><button type="button" class="rc-btn rc-add rc-only-pool" title="Ajouter au relevé">＋</button></span>
+        <span class="rc-tools"><button type="button" class="btn btn-icon btn-primary rc-add rc-only-pool" title="Ajouter au relevé">＋</button></span>
     </li>
     <li class="rc-op" draggable="true">
         <label class="rc-pick rc-only-pool"><input type="checkbox"></label>
@@ -106,7 +106,7 @@
         <span class="rc-main"><strong>Employeur</strong><small>Salaire</small></span>
         <span></span>
         <span class="rc-amount amount-income">+ 1 800,00 €</span>
-        <span class="rc-tools"><button type="button" class="rc-btn rc-add rc-only-pool" title="Ajouter au relevé">＋</button></span>
+        <span class="rc-tools"><button type="button" class="btn btn-icon btn-primary rc-add rc-only-pool" title="Ajouter au relevé">＋</button></span>
     </li>
 </ul>
 <input type="search" class="modern-form-control rc-filter" placeholder="Filtrer (tiers, catégorie, montant, date…)" style="margin-top: 8px">
@@ -127,8 +127,8 @@
     <div class="rc-newop-foot">
         <p class="rc-msg" hidden></p>
         <span class="rc-newop-actions">
-            <button type="button" class="page-action page-action-neutral"><span>Annuler</span></button>
-            <button type="button" class="page-action page-action-primary"><span>Créer et ajouter</span></button>
+            <button type="button" class="btn btn-neutral"><span>Annuler</span></button>
+            <button type="button" class="btn btn-primary"><span>Créer et ajouter</span></button>
         </span>
     </div>
 </div>
@@ -143,8 +143,8 @@
         <span>Solde cumulé <strong>1 095,40 €</strong></span>
     </div>
     <span class="rc-actions-buttons">
-        <button type="button" class="page-action page-action-neutral"><twig:ux:icon name="lucide:save" /><span>Enregistrer</span></button>
-        <button type="button" class="page-action page-action-primary"><twig:ux:icon name="lucide:lock" /><span>Finaliser</span></button>
+        <button type="button" class="btn btn-neutral"><twig:ux:icon name="lucide:save" /><span>Enregistrer</span></button>
+        <button type="button" class="btn btn-primary"><twig:ux:icon name="lucide:lock" /><span>Finaliser</span></button>
     </span>
 </div>
 <footer class="rc-total rc-total-multi">

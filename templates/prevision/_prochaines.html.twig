@@ -21,15 +21,15 @@
                 <p class="pv-range"><span data-pv-nb2>{{ nb }}</span> · net <strong data-pv-net2 class="{{ brut < 0 ? 'amount-expense' : 'amount-income' }}">{{ brut < 0 ? '−' : '+' }} {{ brut|abs|number_format(2, ',', ' ') }} €</strong>
                     · pondéré {{ pondere < 0 ? '−' : '+' }} {{ pondere|abs|number_format(2, ',', ' ') }} €</p>
             </div>
-            <button type="button" class="pv-remove" data-pv-toggle title="Replier">✕</button>
+            <button type="button" class="btn btn-icon btn-ghost is-danger" data-pv-toggle title="Replier">✕</button>
         </header>
         <ul class="pv-cards">
             {% for e in retard %}{% include 'prevision/_echeance_card.html.twig' with { e: e, late: true, today: today, back: back, mode: mode } only %}{% endfor %}
             {% for e in proches %}{% include 'prevision/_echeance_card.html.twig' with { e: e, late: false, today: today, back: back, mode: mode } only %}{% endfor %}
         </ul>
         <footer class="pv-drawer-foot">
-            <a class="pv-link-btn" href="{{ path('app_portefeuille_show', { id: portefeuille.id, tab: 'prevision' }) }}"{% if mode == 'releve' %} target="_blank" rel="noopener"{% endif %}>Tout voir{% if total > nb %} ({{ total }}){% endif %}</a>
-            <a class="pv-link-btn" href="{{ path('app_prevision_new', { portefeuille: portefeuille.id }) }}"{% if mode == 'releve' %} target="_blank" rel="noopener"{% endif %}>+ Nouvelle règle</a>
+            <a class="btn-link is-muted" href="{{ path('app_portefeuille_show', { id: portefeuille.id, tab: 'prevision' }) }}"{% if mode == 'releve' %} target="_blank" rel="noopener"{% endif %}>Tout voir{% if total > nb %} ({{ total }}){% endif %}</a>
+            <a class="btn-link is-muted" href="{{ path('app_prevision_new', { portefeuille: portefeuille.id }) }}"{% if mode == 'releve' %} target="_blank" rel="noopener"{% endif %}>+ Nouvelle règle</a>
         </footer>
     </div>
 </aside>

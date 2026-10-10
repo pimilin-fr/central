@@ -11,33 +11,33 @@
         <tr class="ops-row">
             <td class="px-4 py-2">12/10</td>
             <td class="px-4 py-2"><a class="ops-group-link" href="#">Abonnement internet</a><div class="pv-range">Free · Compte courant</div></td>
-            <td class="px-4 py-2"><span class="pv-badge is-certain">Certain</span></td>
+            <td class="px-4 py-2"><span class="pill pill-success">Certain</span></td>
             <td class="px-4 py-2 text-right font-medium amount-expense">− 39,99 €</td>
             <td class="px-4 py-2">
                 <form class="pv-concretise" onsubmit="return false">
                     <label><span class="pv-range">Date réelle</span><input type="date" class="modern-form-control" value="2026-10-12"></label>
                     <label><span class="pv-range">Montant réel (€)</span><input type="text" class="modern-form-control" value="39.99"></label>
-                    <button type="submit" class="page-action page-action-primary">Concrétiser</button>
+                    <button type="submit" class="btn btn-primary">Concrétiser</button>
                 </form>
             </td>
-            <td class="px-4 py-2"><div class="pv-actions"><button type="button" class="pv-link-btn">Ajuster</button><button type="button" class="pv-link-btn">Ignorer</button></div></td>
+            <td class="px-4 py-2"><div class="pv-actions"><button type="button" class="btn-link is-muted">Ajuster</button><button type="button" class="btn-link is-muted">Ignorer</button></div></td>
         </tr>
     </tbody></table></div>
 </section>
-<details class="pv-more"><summary class="page-action">Afficher les mois suivants <span class="pv-range">(2)</span></summary></details>
+<details class="pv-more"><summary class="btn">Afficher les mois suivants <span class="pv-range">(2)</span></summary></details>
 {% endverbatim %}{% endset %}
 {{ sg.ex('pv-month, pv-concretise, pv-more', code, 'Une période va d\'un relevé de compte au suivant. « Concrétiser » = date et montant réels, pré-remplis avec la prévision.') }}
 
 <p class="sg-sub">Règles (repliées)</p>
 {% set code %}{% verbatim %}
 <details class="rc-panel pv-rules">
-    <summary class="rc-panel-head"><h2>Règles <span class="rc-count">9 actives</span> <span class="pv-range">· 2 inactive(s)</span></h2></summary>
+    <summary class="rc-panel-head"><h2>Règles <span class="pill pill-solid">9 actives</span> <span class="pv-range">· 2 inactive(s)</span></h2></summary>
     <div class="rc-table-wrap"><table class="ops-table">
         <thead><tr><th class="px-4 py-3 text-left">Règle</th><th class="px-4 py-3 text-left">Rythme</th><th class="px-4 py-3 text-left">Certitude</th><th class="px-4 py-3 text-left">Montants</th></tr></thead>
         <tbody><tr class="ops-row">
             <td class="px-4 py-2"><a class="ops-group-link" href="#">Abonnement internet</a><div class="pv-range">Free · Compte courant</div></td>
             <td class="px-4 py-2">Mensuel, le 12</td>
-            <td class="px-4 py-2"><span class="pv-badge is-certain">Certain</span></td>
+            <td class="px-4 py-2"><span class="pill pill-success">Certain</span></td>
             <td class="px-4 py-2">39,99 €<span class="pv-range"> dès le 01/01/2026</span></td>
         </tr></tbody>
     </table></div>
@@ -50,17 +50,17 @@
 <ul class="pv-cards" style="list-style: none; margin: 0; padding: 0; max-width: 420px">
     <li class="pv-card">
         <div class="pv-card-top"><span class="pv-card-date">12/10</span><strong class="amount-expense">− 39,99 €</strong></div>
-        <div class="pv-card-title"><a class="ops-group-link" href="#">Abonnement internet</a><span class="pv-badge is-certain">Certain</span></div>
+        <div class="pv-card-title"><a class="ops-group-link" href="#">Abonnement internet</a><span class="pill pill-success">Certain</span></div>
         <div class="pv-range">Free</div>
         <form class="pv-concretise" onsubmit="return false">
             <label><span class="pv-range">Date réelle</span><input type="date" class="modern-form-control" value="2026-10-12"></label>
             <label><span class="pv-range">Montant réel (€)</span><input type="text" class="modern-form-control" value="39.99"></label>
-            <button type="submit" class="page-action page-action-primary">Concrétiser</button>
+            <button type="submit" class="btn btn-primary">Concrétiser</button>
         </form>
     </li>
     <li class="pv-card is-late">
         <div class="pv-card-top"><span class="pv-card-date pv-late">02/10 · retard</span><strong class="amount-expense">− 120,00 €</strong></div>
-        <div class="pv-card-title"><a class="ops-group-link" href="#">Électricité</a><span class="pv-badge is-estime">Estimé</span></div>
+        <div class="pv-card-title"><a class="ops-group-link" href="#">Électricité</a><span class="pill pill-muted">Estimé</span></div>
         <div class="pv-range">EDF · entre 90,00 et 150,00 €</div>
     </li>
 </ul>
@@ -80,10 +80,10 @@
         <div class="pv-drawer-panel">
             <header class="pv-drawer-head">
                 <div><h2>Prochaines échéances</h2><p class="pv-range">4 · net <strong class="amount-expense">− 240,00 €</strong></p></div>
-                <button type="button" class="pv-remove" title="Replier">✕</button>
+                <button type="button" class="btn btn-icon btn-ghost is-danger" title="Replier">✕</button>
             </header>
             <ul class="pv-cards" style="list-style: none; margin: 0; padding: 10px">
-                <li class="pv-card"><div class="pv-card-top"><span class="pv-card-date">12/10</span><strong class="amount-expense">− 39,99 €</strong></div><div class="pv-card-title"><a class="ops-group-link" href="#">Abonnement internet</a><span class="pv-badge is-certain">Certain</span></div></li>
+                <li class="pv-card"><div class="pv-card-top"><span class="pv-card-date">12/10</span><strong class="amount-expense">− 39,99 €</strong></div><div class="pv-card-title"><a class="ops-group-link" href="#">Abonnement internet</a><span class="pill pill-success">Certain</span></div></li>
             </ul>
         </div>
     </aside>
@@ -98,7 +98,7 @@
         <div><label class="modern-form-label">À partir du</label><input type="date" class="modern-form-control" value="2026-01-01"></div>
         <div><label class="modern-form-label">Montant</label><input class="modern-form-control" value="39.99"></div>
         <div><label class="modern-form-label">Min</label><input class="modern-form-control"></div>
-        <button type="button" class="pv-remove" title="Retirer la tranche">✕</button>
+        <button type="button" class="btn btn-icon btn-ghost is-danger" title="Retirer la tranche">✕</button>
     </div>
 </div>
 {% endverbatim %}{% endset %}

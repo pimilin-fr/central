@@ -68,12 +68,12 @@
                                 <div>{{ form_label(tranche.montant, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(tranche.montant, { attr: { class: 'modern-form-control' } }) }}{{ form_errors(tranche.montant) }}</div>
                                 <div>{{ form_label(tranche.montantMin, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(tranche.montantMin, { attr: { class: 'modern-form-control' } }) }}</div>
                                 <div>{{ form_label(tranche.montantMax, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(tranche.montantMax, { attr: { class: 'modern-form-control' } }) }}</div>
-                                <button type="button" class="pv-remove" data-pv-remove title="Retirer ce montant">✕</button>
+                                <button type="button" class="btn btn-icon btn-ghost is-danger" data-pv-remove title="Retirer ce montant">✕</button>
                             </div>
                         {% endfor %}
                     </div>
                     {{ form_errors(form.tranches) }}
-                    <button type="button" class="page-action" data-pv-add><twig:ux:icon name="gridicons:add" /><span>Ajouter un montant (changement à une date)</span></button>
+                    <button type="button" class="btn" data-pv-add><twig:ux:icon name="gridicons:add" /><span>Ajouter un montant (changement à une date)</span></button>
                     {% do form.tranches.setRendered %}
                 </div>
 
@@ -84,7 +84,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="page-action page-action-primary"><twig:ux:icon name="lucide:check" /><span>Enregistrer</span></button>
+            <button type="submit" class="btn btn-primary"><twig:ux:icon name="lucide:check" /><span>Enregistrer</span></button>
         </div>
         {{ form_end(form) }}
     </div>

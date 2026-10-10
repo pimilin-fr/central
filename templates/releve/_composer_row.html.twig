@@ -20,12 +20,12 @@
         <strong>{{ op.tiers.name }}</strong>
         <small>{{ op.categorie.name }}{% if op.numCommande %} · n° {{ op.numCommande }}{% endif %}{% if op.note %} · {{ op.note|slice(0, 40) }}{% endif %}</small>
     </span>
-    <button type="button" class="rc-chip rc-only-pool" data-rc-siblings hidden></button>
+    <button type="button" class="pill rc-only-pool" data-rc-siblings hidden></button>
     <span class="rc-amount {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">{{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €</span>
     <span class="rc-tools">
-        <button type="button" class="rc-btn rc-add rc-only-pool" data-rc-add title="Ajouter au relevé" aria-label="Ajouter au relevé">＋</button>
-        <button type="button" class="rc-btn rc-only-part" data-rc-detach title="Sortir du détail (devient une ligne à part)" aria-label="Sortir du détail">✂</button>
-        <button type="button" class="rc-btn rc-only-part" data-rc-remove-part title="Retirer du relevé" aria-label="Retirer du relevé">✕</button>
+        <button type="button" class="btn btn-icon btn-primary rc-add rc-only-pool" data-rc-add title="Ajouter au relevé" aria-label="Ajouter au relevé">＋</button>
+        <button type="button" class="btn btn-icon rc-only-part" data-rc-detach title="Sortir du détail (devient une ligne à part)" aria-label="Sortir du détail">✂</button>
+        <button type="button" class="btn btn-icon rc-only-part" data-rc-remove-part title="Retirer du relevé" aria-label="Retirer du relevé">✕</button>
     </span>
     <input type="hidden" value="{{ op.id }}" data-rc-input {{ inList ? '' : 'disabled' }}>
 </li>

@@ -1,10 +1,10 @@
 {% set buttonColors = {
-    primary: 'page-action-primary',
-    neutral: 'page-action-neutral',
-    danger: 'page-action-danger',
-    success: 'page-action-success',
-    info: 'page-action-info',
-    warning: 'page-action-warning'
+    primary: 'btn-primary',
+    neutral: 'btn-neutral',
+    danger: 'btn-danger',
+    success: 'btn-success',
+    info: 'btn-info',
+    warning: 'btn-warning'
 } %}
 {# removeContainer: true => pas de <div> englobant (bouton seul dans un formulaire, une barre…) #}
 {% set withContainer = removeContainer is not defined or not removeContainer %}
@@ -19,7 +19,7 @@
         {% if btn.type is not defined or btn.type == 'link' %}
             <a
                 href="{{ btn.path }}"
-                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }} {{ btn.class ??"" }}"
+                class="btn {{ buttonColors[color] ?? 'btn-neutral' }} {{ btn.class ??"" }}"
                 {% if btn.attr is defined %}
                     {% for at in btn.attr %}
                         {{ at.label }}="{{ at.value }}"
@@ -34,7 +34,7 @@
         {% elseif btn.type == 'submit' %}
             <button
                 type="submit"
-                class="page-action {{ buttonColors[color] ?? 'page-action-neutral' }} {{ btn.class ??"" }}"
+                class="btn {{ buttonColors[color] ?? 'btn-neutral' }} {{ btn.class ??"" }}"
                 >
                 {% if btn.icon is defined %}
                     <twig:ux:icon name="{{ btn.icon }}" />

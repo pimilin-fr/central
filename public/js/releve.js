@@ -15,7 +15,7 @@ const CentralReleve = {
 
     config: {
         debug: true,
-        version: 'v1.1.0',
+        version: 'v1.2.0',
         appName: 'Central-ModuleReleve'
     },
 
@@ -167,15 +167,15 @@ const CentralReleve = {
                         '<button type="button" class="rc-done' + (isDone(line) ? ' is-on' : '') + '" data-rc-done aria-pressed="' + (isDone(line) ? 'true' : 'false') + '" title="' + (isDone(line) ? 'Pointée : cliquer pour dépointer' : 'Cliquer quand la ligne est vérifiée sur le relevé de compte (les lignes au-dessus sont pointées aussi)') + '">✓</button>' +
                         '<span class="rc-date">' + esc(first.dataset.dateFr) + '</span>' +
                         '<span class="rc-main"><strong>' + esc(tiersNames.join(' + ')) + '</strong><small>' + esc(categories) + '</small></span>' +
-                        (parts.length > 1 ? '<span class="rc-chip is-detail" title="Plusieurs opérations pointées ensemble">Détail × ' + parts.length + '</span>' : '<span></span>') +
+                        (parts.length > 1 ? '<span class="pill pill-accent" title="Plusieurs opérations pointées ensemble">Détail × ' + parts.length + '</span>' : '<span></span>') +
                         '<span class="rc-amount ' + (total < 0 ? 'amount-expense' : 'amount-income') + '">' + signed(total) + '</span>' +
                         '<span class="rc-balance" title="Solde cumulé après cette ligne">' + money.format(running) + ' €</span>' +
                         '<span class="rc-tools">' +
-                                                '<button type="button" class="rc-btn" data-rc-bring title="Placer cette ligne juste après la dernière ligne pointée (en premier si aucune n\'est pointée)" aria-label="Placer après la dernière ligne pointée">⤒</button>' +
-                        '<button type="button" class="rc-btn" data-rc-up title="Monter" aria-label="Monter">▲</button>' +
-                        '<button type="button" class="rc-btn" data-rc-down title="Descendre" aria-label="Descendre">▼</button>' +
-                        (parts.length > 1 ? '<button type="button" class="rc-btn" data-rc-split title="Dégrouper : une ligne par opération" aria-label="Dégrouper">⧉</button>' : '') +
-                        '<button type="button" class="rc-btn" data-rc-remove-line title="Retirer la ligne du relevé" aria-label="Retirer la ligne">✕</button>' +
+                                                '<button type="button" class="btn btn-icon" data-rc-bring title="Placer cette ligne juste après la dernière ligne pointée (en premier si aucune n\'est pointée)" aria-label="Placer après la dernière ligne pointée">⤒</button>' +
+                        '<button type="button" class="btn btn-icon" data-rc-up title="Monter" aria-label="Monter">▲</button>' +
+                        '<button type="button" class="btn btn-icon" data-rc-down title="Descendre" aria-label="Descendre">▼</button>' +
+                        (parts.length > 1 ? '<button type="button" class="btn btn-icon" data-rc-split title="Dégrouper : une ligne par opération" aria-label="Dégrouper">⧉</button>' : '') +
+                        '<button type="button" class="btn btn-icon" data-rc-remove-line title="Retirer la ligne du relevé" aria-label="Retirer la ligne">✕</button>' +
                         '</span>';
             };
 

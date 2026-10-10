@@ -37,7 +37,7 @@
 {% for key in visibles %}{{ _self.mois(months[key], today, back|default('')) }}{% endfor %}
 {% if caches is not empty %}
     <details class="pv-more">
-        <summary class="page-action">Afficher plus <span class="pv-range">({{ caches|length }} mois)</span></summary>
+        <summary class="btn">Afficher plus <span class="pv-range">({{ caches|length }} mois)</span></summary>
         {% for key in caches %}{{ _self.mois(months[key], today, back|default('')) }}{% endfor %}
     </details>
 {% endif %}
