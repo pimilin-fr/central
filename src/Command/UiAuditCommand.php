@@ -45,49 +45,77 @@ class UiAuditCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $strictFail = false;
 
-        // 1. classes définies dans le CSS (hors thèmes et feuille du styleguide)
+        // 1. classes définies dans le CSS (hors feuille du styleguide) : fichier + ligne de la 1re définition
         $defined = [];
         foreach (glob($this->projectDir.'/public/css/*.css') ?: [] as $file) {
             if (str_ends_with($file, 'styleguide.css')) {
                 continue;
             }
-            $css = preg_replace('~/\*.*?\*/~s', '', (string) file_get_contents($file));
-            $css = preg_replace('/\{[^{}]*\}/', '{}', (string) $css);
-            if (preg_match_all('/\.([A-Za-z_][\w-]*)/', (string) $css, $m)) {
-                foreach ($m[1] as $c) {
-                    $defined[$c][basename($file)] = true;
+            $rel = 'public/css/'.basename($file);
+            $raw = (string) file_get_contents($file);
+            // on remplace commentaires et corps de règles par des espaces/retours à la ligne pour garder les numéros de ligne
+            $css = preg_replace_callback('~/\*.*?\*/~s', static fn (array $m): string => str_repeat("\n", substr_count($m[0], "\n")), $raw);
+            $css = preg_replace_callback('/\{[^{}]*\}/', static fn (array $m): string => '{'.str_repeat("\n", substr_count($m[0], "\n")).'}', (string) $css);
+            foreach (preg_split('/\R/', (string) $css) ?: [] as $n => $line) {
+                if (preg_match_all('/\.([A-Za-z_][\w-]*)/', $line, $m)) {
+                    foreach ($m[1] as $c) {
+                        $defined[$c][$rel.':'.($n + 1)] ??= true;
+                    }
                 }
             }
         }
 
-        // 2. texte de l'application et du styleguide
-        $app = $this->read(['templates', 'public/js', 'src'], ['templates/styleguide', 'templates/verification', 'public/js/verification', 'src/Command/UiAuditCommand.php']);
-        $guide = $this->read(['templates/styleguide'], []);
+        // 2. fichiers de l'application et du styleguide
+        $appFiles = $this->read(['templates', 'public/js', 'src'], ['templates/styleguide', 'templates/verification', 'public/js/verification', 'src/Command/UiAuditCommand.php']);
+        $guideFiles = $this->read(['templates/styleguide'], []);
+        $app = implode("\n", $appFiles);
+        $guide = implode("\n", $guideFiles);
 
         $used = static fn (string $c, string $text): bool => (bool) preg_match('/(?<![\w-])'.preg_quote($c, '/').'(?![\w-])/', $text);
+        /** fichiers (max 4) où une classe est utilisée */
+        $where = static function (string $c, array $files): string {
+            $out = [];
+            foreach ($files as $rel => $content) {
+                if (preg_match('/(?<![\w-])'.preg_quote($c, '/').'(?![\w-])/', $content)) {
+                    $out[] = $rel;
+                    if (count($out) === 4) {
+                        break;
+                    }
+                }
+            }
+
+            return implode(', ', $out);
+        };
 
         $noExample = $orphans = [];
-        foreach ($defined as $class => $files) {
+        foreach ($defined as $class => $defs) {
             if (preg_match(self::IGNORE, $class)) {
                 continue;
             }
             $inApp = $used($class, $app);
             $inGuide = $used($class, $guide);
+            $def = implode(', ', array_slice(array_keys($defs), 0, 2));
             if (!$inApp && !$inGuide) {
-                $orphans[] = $class;
+                $orphans[] = $class.'  → défini dans '.$def;
             } elseif ($inApp && !$inGuide) {
-                $noExample[] = $class.'  ('.implode(', ', array_keys($files)).')';
+                $noExample[] = $class.'  → défini dans '.$def.' ; utilisé dans '.$where($class, $appFiles);
             }
         }
 
-        // 3. utilitaires morts : jetons de class="…" qui ressemblent à du Tailwind et n'ont aucun CSS
+        // 3. utilitaires morts : jetons de class="…" qui ressemblent à du Tailwind et n'ont aucun CSS (fichier:ligne)
         $deadUtil = [];
-        if (preg_match_all('/class\s*=\s*(["\'])(.*?)\1/s', $app, $m)) {
-            foreach ($m[2] as $attr) {
-                foreach (preg_split('/\s+/', trim($attr)) ?: [] as $tok) {
-                    if ($tok !== '' && !isset($defined[$tok]) && preg_match(self::UTILITY, $tok)) {
-                        $deadUtil[$tok] = ($deadUtil[$tok] ?? 0) + 1;
+        foreach ($appFiles as $rel => $content) {
+            foreach (preg_split('/\R/', $content) ?: [] as $n => $line) {
+                if (!preg_match_all('/class\s*=\s*(["\'])(.*?)\1/', $line, $m)) {
+                    continue;
+                }
+                foreach ($m[2] as $attr) {
+                    foreach (preg_split('/\s+/', trim($attr)) ?: [] as $tok) {
+                        if ($tok !== '' && !isset($defined[$tok]) && preg_match(self::UTILITY, $tok)) {
+                            $deadUtil[$tok][] = $rel.':'.($n + 1);
+                        }
                     }
                 }
             }
@@ -102,13 +130,19 @@ class UiAuditCommand extends Command
         );
 
         if ($orphans) {
-            $io->section('Orphelines : à supprimer du CSS');
+            $io->section('Orphelines : à supprimer du CSS (fichier:ligne)');
             $io->listing($orphans);
+            $strictFail = true;
         }
         if ($deadUtil) {
-            $io->section('Utilitaires sans CSS : à retirer des gabarits');
-            arsort($deadUtil);
-            $io->listing(array_map(static fn ($c, $n) => $c.' ×'.$n, array_keys($deadUtil), $deadUtil));
+            $io->section('Utilitaires sans CSS : à retirer des gabarits (fichier:ligne)');
+            uasort($deadUtil, static fn (array $a, array $b): int => count($b) <=> count($a));
+            $io->listing(array_map(
+                static fn (string $c, array $places): string => $c.' ×'.count($places).'  → '.implode(', ', array_slice($places, 0, 6)).(count($places) > 6 ? ' …' : ''),
+                array_keys($deadUtil),
+                $deadUtil
+            ));
+            $strictFail = true;
         }
         if ($noExample && $input->getOption('list')) {
             $io->section('Utilisées mais sans exemple : ajouter un exemple vivant (ou une ligne « Référence »)');
@@ -121,13 +155,18 @@ class UiAuditCommand extends Command
             return Command::SUCCESS;
         }
 
-        return ($orphans || $deadUtil) && $input->getOption('strict') ? Command::FAILURE : Command::SUCCESS;
+        return $strictFail && $input->getOption('strict') ? Command::FAILURE : Command::SUCCESS;
     }
 
-    /** @param list<string> $dirs @param list<string> $exclude */
-    private function read(array $dirs, array $exclude): string
+    /**
+     * @param list<string> $dirs
+     * @param list<string> $exclude
+     *
+     * @return array<string, string> chemin relatif => contenu
+     */
+    private function read(array $dirs, array $exclude): array
     {
-        $text = '';
+        $files = [];
         foreach ($dirs as $dir) {
             $base = $this->projectDir.'/'.$dir;
             if (!is_dir($base)) {
@@ -144,10 +183,10 @@ class UiAuditCommand extends Command
                         continue 2;
                     }
                 }
-                $text .= file_get_contents($file->getPathname())."\n";
+                $files[$rel] = (string) file_get_contents($file->getPathname());
             }
         }
 
-        return $text;
+        return $files;
     }
 }
