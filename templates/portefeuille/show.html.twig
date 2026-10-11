@@ -35,6 +35,14 @@
                         color: 'info'
                     },
                     {
+                        type: 'button',
+                        label: 'Opération',
+                        icon: 'gridicons:add',
+                        color: 'primary',
+                        title: 'Ajouter une opération à ce portefeuille',
+                        attrs: { 'data-op-open': true }
+                    },
+                    {
                         label: 'Suppr.',
                         path: path('app_portefeuille_delete', { id: entity.id }),
                         icon: 'fa7-solid:trash',
@@ -46,6 +54,9 @@
 
         {# Prochaines échéances prévues (visible quel que soit l'onglet) #}
         {{ render(controller('App\\Controller\\PrevisionController::prochaines', { id: entity.id })) }}
+
+        {# Tiroir « Nouvelle opération » (visible quel que soit l'onglet) #}
+        {{ render(controller('App\\Controller\\OperationController::drawer', { portefeuille: entity.id })) }}
 
         {# Onglets fonctionnels #}
         {% include 'portefeuille/show/_tabs.html.twig' %}

@@ -24,6 +24,9 @@
             {% include 'tiers/show/_btns.html.twig' %}
         </div>
 
+        {# Tiroir « Nouvelle opération » (visible quel que soit l'onglet) #}
+        {{ render(controller('App\\Controller\\OperationController::drawer', { tiers: entity.id })) }}
+
         {# Onglets fonctionnels #}
         {% include 'tiers/show/_tabs.html.twig' %}
     </div>

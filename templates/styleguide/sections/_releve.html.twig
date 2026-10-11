@@ -113,27 +113,31 @@
 {% endverbatim %}{% endset %}
 {{ sg.ex('rc-op dans rc-list is-pool', code, 'Colonne « À pointer » : case, poignée, date, libellé, puce, montant, bouton ＋. <code>rc-only-pool</code> / <code>rc-only-part</code> montrent un élément selon le conteneur.') }}
 
-<p class="sg-sub">Mini-formulaire « Nouvelle opération »</p>
+<p class="sg-sub">Tiroir « Nouvelle opération »</p>
 {% set code %}{% verbatim %}
-<div class="rc-newop">
-    <div class="rc-newop-grid">
-        <label class="rc-field"><span class="modern-form-label">Date</span><input type="date" class="modern-form-control" value="2026-10-05"></label>
-        <label class="rc-field"><span class="modern-form-label">Montant <small>(négatif = remboursement)</small></span><input class="modern-form-control" placeholder="0,00"></label>
-        <label class="rc-field"><span class="modern-form-label">Catégorie</span><input class="modern-form-control"></label>
-        <label class="rc-field"><span class="modern-form-label">Tiers</span><input class="modern-form-control"></label>
-        <label class="rc-field rc-field-wide"><span class="modern-form-label">Adresse du tiers</span><select class="modern-form-control"><option>Choisir d'abord le tiers</option></select></label>
-    </div>
-    <details class="rc-more"><summary>Plus de champs <small>(projet, n° de commande, note)</small></summary></details>
-    <div class="rc-newop-foot">
-        <p class="rc-msg" hidden></p>
-        <span class="rc-newop-actions">
-            <button type="button" class="btn btn-neutral"><span>Annuler</span></button>
-            <button type="button" class="btn btn-primary"><span>Créer et ajouter</span></button>
-        </span>
-    </div>
+<div style="position: relative; height: 330px; overflow: hidden">
+    <aside class="op-drawer is-open" style="position: absolute; top: 0; right: 0; transform: none">
+        <button type="button" class="op-drawer-handle" aria-expanded="true" title="Nouvelle opération" style="top: .5rem">
+            <twig:ux:icon name="gridicons:add" />
+            <span class="op-drawer-label">Opération</span>
+        </button>
+        <div class="op-drawer-panel">
+            <header class="op-drawer-head"><div><h2>Nouvelle opération</h2><p class="op-drawer-context">Portefeuille <strong>Compte courant</strong></p></div></header>
+            <div class="op-form">
+                <div class="op-grid">
+                    <label class="op-field"><span class="modern-form-label">Date</span><input type="date" class="modern-form-control" value="2026-10-05"></label>
+                    <label class="op-field"><span class="modern-form-label">Montant <small>(négatif = remboursement)</small></span><input class="modern-form-control" placeholder="0,00"></label>
+                    <label class="op-field op-field-wide"><span class="modern-form-label">Catégorie</span><input class="modern-form-control"></label>
+                    <label class="op-field op-field-wide"><span class="modern-form-label">Tiers</span><input class="modern-form-control"></label>
+                </div>
+                <details class="op-more"><summary>Plus de champs <small>(projet, n° de commande, note)</small></summary></details>
+                <div class="op-foot"><label class="op-check"><input type="checkbox"> Ajouter directement au relevé</label></div>
+            </div>
+        </div>
+    </aside>
 </div>
 {% endverbatim %}{% endset %}
-{{ sg.ex('rc-newop', code) }}
+{{ sg.ex('op-drawer', code, 'Même mécanique que le panneau des prévisions, languette placée dessous ; un seul tiroir ouvert à la fois. Ouverture : languette ou tout élément <code>data-op-open</code> ; JS : <code>operation.js</code>.', 'sg-frame') }}
 
 <p class="sg-sub">Barre d'actions du relevé</p>
 {% set code %}{% verbatim %}

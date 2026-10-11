@@ -6,7 +6,6 @@ use App\Entity\Depenses;
 use App\Entity\Depenses as Operation;
 use App\Entity\Portefeuille;
 use App\Entity\PortefeuilleView;
-use App\Form\AddDepensesType;
 use App\Form\PortefeuilleType;
 use App\Service\DepenseGrouper\DepenseGrouper;
 use App\Service\DepenseGrouper\DepenseGroupManager;
@@ -122,45 +121,6 @@ final class PortefeuilleController extends AbstractController {
         }
 
         return $this->render('portefeuille/_form.html.twig', [
-                    'form' => $form->createView(),
-                    'portefeuille' => $portefeuille,
-        ]);
-    }
-
-    #[Route('/add-operation/{id}', name: 'app_portefeuille_add_operation', methods: ['GET', 'POST'])]
-    public function addOperation(Portefeuille $portefeuille, Request $request, EntityManagerInterface $em): Response {
-        $operation = new Operation();
-
-        $form = $this->createForm(
-                AddDepensesType::class,
-                $operation,
-                [
-                    'portefeuille_entity' => $portefeuille,
-                ]
-        );
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Si ton AddDepensesType ne fait pas déjà l'association,
-            // on force le portefeuille ici.
-            $operation->setPortefeuille($portefeuille);
-
-            $em->persist($operation);
-            $em->flush();
-
-            $this->addFlash('success', 'Opération ajoutée avec succès');
-
-            return $this->redirectToRoute(
-                            'app_portefeuille_show',
-                            [
-                                'id' => $portefeuille->getId(),
-                                'tab' => 'addoperation',
-                            ]
-                    );
-        }
-
-        return $this->render('depenses/form/_form.html.twig', [
                     'form' => $form->createView(),
                     'portefeuille' => $portefeuille,
         ]);

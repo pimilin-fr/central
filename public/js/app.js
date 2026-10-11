@@ -2,7 +2,7 @@ const App = {
 
     config: {
         debug: true,
-        version: "v1.8.1",
+        version: "v1.9.0",
         appName: "Central"
     },
 
@@ -47,6 +47,7 @@ const App = {
         CentralMaps.init();
         CentralReleve.init();
         CentralPrevision.init();
+        CentralOperation.init();
     },
 
     /* =========================================================
@@ -1120,9 +1121,7 @@ const App = {
 
                                 App.events.emit('depense:created', data);
 
-                                const url = new URL(window.location);
-                                url.searchParams.set('tab', 'addoperation');
-                                window.location = url;
+                                window.location.reload();
 
                                 return;
                             }
@@ -1130,7 +1129,7 @@ const App = {
 
                         const html = await response.text();
 
-                        const container = form.closest('#tab-addoperation') || form.parentNode;
+                        const container = form.parentNode;
 
                         container.innerHTML = html;
 

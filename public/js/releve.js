@@ -15,7 +15,7 @@ const CentralReleve = {
 
     config: {
         debug: true,
-        version: 'v1.5.0',
+        version: 'v1.6.0',
         appName: 'Central-ModuleReleve'
     },
 
@@ -280,8 +280,9 @@ const CentralReleve = {
 
             const checkedLines = () => lines().filter(line => line.querySelector('[data-rc-check-line]')?.checked);
 
-            /* ---- prévision concrétisée depuis le panneau latéral : l'opération est créée, on la place dans le relevé ---- */
-            document.addEventListener('prevision:operation-created', event => {
+            /* ---- opération créée depuis un tiroir (prévision concrétisée OU « Nouvelle opération ») : on la place dans « À pointer »,
+                   puis dans le relevé si le tiroir le demande (detail.direct, vrai par défaut) ---- */
+            const received = (event, message) => {
                 const holder = document.createElement('ul');
                 holder.innerHTML = String(event.detail.html || '').trim();
                 const row = holder.firstElementChild;
@@ -289,110 +290,14 @@ const CentralReleve = {
                     return;
                 }
                 pool.insertBefore(row, poolRows().find(other => sortKey(other) > sortKey(row)) || null);
-                addParts([row]);
-                say('Prévision ajoutée au relevé.', 'info');
+                if (event.detail.direct !== false) {
+                    addParts([row]);
+                }
+                say(message(event.detail.direct !== false), 'info');
                 changed();
-            });
-
-            /* ---- mini formulaire « Nouvelle opération » (panneau replié dans « À pointer ») ---- */
-            const panel = root.querySelector('[data-rc-op-panel]');
-            if (panel) {
-                const field = name => panel.querySelector('[name="op[' + name + ']"]');
-                const opError = panel.querySelector('[data-rc-op-error]');
-                const direct = panel.querySelector('[data-rc-op-direct]');
-                const mainDate = root.querySelector('input[name="date"]');
-                const oops = text => { opError.textContent = text; opError.hidden = !text; };
-                const clear = (...names) => names.forEach(name => {
-                    field(name).value = '';
-                    const hidden = field(name + '_id');
-                    if (hidden) {
-                        hidden.value = '';
-                    }
-                });
-
-                root.addEventListener('click', event => {
-                    if (event.target.closest('[data-rc-open-op]')) {
-                        panel.hidden = !panel.hidden;
-                        if (!panel.hidden) {
-                            field('date').value = (mainDate && mainDate.value) || panel.dataset.defaultDate;
-                            oops('');
-                            field('montant').focus();
-                        }
-                    } else if (event.target.closest('[data-rc-op-cancel]')) {
-                        panel.hidden = true;
-                    }
-                });
-
-                field('adresse').addEventListener('change', event => {
-                    field('adresse_id').value = event.target.value;
-                });
-
-                const create = async () => {
-                    oops('');
-                    if (!field('date').value || !field('montant').value.trim()) {
-                        return oops('Renseignez la date et le montant.');
-                    }
-                    if (!field('categorie_id').value) {
-                        return oops('Choisissez la catégorie dans la liste proposée.');
-                    }
-                    if (!field('tiers_id').value) {
-                        return oops('Choisissez le tiers dans la liste proposée.');
-                    }
-
-                    const body = new FormData();
-                    body.append('_token', panel.dataset.token);
-                    panel.querySelectorAll('[name]').forEach(el => body.append(el.name, el.value));
-                    if (!field('adresse_id').value) {
-                        body.set('op[adresse_id]', field('adresse').value);
-                    }
-
-                    const submit = panel.querySelector('[data-rc-op-submit]');
-                    submit.disabled = true;
-                    try {
-                        const response = await fetch(panel.dataset.url, {
-                            method: 'POST',
-                            body,
-                            headers: {'X-Requested-With': 'XMLHttpRequest'}
-                        });
-                        const data = await response.json();
-                        if (!data.ok) {
-                            return oops(data.error || 'Enregistrement impossible.');
-                        }
-
-                        const holder = document.createElement('ul');
-                        holder.innerHTML = data.html.trim();
-                        const row = holder.firstElementChild;
-                        pool.insertBefore(row, poolRows().find(other => sortKey(other) > sortKey(row)) || null);
-                        if (direct.checked) {
-                            addParts([row]);
-                        }
-                        // prêt pour une autre opération (même date) ; le panneau reste ouvert
-                        clear('categorie', 'tiers');
-                        field('montant').value = '';
-                        field('numCommande').value = '';
-                        field('note').value = '';
-                        clear('projet');
-                        field('adresse').innerHTML = '<option value="">Choisir d\'abord le tiers</option>';
-                        field('adresse_id').value = '';
-                        say('Opération créée' + (direct.checked ? ' et ajoutée au relevé.' : ' : elle est dans « À pointer ».'), 'info');
-                        changed();
-                        field('montant').focus();
-                    } catch (error) {
-                        oops('Erreur réseau : ' + error.message);
-                    } finally {
-                        submit.disabled = false;
-                    }
-                };
-
-                panel.querySelector('[data-rc-op-submit]').addEventListener('click', create);
-                panel.addEventListener('keydown', event => {
-                    // Entrée = créer (sauf si la liste d'autocomplétion vient de la consommer, ou dans la note)
-                    if (event.key === 'Enter' && !event.defaultPrevented && event.target.tagName !== 'TEXTAREA') {
-                        event.preventDefault();
-                        create();
-                    }
-                });
-            }
+            };
+            document.addEventListener('prevision:operation-created', event => received(event, () => 'Prévision ajoutée au relevé.'));
+            document.addEventListener('operation:created', event => received(event, direct => direct ? 'Opération créée et ajoutée au relevé.' : 'Opération créée : elle est dans « À pointer ».'));
 
             /* ---- cases à cocher : Maj+clic coche une plage ; le total des éléments cochés se met à jour ---- */
             const lastPicked = {pool: null, line: null};

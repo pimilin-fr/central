@@ -166,10 +166,9 @@
                             <div class="rc-pool-actions">
                                 {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Tout grouper', icon: 'material-symbols:stack-group', color: 'danger', title: 'Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)', attrs: { 'data-rc-add-group': true } }] } %}
                                 {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Tout ajouter', icon: 'material-symbols:list-alt-add', color: 'info', title: 'Ajouter toutes les opérations affichées, une ligne chacune, par date', attrs: { 'data-rc-add-all': true } }] } %}
-                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Ajouter', icon: 'gridicons:add', color: 'primary', title: 'Créer une opération qui n\'existe pas encore (ex. frais bancaires)', attrs: { 'data-rc-open-op': true } }] } %}
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Ajouter', icon: 'gridicons:add', color: 'primary', title: 'Créer une opération qui n\'existe pas encore (ex. frais bancaires)', attrs: { 'data-op-open': true } }] } %}
                             </div>
                         </header>
-                        {% include 'releve/_operation_panel.html.twig' with { portefeuille: portefeuille, releve: releve, token: token } only %}
                         <div class="rc-selsum" data-rc-sel-pool hidden><span data-rc-sel-text></span><span class="rc-selsum-actions">{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Tout grouper', icon: 'material-symbols:stack-group', color: 'danger', title: 'Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)', attrs: { 'data-rc-add-group': true } }] } %}{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Désélectionner', color: 'link', attrs: { 'data-rc-sel-clear': true } }] } %}</span></div>
                         <input type="search" class="modern-form-control rc-filter" placeholder="Filtrer (tiers, catégorie, montant, date…)" data-rc-filter>
                         <ul class="rc-list is-pool" data-rc-pool>
@@ -196,6 +195,9 @@
 
             {# Prévisions de ce portefeuille : « Ajouter au relevé » crée l'opération et la place dans les lignes #}
             {{ render(controller('App\\Controller\\PrevisionController::prochaines', { id: portefeuille.id, mode: 'releve' })) }}
+
+            {# Tiroir « Nouvelle opération » (remplace l'ancien mini-formulaire) #}
+            {{ render(controller('App\\Controller\\OperationController::drawer', { portefeuille: portefeuille.id, mode: 'releve', date: releve.date|date('Y-m-d') })) }}
 
         {% endif %}
     </div>

@@ -8,7 +8,6 @@ use App\Entity\Depenses as Operation;
 use App\Entity\Tiers;
 use App\Entity\TiersAdresse;
 use App\Form\AddAdresseType;
-use App\Form\AddDepensesType;
 use App\Form\TiersType;
 use App\Repository\TiersAdresseRepository;
 use App\Repository\TiersRepository;
@@ -206,46 +205,6 @@ final class TiersController extends AbstractController {
         }
 //        var_dump($results);die;
         return $this->json($results);
-    }
-
-    
-    #[Route('/add-operation/{id}', name: 'app_tiers_add_operation', methods: ['GET', 'POST'])]
-    public function addOperation(Tiers $tiers, Request $request, EntityManagerInterface $em): Response {
-        $operation = new Operation();
-
-        $form = $this->createForm(
-                AddDepensesType::class,
-                $operation,
-                [
-                    'tiers_entity' => $tiers,
-                ]
-        );
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Si ton AddDepensesType ne fait pas déjà l'association,
-            // on force le portefeuille ici.
-            $operation->setTiers($tiers);
-
-            $em->persist($operation);
-            $em->flush();
-
-            $this->addFlash('success', 'Opération ajoutée avec succès');
-
-            return $this->redirectToRoute(
-                            'app_tiers_show',
-                            [
-                                'id' => $tiers->getId(),
-                                'tab' => 'addoperation',
-                            ]
-                    );
-        }
-
-        return $this->render('depenses/form/_form.html.twig', [
-                    'form' => $form->createView(),
-                    'tiers' => $tiers,
-        ]);
     }
     
     

@@ -7,7 +7,7 @@
 const CentralPrevision = {
     config: {
         debug: true,
-        version: 'v1.4.0',
+        version: 'v1.5.0',
         appName: 'Central-ModulePrevision'
     },
 
@@ -47,7 +47,16 @@ const CentralPrevision = {
                 localStorage.setItem(KEY, open ? '1' : '0');
             } catch (e) {
             }
+            if (open) {
+                // un seul tiroir à la fois (voir operation.js)
+                document.dispatchEvent(new CustomEvent('central:drawer-open', {detail: 'prevision'}));
+            }
         };
+        document.addEventListener('central:drawer-open', e => {
+            if (e.detail !== 'prevision' && drawer.classList.contains('is-open')) {
+                set(false);
+            }
+        });
         let open = false;
         try {
             open = localStorage.getItem(KEY) === '1';

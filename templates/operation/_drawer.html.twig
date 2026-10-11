@@ -1,0 +1,127 @@
+{#
+    Tiroir « Nouvelle opération » : unique formulaire d'ajout d'une opération (relevé, fiche portefeuille, fiche tiers).
+    Replié au bord droit (languette) ; ouvert par la languette ou par tout élément portant [data-op-open].
+    Le contexte de la page est verrouillé (portefeuille OU tiers) ; l'autre se choisit ici.
+    Paramètres : portefeuilles, portefeuille (verrouillé ou null), tiers (verrouillé ou null), adresses (du tiers verrouillé),
+                 mode ('page' | 'releve'), date (Y-m-d par défaut)
+    JS : public/js/operation.js
+#}
+<aside class="op-drawer{{ mode == 'releve' ? ' is-releve' : '' }}" data-op-drawer data-op-mode="{{ mode }}" aria-label="Nouvelle opération">
+    <button type="button" class="op-drawer-handle" data-op-toggle aria-expanded="false" aria-controls="op-drawer-panel" title="Nouvelle opération">
+        <twig:ux:icon name="gridicons:add" />
+        <span class="op-drawer-label">Opération</span>
+    </button>
+
+    <div class="op-drawer-panel" id="op-drawer-panel">
+        <header class="op-drawer-head">
+            <div>
+                <h2>Nouvelle opération</h2>
+                {% if portefeuille is not null or tiers is not null %}
+                    <p class="op-drawer-context">
+                        {% if portefeuille is not null %}Portefeuille <strong>{{ portefeuille.name }}</strong>{% endif %}
+                        {% if tiers is not null %}Tiers <strong>{{ tiers.name }}</strong>{% endif %}
+                    </p>
+                {% endif %}
+            </div>
+            {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Fermer', icon: 'mdi:close-box', color: 'ghost', iconOnly: true, class: 'is-danger', attrs: { 'data-op-toggle': true } }] } %}
+        </header>
+
+        <form class="op-form" data-op-form novalidate
+              action="{{ path('app_operation_new') }}"
+              data-context="{{ mode }}"
+              data-default-date="{{ date }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('operation_new') }}">
+            <input type="hidden" name="context" value="{{ mode }}">
+
+            <div class="op-grid">
+                <label class="op-field">
+                    <span class="modern-form-label">Date</span>
+                    <input type="date" name="op[date]" class="modern-form-control" required value="{{ date }}">
+                </label>
+                <label class="op-field">
+                    <span class="modern-form-label">Montant <small>(négatif = remboursement)</small></span>
+                    <input type="text" inputmode="decimal" name="op[montant]" class="modern-form-control" required placeholder="0,00" autocomplete="off">
+                </label>
+
+                {% if portefeuille is not null %}
+                    <input type="hidden" name="op[portefeuille_id]" value="{{ portefeuille.id }}">
+                {% else %}
+                    <label class="op-field op-field-wide">
+                        <span class="modern-form-label">Portefeuille</span>
+                        <select name="op[portefeuille_id]" class="modern-form-control" required>
+                            {% for p in portefeuilles %}
+                                <option value="{{ p.id }}"{{ p.isDefault ? ' selected' : '' }}>{{ p.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                {% endif %}
+
+                <label class="op-field op-field-wide">
+                    <span class="modern-form-label">Catégorie</span>
+                    <input type="text" name="op[categorie]" class="modern-form-control autocomplete" data-endpoint="/categories/search" autocomplete="off" required>
+                    <input type="hidden" name="op[categorie_id]">
+                </label>
+
+                {% if tiers is not null %}
+                    <label class="op-field op-field-wide">
+                        <span class="modern-form-label">Tiers</span>
+                        <input type="text" name="op[tiers]" class="modern-form-control" value="{{ tiers.name }}" readonly>
+                        <input type="hidden" name="op[tiers_id]" value="{{ tiers.id }}">
+                    </label>
+                {% else %}
+                    <label class="op-field op-field-wide">
+                        <span class="modern-form-label">Tiers</span>
+                        <input type="text" name="op[tiers]" class="modern-form-control autocomplete" data-endpoint="/tiers/search" autocomplete="off" required>
+                        <input type="hidden" name="op[tiers_id]">
+                    </label>
+                {% endif %}
+
+                <label class="op-field op-field-wide">
+                    <span class="modern-form-label">Adresse du tiers</span>
+                    <select name="op[adresse]" class="modern-form-control">
+                        {% if tiers is not null %}
+                            <option value="">Adresse</option>
+                            {% for a in adresses %}<option value="{{ a.id }}"{{ a.principale ? ' selected' : '' }}>{{ a.label }}</option>{% endfor %}
+                        {% else %}
+                            <option value="">Choisir d'abord le tiers</option>
+                        {% endif %}
+                    </select>
+                    <input type="hidden" name="op[adresse_id]" value="{% for a in adresses %}{{ a.principale ? a.id : '' }}{% endfor %}">
+                </label>
+            </div>
+
+            <details class="op-more">
+                <summary>Plus de champs <small>(projet, n° de commande, note)</small></summary>
+                <div class="op-grid">
+                    <label class="op-field op-field-wide">
+                        <span class="modern-form-label">Projet</span>
+                        <input type="text" name="op[projet]" class="modern-form-control autocomplete" data-endpoint="/projet/search" autocomplete="off">
+                        <input type="hidden" name="op[projet_id]">
+                    </label>
+                    <label class="op-field op-field-wide">
+                        <span class="modern-form-label">N° de commande</span>
+                        <input type="text" name="op[numCommande]" class="modern-form-control" maxlength="255">
+                    </label>
+                    <label class="op-field op-field-wide">
+                        <span class="modern-form-label">Note</span>
+                        <textarea name="op[note]" class="modern-form-control" rows="2"></textarea>
+                    </label>
+                </div>
+            </details>
+
+            <p class="op-msg" data-op-error role="alert" hidden></p>
+
+            <div class="op-foot">
+                {% if mode == 'releve' %}
+                    <label class="op-check"><input type="checkbox" data-op-direct> Ajouter directement au relevé</label>
+                {% else %}
+                    <span></span>
+                {% endif %}
+                <span class="op-actions">
+                    {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Fermer', icon: 'mdi:close-box', color: 'neutral', attrs: { 'data-op-toggle': true } }] } %}
+                    {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Ajouter', icon: 'gridicons:add', color: 'primary' }] } %}
+                </span>
+            </div>
+        </form>
+    </div>
+</aside>

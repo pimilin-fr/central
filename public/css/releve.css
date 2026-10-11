@@ -185,25 +185,6 @@
 .rc-releves tr.is-open td:first-child { box-shadow: inset 3px 0 0 var(--warning); }
 .rc-releves tr.is-closed td:first-child { box-shadow: inset 3px 0 0 var(--success); }
 
-/* ---- Mini formulaire « Nouvelle opération » (panneau replié dans « À pointer ») ---- */
-.rc-newop {
-    display: grid;
-    gap: 10px;
-    padding: 12px;
-    background: var(--surface-soft);
-    border: 1px dashed var(--border-strong, var(--border));
-    border-radius: 12px;
-}
-.rc-newop[hidden] { display: none; }
-.rc-newop-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
-.rc-newop-grid .rc-field-wide { grid-column: 1 / -1; }
-@media (max-width: 520px) { .rc-newop-grid { grid-template-columns: minmax(0, 1fr); } }
-.rc-more > summary { cursor: pointer; color: var(--accent); font-size: 12px; font-weight: 750; padding: 2px 0 8px; }
-.rc-more > summary small { color: var(--text-muted); font-weight: 600; }
-.rc-newop-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; }
-.rc-check { display: inline-flex; align-items: center; gap: 6px; color: var(--text-soft); font-size: 12px; }
-.rc-newop-actions { display: inline-flex; gap: 8px; }
-
 /* ---- Pointage : lignes vérifiées sur le relevé de compte (jamais stocké en base) ---- */
 .rc-done {
     inline-size: 22px;

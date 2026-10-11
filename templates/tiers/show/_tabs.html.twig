@@ -30,16 +30,6 @@
                 }
             ))
             ~ include('tiers/show/_adresses.html.twig')
-    },{
-        id: 'addoperation',
-        label: 'Opération',
-        icon: 'gridicons:add',
-        content: render(controller(
-            'App\\Controller\\TiersController::addOperation',
-            {
-                id: entity.id
-            }
-        ))
     }
 ]%}
 

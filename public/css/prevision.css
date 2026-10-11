@@ -39,7 +39,7 @@
 /* Panneau latéral « Prochaines échéances » : superposé à la fiche, languette visible une fois replié */
 .pv-drawer { --pv-handle: 3.6rem; position: fixed; z-index: 25; right: 0; top: calc(var(--topbar-height, 72px) + 1rem); width: min(30rem, calc(100vw - var(--pv-handle) - .5rem)); transform: translateX(100%); transition: transform .25s ease; }
 .pv-drawer.is-open { transform: translateX(0); }
-.pv-drawer-handle { position: absolute; left: calc(-1 * var(--pv-handle)); top: max(6rem, calc(50vh - var(--topbar-height, 72px) - 3rem)); width: var(--pv-handle); display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .6rem .25rem; border: 1px solid var(--border, #e5e7eb); border-right: 0; border-radius: .75rem 0 0 .75rem; background: var(--surface, #fff); color: var(--text); box-shadow: -4px 4px 16px rgba(0, 0, 0, .12); cursor: pointer; font: inherit; }
+.pv-drawer-handle { position: absolute; left: calc(-1 * var(--pv-handle)); top: calc(var(--handles-top, calc(var(--topbar-height, 72px) + 7rem)) - var(--topbar-height, 72px) - 1rem); width: var(--pv-handle); display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .6rem .25rem; border: 1px solid var(--border, #e5e7eb); border-right: 0; border-radius: .75rem 0 0 .75rem; background: var(--surface, #fff); color: var(--text); box-shadow: -4px 4px 16px rgba(0, 0, 0, .12); cursor: pointer; font: inherit; }
 .pv-drawer-handle:hover { filter: brightness(.97); }
 .pv-drawer-count { font-size: 1.1rem; font-weight: 700; line-height: 1; }
 .pv-drawer-sum { font-size: .72rem; font-weight: 600; white-space: nowrap; }

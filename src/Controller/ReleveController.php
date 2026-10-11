@@ -2,15 +2,10 @@
 
 namespace App\Controller;
 
-use App\Entity\Depenses;
 use App\Entity\Portefeuille;
 use App\Entity\Releve;
 use App\Repository\DepensesRepository;
-use App\Repository\CategorieRepository;
-use App\Repository\ProjetRepository;
 use App\Repository\ReleveRepository;
-use App\Repository\TiersRepository;
-use App\Repository\AdresseRepository;
 use App\Service\ReleveManager;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -147,81 +142,6 @@ final class ReleveController extends AbstractController {
         $rows = (new ReleveManager($em))->summarize($releveRepo->findAllAsc($portefeuille));
 
         return ['portefeuille' => $portefeuille, 'rows' => array_reverse($rows)]; // récent d'abord
-    }
-
-    /**
-     * Mini formulaire d'ajout d'une opération spécifique depuis l'écran du relevé (ex. frais bancaires).
-     * Le portefeuille est celui de l'écran. Répond en JSON avec la ligne HTML à insérer dans « À pointer ».
-     */
-    #[Route('/composer/{id}/operation', name: 'app_releve_add_operation', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function addOperation(
-            Portefeuille $portefeuille,
-            Request $request,
-            EntityManagerInterface $em,
-            CategorieRepository $catRepo,
-            TiersRepository $tiersRepo,
-            ProjetRepository $projRepo,
-            AdresseRepository $adrRepo
-    ): Response {
-        if (!$this->isCsrfTokenValid(self::TOKEN, (string) $request->request->get('_token'))) {
-            return $this->json(['ok' => false, 'error' => 'Jeton de sécurité invalide, rechargez la page.'], 400);
-        }
-
-        $data = (array) $request->request->all('op');
-        $date = $this->parseDate($data['date'] ?? null);
-        $montant = str_replace([' ', ','], ['', '.'], trim((string) ($data['montant'] ?? '')));
-        $categorie = ($data['categorie_id'] ?? '') !== '' ? $catRepo->find((int) $data['categorie_id']) : null;
-        $tiersId = trim((string) ($data['tiers_id'] ?? '')); // identifiant TEXTE (uuid), pas un entier
-        $tiers = $tiersId !== '' ? $tiersRepo->find($tiersId) : null;
-
-        $errors = [];
-        if ($date === null) {
-            $errors[] = 'la date';
-        }
-        if ($montant === '' || !is_numeric($montant)) {
-            $errors[] = 'le montant';
-        }
-        if ($categorie === null) {
-            $errors[] = 'la catégorie (à choisir dans la liste)';
-        }
-        if ($tiers === null) {
-            $errors[] = 'le tiers (à choisir dans la liste)';
-        }
-        if ($errors !== []) {
-            return $this->json(['ok' => false, 'error' => 'Vérifiez ' . implode(', ', $errors) . '.'], 422);
-        }
-
-        $operation = (new Depenses())
-                ->setDate($date)
-                ->setMontant(number_format((float) $montant, 2, '.', ''))
-                ->setCategorie($categorie)
-                ->setTiers($tiers)
-                ->setPortefeuille($portefeuille);
-
-        $numCommande = trim((string) ($data['numCommande'] ?? ''));
-        if ($numCommande !== '') {
-            $operation->setNumCommande(mb_substr($numCommande, 0, 255));
-        }
-        $note = trim((string) ($data['note'] ?? ''));
-        if ($note !== '') {
-            $operation->setNote($note);
-        }
-        if (($data['projet_id'] ?? '') !== '' && ($projet = $projRepo->find((int) $data['projet_id'])) !== null) {
-            $operation->setProjet($projet);
-        }
-        $adresseId = ($data['adresse_id'] ?? '') !== '' ? $data['adresse_id'] : ($data['adresse'] ?? '');
-        if (is_numeric($adresseId) && ($adresse = $adrRepo->find((int) $adresseId)) !== null) {
-            $operation->setAdresse($adresse);
-        }
-
-        $em->persist($operation);
-        $em->flush();
-
-        return $this->json([
-                    'ok' => true,
-                    'id' => $operation->getId(),
-                    'html' => $this->renderView('releve/_composer_row.html.twig', ['op' => $operation, 'inList' => false]),
-        ]);
     }
 
     /** Enregistre (reste « en cours ») ou finalise. Corps : _token, releve?, date, lines[i][] (opérations de la ligne i, dans l'ordre ; plusieurs = un détail), action. */

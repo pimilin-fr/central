@@ -1,0 +1,30 @@
+/* Tiroir « Nouvelle opération » : même mécanique que le panneau des prévisions (prevision.css), languette placée dessous. */
+.op-drawer { --op-handle: 3.6rem; position: fixed; z-index: 26; right: 0; top: calc(var(--topbar-height, 72px) + 1rem); width: min(30rem, calc(100vw - var(--op-handle) - .5rem)); transform: translateX(100%); transition: transform .25s ease; }
+.op-drawer.is-open { transform: translateX(0); }
+.op-drawer.is-releve { z-index: 29; }
+.op-drawer-handle { position: absolute; left: calc(-1 * var(--op-handle)); top: calc(var(--handles-top, calc(var(--topbar-height, 72px) + 7rem)) - var(--topbar-height, 72px) - 1rem + var(--op-offset, 0rem)); width: var(--op-handle); display: flex; flex-direction: column; align-items: center; gap: .2rem; padding: .6rem .25rem; border: 1px solid var(--border, #e5e7eb); border-right: 0; border-radius: .75rem 0 0 .75rem; background: var(--surface, #fff); color: var(--text); box-shadow: -4px 4px 16px rgba(0, 0, 0, .12); cursor: pointer; font: inherit; }
+.op-drawer-handle:hover { filter: brightness(.97); }
+.op-drawer-handle svg { width: 1.3rem; height: 1.3rem; }
+.op-drawer-label { font-size: .66rem; font-weight: 700; line-height: 1; }
+.op-drawer-panel { display: flex; flex-direction: column; max-height: calc(100vh - var(--topbar-height, 72px) - 2rem); background: var(--surface, #fff); border: 1px solid var(--border, #e5e7eb); border-right: 0; border-radius: .75rem 0 0 .75rem; box-shadow: -8px 8px 28px rgba(0, 0, 0, .18); }
+.op-drawer-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .75rem; padding: .85rem 1rem .5rem; border-bottom: 1px solid var(--border, #e5e7eb); }
+.op-drawer-head h2 { margin: 0; font-size: 1rem; }
+.op-drawer-context { margin: .15rem 0 0; font-size: .8rem; color: var(--text-muted, #6b7280); }
+.op-form { display: grid; gap: .75rem; padding: 1rem; overflow-y: auto; }
+.op-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.op-field { display: grid; gap: 4px; min-inline-size: 0; }
+.op-field small { color: var(--text-muted); font-weight: 600; }
+.op-field-wide { grid-column: 1 / -1; }
+@media (max-width: 520px) { .op-grid { grid-template-columns: minmax(0, 1fr); } }
+.op-more > summary { cursor: pointer; color: var(--accent); font-size: 12px; font-weight: 750; padding: 2px 0 8px; }
+.op-more > summary small { color: var(--text-muted); font-weight: 600; }
+.op-msg { margin: 0; font-size: .85rem; color: var(--danger, #dc2626); }
+.op-msg[hidden] { display: none; }
+.op-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; }
+.op-check { display: inline-flex; align-items: center; gap: 6px; color: var(--text-soft); font-size: 12px; }
+.op-actions { display: inline-flex; gap: 8px; }
+@media (prefers-reduced-motion: reduce) { .op-drawer { transition: none; } }
+/* replié : pas d'ombre résiduelle, et rien de focalisable dans le panneau caché */
+.op-drawer .op-drawer-panel { transition: visibility 0s linear .25s; }
+.op-drawer:not(.is-open) .op-drawer-panel { visibility: hidden; box-shadow: none; }
+.op-drawer.is-open .op-drawer-panel { transition-delay: 0s; }
