@@ -1,0 +1,117 @@
+{#
+    INVENTAIRE DES COMMANDES — boutons, liens, onglets, dépliants, menus.
+    Page TEMPORAIRE de travail : calculée à chaque affichage par App\Service\UiCommandScanner (lecture des sources, aucune écriture).
+    Corriger un fichier puis recharger la page suffit à voir l'anomalie disparaître.
+#}
+{% set rep = sg_commandes() %}
+{% set flag_labels = {
+    divergent: 'Diffère de la famille',
+    sans_icone: 'Sans icône',
+    caractere: 'Caractère au lieu d’une icône',
+    libelle: 'Libellé à revoir',
+    hors_kit: 'Hors kit UI'
+} %}
+
+{% macro preview(it) %}
+    {%- set ic = (it.icon is not null and it.icon matches '/^[a-z0-9-]+:[a-z0-9-]+$/') ? it.icon : null -%}
+    {%- set cls = it.classes -%}
+    {%- if it.kind == 'onglet' -%}
+        <div class="modern-tabs"><div class="modern-tabs-nav-wrap"><nav class="modern-tabs-nav"><span class="tab-button is-active">{% if ic %}<twig:ux:icon name="{{ ic }}" />{% endif %}<span>{{ it.label }}</span></span></nav></div></div>
+    {%- elseif it.kind == 'menu' or it.kind == 'segment' or it.kind == 'depliant' -%}
+        <span class="{{ cls }}">{% if ic %}<twig:ux:icon name="{{ ic }}" />{% endif %}{{ it.label }}</span>
+    {%- elseif it.source == 'objet' -%}
+        <span class="{{ cls ?: 'btn' }}">{% if ic %}<twig:ux:icon name="{{ ic }}" />{% endif %}<span>{{ it.label }}</span></span>
+    {%- else -%}
+        <span class="{{ cls }}">{% if ic %}<twig:ux:icon name="{{ ic }}" />{% endif %}{% if it.label != '' %}<span>{{ it.label }}</span>{% endif %}</span>
+    {%- endif -%}
+{% endmacro %}
+
+{% macro row(it, flag_labels) %}
+    {% set types = it.flags|map(f => f.type)|join(' ') %}
+    <tr class="sg-inv-tr{{ it.flags ? ' is-flag' : '' }}" data-sg-inv-row data-flags="{{ types }}" data-kind="{{ it.kind }}"
+        data-text="{{ (it.label ~ ' ' ~ it.icon ~ ' ' ~ it.file ~ ' ' ~ it.classes ~ ' ' ~ it.family)|lower }}">
+        <td class="sg-inv-td-prev"><div class="sg-inv-stage">{{ _self.preview(it) }}</div></td>
+        <td class="{{ it.diff_label is defined and it.diff_label ? 'is-diff' : '' }}">
+            {% if it.label != '' %}{{ it.label }}{% else %}<em class="sg-inv-none">—</em>{% endif %}
+            <small class="sg-inv-kind">{{ it.kind }}{% if it.scope == 'global' %} · global{% endif %}</small>
+        </td>
+        <td class="{{ it.diff_icon is defined and it.diff_icon ? 'is-diff' : '' }}">
+            {% if it.icon %}<code>{{ it.icon }}</code>{% elseif it.icon_dyn is defined and it.icon_dyn %}<em class="sg-inv-none">dynamique</em>{% elseif it.glyph %}<code>{{ it.label }}</code>{% else %}<em class="sg-inv-none">—</em>{% endif %}
+            {% if it.diff_icon is defined and it.diff_icon and (it.ref_icon ?? null) %}<small class="sg-inv-ref">majorité : {{ it.ref_icon }}</small>{% endif %}
+        </td>
+        <td class="{{ it.diff_tint is defined and it.diff_tint ? 'is-diff' : '' }}">
+            {% if it.tint %}<span class="sg-inv-dot is-{{ it.tint }}"></span>{{ it.tint }}{% else %}<em class="sg-inv-none">—</em>{% endif %}
+            {% if it.diff_tint is defined and it.diff_tint and (it.ref_tint ?? null) %}<small class="sg-inv-ref">majorité : {{ it.ref_tint }}</small>{% endif %}
+        </td>
+        <td><button type="button" class="sg-inv-loc" data-sg-inv-loc title="Copier le chemin">{{ it.file }}:{{ it.line }}</button></td>
+        <td class="sg-inv-td-flags">
+            {% for f in it.flags %}<span class="sg-inv-flag is-{{ f.type }}" title="{{ f.msg }}">{{ f.msg }}</span>{% endfor %}
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro head() %}
+    <thead><tr><th>Aperçu</th><th>Libellé</th><th>Icône</th><th>Couleur</th><th>Fichier : ligne</th><th>À revoir</th></tr></thead>
+{% endmacro %}
+
+<div class="sg-inv" data-sg-inv>
+    <div class="sg-inv-bar">
+        <input type="search" class="sg-inv-search" placeholder="Filtrer : libellé, icône, fichier…" data-sg-inv-q aria-label="Filtrer">
+        <select class="sg-inv-select" data-sg-inv-kind aria-label="Type">
+            <option value="">Tous les types</option>
+            <option value="bouton">Boutons</option>
+            <option value="lien">Liens</option>
+            <option value="onglet">Onglets</option>
+            <option value="depliant">Dépliants</option>
+            <option value="menu">Menus</option>
+            <option value="segment">Segments</option>
+        </select>
+        <label class="sg-inv-check"><input type="checkbox" data-sg-inv-only checked> Anomalies seulement</label>
+        <span class="sg-inv-switch" role="group" aria-label="Regroupement">
+            <button type="button" class="is-on" data-sg-inv-view="famille">Par action</button>
+            <button type="button" data-sg-inv-view="fichier">Par fichier</button>
+        </span>
+        <button type="button" class="sg-inv-btn" data-sg-inv-all="open">Tout déplier</button>
+        <button type="button" class="sg-inv-btn" data-sg-inv-all="close">Tout replier</button>
+    </div>
+
+    <div class="sg-inv-chips" role="group" aria-label="Filtrer par signal">
+        {% for key, text in flag_labels %}
+            <button type="button" class="sg-inv-chip is-{{ key }}" data-sg-inv-flag="{{ key }}" aria-pressed="false">{{ text }} <b>{{ rep.stats[key] }}</b></button>
+        {% endfor %}
+        <span class="sg-inv-total" data-sg-inv-total>{{ rep.stats.a_revoir }} à revoir / {{ rep.stats.total }}</span>
+    </div>
+
+    {# ---------- Par action ---------- #}
+    <div data-sg-inv-pane="famille">
+        {% for g in rep.groups %}
+            <details class="sg-inv-group" data-sg-inv-group {{ g.alerts ? 'open' : '' }}>
+                <summary class="sg-inv-sum">
+                    <span class="sg-inv-name">{{ g.title }}</span>
+                    <span class="sg-inv-n"><b data-sg-inv-shown>{{ g.alerts }}</b> / {{ g.count }}</span>
+                    {% if g.icons > 1 %}<span class="sg-inv-pill">{{ g.icons }} icônes</span>{% endif %}
+                    {% if g.tints > 1 %}<span class="sg-inv-pill">{{ g.tints }} couleurs</span>{% endif %}
+                    {% if g.labels > 1 and g.key in ['ajout', 'enregistrer', 'retour', 'supprimer', 'restaurer', 'fermer'] %}<span class="sg-inv-pill">{{ g.labels }} libellés</span>{% endif %}
+                </summary>
+                <div class="sg-inv-table-wrap"><table class="sg-inv-table">{{ _self.head() }}<tbody>
+                    {% for it in rep.items %}{% if it.family == g.key %}{{ _self.row(it, flag_labels) }}{% endif %}{% endfor %}
+                </tbody></table></div>
+            </details>
+        {% endfor %}
+    </div>
+
+    {# ---------- Par fichier ---------- #}
+    <div data-sg-inv-pane="fichier" hidden>
+        {% for file, list in rep.files %}
+            <details class="sg-inv-group" data-sg-inv-group {{ list|filter(i => i.flags)|length ? 'open' : '' }}>
+                <summary class="sg-inv-sum">
+                    <span class="sg-inv-name sg-inv-file">{{ file }}</span>
+                    <span class="sg-inv-n"><b data-sg-inv-shown>{{ list|filter(i => i.flags)|length }}</b> / {{ list|length }}</span>
+                </summary>
+                <div class="sg-inv-table-wrap"><table class="sg-inv-table">{{ _self.head() }}<tbody>
+                    {% for it in list %}{{ _self.row(it, flag_labels) }}{% endfor %}
+                </tbody></table></div>
+            </details>
+        {% endfor %}
+    </div>
+</div>

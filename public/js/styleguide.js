@@ -6,7 +6,7 @@ const CentralStyleguide = {
 
     config: {
         appName: 'Styleguide',
-        version: 'v1.0.0',
+        version: 'v1.2.0',
         debug: false,
         storageKey: 'central-styleguide-open'
     },
@@ -25,6 +25,7 @@ const CentralStyleguide = {
         this.log('Init');
         this.accordion(root);
         this.copy(root);
+        this.inventory(root);
         this.tokens();
     },
 
@@ -56,7 +57,7 @@ const CentralStyleguide = {
         };
 
         sections.forEach(section => {
-            const examples = section.querySelectorAll('.sg-example').length;
+            const examples = section.querySelectorAll('.sg-example, .sg-inv-item').length;
             const count = section.querySelector('[data-sg-count]');
             if (count) {
                 count.textContent = examples ? examples + (examples > 1 ? ' exemples' : ' exemple') : '';
@@ -77,6 +78,84 @@ const CentralStyleguide = {
                 openOnly(id, true);
             }
         });
+    },
+
+    /** Inventaire des commandes : filtres (texte, type, signal), anomalies seulement, vue par action / par fichier. */
+    inventory(root) {
+        const inv = root.querySelector('[data-sg-inv]');
+        if (!inv) {
+            return;
+        }
+        const q = inv.querySelector('[data-sg-inv-q]');
+        const kind = inv.querySelector('[data-sg-inv-kind]');
+        const only = inv.querySelector('[data-sg-inv-only]');
+        const total = inv.querySelector('[data-sg-inv-total]');
+        const chips = [...inv.querySelectorAll('[data-sg-inv-flag]')];
+        const panes = [...inv.querySelectorAll('[data-sg-inv-pane]')];
+        const state = {view: 'famille'};
+
+        const apply = () => {
+            const text = q.value.trim().toLowerCase();
+            const flags = chips.filter(c => c.getAttribute('aria-pressed') === 'true').map(c => c.dataset.sgInvFlag);
+            let shown = 0;
+            let all = 0;
+            panes.forEach(pane => {
+                const active = pane.dataset.sgInvPane === state.view;
+                pane.querySelectorAll('[data-sg-inv-group]').forEach(group => {
+                    let visible = 0;
+                    group.querySelectorAll('[data-sg-inv-row]').forEach(row => {
+                        const rowFlags = row.dataset.flags ? row.dataset.flags.split(' ') : [];
+                        const ok = (!only.checked || rowFlags.length > 0 || flags.length > 0)
+                            && (flags.length === 0 || flags.some(f => rowFlags.includes(f)))
+                            && (!kind.value || row.dataset.kind === kind.value)
+                            && (!text || row.dataset.text.includes(text));
+                        row.hidden = !ok;
+                        if (ok) { visible++; }
+                    });
+                    group.hidden = visible === 0;
+                    const n = group.querySelector('[data-sg-inv-shown]');
+                    if (n) { n.textContent = visible; }
+                    if (active) { shown += visible; all += group.querySelectorAll('[data-sg-inv-row]').length; }
+                });
+            });
+            total.textContent = shown + ' affichée' + (shown > 1 ? 's' : '') + ' / ' + all;
+        };
+
+        q.addEventListener('input', apply);
+        kind.addEventListener('change', apply);
+        only.addEventListener('change', apply);
+
+        inv.addEventListener('click', event => {
+            const chip = event.target.closest('[data-sg-inv-flag]');
+            if (chip) {
+                chip.setAttribute('aria-pressed', chip.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+                apply();
+                return;
+            }
+            const view = event.target.closest('[data-sg-inv-view]');
+            if (view) {
+                state.view = view.dataset.sgInvView;
+                inv.querySelectorAll('[data-sg-inv-view]').forEach(b => b.classList.toggle('is-on', b === view));
+                panes.forEach(pane => { pane.hidden = pane.dataset.sgInvPane !== state.view; });
+                apply();
+                return;
+            }
+            const all = event.target.closest('[data-sg-inv-all]');
+            if (all) {
+                const open = all.dataset.sgInvAll === 'open';
+                inv.querySelectorAll('[data-sg-inv-pane]:not([hidden]) details').forEach(d => { if (!d.hidden) { d.open = open; } });
+                return;
+            }
+            const loc = event.target.closest('[data-sg-inv-loc]');
+            if (loc && navigator.clipboard) {
+                navigator.clipboard.writeText(loc.textContent.trim()).then(() => {
+                    loc.classList.add('is-copied');
+                    setTimeout(() => loc.classList.remove('is-copied'), 900);
+                }).catch(() => {});
+            }
+        });
+
+        apply();
     },
 
     /** Bouton « Copier le code ». */
