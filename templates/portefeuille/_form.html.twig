@@ -13,7 +13,7 @@
     <div class="form-timeline">
 
         {# 01 — Identité #}
-        <div class="form-field-card">
+        <div class="form-field-card card-inset">
             <div class="form-field-heading">
                 <span class="form-field-index">01</span>
                 <h3>Identité</h3>
@@ -38,7 +38,7 @@
         </div>
 
         {# 02 — Apparence #}
-        <div class="form-field-card">
+        <div class="form-field-card card-inset">
             <div class="form-field-heading">
                 <span class="form-field-index">02</span>
                 <h3>Apparence</h3>
@@ -58,21 +58,21 @@
         </div>
 
         {# 03 — Comportement #}
-        <div class="form-field-card">
+        <div class="form-field-card card-inset">
             <div class="form-field-heading">
                 <span class="form-field-index">03</span>
                 <h3>Comportement</h3>
             </div>
             <div class="form-row" style="--cols: minmax(0, 1fr) minmax(0, 1fr)">
                 <div>
-                    <label class="choice-card">
+                    <label class="choice-card tile">
                         {{ form_widget(form.isDefault) }}
                         <span>Par défaut</span>
                     </label>
                     {{ form_errors(form.isDefault) }}
                 </div>
                 <div>
-                    <label class="choice-card">
+                    <label class="choice-card tile">
                         {{ form_widget(form.isReal) }}
                         <span>Dépenses réelles</span>
                     </label>

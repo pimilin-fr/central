@@ -1,7 +1,7 @@
 {# Carte type de tiers (feuille N3) — composants génériques entity-*. Paramètre : type #}
 {% set lineage = [type.typeN1, type.typeN2]|filter(v => v)|join(' / ') %}
 
-<article class="entity-card is-compact"
+<article class="entity-card is-compact card"
          style="--entity-color: {{ (type.couleur ?? null)|entity_color }}; --entity-text: {{ (type.couleur ?? null)|entity_text }};"
          data-search-item
          data-search-value="{{ ((type.typeN1 ?? '') ~ ' ' ~ (type.typeN2 ?? '') ~ ' ' ~ (type.typeN3 ?? '') ~ ' ' ~ (type.name ?? '') ~ ' ' ~ (type.libelle ?? '') ~ ' ' ~ (type.libelleLiserai ?? ''))|lower|e('html_attr') }}">

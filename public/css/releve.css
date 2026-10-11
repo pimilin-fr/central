@@ -37,10 +37,6 @@
     align-content: start;
     gap: 10px;
     padding: 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: var(--shadow-sm);
     min-inline-size: 0;
 }
 
@@ -69,9 +65,6 @@
     gap: 4px 10px;
     padding: 7px 8px;
     color: var(--text);
-    background: var(--surface-soft);
-    border: 1px solid var(--border);
-    border-radius: 9px;
     font-size: 12px;
 }
 .rc-op:hover { border-color: var(--border-strong, var(--border)); }
@@ -82,9 +75,6 @@
 .rc-line {
     position: relative;
     display: grid;
-    background: var(--surface-soft);
-    border: 1px solid var(--border);
-    border-radius: 10px;
     font-size: 12px;
 }
 .rc-line[data-parts]:not([data-parts="1"]) { border-inline-start: 3px solid var(--accent); }
@@ -179,10 +169,6 @@
     flex-wrap: wrap;
     gap: 8px 28px;
     padding: 10px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
 }
 .rc-recap-item { display: grid; gap: 2px; min-inline-size: 0; }
 .rc-recap-label { color: var(--text-muted); font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
@@ -309,10 +295,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
 }
 .rc-sums { display: flex; flex-wrap: wrap; gap: 4px 22px; color: var(--text-soft); font-size: 12px; }
 .rc-sums strong { margin-inline-start: 6px; color: var(--text); font-size: 15px; font-variant-numeric: tabular-nums; }

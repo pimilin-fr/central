@@ -32,10 +32,6 @@
     flex-direction: column;
     min-width: 0;
     overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow-sm);
     transition:
         transform 180ms ease,
         box-shadow 180ms ease,

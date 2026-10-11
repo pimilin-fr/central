@@ -1,5 +1,5 @@
 {% set isDeleted =  portefeuille.deletedAt is not null %}
-<article class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
+<article class="entity-card {{ isDeleted ? 'is-archived' : '' }} card"
          style="--entity-color: {{ (portefeuille.couleur ?? null)|entity_color }}; --entity-text: {{ (portefeuille.couleur ?? null)|entity_text }};"
          data-search-item
          data-search-value="{{ (

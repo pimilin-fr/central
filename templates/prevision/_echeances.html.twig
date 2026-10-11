@@ -4,7 +4,7 @@
     jusqua (« Y-m » : les mois suivants sont repliés derrière « Afficher plus », facultatif)
 #}
 {% if retard is not empty %}
-    <section class="rc-panel pv-month">
+    <section class="rc-panel pv-month card">
         <header class="block-head block-head-lg"><h3 class="pv-late">En retard · {{ retard|length }}</h3><span class="block-head-meta">dates dépassées, à concrétiser ou ignorer</span></header>
         <div class="rc-table-wrap"><table class="ops-table"><tbody>
             {% for e in retard %}{% include 'prevision/_echeance_row.html.twig' with { e: e, late: true, today: today, back: back|default('') } only %}{% endfor %}
@@ -20,7 +20,7 @@
 {% endfor %}
 
 {% macro mois(month, today, back) %}
-    <section class="rc-panel pv-month">
+    <section class="rc-panel pv-month card">
         <header class="block-head block-head-lg">
             <h3>{{ ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][month.label|date('n') - 1] }} {{ month.label|date('Y') }}</h3>
             <span class="block-head-meta">

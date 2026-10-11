@@ -2,7 +2,7 @@
 {% set now = date() %}
 {% set isDimmed = (projet.endAt and projet.endAt < now) or (projet.beginAt and projet.beginAt > now) %}
 
-<article class="entity-card {{ isDimmed ? 'is-archived' : '' }}"
+<article class="entity-card {{ isDimmed ? 'is-archived' : '' }} card"
          style="--entity-color: {{ (projet.couleur ?? null)|entity_color }}; --entity-text: {{ (projet.couleur ?? null)|entity_text }};"
          data-search-item
          data-search-value="{{ (

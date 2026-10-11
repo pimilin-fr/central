@@ -48,10 +48,6 @@
     position: relative;
     min-width: 0;
     padding: 14px 15px 15px;
-    background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft));
-    border: 1px solid var(--border);
-    border-radius: 13px;
-    box-shadow: none;
     transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
 }
 
@@ -202,9 +198,6 @@
     gap: 10px;
     padding: 9px 11px;
     color: var(--text-soft);
-    background: var(--surface-soft);
-    border: 1px solid var(--border);
-    border-radius: 10px;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
@@ -232,9 +225,6 @@
     flex-wrap: wrap;
     gap: 10px 14px;
     padding: 12px 14px;
-    background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft));
-    border: 1px solid var(--border);
-    border-radius: 14px;
 }
 
 .inline-form-field {

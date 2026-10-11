@@ -1,7 +1,7 @@
 {# Types de tiers groupés N1 > N2 > types. Paramètre : grouped #}
 <div id="type-tiers-list" class="categorie-tree" data-search-target>
     {% for n1, n2s in grouped %}
-        <section class="categorie-branch level-0" data-search-group>
+        <section class="categorie-branch level-0 card" data-search-group>
             <header class="categorie-branch-header">
                 <div class="categorie-branch-heading">
                     <span class="categorie-branch-index">{{ '%02d'|format(loop.index) }}</span>
@@ -18,7 +18,7 @@
 
             <div class="categorie-branch-children">
                 {% for n2, n3s in n2s %}
-                    <section class="categorie-branch level-1" data-search-group>
+                    <section class="categorie-branch level-1 card" data-search-group>
                         <header class="categorie-branch-header">
                             <div class="categorie-branch-heading">
                                 <span class="categorie-branch-index">{{ '%02d'|format(loop.index) }}</span>

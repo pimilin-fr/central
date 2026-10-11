@@ -1089,18 +1089,6 @@ GENERIC TOOLBAR
     box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 65%, transparent);
 }
 
-/* =========================================================
-CARDS / PANELS
-========================================================= */
-
-.panel,
-.card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow-sm);
-}
-
 
 /* =========================================================
 EMPTY STATE

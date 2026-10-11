@@ -2,7 +2,7 @@
 
 <p class="sg-sub">Barre de regroupement</p>
 {% set code %}{% verbatim %}
-<div class="group-bar">
+<div class="group-bar card-bar">
     <span class="group-bar-title"><twig:ux:icon name="lucide:layers" /> Regrouper par</span>
     <div class="group-bar-set">
         <span class="group-bar-label">Date</span>
@@ -103,7 +103,7 @@
 {% set code %}{% verbatim %}
 {# En réel : {{ include('depenses/list/_table.html.twig', { depenses: group.depenses, numbered: group.statementOrder, before: soldeAvant }) }} #}
 <ol class="rc-list is-readonly is-inline is-selectable">
-    <li class="rc-line is-readonly">
+    <li class="rc-line is-readonly tile">
         <div class="rc-line-head">
             <input type="checkbox" class="row-checkbox">
             <span class="rc-rank">1</span><span class="rc-date">02/09/2026</span>
@@ -113,7 +113,7 @@
             <span class="rc-balance is-visible">957,90 €</span>
         </div>
     </li>
-    <li class="rc-line is-readonly">
+    <li class="rc-line is-readonly tile">
         <div class="rc-line-head">
             <input type="checkbox" class="line-check">
             <span class="rc-rank">2</span><span class="rc-date">03/09/2026</span>
@@ -123,8 +123,8 @@
             <span class="rc-balance is-visible">915,40 €</span>
         </div>
         <ul class="rc-parts is-open">
-            <li class="rc-op"><input type="checkbox" class="row-checkbox"><span class="rc-main"><small>Courses</small></span><span class="rc-amount amount-expense">− 30,00 €</span></li>
-            <li class="rc-op"><input type="checkbox" class="row-checkbox"><span class="rc-main"><small>Maison</small></span><span class="rc-amount amount-expense">− 12,50 €</span></li>
+            <li class="rc-op tile"><input type="checkbox" class="row-checkbox"><span class="rc-main"><small>Courses</small></span><span class="rc-amount amount-expense">− 30,00 €</span></li>
+            <li class="rc-op tile"><input type="checkbox" class="row-checkbox"><span class="rc-main"><small>Maison</small></span><span class="rc-amount amount-expense">− 12,50 €</span></li>
         </ul>
     </li>
 </ol>

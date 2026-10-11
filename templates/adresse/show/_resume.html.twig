@@ -15,7 +15,7 @@
 <div class="resume-layout">
 
     {# CARTE RESUME : cercle (géolocalisation) | identité + adresse | liseré (type d'adresse) #}
-    <section class="summary-card {{ isDeleted ? 'is-archived' : '' }}"
+    <section class="summary-card {{ isDeleted ? 'is-archived' : '' }} card"
              style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};">
 
         <div class="entity-circle"
@@ -88,7 +88,7 @@
             {% endif %}
         </div>
 
-        <section class="geo-card">
+        <section class="geo-card card">
             <div class="geo-card-ribbon" style="{{ hasMapData ? '' : 'background: var(--border-strong);' }}"></div>
 
             <div class="geo-card-body">

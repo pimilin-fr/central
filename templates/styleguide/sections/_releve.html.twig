@@ -2,7 +2,7 @@
 
 <p class="sg-sub">Repères du relevé</p>
 {% set code %}{% verbatim %}
-<div class="rc-recap">
+<div class="rc-recap card-bar">
     <div class="rc-recap-item"><span class="rc-recap-label">Relevé précédent</span><strong><a href="#">05/10/2026</a> <span class="ops-group-badge is-closed">Clos</span></strong></div>
     <div class="rc-recap-item"><span class="rc-recap-label">Montant du précédent <small>(mouvement)</small></span><strong class="amount-expense">− 154,60 €</strong></div>
     <div class="rc-recap-item"><span class="rc-recap-label">Solde cumulé avant ce relevé</span><strong>1 250,00 €</strong></div>
@@ -12,7 +12,7 @@
 
 <p class="sg-sub">Panneaux, en-tête et progression</p>
 {% set code %}{% verbatim %}
-<section class="rc-panel">
+<section class="rc-panel card">
     <header class="block-head">
         <h2>Relevé <span class="pill pill-solid">4</span> <small>6 opérations</small></h2>
         <div class="rc-progress">
@@ -40,7 +40,7 @@
 <p class="sg-sub">Lignes du relevé en cours de composition</p>
 {% set code %}{% verbatim %}
 <ol class="rc-list is-selected">
-    <li class="rc-line is-done" data-parts="1" draggable="true">
+    <li class="rc-line is-done tile" data-parts="1" draggable="true">
         <div class="rc-line-head">
             <label class="rc-pick"><input type="checkbox"></label>
             <span class="rc-grip" aria-hidden="true">⋮⋮</span>
@@ -59,7 +59,7 @@
             </span>
         </div>
     </li>
-    <li class="rc-line" data-parts="2" draggable="true">
+    <li class="rc-line tile" data-parts="2" draggable="true">
         <div class="rc-line-head">
             <label class="rc-pick"><input type="checkbox"></label>
             <span class="rc-grip" aria-hidden="true">⋮⋮</span>
@@ -79,8 +79,8 @@
             </span>
         </div>
         <ul class="rc-parts">
-            <li class="rc-op"><span class="rc-main"><small>Courses</small></span><span class="rc-amount amount-expense">− 30,00 €</span><span class="rc-tools"><button type="button" class="btn btn-icon" title="Sortir du détail">✂</button><button type="button" class="btn btn-icon" title="Retirer du relevé">✕</button></span></li>
-            <li class="rc-op"><span class="rc-main"><small>Maison</small></span><span class="rc-amount amount-expense">− 12,50 €</span><span class="rc-tools"><button type="button" class="btn btn-icon" title="Sortir du détail">✂</button><button type="button" class="btn btn-icon" title="Retirer du relevé">✕</button></span></li>
+            <li class="rc-op tile"><span class="rc-main"><small>Courses</small></span><span class="rc-amount amount-expense">− 30,00 €</span><span class="rc-tools"><button type="button" class="btn btn-icon" title="Sortir du détail">✂</button><button type="button" class="btn btn-icon" title="Retirer du relevé">✕</button></span></li>
+            <li class="rc-op tile"><span class="rc-main"><small>Maison</small></span><span class="rc-amount amount-expense">− 12,50 €</span><span class="rc-tools"><button type="button" class="btn btn-icon" title="Sortir du détail">✂</button><button type="button" class="btn btn-icon" title="Retirer du relevé">✕</button></span></li>
         </ul>
     </li>
 </ol>
@@ -90,7 +90,7 @@
 <p class="sg-sub">Opérations à pointer</p>
 {% set code %}{% verbatim %}
 <ul class="rc-list is-pool">
-    <li class="rc-op" draggable="true">
+    <li class="rc-op tile" draggable="true">
         <label class="rc-pick rc-only-pool"><input type="checkbox"></label>
         <span class="rc-grip rc-only-pool" aria-hidden="true">⋮⋮</span>
         <span class="rc-date">06/09/2026</span>
@@ -99,7 +99,7 @@
         <span class="rc-amount amount-expense">− 19,99 €</span>
         <span class="rc-tools"><button type="button" class="btn btn-icon btn-primary rc-add rc-only-pool" title="Ajouter au relevé">＋</button></span>
     </li>
-    <li class="rc-op" draggable="true">
+    <li class="rc-op tile" draggable="true">
         <label class="rc-pick rc-only-pool"><input type="checkbox"></label>
         <span class="rc-grip rc-only-pool" aria-hidden="true">⋮⋮</span>
         <span class="rc-date">07/09/2026</span>
@@ -137,7 +137,7 @@
 
 <p class="sg-sub">Barre d'actions du relevé</p>
 {% set code %}{% verbatim %}
-<div class="rc-actions" style="position: static">
+<div class="rc-actions card-bar" style="position: static">
     <div class="rc-sums">
         <span>Mouvement <strong>− 154,60 €</strong></span>
         <span>Solde cumulé <strong>1 095,40 €</strong></span>

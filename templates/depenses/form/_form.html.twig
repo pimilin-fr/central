@@ -21,7 +21,7 @@
         <div class="op-main-top">
 
             {# ---- 01 Opération (1/3) ---- #}
-            <div class="form-field-card">
+            <div class="form-field-card card-inset">
                 <div class="form-field-heading">
                     <span class="form-field-index">01</span>
                     <h3>Opération</h3>
@@ -46,7 +46,7 @@
             </div>
 
             {# ---- 02 Imputation (2/3) ---- #}
-            <div class="form-field-card">
+            <div class="form-field-card card-inset">
                 <div class="form-field-heading">
                     <span class="form-field-index">02</span>
                     <h3>Imputation</h3>
@@ -84,7 +84,7 @@
         </div>
 
         {# ---- 04 Note ---- #}
-        <div class="form-field-card">
+        <div class="form-field-card card-inset">
             <div class="form-field-heading">
                 <span class="form-field-index">04</span>
                 <h3>Note</h3>
@@ -96,7 +96,7 @@
     </div>
 
     {# ---- 03 Portefeuille (2e colonne) : couleur lue dans data-color ---- #}
-    <div class="form-field-card">
+    <div class="form-field-card card-inset">
         <div class="form-field-heading">
             <span class="form-field-index">03</span>
             <h3>Portefeuille</h3>
@@ -104,7 +104,7 @@
         <div class="choice-list">
             {% for choice in form.portefeuille %}
                 {% set color = choice.vars.attr['data-color'] ?? null %}
-                <label class="choice-card {{ color ? 'is-colored' : '' }}"
+                <label class="choice-card {{ color ? 'is-colored' : '' }} tile"
                        {% if color %}style="--entity-color: {{ color }}; --entity-text: {{ choice.vars.attr['data-text-color'] ?? '#fff' }};"{% endif %}>
                     {{ form_widget(choice) }}
                     {% if color %}<span class="choice-dot" aria-hidden="true"></span>{% endif %}

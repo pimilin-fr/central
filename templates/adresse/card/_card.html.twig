@@ -14,7 +14,7 @@
 {% set isPrincipale = isAdresseTiers and tierAdresse.isPrincipale %}
 
 <article
-    class="entity-card {{ isDeleted ? 'is-archived' : '' }}"
+    class="entity-card {{ isDeleted ? 'is-archived' : '' }} card"
     style="--entity-color: {{ bgColor }}; --entity-text: {{ textColor }};"
     data-search-item
     data-search-value="{{ (

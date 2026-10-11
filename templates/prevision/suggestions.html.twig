@@ -19,7 +19,7 @@
 
         <p class="pv-hint">{{ total }} opération(s) analysée(s) sur les {{ fenetre }} derniers mois{% if derniere %} · dernière opération en base : <strong>{{ derniere|date('d/m/Y') }}</strong>{% endif %}. Une récurrence dont la dernière occurrence est trop ancienne est considérée comme terminée.</p>
 
-        <section class="rc-panel" data-pv-suggestions>
+        <section class="rc-panel card" data-pv-suggestions>
             <header class="block-head">
                 <h2>Récurrences repérées <span class="pill pill-solid" data-pv-count>{{ suggestions|length }}</span></h2>
                 <button type="button" class="btn-link is-muted hidden" data-pv-reset>Réafficher les suggestions masquées</button>
@@ -84,7 +84,7 @@
             {% endif %}
         </section>
 
-        <section class="rc-panel">
+        <section class="rc-panel card">
             <details>
                 <summary class="block-head"><h2>Non retenues <span class="pill pill-solid">{{ rejets|length }}</span></h2></summary>
                 <p class="pv-hint">Opérations d'un même tiers et portefeuille qui n'ont été rattachées à aucune récurrence (opérations ponctuelles, rythme irrégulier, série terminée…), et pourquoi. Les plus nombreuses d'abord.</p>

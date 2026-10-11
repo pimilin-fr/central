@@ -5,7 +5,7 @@
  * À supprimer en fin de chantier.
  */
 const CentralVerification = {
-    config: { appName: 'CentralVerification', version: 'v2.4.0', debug: false },
+    config: { appName: 'CentralVerification', version: 'v2.5.0', debug: false },
 
     STEPS: [
         {
@@ -29,6 +29,16 @@ const CentralVerification = {
             id: 'e3a', titre: 'Étape 3a — en-têtes de bloc (.block-head)',
             interdites: ['rc-panel-head', 'pv-month-head', 'pv-month-sums'],
             requises: ['block-head', 'block-head-lg', 'block-head-meta', 'is-bar', 'is-clickable'],
+        },
+        {
+            id: 'e3b', titre: 'Étape 3b/3c — surfaces (.card, .card-bar, .card-inset, .tile)',
+            interdites: [],
+            requises: ['card', 'card-bar', 'card-inset', 'tile'],
+            // chaque élément portant l'ancienne classe doit porter aussi la primitive
+            couples: [['categorie-branch', 'card'], ['summary-card', 'card'], ['geo-card', 'card'], ['entity-card', 'card'],
+                ['rc-panel', 'card'], ['group-bar', 'card-bar'], ['rc-recap', 'card-bar'], ['rc-actions', 'card-bar'],
+                ['bulk-bar', 'card-inset'], ['inline-form', 'card-inset'], ['form-field-card', 'card-inset'],
+                ['rc-line', 'tile'], ['rc-op', 'tile'], ['choice-card', 'tile']],
         },
     ],
 
@@ -100,6 +110,16 @@ const CentralVerification = {
             (st.feuilles || []).forEach(f => { total++; const g = sheets.includes(f); ok += g; html += this.row(g, 'Feuille ' + f + ' chargée', g ? '' : 'absente : vérifier _head.html.twig'); });
             (st.requises || []).forEach(c => { total++; const g = all.has(c); ok += g; html += this.row(g, 'Classe .' + c + ' utilisée', g ? '' : 'introuvable dans les pages scannées'); });
             const bad = st.interdites.map(c => ({ c, where: perSource.filter(s => s.tokens.has(c)).map(s => s.label) })).filter(x => x.where.length);
+            (st.couples || []).forEach(([old, prim]) => {
+                const miss = [];
+                perSource.filter(s => s.kind === 'page').forEach(s => {
+                    const doc = new DOMParser().parseFromString(s.html, 'text/html');
+                    const n = doc.querySelectorAll('.' + old + ':not(.' + prim + ')').length;
+                    if (n) miss.push(s.label + ' ×' + n);
+                });
+                total++; ok += !miss.length;
+                html += this.row(!miss.length, '.' + old + ' porte aussi .' + prim, miss.join(' · '));
+            });
             total++; ok += !bad.length;
             html += this.row(!bad.length, 'Anciennes classes disparues (' + st.interdites.length + ' contrôlées)',
                 bad.map(b => '<br><code>' + this.esc(b.c) + '</code> dans ' + this.esc(b.where.join(', ')) + ' <span style="opacity:.7">› ' + this.esc(this.snippet(perSource, b.c)) + '</span>').join(''));

@@ -9,7 +9,7 @@
 <div class="form-section-grid">
 
     {# 01 — Identité #}
-    <div class="form-field-card">
+    <div class="form-field-card card-inset">
         <div class="form-field-heading">
             <span class="form-field-index">01</span>
             <h3>Identité</h3>
@@ -29,7 +29,7 @@
     </div>
 
     {# 02 — Type de tiers (liste colorée) #}
-    <div class="form-field-card">
+    <div class="form-field-card card-inset">
         <div class="form-field-heading">
             <span class="form-field-index">02</span>
             <h3>Type de tiers</h3>
@@ -41,7 +41,7 @@
                 {{ form_errors(form.tiersType) }}
             </div>
             <div>
-                <label class="choice-card">
+                <label class="choice-card tile">
                     {{ form_widget(form.personne) }}
                     <twig:ux:icon name="lucide:user-round" />
                     <span>Personne physique</span>
@@ -53,7 +53,7 @@
     </div>
 
     {# 03 — Mode démo #}
-    <div class="form-field-card form-field-card-wide">
+    <div class="form-field-card form-field-card-wide card-inset">
         <div class="form-field-heading">
             <span class="form-field-index">03</span>
             <h3>Mode démo</h3>

@@ -4,7 +4,7 @@
     Paramètres : op (Depenses), inList (bool : dans une ligne du relevé)
 #}
 {% set signed = op.categorie.isDepense ? -(op.montant * 1) : (op.montant * 1) %}
-<li class="rc-op" data-rc-op {{ inList ? '' : 'draggable="true"' }}
+<li class="rc-op tile" data-rc-op {{ inList ? '' : 'draggable="true"' }}
     data-id="{{ op.id }}"
     data-date="{{ op.date|date('Y-m-d') }}"
     data-date-fr="{{ op.date|date('d/m/Y') }}"

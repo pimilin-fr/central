@@ -16,6 +16,9 @@
     --h-btn: 38px;
     --h-btn-sm: 32px;
     --h-btn-xs: 24px;
+    --r-row: 10px;
+    --r-bar: 12px;
+    --r-card: 16px;
 }
 
 /* ---------- BOUTON : base (géométrie unique) ---------- */
@@ -137,3 +140,14 @@ button.pill:hover { color: var(--accent); border-color: var(--accent); }
 .block-head.is-bar { padding: 12px 14px; }
 .block-head.is-clickable { cursor: pointer; transition: background 150ms ease; }
 .block-head.is-clickable:hover { background: var(--surface-hover); }
+
+/* ---------- SURFACES : .card .card-bar .card-inset .tile ----------
+   .card        carte / panneau (rayon 16, ombre légère)
+   .card-bar    barre de contrôle (rayon 12, ombre légère)
+   .card-inset  bloc encastré dans une carte (rayon 12, fond atténué, sans ombre)
+   .tile        ligne / ligne de choix dans une liste (rayon 10, fond doux)
+   Les familles rc-/pv-/entity-… ne gardent que la mise en page et les états. */
+.card, .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); box-shadow: var(--shadow-sm); }
+.card-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-bar); box-shadow: var(--shadow-sm); }
+.card-inset { background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft)); border: 1px solid var(--border); border-radius: var(--r-bar); }
+.tile { background: var(--surface-soft); border: 1px solid var(--border); border-radius: var(--r-row); }

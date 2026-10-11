@@ -1,9 +1,22 @@
 {% import 'styleguide/_ex.html.twig' as sg %}
 
+<p class="sg-sub">Surfaces du kit</p>
+{% set code %}{% verbatim %}
+<div style="display:grid;gap:12px">
+    <div class="card" style="padding:14px"><strong>.card</strong> — carte ou panneau : rayon 16px, ombre légère</div>
+    <div class="card-bar" style="padding:10px 14px"><strong>.card-bar</strong> — barre de contrôle : rayon 12px, ombre légère</div>
+    <div class="card" style="padding:14px">
+        <div class="card-inset" style="padding:10px 12px"><strong>.card-inset</strong> — bloc encastré : rayon 12px, fond atténué</div>
+        <div class="tile" style="padding:8px 10px;margin-top:8px"><strong>.tile</strong> — ligne de liste ou de choix : rayon 10px, fond doux</div>
+    </div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('card, card-bar, card-inset, tile', code, 'Les familles <code>entity-</code>, <code>rc-</code>, <code>summary-</code>… ajoutent ces classes et ne gardent que leur mise en page et leurs états.') }}
+
 <p class="sg-sub">Carte d'entité</p>
 {% set code %}{% verbatim %}
 <div class="entity-grid">
-    <article class="entity-card" style="--entity-color: #f97316; --entity-text: #fff;">
+    <article class="entity-card card" style="--entity-color: #f97316; --entity-text: #fff;">
         <a href="#" class="entity-card-link">
             <div class="entity-circle"><twig:ux:icon name="lucide:map-pin" /></div>
             <div class="entity-ribbon"><span class="entity-ribbon-label">Libellé</span></div>
@@ -36,14 +49,14 @@
 
 {% set code %}{% verbatim %}
 <div class="entity-grid">
-    <article class="entity-card is-archived" style="--entity-color: #64748b; --entity-text: #fff;">
+    <article class="entity-card is-archived card" style="--entity-color: #64748b; --entity-text: #fff;">
         <a href="#" class="entity-card-link">
             <div class="entity-circle"><twig:ux:icon name="lucide:archive" /></div>
             <div class="entity-ribbon"><span class="entity-ribbon-label">Archivé</span></div>
             <div class="entity-body"><div class="entity-head"><h2 class="entity-title">Entité archivée</h2><span class="entity-sub">is-archived</span></div></div>
         </a>
     </article>
-    <article class="entity-card is-compact" style="--entity-color: #3b82f6; --entity-text: #fff;">
+    <article class="entity-card is-compact card" style="--entity-color: #3b82f6; --entity-text: #fff;">
         <a href="#" class="entity-card-link">
             <div class="entity-circle"><twig:ux:icon name="reicon:money-send3-filled" /></div>
             <div class="entity-ribbon"><span class="entity-ribbon-label">Dépense</span></div>
@@ -56,7 +69,7 @@
 
 {% set code %}{% verbatim %}
 <div class="entity-grid">
-    <article class="entity-card" style="--entity-color: #22a06b; --entity-text: #fff;">
+    <article class="entity-card card" style="--entity-color: #22a06b; --entity-text: #fff;">
         <a href="#" class="entity-card-link">
             <div class="entity-circle"><twig:ux:icon name="lucide:building-2" /></div>
             <div class="entity-ribbon"><span class="entity-ribbon-label">Fournisseur</span></div>
@@ -103,7 +116,7 @@
 
 <p class="sg-sub">Carte de résumé (fiche)</p>
 {% set code %}{% verbatim %}
-<section class="summary-card" style="--entity-color: #f97316; --entity-text: #fff;">
+<section class="summary-card card" style="--entity-color: #f97316; --entity-text: #fff;">
     <div class="entity-circle"><twig:ux:icon name="lucide:wallet" /></div>
     <div class="summary-body">
         <div class="summary-head">
@@ -127,7 +140,7 @@
 
 <p class="sg-sub">Carte de localisation</p>
 {% set code %}{% verbatim %}
-<section class="geo-card">
+<section class="geo-card card">
     <div class="geo-card-ribbon"></div>
     <div class="geo-card-body">
         <div class="geo-card-head">
@@ -143,7 +156,7 @@
 <p class="sg-sub">Branche d'arbre (catégories, types)</p>
 {% set code %}{% verbatim %}
 <div class="categorie-tree">
-    <section class="categorie-branch level-0">
+    <section class="categorie-branch level-0 card">
         <header class="categorie-branch-header">
             <div class="categorie-branch-heading">
                 <span class="categorie-branch-index">01</span>
@@ -155,7 +168,7 @@
             <div class="categorie-branch-meta"><span class="categorie-branch-count">2 enfants</span><twig:ux:icon name="lucide:layers-3" /></div>
         </header>
         <div class="categorie-branch-children">
-            <article class="entity-card is-compact" style="--entity-color: #3b82f6; --entity-text: #fff;">
+            <article class="entity-card is-compact card" style="--entity-color: #3b82f6; --entity-text: #fff;">
                 <a href="#" class="entity-card-link">
                     <div class="entity-circle"><twig:ux:icon name="reicon:money-send3-filled" /></div>
                     <div class="entity-ribbon"><span class="entity-ribbon-label">Dépense</span></div>

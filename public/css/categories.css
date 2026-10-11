@@ -13,10 +13,6 @@
     position: relative;
     overflow: hidden;
     padding: 18px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    box-shadow: var(--shadow-sm);
     transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 

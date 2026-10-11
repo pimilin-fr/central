@@ -19,10 +19,6 @@
     flex-wrap: wrap;
     gap: 10px 22px;
     padding: 10px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: var(--shadow-sm);
 }
 
 .group-bar-title {
@@ -73,10 +69,6 @@
     min-height: 118px;
     padding: 20px 56px 20px 20px;
     overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow-sm);
     transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
@@ -218,9 +210,6 @@
     gap: 8px 10px;
     margin-bottom: 16px;
     padding: 8px 12px;
-    background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft));
-    border: 1px solid var(--border);
-    border-radius: 12px;
 }
 
 .bulk-bar-kicker {
@@ -515,10 +504,6 @@
     align-self: start;
     min-width: 0;
     overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow-sm);
 }
 
 .geo-card-ribbon {

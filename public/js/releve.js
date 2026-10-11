@@ -15,7 +15,7 @@ const CentralReleve = {
 
     config: {
         debug: true,
-        version: 'v1.2.0',
+        version: 'v1.3.0',
         appName: 'Central-ModuleReleve'
     },
 
@@ -100,7 +100,7 @@ const CentralReleve = {
 
             const newLine = (parts, done = true) => {
                 const line = document.createElement('li');
-                line.className = 'rc-line';
+                line.className = 'rc-line tile';
                 line.setAttribute('data-rc-line', '');
                 line.draggable = true;
                 setDone(line, done); // une ligne placée à la main est considérée pointée

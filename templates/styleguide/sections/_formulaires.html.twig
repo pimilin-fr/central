@@ -66,16 +66,16 @@
     <div>
         <label class="modern-form-label">choice-card</label>
         <div class="choice-list">
-            <label class="choice-card"><input type="radio" name="sg-a" checked><span>Choix simple</span></label>
-            <label class="choice-card"><input type="radio" name="sg-a"><span>Autre choix</span></label>
+            <label class="choice-card tile"><input type="radio" name="sg-a" checked><span>Choix simple</span></label>
+            <label class="choice-card tile"><input type="radio" name="sg-a"><span>Autre choix</span></label>
         </div>
     </div>
     <div>
         <label class="modern-form-label">choice-card colorée</label>
         <div class="choice-list">
-            <label class="choice-card is-colored" style="--entity-color: #f97316; --entity-text: #fff;"><input type="radio" name="sg-b" checked><span class="choice-dot" aria-hidden="true"></span><span>Orange</span></label>
-            <label class="choice-card is-colored" style="--entity-color: #22a06b; --entity-text: #fff;"><input type="radio" name="sg-b"><span class="choice-dot" aria-hidden="true"></span><span>Vert</span></label>
-            <label class="choice-card is-colored" style="--entity-color: #3b82f6; --entity-text: #fff;"><input type="radio" name="sg-b"><span class="choice-dot" aria-hidden="true"></span><span>Bleu</span></label>
+            <label class="choice-card is-colored tile" style="--entity-color: #f97316; --entity-text: #fff;"><input type="radio" name="sg-b" checked><span class="choice-dot" aria-hidden="true"></span><span>Orange</span></label>
+            <label class="choice-card is-colored tile" style="--entity-color: #22a06b; --entity-text: #fff;"><input type="radio" name="sg-b"><span class="choice-dot" aria-hidden="true"></span><span>Vert</span></label>
+            <label class="choice-card is-colored tile" style="--entity-color: #3b82f6; --entity-text: #fff;"><input type="radio" name="sg-b"><span class="choice-dot" aria-hidden="true"></span><span>Bleu</span></label>
         </div>
     </div>
     <div>
@@ -112,14 +112,14 @@
 {% set code %}{% verbatim %}
 <form class="modern-form" onsubmit="return false">
     <div class="form-section-grid">
-        <div class="form-field-card">
+        <div class="form-field-card card-inset">
             <div class="form-field-heading"><span class="form-field-index">01</span><h3>Identité</h3></div>
             <div class="form-stack">
                 <div><label class="modern-form-label required">Nom</label><input class="modern-form-control" required></div>
                 <div><label class="modern-form-label">Code</label><input class="modern-form-control"></div>
             </div>
         </div>
-        <div class="form-field-card form-field-card-wide">
+        <div class="form-field-card form-field-card-wide card-inset">
             <div class="form-field-heading"><span class="form-field-index">02</span><h3>Adresse (form-row)</h3></div>
             <div class="form-row" style="--cols: 110px 90px 100px 160px">
                 <div><label class="modern-form-label">Préfixe</label><input class="modern-form-control"></div>
@@ -150,8 +150,8 @@
 {% set code %}{% verbatim %}
 <div class="form-layout is-single" style="max-width: 760px">
     <div class="form-timeline">
-        <div class="form-field-card"><div class="form-field-heading"><span class="form-field-index">01</span><h3>Étape</h3></div><p class="form-hint">Contenu de l'étape.</p></div>
-        <div class="form-field-card"><div class="form-field-heading"><span class="form-field-index">02</span><h3>Étape suivante</h3></div><p class="form-hint">Contenu de l'étape.</p></div>
+        <div class="form-field-card card-inset"><div class="form-field-heading"><span class="form-field-index">01</span><h3>Étape</h3></div><p class="form-hint">Contenu de l'étape.</p></div>
+        <div class="form-field-card card-inset"><div class="form-field-heading"><span class="form-field-index">02</span><h3>Étape suivante</h3></div><p class="form-hint">Contenu de l'étape.</p></div>
     </div>
 </div>
 {% endverbatim %}{% endset %}
@@ -160,7 +160,7 @@
 <p class="sg-sub">Modification en masse</p>
 {% set code %}{% verbatim %}
 <form class="bulk-form" onsubmit="return false">
-    <div class="bulk-bar">
+    <div class="bulk-bar card-inset">
         <span class="bulk-bar-kicker">Modification en masse</span>
         <div class="bulk-field bulk-field-action">
             <label class="modern-form-label">Action</label>
@@ -185,7 +185,7 @@
 
 <p class="sg-sub">Champs du relevé</p>
 {% set code %}{% verbatim %}
-<section class="rc-panel rc-top">
+<section class="rc-panel rc-top card">
     <label class="rc-field">
         <span class="modern-form-label">Date du relevé</span>
         <input type="date" class="modern-form-control" value="2026-10-05">

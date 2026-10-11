@@ -23,7 +23,7 @@
     {% set natureColor = node.categorie.isDepense() ? 'var(--category-expense)' : 'var(--category-income)' %}
 
     <article
-        class="entity-card is-compact"
+        class="entity-card is-compact card"
         style="--entity-color: {{ natureColor }}; --entity-text: #fff;"
         data-search-item
         data-search-value="{{ categoryPath|lower|e('html_attr') }}"
@@ -51,7 +51,7 @@
     </article>
 {% else %}
     <section
-        class="categorie-branch level-{{ level }}"
+        class="categorie-branch level-{{ level }} card"
         data-search-group
         >
         <header class="categorie-branch-header">

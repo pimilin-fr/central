@@ -16,7 +16,7 @@
 {% set typePath = pathParts|join(' / ') %}
 
 {% if not hasChildren %}
-    <article class="entity-card is-compact"
+    <article class="entity-card is-compact card"
              style="--entity-color: var(--accent); --entity-text: var(--accent-contrast, #fff);"
              data-search-item
              data-search-value="{{ (typePath ~ ' ' ~ (node.name ?? ''))|lower|e('html_attr') }}">
@@ -36,7 +36,7 @@
         </a>
     </article>
 {% else %}
-    <section class="categorie-branch level-{{ level > 2 ? 2 : level }}" data-search-group>
+    <section class="categorie-branch level-{{ level > 2 ? 2 : level }} card" data-search-group>
         <header class="categorie-branch-header">
             <div class="categorie-branch-heading">
                 <span class="categorie-branch-index">{{ '%02d'|format(level + 1) }}</span>

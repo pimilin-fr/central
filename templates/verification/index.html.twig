@@ -4,7 +4,7 @@
 
 {#
     TEMPORAIRE — vérification du chantier « kit UI ».
-    À chaque étape : (1) compléter const STEPS dans public/js/verification.js (contrôles automatiques),
+    À chaque étape : (1) compléter const STEPS dans public/js/verification/verification.js (contrôles automatiques),
     (2) remplacer la liste « À vérifier à l'œil » ci-dessous. Chaque ligne a un VRAI lien, construit par
     StyleguideController::verification() sur des enregistrements existants (lecture seule).
     Suppression en fin de chantier : voir StyleguideController.
@@ -39,19 +39,23 @@
 
 {# Liste « à l'œil » de l'étape en cours : [texte, url] — url nulle = enregistrement inexistant #}
 {% set manual = [
-    ['Fiche portefeuille : en-têtes des groupes d’opérations (barre cliquable, survol grisé, clic = déplier)', urlPtf],
-    ['Fiche portefeuille : changer « Regrouper par » (Mois, Relevé…) — en-têtes et sous-groupes de relevé identiques à avant', urlPtf],
-    ['Fiche portefeuille, onglet Prévision : titres de période, chiffres à droite', urlPtfPrev],
-    ['Composeur de relevé : en-têtes « Relevé » et « À pointer » (titre, compteur, boutons à droite)', urlComposer],
-    ['Tous les relevés : en-tête du panneau', path('app_releve_all')],
-    ['Prévisions : « Règles » replié (flèche, nombre de règles actives) puis « Période en cours » (titre plus grand, totaux à droite)', path('app_prevision_index')],
-    ['Prévisions : bouton « Afficher les mois suivants » puis titres des mois (majuscule initiale)', path('app_prevision_index')],
-    ['Suggestions : « Récurrences repérées » et « Non retenues » (compteur dans l’en-tête)', path('app_prevision_suggestions')],
-    ['Fiche tiers : les groupes d’opérations s’affichent comme avant', urlTiers],
-    ['Fiche projet : idem', urlProjet],
-    ['Fiche catégorie (arbre) : INCHANGÉE — son en-tête de branche garde son style propre', urlCat],
-    ['Styleguide › Structure : nouvel exemple « En-têtes de bloc »', path('app_styleguide') ~ '#structure'],
-    ['Styleguide › Listes et Écran du relevé : en-têtes conformes', path('app_styleguide') ~ '#listes']
+    ['Portefeuilles (cartes) : cartes arrondies à 16px, ombre légère, survol inchangé', path('app_portefeuille_index')],
+    ['Tiers (cartes d’entité) : mêmes cartes', path('app_tiers_index')],
+    ['Projets, types de projet, types de tiers : cartes et cartes compactes', path('app_projet_index')],
+    ['Catégories (arbre) : branches arrondies à 16px (avant 20px), feuilles compactes', path('app_categorie_index')],
+    ['Fiche portefeuille : carte de résumé en haut, barre « Regrouper par » (12px), barre d’actions groupées en cochant une ligne', urlPtf],
+    ['Fiche tiers : carte de résumé + carte de localisation (carte géographique)', urlTiers],
+    ['Fiche projet : carte de résumé', urlProjet],
+    ['Fiche catégorie : carte de résumé, branches', urlCat],
+    ['Fiche adresse : carte de résumé + carte de localisation', urlAdr],
+    ['Composeur de relevé : panneaux « Relevé » et « À pointer », bandeau récap, barre du bas, lignes (↑ ↓ + ✕)', urlComposer],
+    ['Composeur : cocher des lignes, déplacer une ligne, pointer ✓ — la liste réagit comme avant (JS v1.3.0)', urlComposer],
+    ['Tous les relevés : panneau et lignes', path('app_releve_all')],
+    ['Prévisions : panneaux de périodes arrondis comme les autres panneaux', path('app_prevision_index')],
+    ['Formulaire portefeuille : cartes numérotées + choix « choice-card » (lignes douces)', path('app_portefeuille_new')],
+    ['Formulaire tiers : cartes numérotées (fond atténué, 12px)', path('app_tiers_new')],
+    ['Formulaire projet : idem', path('app_projet_new')],
+    ['Styleguide › Cartes, Formulaires, Écran du relevé : exemples conformes', path('app_styleguide') ~ '#cartes']
 ] %}
 
 {% block body %}
@@ -63,7 +67,7 @@
         <div class="page-heading">
             <div class="page-heading-copy">
                 <h1 class="page-title">Vérification du kit UI <span class="pill pill-accent">temporaire</span></h1>
-                <p>Étape en cours : <strong>3a — en-têtes de bloc</strong>. Contrôles automatiques sur vos vraies pages, puis liste à vérifier à l'œil.</p>
+                <p>Étape en cours : <strong>3b/3c — surfaces (cartes, barres, lignes)</strong>. Contrôles automatiques sur vos vraies pages, puis liste à vérifier à l'œil.</p>
             </div>
             <div class="page-heading-actions">
                 <button type="button" class="btn btn-primary" data-vf-run><twig:ux:icon name="lucide:play" /><span>Lancer les contrôles</span></button>
@@ -82,11 +86,11 @@
         </section>
 
         <section class="rc-panel" style="margin-bottom:16px">
-            <div class="block-head"><h2>À vérifier à l'œil — étape 3a</h2></div>
-            <p class="pv-range">Changements attendus : titres de période un peu plus petits ou plus grands selon l'écran (17px), écarts d'en-têtes homogènes (8/16px). Le reste doit être identique. Les liens ouvrent de vrais enregistrements, en lecture seule.</p>
+            <div class="block-head"><h2>À vérifier à l'œil — étape 3b/3c</h2></div>
+            <p class="pv-range">Changements attendus (quelques pixels) : rayons homogènes — cartes 16px (branches de catégories 20→16, cartes d'entité 18→16, panneaux du relevé 14→16), barres 12px, lignes 10px. Fond, bordure et ombre inchangés. Les liens ouvrent de vrais enregistrements, en lecture seule.</p>
             {% for item in manual %}
                 <label style="display:flex;gap:8px;align-items:baseline;padding:3px 0">
-                    <input type="checkbox" data-vf-check="e3a-{{ loop.index }}">
+                    <input type="checkbox" data-vf-check="e3b-{{ loop.index }}">
                     <span>{{ item[0] }}
                         {% if item[1] %} — <a class="btn-link" href="{{ item[1] }}" target="_blank" rel="noopener">ouvrir</a>
                         {% else %} — <em class="pv-range">aucun enregistrement : lien indisponible</em>{% endif %}
@@ -100,5 +104,5 @@
             <p>{% for p in pages %}<a class="btn-link is-muted" href="{{ p.url }}" target="_blank" rel="noopener" style="margin-right:12px">{{ p.label }}</a>{% endfor %}</p>
         </section>
     </div>
-    <script src="{{ asset('js/verification.js') }}?v=6" defer></script>
+    <script src="{{ asset('js/verification/verification.js') }}?v=7" defer></script>
 {% endblock %}
