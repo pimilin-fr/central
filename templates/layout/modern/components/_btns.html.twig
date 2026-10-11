@@ -1,12 +1,40 @@
+{#
+    COMPOSANT BOUTONS — l'UNIQUE façon de poser un bouton ou un lien d'action dans un template.
+
+        {% include 'layout/modern/components/_btns.html.twig' with {
+            removeContainer: true,
+            btns: [{ label: 'Ajouter', path: path('app_tiers_new'), icon: 'gridicons:add', color: 'primary' }]
+        } %}
+
+    Clés d'un bouton
+        label       libellé (sert aussi de title et d'aria-label quand il n'y a que l'icône)
+        type        'link' (défaut : <a>) · 'button' · 'submit' · 'summary' (<summary> d'un <details>)
+        path        URL (type link)
+        icon        nom d'icône ; un 'submit' prend l'icône « enregistrer » s'il n'en a pas
+        color       primary · neutral (défaut) · info · danger · success · warning · soft · ghost · link · muted
+        iconOnly    true : carré avec la seule icône (le libellé devient l'info-bulle)
+        size        'sm' · 'xs'
+        title       info-bulle (par défaut : le libellé si iconOnly)
+        class       classes en plus (utilitaires : hidden, is-danger, is-on…)
+        id, name, value
+        attrs       { 'data-pv-add': true, onclick: '…', target: '_blank' } — true = attribut sans valeur
+        attr        ancien format [{ label, value }] (conservé)
+
+    removeContainer : true => pas de <div class="page-heading-actions"> autour (bouton seul dans un formulaire, une barre, une cellule…)
+    Les couleurs et formes vivent dans public/css/ui-kit.css.
+#}
 {% set buttonColors = {
     primary: 'btn-primary',
     neutral: 'btn-neutral',
     danger: 'btn-danger',
     success: 'btn-success',
     info: 'btn-info',
-    warning: 'btn-warning'
+    warning: 'btn-warning',
+    soft: 'btn-soft',
+    ghost: 'btn-ghost',
+    link: 'btn-link',
+    muted: 'btn-link is-muted'
 } %}
-{# removeContainer: true => pas de <div> englobant (bouton seul dans un formulaire, une barre…) #}
 {% set withContainer = removeContainer is not defined or not removeContainer %}
 
 {% if withContainer %}
@@ -15,35 +43,40 @@
 
     {% for btn in btns %}
         {% set color = btn.color|default('neutral') %}
+        {% set btype = btn.type ?? 'link' %}
+        {% set tag = btype == 'link' ? 'a' : (btype == 'summary' ? 'summary' : 'button') %}
+        {% set iconOnly = btn.iconOnly|default(false) %}
+        {% set icon = btn.icon ?? (btype == 'submit' ? 'material-symbols:save-rounded' : null) %}
+        {% set label = btn.label ?? (btype == 'submit' ? 'Enregistrer' : '') %}
+        {% set tip = btn.title ?? (iconOnly ? label : null) %}
+        {% set classes = ((color in ['link', 'muted'] ? '' : 'btn ') ~ (buttonColors[color] ?? 'btn-neutral') ~ (iconOnly ? ' btn-icon' : '') ~ (btn.size is defined ? ' btn-' ~ btn.size : '') ~ ' ' ~ (btn.class ?? ''))|trim %}
 
-        {% if btn.type is not defined or btn.type == 'link' %}
-            <a
-                href="{{ btn.path }}"
-                class="btn {{ buttonColors[color] ?? 'btn-neutral' }} {{ btn.class ??"" }}"
-                {% if btn.attr is defined %}
-                    {% for at in btn.attr %}
-                        {{ at.label }}="{{ at.value }}"
-                    {% endfor %}
-                {% endif %}
-                >
-                {% if btn.icon is defined %}
-                    <twig:ux:icon name="{{ btn.icon }}" />
-                {% endif %}
-                <span>{{ btn.label }}</span>
-            </a>
-        {% elseif btn.type == 'submit' %}
-            <button
-                type="submit"
-                class="btn {{ buttonColors[color] ?? 'btn-neutral' }} {{ btn.class ??"" }}"
-                >
-                {% if btn.icon is defined %}
-                    <twig:ux:icon name="{{ btn.icon }}" />
-                {% else %}
-                    <twig:ux:icon name="material-symbols:save-rounded" />
-                {% endif %}
-                <span>{{ btn.label|default('Enregistrer') }}</span>
-            </button>
-        {% endif %}
+        <{{ tag }}
+            {% if tag == 'a' %}href="{{ btn.path }}"{% elseif tag == 'button' %}type="{{ btype == 'submit' ? 'submit' : 'button' }}"{% endif %}
+            class="{{ classes }}"
+            {% if btn.id is defined %}id="{{ btn.id }}"{% endif %}
+            {% if btn.name is defined %}name="{{ btn.name }}"{% endif %}
+            {% if btn.value is defined %}value="{{ btn.value }}"{% endif %}
+            {% if tip is not empty %}title="{{ tip }}"{% endif %}
+            {% if iconOnly %}aria-label="{{ label }}"{% endif %}
+            {% if btn.attrs is defined %}
+                {% for key, val in btn.attrs %}
+                    {% if val is same as(true) %}{{ key }}{% else %}{{ key }}="{{ val }}"{% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if btn.attr is defined %}
+                {% for at in btn.attr %}
+                    {{ at.label }}="{{ at.value }}"
+                {% endfor %}
+            {% endif %}
+            >
+            {% if icon %}
+                <twig:ux:icon name="{{ icon }}" />
+            {% endif %}
+            {% if not iconOnly and label is not empty %}
+                <span>{{ label }}</span>
+            {% endif %}
+        </{{ tag }}>
     {% endfor %}
 {% if withContainer %}
     </div>

@@ -29,10 +29,7 @@
     <input type="hidden" name="projet_id">
 </div>
 
-{#<button type="submit" class="btn btn-primary bulk-submit">
-    <twig:ux:icon name="material-symbols:check-circle" />
-    <span>Appliquer</span>
-</button>#}
+{#{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Appliquer', icon: 'material-symbols:check-circle', color: 'primary', class: 'bulk-submit' }] } %}#}
 {% include 'layout/modern/components/_btns.html.twig' with {
         removeContainer:true,
         btns: [
@@ -41,7 +38,7 @@
                 label: 'Appliquer',
                 icon: 'lucide:check',
                 color: 'primary',
-                class:"btn btn-primary bulk-submit"
+                class: 'bulk-submit'
             }
         ]
 } %}

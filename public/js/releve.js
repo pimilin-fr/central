@@ -15,7 +15,7 @@ const CentralReleve = {
 
     config: {
         debug: true,
-        version: 'v1.4.0',
+        version: 'v1.5.0',
         appName: 'Central-ModuleReleve'
     },
 
@@ -171,11 +171,11 @@ const CentralReleve = {
                         '<span class="rc-amount ' + (total < 0 ? 'amount-expense' : 'amount-income') + '">' + signed(total) + '</span>' +
                         '<span class="rc-balance" title="Solde cumulé après cette ligne">' + money.format(running) + ' €</span>' +
                         '<span class="rc-tools">' +
-                                                '<button type="button" class="btn btn-icon" data-rc-bring title="Placer cette ligne juste après la dernière ligne pointée (en premier si aucune n\'est pointée)" aria-label="Placer après la dernière ligne pointée">' + CentralIcons.get('move', '⤒') + '</button>' +
-                        '<button type="button" class="btn btn-icon" data-rc-up title="Monter" aria-label="Monter">' + CentralIcons.get('up', '▲') + '</button>' +
-                        '<button type="button" class="btn btn-icon" data-rc-down title="Descendre" aria-label="Descendre">' + CentralIcons.get('down', '▼') + '</button>' +
-                        (parts.length > 1 ? '<button type="button" class="btn btn-icon" data-rc-split title="Dégrouper : une ligne par opération" aria-label="Dégrouper">' + CentralIcons.get('group', '⧉') + '</button>' : '') +
-                        '<button type="button" class="btn btn-icon" data-rc-remove-line title="Retirer la ligne du relevé" aria-label="Retirer la ligne">' + CentralIcons.get('close', '✕') + '</button>' +
+                        CentralIcons.button('rc-bring', '⤒') +
+                        CentralIcons.button('rc-up', '▲') +
+                        CentralIcons.button('rc-down', '▼') +
+                        (parts.length > 1 ? CentralIcons.button('rc-split', '⧉') : '') +
+                        CentralIcons.button('rc-remove-line', '✕') +
                         '</span>';
             };
 

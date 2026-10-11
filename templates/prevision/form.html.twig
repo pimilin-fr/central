@@ -68,12 +68,12 @@
                                 <div>{{ form_label(tranche.montant, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(tranche.montant, { attr: { class: 'modern-form-control' } }) }}{{ form_errors(tranche.montant) }}</div>
                                 <div>{{ form_label(tranche.montantMin, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(tranche.montantMin, { attr: { class: 'modern-form-control' } }) }}</div>
                                 <div>{{ form_label(tranche.montantMax, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(tranche.montantMax, { attr: { class: 'modern-form-control' } }) }}</div>
-                                <button type="button" class="btn btn-icon btn-ghost is-danger" data-pv-remove title="Retirer ce montant" aria-label="Retirer ce montant"><twig:ux:icon name="mdi:close-box" /></button>
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Retirer ce montant', icon: 'mdi:close-box', color: 'ghost', iconOnly: true, title: 'Retirer ce montant', class: 'is-danger', attrs: { 'data-pv-remove': true } }] } %}
                             </div>
                         {% endfor %}
                     </div>
                     {{ form_errors(form.tranches) }}
-                    <button type="button" class="btn btn-primary" data-pv-add><twig:ux:icon name="gridicons:add" /><span>Ajouter</span></button>
+                    {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Ajouter', icon: 'gridicons:add', color: 'primary', attrs: { 'data-pv-add': true } }] } %}
                     {% do form.tranches.setRendered %}
                 </div>
 
@@ -84,7 +84,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary"><twig:ux:icon name="material-symbols:save-rounded" /><span>Enregistrer</span></button>
+            {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Enregistrer', icon: 'material-symbols:save-rounded', color: 'primary' }] } %}
         </div>
         {{ form_end(form) }}
     </div>

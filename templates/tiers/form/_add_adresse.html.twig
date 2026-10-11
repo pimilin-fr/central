@@ -15,9 +15,9 @@
         <span>Principale</span>
     </label>
 
-    <button type="submit" class="btn btn-primary">
-        <twig:ux:icon name="gridicons:add" />
-        <span>Ajouter</span>
-    </button>
+    {% include 'layout/modern/components/_btns.html.twig' with {
+        removeContainer: true,
+        btns: [{ type: 'submit', label: 'Ajouter', icon: 'gridicons:add', color: 'primary' }]
+    } %}
 
 {{ form_end(form) }}

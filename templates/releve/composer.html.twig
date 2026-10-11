@@ -58,7 +58,7 @@
                     <form method="post" action="{{ path('app_releve_reopen', { id: releve.id }) }}"
                           onsubmit="return confirm('Rouvrir ce relevé pour corriger l\'ordre des opérations ?');">
                         <input type="hidden" name="_token" value="{{ csrf_token(token) }}">
-                        <button type="submit" class="btn btn-neutral"><twig:ux:icon name="lucide:lock-open" /><span>Rouvrir</span></button>
+                        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Rouvrir', icon: 'lucide:lock-open', color: 'neutral' }] } %}
                     </form>
                 </header>
                 <ol class="rc-list is-readonly">
@@ -141,14 +141,14 @@
                             <div class="rc-progress" data-rc-progress-box hidden>
                                 <span class="rc-progress-text" data-rc-progress-text></span>
                                 <span class="rc-bar" aria-hidden="true"><i data-rc-progress-bar></i></span>
-                                <button type="button" class="btn-link" data-rc-done-all></button>
-                                <button type="button" class="btn-link" data-rc-hide-done aria-pressed="false">Masquer les pointées</button>
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: '', color: 'link', attrs: { 'data-rc-done-all': true } }] } %}
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Masquer les pointées', color: 'link', attrs: { 'data-rc-hide-done': true, 'aria-pressed': 'false' } }] } %}
                             </div>
                             <div class="rc-sorts" role="group" aria-label="Outils du relevé">
-                                <button type="button" class="btn btn-icon" data-rc-sort="asc" title="Trier par date : du plus ancien au plus récent (ex. espèces)" aria-label="Trier du plus ancien au plus récent"><twig:ux:icon name="fa7-solid:sort-up" /></button>
-                                <button type="button" class="btn btn-icon" data-rc-sort="desc" title="Trier par date : du plus récent au plus ancien" aria-label="Trier du plus récent au plus ancien"><twig:ux:icon name="fa7-solid:sort-down" /></button>
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Trier du plus ancien au plus récent', icon: 'fa7-solid:sort-up', iconOnly: true, title: 'Trier par date : du plus ancien au plus récent (ex. espèces)', attrs: { 'data-rc-sort': 'asc' } }] } %}
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Trier du plus récent au plus ancien', icon: 'fa7-solid:sort-down', iconOnly: true, title: 'Trier par date : du plus récent au plus ancien', attrs: { 'data-rc-sort': 'desc' } }] } %}
                             </div>
-                            <div class="rc-selsum" data-rc-sel-lines hidden><span data-rc-sel-text></span><span class="rc-selsum-actions"><button type="button" class="btn btn-primary" data-rc-merge title="Regrouper les lignes cochées en un seul détail (même date, tiers libres)"><twig:ux:icon name="material-symbols:stack-group" /><span>Regrouper</span></button><button type="button" class="btn-link" data-rc-sel-clear>Désélectionner</button></span></div>
+                            <div class="rc-selsum" data-rc-sel-lines hidden><span data-rc-sel-text></span><span class="rc-selsum-actions">{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Regrouper', icon: 'material-symbols:stack-group', color: 'primary', title: 'Regrouper les lignes cochées en un seul détail (même date, tiers libres)', attrs: { 'data-rc-merge': true } }] } %}{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Désélectionner', color: 'link', attrs: { 'data-rc-sel-clear': true } }] } %}</span></div>
                             <p class="rc-msg" data-rc-msg role="status" hidden></p>
                         </header>
                         <ol class="rc-list is-selected" data-rc-list>
@@ -164,13 +164,13 @@
                         <header class="block-head">
                             <h2>À pointer <span class="pill pill-solid" data-rc-pool-count>{{ pool|length }}</span></h2>
                             <div class="rc-pool-actions">
-                                <button type="button" class="btn btn-danger" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="material-symbols:stack-group" /><span>Tout grouper</span></button>
-                                <button type="button" class="btn btn-info" data-rc-add-all title="Ajouter toutes les opérations affichées, une ligne chacune, par date"><twig:ux:icon name="material-symbols:list-alt-add" /><span>Tout ajouter</span></button>
-                                <button type="button" class="btn btn-primary" data-rc-open-op title="Créer une opération qui n'existe pas encore (ex. frais bancaires)"><twig:ux:icon name="gridicons:add" /><span>Ajouter</span></button>
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Tout grouper', icon: 'material-symbols:stack-group', color: 'danger', title: 'Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)', attrs: { 'data-rc-add-group': true } }] } %}
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Tout ajouter', icon: 'material-symbols:list-alt-add', color: 'info', title: 'Ajouter toutes les opérations affichées, une ligne chacune, par date', attrs: { 'data-rc-add-all': true } }] } %}
+                                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Ajouter', icon: 'gridicons:add', color: 'primary', title: 'Créer une opération qui n\'existe pas encore (ex. frais bancaires)', attrs: { 'data-rc-open-op': true } }] } %}
                             </div>
                         </header>
                         {% include 'releve/_operation_panel.html.twig' with { portefeuille: portefeuille, releve: releve, token: token } only %}
-                        <div class="rc-selsum" data-rc-sel-pool hidden><span data-rc-sel-text></span><span class="rc-selsum-actions"><button type="button" class="btn btn-danger" data-rc-add-group title="Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)"><twig:ux:icon name="material-symbols:stack-group" /><span>Tout grouper</span></button><button type="button" class="btn-link" data-rc-sel-clear>Désélectionner</button></span></div>
+                        <div class="rc-selsum" data-rc-sel-pool hidden><span data-rc-sel-text></span><span class="rc-selsum-actions">{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Tout grouper', icon: 'material-symbols:stack-group', color: 'danger', title: 'Ajoute les opérations cochées comme UN SEUL détail (même date, tiers libres)', attrs: { 'data-rc-add-group': true } }] } %}{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Désélectionner', color: 'link', attrs: { 'data-rc-sel-clear': true } }] } %}</span></div>
                         <input type="search" class="modern-form-control rc-filter" placeholder="Filtrer (tiers, catégorie, montant, date…)" data-rc-filter>
                         <ul class="rc-list is-pool" data-rc-pool>
                             {% for op in pool %}
@@ -188,13 +188,8 @@
                         <span>Solde cumulé <strong data-rc-cumul>0,00 €</strong></span>
                     </div>
                     <span class="rc-actions-buttons">
-                        <button type="submit" name="action" value="save" class="btn btn-primary" data-rc-submit>
-                            <twig:ux:icon name="material-symbols:save-rounded" /><span>Enregistrer</span>
-                        </button>
-                        <button type="submit" name="action" value="finalize" class="btn btn-warning" data-rc-submit data-rc-finalize
-                                data-confirm="Finaliser ce relevé ? L'ordre des opérations sera figé (vous pourrez le rouvrir au besoin).">
-                            <twig:ux:icon name="uis:lock" /><span>Finaliser</span>
-                        </button>
+                        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Enregistrer', icon: 'material-symbols:save-rounded', color: 'primary', name: 'action', value: 'save', attrs: { 'data-rc-submit': true } }] } %}
+                        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Finaliser', icon: 'uis:lock', color: 'warning', name: 'action', value: 'finalize', attrs: { 'data-rc-submit': true, 'data-rc-finalize': true, 'data-confirm': 'Finaliser ce relevé ? L\'ordre des opérations sera figé (vous pourrez le rouvrir au besoin).' } }] } %}
                     </span>
                 </div>
             </form>

@@ -48,10 +48,10 @@
                 <h2>Aucun type de tiers</h2>
                 <p>Aucun type n'est actuellement disponible.</p>
             </div>
-            <a href="{{ path('app_type_tiers_new') }}" class="btn btn-primary">
-                <twig:ux:icon name="gridicons:add" />
-                <span>Ajouter</span>
-            </a>
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                removeContainer: true,
+                btns: [{ label: 'Ajouter', path: path('app_type_tiers_new'), icon: 'gridicons:add', color: 'primary' }]
+            } %}
         </div>
     {% endfor %}
 </div>

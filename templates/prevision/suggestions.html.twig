@@ -22,7 +22,7 @@
         <section class="rc-panel card" data-pv-suggestions>
             <header class="block-head">
                 <h2>Récurrences repérées <span class="pill pill-solid" data-pv-count>{{ suggestions|length }}</span></h2>
-                <button type="button" class="btn btn-neutral hidden" data-pv-reset title="Réafficher les suggestions masquées"><twig:ux:icon name="mdi:eye-refresh" /><span>Réafficher</span></button>
+                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Réafficher', icon: 'mdi:eye-refresh', color: 'neutral', title: 'Réafficher les suggestions masquées', class: 'hidden', attrs: { 'data-pv-reset': true } }] } %}
             </header>
 
             {% if suggestions is empty %}
@@ -62,7 +62,7 @@
                                 <td>
                                     {{ s.resume }}
                                     <div class="pv-range">dernière le {{ s.derniere|date('d/m/Y') }} · régularité {{ (s.regularite * 100)|round }} %</div>
-                                    <details class="pv-serie"><summary class="btn-link is-muted">voir les {{ s.serie|length }} opérations</summary>
+                                    <details class="pv-serie">{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'summary', label: 'voir les ' ~ (s.serie|length) ~ ' opérations', color: 'muted' }] } %}
                                         <ul>{% for o in s.serie %}<li>{{ o.date|date('d/m/Y') }} · {{ o.montant|number_format(2, ',', ' ') }} € <span class="pv-range">{{ o.categorie }}</span></li>{% endfor %}</ul>
                                     </details>
                                 </td>
@@ -72,8 +72,8 @@
                                 </td>
                                 <td>
                                     <div class="pv-actions">
-                                        <a class="btn btn-primary" href="{{ path('app_prevision_new', params) }}"><twig:ux:icon name="gridicons:add" /><span>Ajouter</span></a>
-                                        <button type="button" class="btn-link is-muted" data-pv-hide>Masquer</button>
+                                        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ label: 'Ajouter', path: path('app_prevision_new', params), icon: 'gridicons:add', color: 'primary' }] } %}
+                                        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Masquer', color: 'muted', attrs: { 'data-pv-hide': true } }] } %}
                                     </div>
                                 </td>
                             </tr>
@@ -108,7 +108,7 @@
                                     <td>{{ r.occurrences }}</td>
                                     <td>{{ r.derniere|date('d/m/Y') }}</td>
                                     <td>{{ r.raison }}
-                                        <details class="pv-serie"><summary class="btn-link is-muted">voir les {{ r.serie|length }} opérations</summary>
+                                        <details class="pv-serie">{% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'summary', label: 'voir les ' ~ (r.serie|length) ~ ' opérations', color: 'muted' }] } %}
                                             <ul>{% for o in r.serie %}<li>{{ o.date|date('d/m/Y') }} · {{ o.montant|number_format(2, ',', ' ') }} € <span class="pv-range">{{ o.categorie }}</span></li>{% endfor %}</ul>
                                         </details>
                                     </td>

@@ -82,7 +82,15 @@
                                     <td>{{ row.ops }}</td>
                                     <td class="{{ row.total < 0 ? 'amount-expense' : 'amount-income' }}">{{ row.total < 0 ? '−' : '+' }} {{ row.total|abs|number_format(2, ',', ' ') }} €</td>
                                     <td>{{ row.cumul|number_format(2, ',', ' ') }} €</td>
-                                    <td><a class="ops-group-link" href="{{ url }}">{{ releve.closed ? 'Voir' : 'Compléter / clore' }}</a></td>
+                                    <td>
+                                        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{
+                                            label: releve.closed ? 'Voir le relevé' : 'Compléter / clore le relevé',
+                                            path: url,
+                                            icon: releve.closed ? 'mdi:show' : 'griddy-icons:edit-filled',
+                                            iconOnly: true,
+                                            color: releve.closed ? 'neutral' : 'primary'
+                                        }] } %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

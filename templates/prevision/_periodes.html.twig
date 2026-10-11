@@ -26,7 +26,7 @@
 
 {% if periodes|length > 1 %}
     <details class="pv-more">
-        <summary class="btn">Afficher les mois suivants <span class="pv-range">({{ periodes|length - 1 }})</span></summary>
+        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'summary', label: 'Afficher les mois suivants (' ~ (periodes|length - 1) ~ ')' }] } %}
         {% for p in periodes|slice(1) %}{{ _self.periode(p, today, false) }}{% endfor %}
     </details>
 {% endif %}

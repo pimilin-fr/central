@@ -7,7 +7,7 @@
 const CentralPrevision = {
     config: {
         debug: true,
-        version: 'v1.3.0',
+        version: 'v1.4.0',
         appName: 'Central-ModulePrevision'
     },
 
@@ -185,7 +185,7 @@ const CentralPrevision = {
             row.className = 'pv-tranche';
             row.setAttribute('data-pv-tranche', '');
             row.innerHTML = box.dataset.prototype.replace(/__tranche__/g, index)
-                    + '<button type="button" class="btn btn-icon btn-ghost is-danger" data-pv-remove title="Retirer ce montant" aria-label="Retirer ce montant">' + CentralIcons.get('close', '✕') + '</button>';
+                    + CentralIcons.button('pv-remove', '✕');
             row.querySelectorAll('input').forEach(i => i.classList.add('modern-form-control'));
             row.querySelectorAll('label').forEach(l => l.classList.add('modern-form-label'));
             box.append(row);

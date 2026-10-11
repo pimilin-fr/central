@@ -28,12 +28,14 @@
                             <twig:ux:icon name="lucide:lock-open" /> Non clos
                         </span>
                     {% endif %}
-                    <a class="ops-group-link"
-                       href="{{ path('app_releve_compose', { id: group.extra.portefeuilleId, releve: group.extra.releveId }) }}"
-                       onclick="event.stopPropagation()"
-                       title="{{ group.extra.closed ? 'Voir le relevé' : 'Ordonner / compléter / clore le relevé' }}">
-                        {{ group.extra.closed ? 'Voir' : (group.extra.ordered ? 'Compléter' : 'Ordonner / clore') }}
-                    </a>
+                    {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{
+                        label: group.extra.closed ? 'Voir le relevé' : 'Ordonner / compléter / clore le relevé',
+                        path: path('app_releve_compose', { id: group.extra.portefeuilleId, releve: group.extra.releveId }),
+                        icon: group.extra.closed ? 'mdi:show' : 'griddy-icons:edit-filled',
+                        iconOnly: true,
+                        color: group.extra.closed ? 'neutral' : 'primary',
+                        attrs: { onclick: 'event.stopPropagation()' }
+                    }] } %}
                 {% endif %}
 
                 <span class="ops-group-count">
@@ -100,8 +102,13 @@
                                     {% else %}
                                         <span class="ops-group-badge is-open" title="Relevé non clos"><twig:ux:icon name="lucide:lock-open" /> Non clos</span>
                                     {% endif %}
-                                    <a class="ops-group-link" href="{{ path('app_releve_compose', { id: releve.portefeuille.id, releve: releve.id }) }}"
-                                       title="{{ releve.closed ? 'Voir le relevé' : 'Ordonner / compléter / clore le relevé' }}">{{ releve.closed ? 'Voir' : 'Compléter' }}</a>
+                                    {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{
+                                        label: releve.closed ? 'Voir le relevé' : 'Ordonner / compléter / clore le relevé',
+                                        path: path('app_releve_compose', { id: releve.portefeuille.id, releve: releve.id }),
+                                        icon: releve.closed ? 'mdi:show' : 'griddy-icons:edit-filled',
+                                        iconOnly: true,
+                                        color: releve.closed ? 'neutral' : 'primary'
+                                    }] } %}
                                 {% else %}
                                     <span class="ops-group-label is-unassigned">Hors relevé</span>
                                 {% endif %}

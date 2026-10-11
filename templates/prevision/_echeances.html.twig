@@ -37,7 +37,7 @@
 {% for key in visibles %}{{ _self.mois(months[key], today, back|default('')) }}{% endfor %}
 {% if caches is not empty %}
     <details class="pv-more">
-        <summary class="btn">Afficher plus <span class="pv-range">({{ caches|length }} mois)</span></summary>
+        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'summary', label: 'Afficher plus (' ~ caches|length ~ ' mois)' }] } %}
         {% for key in caches %}{{ _self.mois(months[key], today, back|default('')) }}{% endfor %}
     </details>
 {% endif %}

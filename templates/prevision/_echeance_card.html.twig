@@ -25,7 +25,7 @@
                 <input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
             <label><span class="pv-range">Montant réel (€)</span>
                 <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
-            <button type="submit" class="btn btn-primary" title="Crée l'opération et l'ajoute aux lignes du relevé"><twig:ux:icon name="lucide:list-plus" /><span>Ajouter au relevé</span></button>
+            {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Ajouter au relevé', icon: 'lucide:list-plus', color: 'primary', title: 'Crée l\'opération et l\'ajoute aux lignes du relevé' }] } %}
         </form>
         <p class="pv-card-error" data-pv-error hidden></p>
     {% else %}
@@ -35,24 +35,24 @@
                 <input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
             <label><span class="pv-range">Montant réel (€)</span>
                 <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
-            <button type="submit" class="btn btn-primary"><twig:ux:icon name="lucide:calendar-check" /><span>Concrétiser</span></button>
+            {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Concrétiser', icon: 'lucide:calendar-check', color: 'primary' }] } %}
         </form>
     {% endif %}
 
     {% if mode != 'releve' %}
     <div class="pv-card-more">
         <details class="pv-inline-details">
-            <summary class="btn-link is-muted">Ajuster</summary>
+            {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'summary', label: 'Ajuster', color: 'muted' }] } %}
             <form method="post" class="pv-concretise" action="{{ path('app_prevision_ajuster', { id: e.id }) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
                 <label><span class="pv-range">Nouvelle date</span><input type="date" name="date" class="modern-form-control" required value="{{ e.datePrevue|date('Y-m-d') }}"></label>
                 <label><span class="pv-range">Nouveau montant (€)</span><input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
-                <button type="submit" class="btn btn-primary"><twig:ux:icon name="material-symbols:save-rounded" /><span>Enregistrer</span></button>
+                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Enregistrer', icon: 'material-symbols:save-rounded', color: 'primary' }] } %}
             </form>
         </details>
         <form method="post" class="pv-inline" action="{{ path('app_prevision_ignorer', { id: e.id }) }}" onsubmit="return confirm('Ignorer cette échéance ?');">
             <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
-            <button type="submit" class="btn-link is-muted">Ignorer</button>
+            {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Ignorer', color: 'muted' }] } %}
         </form>
     </div>
     {% endif %}

@@ -63,10 +63,10 @@
 
     <div class="page-heading-actions">
         {% if isEdit %}
-            <button type="submit" name="recompute_code" value="1" class="btn btn-warning">
-                <twig:ux:icon name="lucide:refresh-cw" />
-                <span>Recalculer le code</span>
-            </button>
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                removeContainer: true,
+                btns: [{ type: 'submit', label: 'Recalculer le code', icon: 'mdi:refresh', color: 'warning', name: 'recompute_code', value: '1' }]
+            } %}
         {% endif %}
 
         {% include 'layout/modern/components/_btns.html.twig' with {

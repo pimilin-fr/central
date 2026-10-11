@@ -103,9 +103,10 @@
             </div>
 
             <details class="form-more form-more-btn" {{ form.adresseForcee.vars.value ? 'open' : '' }}>
-                <summary class="btn btn-neutral btn-sm" title="Forcer la géolocalisation : saisir soi-même les coordonnées">
-                    <twig:ux:icon name="gravity-ui:geo-pin" /><span>Géolocaliser</span>
-                </summary>
+                {% include 'layout/modern/components/_btns.html.twig' with {
+                    removeContainer: true,
+                    btns: [{ type: 'summary', label: 'Géolocaliser', title: 'Forcer la géolocalisation : saisir soi-même les coordonnées', icon: 'gravity-ui:geo-pin', color: 'neutral', size: 'sm' }]
+                } %}
                 <div class="coords-field" data-coords-state>
                     {{ form_label(form.adresseForcee, 'Coordonnées (latitude, longitude)', { label_attr: { class: 'modern-form-label' } }) }}
                     {{ form_widget(form.adresseForcee, { attr: {

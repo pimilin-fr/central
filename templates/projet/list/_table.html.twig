@@ -8,10 +8,10 @@
                 <h2>Aucun projet</h2>
                 <p>Aucun projet n'est actuellement disponible.</p>
             </div>
-            <a href="{{ path('app_projet_new') }}" class="btn btn-primary">
-                <twig:ux:icon name="gridicons:add" />
-                Ajouter
-            </a>
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                removeContainer: true,
+                btns: [{ label: 'Ajouter', path: path('app_projet_new'), icon: 'gridicons:add', color: 'primary' }]
+            } %}
         </div>
     {% endfor %}
 </div>

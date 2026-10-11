@@ -89,19 +89,17 @@
 
     {% if isAdresseTiers %}
         <div class="entity-actions">
-            <a href="{{ path('app_tiers_adresse_toggle_principale', { id: tierAdresse.id, tiers: tierAdresse.tiers.id }) }}"
-               class="btn btn-soft btn-sm {{ isPrincipale ? 'is-active' : '' }}"
-               title="{{ isPrincipale ? 'Retirer comme adresse principale' : 'Définir comme adresse principale' }}">
-                <twig:ux:icon name="{{ isPrincipale ? 'lucide:star' : 'lucide:star-off' }}" />
-                {{ isPrincipale ? 'Principale' : 'Définir principale' }}
-            </a>
+            {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{
+                label: isPrincipale ? 'Principale' : 'Définir principale',
+                path: path('app_tiers_adresse_toggle_principale', { id: tierAdresse.id, tiers: tierAdresse.tiers.id }),
+                icon: isPrincipale ? 'lucide:star' : 'lucide:star-off',
+                color: 'soft',
+                size: 'sm',
+                class: isPrincipale ? 'is-active' : '',
+                title: isPrincipale ? 'Retirer comme adresse principale' : 'Définir comme adresse principale'
+            }] } %}
 
-            <a href="{{ path('app_tiers_adresse_unlink', { id: tierAdresse.id }) }}"
-               class="btn btn-soft btn-sm is-danger"
-               title="Délier l'adresse">
-                <twig:ux:icon name="lucide:unlink" />
-                Délier
-            </a>
+            {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ label: 'Délier', path: path('app_tiers_adresse_unlink', { id: tierAdresse.id }), icon: 'lucide:unlink', color: 'soft', size: 'sm', title: 'Délier l\'adresse', class: 'is-danger' }] } %}
         </div>
     {% endif %}
 </article>

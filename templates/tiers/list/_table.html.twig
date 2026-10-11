@@ -12,10 +12,10 @@
                 <h2>Aucun tiers</h2>
                 <p>Aucun tiers ne correspond actuellement à votre liste.</p>
             </div>
-            <a href="{{ path('app_tiers_new') }}" class="btn btn-primary">
-                <twig:ux:icon name="gridicons:add" />
-                Ajouter
-            </a>
+            {% include 'layout/modern/components/_btns.html.twig' with {
+                removeContainer: true,
+                btns: [{ label: 'Ajouter', path: path('app_tiers_new'), icon: 'gridicons:add', color: 'primary' }]
+            } %}
         </div>
     {% endfor %}
 </div>

@@ -23,9 +23,9 @@
     <button type="button" class="pill rc-only-pool" data-rc-siblings hidden></button>
     <span class="rc-amount {{ signed < 0 ? 'amount-expense' : 'amount-income' }}">{{ signed < 0 ? '−' : '+' }} {{ signed|abs|number_format(2, ',', ' ') }} €</span>
     <span class="rc-tools">
-        <button type="button" class="btn btn-icon btn-primary rc-add rc-only-pool" data-rc-add title="Ajouter au relevé" aria-label="Ajouter au relevé"><twig:ux:icon name="gridicons:add" /></button>
-        <button type="button" class="btn btn-icon rc-only-part" data-rc-detach title="Sortir du détail (devient une ligne à part)" aria-label="Sortir du détail"><twig:ux:icon name="fa-solid:cut" /></button>
-        <button type="button" class="btn btn-icon rc-only-part" data-rc-remove-part title="Retirer du relevé" aria-label="Retirer du relevé"><twig:ux:icon name="mdi:close-box" /></button>
+        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Ajouter au relevé', icon: 'gridicons:add', color: 'primary', iconOnly: true, title: 'Ajouter au relevé', class: 'rc-add rc-only-pool', attrs: { 'data-rc-add': true } }] } %}
+        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Sortir du détail', icon: 'fa-solid:cut', iconOnly: true, title: 'Sortir du détail (devient une ligne à part)', class: 'rc-only-part', attrs: { 'data-rc-detach': true } }] } %}
+        {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'button', label: 'Retirer du relevé', icon: 'mdi:close-box', iconOnly: true, title: 'Retirer du relevé', class: 'rc-only-part', attrs: { 'data-rc-remove-part': true } }] } %}
     </span>
     <input type="hidden" value="{{ op.id }}" data-rc-input {{ inList ? '' : 'disabled' }}>
 </li>

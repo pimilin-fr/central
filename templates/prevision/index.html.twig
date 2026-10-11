@@ -10,12 +10,12 @@
                 <p class="page-subtitle">Ce qui va arriver : abonnements, LOA, paiements en plusieurs fois, factures variables. Pondéré par la certitude.</p>
             </div>
             <div class="pv-actions">
-                <a class="btn btn-success" href="{{ path('app_prevision_suggestions') }}" title="Récurrences repérées dans vos opérations"><twig:ux:icon name="lucide:sparkles" /><span>Suggestions</span></a>
+                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ label: 'Suggestions', path: path('app_prevision_suggestions'), icon: 'lucide:sparkles', color: 'success', title: 'Récurrences repérées dans vos opérations' }] } %}
                 <form method="post" action="{{ path('app_prevision_refresh') }}" class="pv-inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">
-                    <button type="submit" class="btn btn-neutral" title="Ajoute les échéances des prochains mois"><twig:ux:icon name="mdi:refresh" /><span>Actualiser</span></button>
+                    {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ type: 'submit', label: 'Actualiser', icon: 'mdi:refresh', color: 'neutral', title: 'Ajoute les échéances des prochains mois' }] } %}
                 </form>
-                <a class="btn btn-primary" href="{{ path('app_prevision_new') }}"><twig:ux:icon name="gridicons:add" /><span>Ajouter</span></a>
+                {% include 'layout/modern/components/_btns.html.twig' with { removeContainer: true, btns: [{ label: 'Ajouter', path: path('app_prevision_new'), icon: 'gridicons:add', color: 'primary' }] } %}
             </div>
         </div>
 

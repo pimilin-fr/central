@@ -122,10 +122,10 @@
 <div class="modern-form-footer">
     <span class="modern-form-footer-copy"><span class="required-legend">Champ obligatoire</span>{{ form_errors(form) }}</span>
 
-    <button type="submit" class="btn btn-primary">
-        <twig:ux:icon name="material-symbols:save-rounded" />
-        <span>Enregistrer</span>
-    </button>
+    {% include 'layout/modern/components/_btns.html.twig' with {
+        removeContainer: true,
+        btns: [{ type: 'submit', label: 'Enregistrer', color: 'primary' }]
+    } %}
 </div>
 
 {{ form_end(form) }}
