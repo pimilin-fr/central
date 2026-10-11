@@ -1,5 +1,16 @@
 {% import 'styleguide/_ex.html.twig' as sg %}
 
+<p class="sg-sub">Validation et champs obligatoires</p>
+{% set code %}{% verbatim %}
+<div class="modern-form">
+    <label class="modern-form-label is-required">Libellé</label>
+    <input class="modern-form-control" value="">
+    <div class="invalid-feedback">Cette valeur ne doit pas être vide.</div>
+    <div class="form-error-message">Message d'erreur de formulaire (Symfony).</div>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('is-required, invalid-feedback, form-error-message', code, 'Les messages sont posés par Symfony ; <code>is-required</code> ajoute l\'astérisque à un label écrit en HTML (les labels générés par Symfony l\'obtiennent seuls).') }}
+
 <p class="sg-sub">Champs</p>
 {% set code %}{% verbatim %}
 <div class="form-stack">

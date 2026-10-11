@@ -1,0 +1,151 @@
+{# RÉFÉRENCE : classes de structure ou internes à un composant, listées pour que chaque classe du CSS soit documentée.
+   Ce tableau est la contrepartie « texte » des exemples vivants : une classe nouvelle = un exemple vivant (ou, à défaut, une ligne ici).
+   Contrôle : php bin/console app:ui:audit #}
+<p class="pv-range">Classes de mise en page ou internes à un composant déjà montré ailleurs. Pour une classe nouvelle : ajouter un exemple vivant dans la thématique concernée, ou à défaut une ligne ici.</p>
+
+<p class="sg-sub">Squelette applicatif</p>
+<p class="pv-range">Cadre de toutes les pages : barre du haut, barre latérale, zone de contenu. Voir aussi « Structure de page ».</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>app-shell</code></td><td>app.css</td></tr>
+<tr><td><code>app-main</code></td><td>app.css</td></tr>
+<tr><td><code>app-content</code></td><td>app.css</td></tr>
+<tr><td><code>app-topbar</code></td><td>app.css</td></tr>
+<tr><td><code>topbar-left</code></td><td>app.css</td></tr>
+<tr><td><code>topbar-right</code></td><td>app.css</td></tr>
+<tr><td><code>topbar-menu-button</code></td><td>app.css</td></tr>
+<tr><td><code>sidebar-compact</code></td><td>app.css</td></tr>
+<tr><td><code>sidebar-overlay</code></td><td>app.css</td></tr>
+<tr><td><code>mobile-sidebar-open</code></td><td>app.css</td></tr>
+<tr><td><code>toolbar</code></td><td>app.css</td></tr>
+<tr><td><code>page-heading-actions</code></td><td>app.css</td></tr>
+</tbody></table></div>
+
+<p class="sg-sub">Sélecteur d'application</p>
+<p class="pv-range">Menu déroulant du logo (en haut à gauche) : liste des applications.</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>app-logo</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-active</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-chevron</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-copy</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-icon</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-item</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-kicker</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-list</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-menu</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-menu-header</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-name</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-off</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-status</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-title</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-trigger</code></td><td>app.css</td></tr>
+<tr><td><code>app-switcher-trigger-copy</code></td><td>app.css</td></tr>
+</tbody></table></div>
+
+<p class="sg-sub">Sélecteurs de thème et d'environnement</p>
+<p class="pv-range">Boutons déclencheurs de la barre du haut et leurs états (menus montrés dans « Structure de page »).</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>theme-switcher</code></td><td>app.css</td></tr>
+<tr><td><code>theme-switcher-chevron</code></td><td>app.css</td></tr>
+<tr><td><code>theme-switcher-trigger</code></td><td>app.css</td></tr>
+<tr><td><code>theme-current-mark</code></td><td>app.css</td></tr>
+<tr><td><code>theme-current-name</code></td><td>app.css</td></tr>
+<tr><td><code>env-switcher</code></td><td>env.css</td></tr>
+<tr><td><code>env-trigger</code></td><td>env.css</td></tr>
+<tr><td><code>env-menu-separator</code></td><td>env.css</td></tr>
+<tr><td><code>env-option-rebuild</code></td><td>env.css</td></tr>
+<tr><td><code>env-spin-icon</code></td><td>env.css</td></tr>
+<tr><td><code>env-busy-dot</code></td><td>env.css</td></tr>
+</tbody></table></div>
+
+<p class="sg-sub">Sélecteur de couleur</p>
+<p class="pv-range">Composant « couleur d'entité » des formulaires (familles de couleurs, nuances, aperçu).</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>color-family</code></td><td>palette.css</td></tr>
+<tr><td><code>color-family-label</code></td><td>palette.css</td></tr>
+<tr><td><code>color-picker</code></td><td>palette.css</td></tr>
+<tr><td><code>color-picker-families</code></td><td>palette.css</td></tr>
+<tr><td><code>color-picker-group-title</code></td><td>palette.css</td></tr>
+<tr><td><code>color-picker-hint</code></td><td>palette.css</td></tr>
+<tr><td><code>color-picker-option</code></td><td>palette.css</td></tr>
+<tr><td><code>color-picker-scale</code></td><td>palette.css</td></tr>
+<tr><td><code>color-picker-top</code></td><td>palette.css</td></tr>
+<tr><td><code>color-swatch</code></td><td>palette.css</td></tr>
+<tr><td><code>entity-select-dot</code></td><td>forms.css</td></tr>
+<tr><td><code>entity-circle-sub</code></td><td>entities.css</td></tr>
+<tr><td><code>entity-circle-text</code></td><td>entities.css</td></tr>
+</tbody></table></div>
+
+<p class="sg-sub">Fiches : résumé, localisation, cartes géographiques</p>
+<p class="pv-range">Mise en page des fiches (résumé + carte) et fenêtres d'information de la carte.</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>resume-layout</code></td><td>detail.css</td></tr>
+<tr><td><code>summary-circle-caption</code></td><td>detail.css</td></tr>
+<tr><td><code>summary-circle-wrap</code></td><td>detail.css, entities.css</td></tr>
+<tr><td><code>geo-layout</code></td><td>detail.css</td></tr>
+<tr><td><code>geo-card-foot</code></td><td>detail.css</td></tr>
+<tr><td><code>geo-empty</code></td><td>detail.css</td></tr>
+<tr><td><code>geo-list</code></td><td>detail.css</td></tr>
+<tr><td><code>geo-notes</code></td><td>detail.css</td></tr>
+<tr><td><code>map-popup-link</code></td><td>ui.css</td></tr>
+<tr><td><code>map-popup-meta</code></td><td>ui.css</td></tr>
+<tr><td><code>map-popup-title</code></td><td>ui.css</td></tr>
+<tr><td><code>search-empty</code></td><td>entities.css</td></tr>
+<tr><td><code>categorie-empty-state</code></td><td>categories.css</td></tr>
+</tbody></table></div>
+
+<p class="sg-sub">Formulaires : mises en page spécifiques</p>
+<p class="pv-range">Formulaire en ligne, saisie d'opération, étapes et introduction des formulaires modernes.</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>inline-form</code></td><td>forms.css</td></tr>
+<tr><td><code>inline-form-field</code></td><td>forms.css</td></tr>
+<tr><td><code>op-layout</code></td><td>forms.css</td></tr>
+<tr><td><code>op-main</code></td><td>forms.css</td></tr>
+<tr><td><code>op-main-top</code></td><td>forms.css</td></tr>
+<tr><td><code>modern-form-intro</code></td><td>forms.css</td></tr>
+<tr><td><code>modern-form-step</code></td><td>forms.css</td></tr>
+<tr><td><code>form-aside-title</code></td><td>forms.css</td></tr>
+<tr><td><code>bulk-field-projet</code></td><td>detail.css</td></tr>
+</tbody></table></div>
+
+<p class="sg-sub">Onglets et messages (éléments internes)</p>
+<p class="pv-range">Conteneurs internes des onglets et des toasts (voir « Onglets » et « Messages »).</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>modern-tabs-content</code></td><td>ui.css</td></tr>
+<tr><td><code>modern-tabs-nav-wrap</code></td><td>ui.css</td></tr>
+<tr><td><code>flash-progress</code></td><td>ui.css</td></tr>
+<tr><td><code>flash-stack</code></td><td>ui.css</td></tr>
+</tbody></table></div>
+
+<p class="sg-sub">Écran du relevé : mise en page</p>
+<p class="pv-range">Colonnes, pied collant, filtres, brouillons et rangs de la page de relevé (voir « Écran du relevé »).</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>rc</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-page</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-columns</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-sticky</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-check</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-drafts</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-filters</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-pool-actions</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-pool-panel</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-releves</code></td><td>releve.css</td></tr>
+<tr><td><code>rc-selectall</code></td><td>releve.css</td></tr>
+<tr><td><code>ops-rank</code></td><td>releve.css</td></tr>
+<tr><td><code>ops-rank-head</code></td><td>releve.css</td></tr>
+</tbody></table></div>
+
+<p class="sg-sub">Prévisions : éléments internes</p>
+<p class="pv-range">Aide, pastilles de série, fenêtre d'ajustement, pied de panneau (voir « Prévisions »).</p>
+<div class="rc-table-wrap"><table class="ops-table"><thead><tr><th>Classe</th><th>Définie dans</th></tr></thead><tbody>
+<tr><td><code>pv-card-more</code></td><td>prevision.css</td></tr>
+<tr><td><code>pv-check</code></td><td>prevision.css</td></tr>
+<tr><td><code>pv-drawer-foot</code></td><td>prevision.css</td></tr>
+<tr><td><code>pv-hint</code></td><td>prevision.css</td></tr>
+<tr><td><code>pv-inline</code></td><td>prevision.css</td></tr>
+<tr><td><code>pv-inline-details</code></td><td>prevision.css</td></tr>
+<tr><td><code>pv-pop</code></td><td>prevision.css</td></tr>
+<tr><td><code>pv-ptf-head</code></td><td>prevision.css</td></tr>
+<tr><td><code>pv-serie</code></td><td>prevision.css</td></tr>
+</tbody></table></div>
+

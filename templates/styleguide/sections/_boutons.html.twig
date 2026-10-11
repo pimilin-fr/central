@@ -35,6 +35,19 @@
 {% endverbatim %}{% endset %}
 {{ sg.ex('btn-sm, btn-xs, btn-soft, btn-ghost', code, 'Tailles et teintes complémentaires du kit (<code>public/css/ui-kit.css</code>). Rayon unique 8px (6px pour xs et icônes).') }}
 
+<p class="sg-sub">Teintes pleines</p>
+{% set code %}{% verbatim %}
+<div class="sg-row">
+    <button type="button" class="btn btn-primary">btn-primary</button>
+    <button type="button" class="btn btn-info">btn-info</button>
+    <button type="button" class="btn btn-success">btn-success</button>
+    <button type="button" class="btn btn-warning">btn-warning</button>
+    <button type="button" class="btn btn-danger">btn-danger</button>
+    <button type="button" class="btn btn-neutral">btn-neutral</button>
+</div>
+{% endverbatim %}{% endset %}
+{{ sg.ex('btn-primary / info / success / warning / danger / neutral', code, 'Primaire = action principale ; danger = suppression ; neutre = action secondaire. Dans les pages, passer par <code>_btns.html.twig</code> (<code>color: \'info\'</code>…).') }}
+
 <p class="sg-sub">Boutons de carte</p>
 {% set code %}{% verbatim %}
 <div class="sg-row">

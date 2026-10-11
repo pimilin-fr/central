@@ -182,7 +182,6 @@
 
 /* ---- Liste des relevés ---- */
 .rc-table-wrap { overflow-x: auto; }
-.rc-releves .rc-sub { display: block; color: var(--text-muted); font-size: 11px; }
 .rc-releves tr.is-open td:first-child { box-shadow: inset 3px 0 0 var(--warning); }
 .rc-releves tr.is-closed td:first-child { box-shadow: inset 3px 0 0 var(--success); }
 
