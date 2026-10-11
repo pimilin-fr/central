@@ -511,6 +511,15 @@ label.required::after,
     margin-top: 10px;
 }
 
+/* Variante « bouton » : le <summary> est un vrai .btn (ex. Géolocaliser), sans le + / − habituel */
+.form-more.form-more-btn { border-top: 0; padding-top: 0; }
+.form-more-btn > summary.btn { display: inline-flex; color: var(--text); font-size: 11px; font-weight: 750; }
+.form-more-btn > summary.btn::before,
+.form-more-btn[open] > summary.btn::before { content: none; display: none; }
+.form-more-btn > summary.btn:hover { color: var(--accent-strong); }
+.form-more-btn[open] > summary.btn { border-color: var(--accent); }
+.form-more-btn > :not(summary) { margin-top: 10px; }
+
 /* Petit bouton d'action dans un champ */
 
 

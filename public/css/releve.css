@@ -283,6 +283,7 @@
 .rc-main strong { flex: 0 1 auto; max-inline-size: 65%; }
 .rc-main small { flex: 1 1 0; min-inline-size: 0; }
 .rc-done { inline-size: 20px; block-size: 20px; font-size: 11px; }
+.rc-done svg { inline-size: 13px; block-size: 13px; }
 .rc-parts { padding-block-end: 4px; }
 .rc-parts .rc-op { padding-block: 2px; }
 

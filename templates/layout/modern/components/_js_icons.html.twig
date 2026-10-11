@@ -1,0 +1,15 @@
+{#
+    Icônes à disposition du JavaScript (boutons fabriqués côté navigateur : relevé, prévisions, notifications…).
+    Un <template> n'est pas affiché : public/js/icons.js en lit le SVG par son nom — CentralIcons.get('close').
+    Pour un nouveau nom : ajouter une ligne ici, rien d'autre. Les noms sont aussi ceux à utiliser dans les templates Twig.
+#}
+<template id="central-icons">
+    <span data-icon="close"><twig:ux:icon name="mdi:close-box" /></span>
+    <span data-icon="check"><twig:ux:icon name="formkit:check" /></span>
+    <span data-icon="up"><twig:ux:icon name="fa7-solid:sort-up" /></span>
+    <span data-icon="down"><twig:ux:icon name="fa7-solid:sort-down" /></span>
+    <span data-icon="move"><twig:ux:icon name="ic:outline-move-up" /></span>
+    <span data-icon="group"><twig:ux:icon name="material-symbols:stack-group" /></span>
+    <span data-icon="cut"><twig:ux:icon name="fa-solid:cut" /></span>
+    <span data-icon="add"><twig:ux:icon name="gridicons:add" /></span>
+</template>

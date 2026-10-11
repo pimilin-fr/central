@@ -2,8 +2,8 @@
 {% set tabs = [
     {
         id: 'summary',
-        label: 'Résumé',
-        icon: 'ooui:info-filled',
+        label: 'Informations',
+        icon: 'solar:wallet-money-bold',
         content: include('portefeuille/show/_activite.html.twig', {
             portefeuille: entity,
             groups: groups
@@ -35,7 +35,7 @@
     },{
         id: 'addoperation',
         label: 'Opération',
-        icon: 'ic:round-add',
+        icon: 'gridicons:add',
         content: render(controller(
             'App\\Controller\\PortefeuilleController::addOperation',
             { id: entity.id }

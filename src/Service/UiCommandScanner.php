@@ -33,12 +33,13 @@ final class UiCommandScanner
     /** Verbes d'action connus : sert à repérer une faute probable (« Retaure » ≈ « Restaurer »). */
     private const VOCAB = ['restaurer', 'supprimer', 'enregistrer', 'ajouter', 'modifier', 'retour', 'finaliser', 'appliquer', 'annuler',
         'fermer', 'rouvrir', 'regrouper', 'actualiser', 'concretiser', 'ignorer', 'masquer', 'creer', 'valider', 'nouveau', 'nouvelle',
-        'ordonner', 'completer', 'afficher', 'delier', 'filtrer', 'rechercher'];
+        'ordonner', 'completer', 'ajuster', 'reafficher', 'deselectionner', 'geolocaliser', 'rattacher', 'recalculer', 'reconstruire', 'actualiser', 'afficher', 'delier', 'filtrer', 'rechercher'];
 
     /** Familles : libellé affiché, libellé canonique attendu (null = pas de libellé imposé), ordre. */
     public const FAMILIES = [
         'retour' => ['Retour', 'Retour'],
-        'ajout' => ['Ajout, création, nouveau', null],
+        'ajout' => ['Ajout, création, nouveau', 'Ajouter'],
+        'lot' => ['Actions en lot (relevé)', null],
         'enregistrer' => ['Enregistrer', 'Enregistrer'],
         'valider' => ['Valider, appliquer, finaliser, concrétiser', null],
         'supprimer' => ['Supprimer', 'Supprimer'],
@@ -173,13 +174,15 @@ final class UiCommandScanner
             if (!$isTab && !$isSubmit && !$isLink) {
                 continue;
             }
-            if ($isLink && !$isTab && str_contains(substr($src, max(0, $start - 200), 200), 'breadcrumb_trail')) {
+            if ($isLink && !$isTab && preg_match('/breadcrumb_trail|\btrail\b|ancestors/', substr($src, max(0, $start - 300), 300))) {
                 continue;
             }
 
             $labels = $this->literals($pairs['label']);
-            $icon = isset($pairs['icon']) ? ($this->literals($pairs['icon'])[0] ?? null) : null;
-            $color = isset($pairs['color']) ? ($this->literals($pairs['color'])[0] ?? null) : null;
+            $iconList = isset($pairs['icon']) ? $this->literals($pairs['icon']) : [];
+            $colorList = isset($pairs['color']) ? $this->literals($pairs['color']) : [];
+            $icon = $iconList[0] ?? null;
+            $color = $colorList[0] ?? null;
             if ($isTab) {
                 $kind = 'onglet';
                 $classes = 'tab-button';
@@ -189,16 +192,20 @@ final class UiCommandScanner
                 $tint = in_array($color, [null, 'null', ''], true) ? 'neutral' : $color;
                 $classes = 'btn btn-' . $tint;
                 if ($isSubmit && $icon === null) {
-                    $icon = 'mdi:content-save-outline';
+                    $icon = 'material-symbols:save-rounded';
                 }
             }
             if ($labels === [] && $isSubmit) {
                 $labels = ['Enregistrer'];
             }
-            foreach ($labels ?: ['…'] as $label) {
-                $found[] = $this->item($rel, $line, $isTab ? 'onglet' : $kind, $label, $icon, $classes, $tint, 'objet', dyn: $labels === [], extra: [
+            // « cond ? 'A' : 'B' » donne plusieurs libellés : l'icône et la couleur sont appariées par position.
+            foreach (array_values($labels ?: ['(dynamique)']) as $k => $label) {
+                $itemIcon = count($iconList) === count($labels) && $labels !== [] ? $iconList[$k] : ($isSubmit && $iconList === [] ? 'material-symbols:save-rounded' : $icon);
+                $itemColor = count($colorList) === count($labels) && $labels !== [] ? $colorList[$k] : $color;
+                $itemTint = $isTab ? null : (in_array($itemColor, [null, 'null', ''], true) ? 'neutral' : $itemColor);
+                $found[] = $this->item($rel, $line, $isTab ? 'onglet' : $kind, $label, $itemIcon, $isTab ? 'tab-button' : 'btn btn-' . $itemTint, $itemTint, 'objet', dyn: $labels === [], extra: [
                     'submit' => $isSubmit,
-                    'tint_declared' => $color !== null && $color !== 'null',
+                    'tint_declared' => $itemColor !== null && $itemColor !== 'null',
                 ]);
             }
         }
@@ -432,16 +439,39 @@ final class UiCommandScanner
                 continue;
             }
             $label = '';
+            $icon = null;
             if (preg_match('/>([^<>]*)<\/button>/', $lineText, $l)) {
                 $label = trim(html_entity_decode($l[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                // Icône fournie par CentralIcons.get('nom', …) : on retrouve son vrai nom dans _js_icons.html.twig.
+                if (preg_match("/CentralIcons\.get\('(\w+)'/", $label, $ic)) {
+                    $icon = $this->jsIcons()[$ic[1]] ?? null;
+                    $label = '';
+                }
             }
             $tint = preg_match('/btn-(primary|neutral|danger|info|success|warning|soft|ghost|icon)/', $c[1], $tm) ? $tm[1] : (str_contains($c[1], 'btn') ? 'nu' : null);
-            $found[] = $this->item($rel, $n + 1, 'bouton', $label, null, trim($c[1]), $tint, 'js', extra: [
+            $found[] = $this->item($rel, $n + 1, 'bouton', $label, $icon, trim($c[1]), $tint, 'js', extra: [
                 'tag' => 'button', 'named' => (bool) preg_match('/(title|aria-label)=/', $lineText), 'icon_dyn' => false, 'submit' => false,
             ]);
         }
 
         return $found;
+    }
+
+    /** @return array<string,string> nom court => nom d'icône, d'après templates/layout/modern/components/_js_icons.html.twig */
+    private function jsIcons(): array
+    {
+        static $map = null;
+        if ($map === null) {
+            $map = [];
+            $file = $this->projectDir . '/templates/layout/modern/components/_js_icons.html.twig';
+            if (is_file($file) && preg_match_all('/data-icon="(\w+)"><twig:ux:icon name="([^"]+)"/', (string) file_get_contents($file), $m, PREG_SET_ORDER)) {
+                foreach ($m as $row) {
+                    $map[$row[1]] = $row[2];
+                }
+            }
+        }
+
+        return $map;
     }
 
     private function item(string $file, int $line, string $kind, string $label, ?string $icon, string $classes, ?string $tint, string $source, bool $dyn = false, array $extra = []): array
@@ -483,7 +513,9 @@ final class UiCommandScanner
             $icon === 'icon-park-solid:up-c' => 'remonter',
             (bool) preg_match('/^(enregistrer|sauvegarder)/', $label) || (str_starts_with($label, 'creer') && $icon === 'mdi:content-save-outline') => 'enregistrer',
             (bool) preg_match('/^(appliquer|finaliser|concretiser|valider|ajouter au releve)/', $label) => 'valider',
-            (bool) preg_match('/^(ajouter|ajout|nouveau|nouvelle|creer|faire un releve|tout ajouter|en un detail|\+)/', $label) || in_array($icon, self::ADD_ICONS, true) => 'ajout',
+            (bool) preg_match('/^(tout grouper|regrouper|en un detail)/', $label) => 'detail',
+            (bool) preg_match('/^(faire un releve|tout ajouter)/', $label) => 'lot',
+            (bool) preg_match('/^(ajouter|ajout|nouveau|nouvelle|creer|\+)/', $label) || in_array($icon, self::ADD_ICONS, true) => 'ajout',
             (bool) preg_match('/^(modifier|editer)/', $label) => 'modifier',
             (bool) preg_match('/^(fermer|annuler)/', $label) => 'fermer',
             (bool) preg_match('/^(voir|completer|ordonner|tout voir|compl)/', $label) => 'voir',
@@ -517,10 +549,13 @@ final class UiCommandScanner
             $buckets = $key === 'onglet' ? $this->bucketsByLabel($items, $idx) : [$idx];
 
             foreach ($buckets as $bucket) {
-                if (in_array($key, ['menu', 'autre', 'segment', 'depliant'], true)) {
-                    break;
+                // Seules les familles « une action = une apparence » se comparent ; les onglets « Informations »
+                // portent volontairement l'icône de leur entité (Tiers, Portefeuille…).
+                if (!in_array($key, ['retour', 'ajout', 'enregistrer', 'supprimer', 'restaurer', 'fermer', 'modifier', 'deplacer', 'onglet'], true)
+                    || ($key === 'onglet' && $this->norm($items[$bucket[0]]['label']) === 'informations')) {
+                    continue;
                 }
-                $this->compare($items, $bucket, $key !== 'onglet' && $key !== 'menu' && $key !== 'depliant' && $key !== 'segment' && $key !== 'autre');
+                $this->compare($items, $bucket, $key !== 'onglet');
             }
 
             foreach ($idx as $i) {

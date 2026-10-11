@@ -102,8 +102,10 @@
                 {{ form_errors(form.adresse) }}
             </div>
 
-            <details class="form-more" {{ form.adresseForcee.vars.value ? 'open' : '' }}>
-                <summary>Forcer la géolocalisation</summary>
+            <details class="form-more form-more-btn" {{ form.adresseForcee.vars.value ? 'open' : '' }}>
+                <summary class="btn btn-neutral btn-sm" title="Forcer la géolocalisation : saisir soi-même les coordonnées">
+                    <twig:ux:icon name="gravity-ui:geo-pin" /><span>Géolocaliser</span>
+                </summary>
                 <div class="coords-field" data-coords-state>
                     {{ form_label(form.adresseForcee, 'Coordonnées (latitude, longitude)', { label_attr: { class: 'modern-form-label' } }) }}
                     {{ form_widget(form.adresseForcee, { attr: {
@@ -128,9 +130,9 @@
     {% include 'layout/modern/components/_btns.html.twig' with {
         btns: [
             {
-                label: isEdit ? 'Enregistrer' : 'Créer l’adresse',
+                label: isEdit ? 'Enregistrer' : 'Ajouter',
                 type: 'submit',
-                icon: isEdit ? 'mdi:content-save-outline' : 'ic:round-add',
+                icon: isEdit ? 'material-symbols:save-rounded' : 'gridicons:add',
                 color: 'primary'
             }
         ]

@@ -10,12 +10,12 @@
                 <p class="page-subtitle">Ce qui va arriver : abonnements, LOA, paiements en plusieurs fois, factures variables. Pondéré par la certitude.</p>
             </div>
             <div class="pv-actions">
-                <a class="btn" href="{{ path('app_prevision_suggestions') }}" title="Récurrences repérées dans vos opérations"><twig:ux:icon name="lucide:sparkles" /><span>Suggestions</span></a>
+                <a class="btn btn-neutral" href="{{ path('app_prevision_suggestions') }}" title="Récurrences repérées dans vos opérations"><twig:ux:icon name="lucide:sparkles" /><span>Suggestions</span></a>
                 <form method="post" action="{{ path('app_prevision_refresh') }}" class="pv-inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">
-                    <button type="submit" class="btn" title="Ajoute les échéances des prochains mois">Actualiser</button>
+                    <button type="submit" class="btn btn-neutral" title="Ajoute les échéances des prochains mois"><twig:ux:icon name="mdi:refresh" /><span>Actualiser</span></button>
                 </form>
-                <a class="btn btn-primary" href="{{ path('app_prevision_new') }}"><twig:ux:icon name="gridicons:add" /><span>Nouvelle règle</span></a>
+                <a class="btn btn-primary" href="{{ path('app_prevision_new') }}"><twig:ux:icon name="gridicons:add" /><span>Ajouter</span></a>
             </div>
         </div>
 

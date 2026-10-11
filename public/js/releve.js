@@ -15,7 +15,7 @@ const CentralReleve = {
 
     config: {
         debug: true,
-        version: 'v1.3.0',
+        version: 'v1.4.0',
         appName: 'Central-ModuleReleve'
     },
 
@@ -164,18 +164,18 @@ const CentralReleve = {
                         '<label class="rc-pick" title="Cocher pour regrouper des lignes en un détail"><input type="checkbox" data-rc-check-line' + (keepChecked ? ' checked' : '') + '></label>' +
                         '<span class="rc-grip" aria-hidden="true">⋮⋮</span>' +
                         '<span class="rc-rank">' + (index + 1) + '</span>' +
-                        '<button type="button" class="rc-done' + (isDone(line) ? ' is-on' : '') + '" data-rc-done aria-pressed="' + (isDone(line) ? 'true' : 'false') + '" title="' + (isDone(line) ? 'Pointée : cliquer pour dépointer' : 'Cliquer quand la ligne est vérifiée sur le relevé de compte (les lignes au-dessus sont pointées aussi)') + '">✓</button>' +
+                        '<button type="button" class="rc-done' + (isDone(line) ? ' is-on' : '') + '" data-rc-done aria-pressed="' + (isDone(line) ? 'true' : 'false') + '" title="' + (isDone(line) ? 'Pointée : cliquer pour dépointer' : 'Cliquer quand la ligne est vérifiée sur le relevé de compte (les lignes au-dessus sont pointées aussi)') + '">' + CentralIcons.get('check', '✓') + '</button>' +
                         '<span class="rc-date">' + esc(first.dataset.dateFr) + '</span>' +
                         '<span class="rc-main"><strong>' + esc(tiersNames.join(' + ')) + '</strong><small>' + esc(categories) + '</small></span>' +
                         (parts.length > 1 ? '<span class="pill pill-accent" title="Plusieurs opérations pointées ensemble">Détail × ' + parts.length + '</span>' : '<span></span>') +
                         '<span class="rc-amount ' + (total < 0 ? 'amount-expense' : 'amount-income') + '">' + signed(total) + '</span>' +
                         '<span class="rc-balance" title="Solde cumulé après cette ligne">' + money.format(running) + ' €</span>' +
                         '<span class="rc-tools">' +
-                                                '<button type="button" class="btn btn-icon" data-rc-bring title="Placer cette ligne juste après la dernière ligne pointée (en premier si aucune n\'est pointée)" aria-label="Placer après la dernière ligne pointée">⤒</button>' +
-                        '<button type="button" class="btn btn-icon" data-rc-up title="Monter" aria-label="Monter">▲</button>' +
-                        '<button type="button" class="btn btn-icon" data-rc-down title="Descendre" aria-label="Descendre">▼</button>' +
-                        (parts.length > 1 ? '<button type="button" class="btn btn-icon" data-rc-split title="Dégrouper : une ligne par opération" aria-label="Dégrouper">⧉</button>' : '') +
-                        '<button type="button" class="btn btn-icon" data-rc-remove-line title="Retirer la ligne du relevé" aria-label="Retirer la ligne">✕</button>' +
+                                                '<button type="button" class="btn btn-icon" data-rc-bring title="Placer cette ligne juste après la dernière ligne pointée (en premier si aucune n\'est pointée)" aria-label="Placer après la dernière ligne pointée">' + CentralIcons.get('move', '⤒') + '</button>' +
+                        '<button type="button" class="btn btn-icon" data-rc-up title="Monter" aria-label="Monter">' + CentralIcons.get('up', '▲') + '</button>' +
+                        '<button type="button" class="btn btn-icon" data-rc-down title="Descendre" aria-label="Descendre">' + CentralIcons.get('down', '▼') + '</button>' +
+                        (parts.length > 1 ? '<button type="button" class="btn btn-icon" data-rc-split title="Dégrouper : une ligne par opération" aria-label="Dégrouper">' + CentralIcons.get('group', '⧉') + '</button>' : '') +
+                        '<button type="button" class="btn btn-icon" data-rc-remove-line title="Retirer la ligne du relevé" aria-label="Retirer la ligne">' + CentralIcons.get('close', '✕') + '</button>' +
                         '</span>';
             };
 

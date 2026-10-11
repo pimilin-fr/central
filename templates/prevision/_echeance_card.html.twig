@@ -25,7 +25,7 @@
                 <input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
             <label><span class="pv-range">Montant réel (€)</span>
                 <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
-            <button type="submit" class="btn btn-primary" title="Crée l'opération et l'ajoute aux lignes du relevé">Ajouter au relevé</button>
+            <button type="submit" class="btn btn-primary" title="Crée l'opération et l'ajoute aux lignes du relevé"><twig:ux:icon name="lucide:list-plus" /><span>Ajouter au relevé</span></button>
         </form>
         <p class="pv-card-error" data-pv-error hidden></p>
     {% else %}
@@ -35,7 +35,7 @@
                 <input type="date" name="date" class="modern-form-control" required value="{{ (late ? today : e.datePrevue)|date('Y-m-d') }}"></label>
             <label><span class="pv-range">Montant réel (€)</span>
                 <input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
-            <button type="submit" class="btn btn-primary">Concrétiser</button>
+            <button type="submit" class="btn btn-primary"><twig:ux:icon name="lucide:calendar-check" /><span>Concrétiser</span></button>
         </form>
     {% endif %}
 
@@ -47,7 +47,7 @@
                 <input type="hidden" name="_token" value="{{ csrf_token('prevision') }}">{% if back %}<input type="hidden" name="_back" value="{{ back }}">{% endif %}
                 <label><span class="pv-range">Nouvelle date</span><input type="date" name="date" class="modern-form-control" required value="{{ e.datePrevue|date('Y-m-d') }}"></label>
                 <label><span class="pv-range">Nouveau montant (€)</span><input type="text" inputmode="decimal" name="montant" class="modern-form-control" required value="{{ e.montant }}"></label>
-                <button type="submit" class="btn">Enregistrer</button>
+                <button type="submit" class="btn btn-primary"><twig:ux:icon name="material-symbols:save-rounded" /><span>Enregistrer</span></button>
             </form>
         </details>
         <form method="post" class="pv-inline" action="{{ path('app_prevision_ignorer', { id: e.id }) }}" onsubmit="return confirm('Ignorer cette échéance ?');">

@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             '<div class="flash-icon">' + (ok ? ICONS.ok : ICONS.failed) + '</div>' +
             '<div class="flash-content"><span class="flash-label">' + (ok ? 'Démo prête' : 'Échec') + '</span>' +
             '<span class="flash-text"></span></div>' +
-            '<button type="button" class="flash-close" aria-label="Fermer">&times;</button>';
+            '<button type="button" class="flash-close" aria-label="Fermer">' + (window.CentralIcons ? CentralIcons.get('close', '&times;') : '&times;') + '</button>';
         toast.querySelector('.flash-text').textContent = message;
 
         const remove = () => toast.remove();

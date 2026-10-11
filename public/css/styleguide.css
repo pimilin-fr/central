@@ -207,3 +207,6 @@ td.is-diff, td.is-diff code { color: var(--warning-strong); font-weight: 750; }
 .sg-inv-flag { display: block; width: fit-content; max-width: 280px; margin: 0 0 3px; padding: 0 8px; color: var(--warning-strong); background: var(--warning-soft); border-radius: var(--r-pill); font-size: 10px; font-weight: 750; line-height: 1.6; }
 .sg-inv-flag.is-sans_icone, .sg-inv-flag.is-caractere { color: var(--danger-strong); background: var(--danger-soft); }
 .sg-inv-flag.is-hors_kit { color: var(--text-soft); background: var(--surface-soft); }
+.sg-inv-see { display: inline-flex; margin: 3px 8px 0 0; padding: 0 8px; color: var(--accent-strong); background: var(--accent-soft); border-radius: var(--r-pill); font-size: 10px; font-weight: 800; text-decoration: none; white-space: nowrap; }
+.sg-inv-see:hover { background: var(--accent); color: var(--on-accent, #fff); }
+.sg-inv-loc { display: block; }

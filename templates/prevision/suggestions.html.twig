@@ -22,7 +22,7 @@
         <section class="rc-panel card" data-pv-suggestions>
             <header class="block-head">
                 <h2>Récurrences repérées <span class="pill pill-solid" data-pv-count>{{ suggestions|length }}</span></h2>
-                <button type="button" class="btn-link is-muted hidden" data-pv-reset>Réafficher les suggestions masquées</button>
+                <button type="button" class="btn btn-neutral hidden" data-pv-reset title="Réafficher les suggestions masquées"><twig:ux:icon name="mdi:eye-refresh" /><span>Réafficher</span></button>
             </header>
 
             {% if suggestions is empty %}
@@ -72,7 +72,7 @@
                                 </td>
                                 <td>
                                     <div class="pv-actions">
-                                        <a class="btn btn-primary" href="{{ path('app_prevision_new', params) }}">Créer la règle</a>
+                                        <a class="btn btn-primary" href="{{ path('app_prevision_new', params) }}"><twig:ux:icon name="gridicons:add" /><span>Ajouter</span></a>
                                         <button type="button" class="btn-link is-muted" data-pv-hide>Masquer</button>
                                     </div>
                                 </td>

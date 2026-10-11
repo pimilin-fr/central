@@ -4,6 +4,7 @@
     Corriger un fichier puis recharger la page suffit à voir l'anomalie disparaître.
 #}
 {% set rep = sg_commandes() %}
+{% set vues = sg_vues(rep) %}
 {% set flag_labels = {
     divergent: 'Diffère de la famille',
     sans_icone: 'Sans icône',
@@ -26,7 +27,7 @@
     {%- endif -%}
 {% endmacro %}
 
-{% macro row(it, flag_labels) %}
+{% macro row(it, flag_labels, vues) %}
     {% set types = it.flags|map(f => f.type)|join(' ') %}
     <tr class="sg-inv-tr{{ it.flags ? ' is-flag' : '' }}" data-sg-inv-row data-flags="{{ types }}" data-kind="{{ it.kind }}"
         data-text="{{ (it.label ~ ' ' ~ it.icon ~ ' ' ~ it.file ~ ' ' ~ it.classes ~ ' ' ~ it.family)|lower }}">
@@ -43,7 +44,9 @@
             {% if it.tint %}<span class="sg-inv-dot is-{{ it.tint }}"></span>{{ it.tint }}{% else %}<em class="sg-inv-none">—</em>{% endif %}
             {% if it.diff_tint is defined and it.diff_tint and (it.ref_tint ?? null) %}<small class="sg-inv-ref">majorité : {{ it.ref_tint }}</small>{% endif %}
         </td>
-        <td><button type="button" class="sg-inv-loc" data-sg-inv-loc title="Copier le chemin">{{ it.file }}:{{ it.line }}</button></td>
+        <td><button type="button" class="sg-inv-loc" data-sg-inv-loc title="Copier le chemin">{{ it.file }}:{{ it.line }}</button>
+            {% for p in (vues[it.file] ?? []) %}<a class="sg-inv-see" href="{{ p.url }}" target="_blank" rel="noopener" title="Ouvrir la page dans l’application ({{ p.name }})">↗ {{ p.name|replace({'app_': '', 'json_': ''}) }}</a>{% endfor %}
+        </td>
         <td class="sg-inv-td-flags">
             {% for f in it.flags %}<span class="sg-inv-flag is-{{ f.type }}" title="{{ f.msg }}">{{ f.msg }}</span>{% endfor %}
         </td>
@@ -94,7 +97,7 @@
                     {% if g.labels > 1 and g.key in ['ajout', 'enregistrer', 'retour', 'supprimer', 'restaurer', 'fermer'] %}<span class="sg-inv-pill">{{ g.labels }} libellés</span>{% endif %}
                 </summary>
                 <div class="sg-inv-table-wrap"><table class="sg-inv-table">{{ _self.head() }}<tbody>
-                    {% for it in rep.items %}{% if it.family == g.key %}{{ _self.row(it, flag_labels) }}{% endif %}{% endfor %}
+                    {% for it in rep.items %}{% if it.family == g.key %}{{ _self.row(it, flag_labels, vues) }}{% endif %}{% endfor %}
                 </tbody></table></div>
             </details>
         {% endfor %}
@@ -109,7 +112,7 @@
                     <span class="sg-inv-n"><b data-sg-inv-shown>{{ list|filter(i => i.flags)|length }}</b> / {{ list|length }}</span>
                 </summary>
                 <div class="sg-inv-table-wrap"><table class="sg-inv-table">{{ _self.head() }}<tbody>
-                    {% for it in list %}{{ _self.row(it, flag_labels) }}{% endfor %}
+                    {% for it in list %}{{ _self.row(it, flag_labels, vues) }}{% endfor %}
                 </tbody></table></div>
             </details>
         {% endfor %}

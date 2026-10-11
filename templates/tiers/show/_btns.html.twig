@@ -23,14 +23,14 @@
         label: "Suppr.",
         path: path('app_tiers_delete', {id:entity.id}),
         color: 'danger',
-        icon: 'gridicons:trash'
+        icon: 'fa7-solid:trash'
     }])%}
 {% else %}
     {% set btns = btns|merge([ {
-        label: "Retaure",
+        label: "Restaurer",
         path: path('app_tiers_restore', {id:entity.id}),
         color: 'info',
-        icon: 'fa-solid:trash-restore-alt'
+        icon: 'fa7-solid:trash-restore'
     }])%}
 {% endif %}
 

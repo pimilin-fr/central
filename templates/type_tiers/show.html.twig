@@ -34,14 +34,14 @@
             tabs: [
                 {
                     id: 'summary',
-                    label: 'Résumé',
-                    icon: 'ooui:info-filled',
+                    label: 'Informations',
+                    icon: 'mage:users-fill',
                     content: include('type_tiers/show/_resume.html.twig')
                 },
                 {
                     id: 'tiers',
                     label: 'Tiers',
-                    icon: 'mage:users-fill',
+                    icon: 'mage:user-fill',
                     badge: tiers|length,
                     content: include('tiers/list/_table.html.twig', { tiers: tiers })
                 },

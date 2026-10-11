@@ -18,14 +18,14 @@
     {% set btns = btns|merge([{
         label: 'Suppr.',
         path: path('app_adresse_delete', { id: adresse.id }),
-        icon: 'gridicons:trash',
+        icon: 'fa7-solid:trash',
         color: 'danger'
     }]) %}
 {% else %}
     {% set btns = btns|merge([{
         label: 'Restaurer',
         path: path('app_adresse_restore', { id: adresse.id }),
-        icon: 'fa-solid:trash-restore-alt',
+        icon: 'fa7-solid:trash-restore',
         color: 'info'
     }]) %}
 {% endif %}

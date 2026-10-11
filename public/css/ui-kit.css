@@ -76,6 +76,7 @@
 .btn-icon.btn-primary, .btn-icon.is-on { color: var(--accent-contrast); background: var(--accent); border-color: var(--accent); }
 .btn-icon.btn-primary:hover, .btn-icon.is-on:hover { color: var(--accent-contrast); background: var(--accent); filter: brightness(1.08); }
 .btn-icon.rc-add { font-size: 14px; }
+.btn-icon svg { inline-size: 14px; block-size: 14px; }
 .btn-icon.btn-ghost { inline-size: 28px; block-size: 28px; font-size: 1.1rem; color: var(--text-muted); background: transparent; }
 .btn-icon.btn-ghost:hover { background: var(--surface-hover); }
 .btn-icon.btn-ghost.is-danger:hover { color: var(--danger); }

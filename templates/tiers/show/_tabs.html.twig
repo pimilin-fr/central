@@ -3,8 +3,8 @@
 {% set tabs = [
     {
         id: 'summary',
-        label: 'Résumé',
-        icon: 'ooui:info-filled',
+        label: 'Informations',
+        icon: 'mage:user-fill',
         content: include('tiers/show/_resume.html.twig',{
             tiers: entity
         })
@@ -21,7 +21,7 @@
     },{
         id: 'adresses',
         label: 'Adresses',
-        icon: 'mdi:address-marker',
+        icon: 'entypo:address',
         badge: adresses|length,
         content: render(controller(
                 'App\\Controller\\TiersController::addAdresse',

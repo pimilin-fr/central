@@ -31,7 +31,7 @@
         <form method="post" action="{{ path('app_env_switch', { mode: 'prod' }) }}">
             <input type="hidden" name="_token" value="{{ token }}">
             <button type="submit" class="env-option{{ not is_demo ? ' is-active' : '' }}" {{ not is_demo or building ? 'disabled' : '' }} role="menuitemradio" aria-checked="{{ not is_demo ? 'true' : 'false' }}">
-                <span class="env-option-icon"><twig:ux:icon name="lucide:landmark" /></span>
+                <span class="env-option-icon"><twig:ux:icon name="streamline:bank-solid" /></span>
                 <span class="env-option-copy"><strong>Central</strong><small>Production — vos vraies données</small></span>
                 <span class="env-option-check"><twig:ux:icon name="lucide:check" /></span>
             </button>
@@ -53,12 +53,11 @@
         <form method="post" action="{{ path('app_env_rebuild') }}" data-env-confirm="Reconstruire la base démo ?&#10;&#10;La production est d'abord sauvegardée puis lue en lecture seule ; la démo actuelle est effacée et recréée.">
             <input type="hidden" name="_token" value="{{ token }}">
             <button type="submit" class="env-option env-option-rebuild" data-env-rebuild {{ is_demo or building ? 'disabled' : '' }}>
-                <span class="env-option-icon"><twig:ux:icon name="lucide:refresh-cw" class="env-spin-icon" /></span>
+                <span class="env-option-icon"><twig:ux:icon name="mdi:refresh" class="env-icon-idle" /><twig:ux:icon name="mdi:timer-refresh" class="env-icon-busy" /></span>
                 <span class="env-option-copy">
-                    <strong data-env-rebuild-title>{{ building ? 'Reconstruction en cours…' : 'Reconstruire la démo' }}</strong>
+                    <strong data-env-rebuild-title>{{ building ? 'Reconstruction en cours' : 'Reconstruire la démo' }}</strong>
                     <small data-env-rebuild-hint>
                         {% if building %}
-                            Patientez, rechargez la page dans un instant
                         {% elseif is_demo %}
                             Revenez d'abord sur Central
                         {% elseif last_build and last_build.state == 'ok' %}

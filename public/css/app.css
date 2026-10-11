@@ -580,6 +580,15 @@ COMPACT SIDEBAR
     display: grid;
 }
 
+/* Une icône selon l'état : menu ouvert → « fermer le panneau », menu réduit → « ouvrir le panneau » */
+.sidebar-collapse-button .sidebar-icon-compact,
+.app-shell.sidebar-compact .sidebar-collapse-button .sidebar-icon-open {
+    display: none;
+}
+.app-shell.sidebar-compact .sidebar-collapse-button .sidebar-icon-compact {
+    display: block;
+}
+
 .app-shell.sidebar-compact .sidebar-link {
     justify-content: center;
     padding: 7px;
