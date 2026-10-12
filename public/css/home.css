@@ -1,0 +1,14 @@
+/* Page d'accueil : cartes des applications */
+.home-title { margin: 0; font-size: 1.6rem; color: var(--text); }
+.home-lead { margin: .25rem 0 0; color: var(--text-muted); }
+.home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+.home-card { display: flex; align-items: center; gap: .9rem; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); color: var(--text); text-decoration: none; box-shadow: var(--shadow-sm); transition: border-color .15s, background .15s, transform .15s; }
+a.home-card:hover { border-color: var(--accent); background: var(--surface-hover); transform: translateY(-1px); }
+.home-card-icon { display: grid; place-items: center; flex: none; width: 2.8rem; height: 2.8rem; border-radius: var(--r-sm); background: var(--accent); color: var(--accent-contrast); font-size: 1.4rem; }
+.home-card-copy { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.home-card-name { font-weight: 600; }
+.home-card-info { font-size: .85rem; color: var(--text-muted); }
+.home-card-go { flex: none; color: var(--text-muted); }
+.home-card.is-off { opacity: .55; cursor: not-allowed; }
+.home-card.is-off .home-card-icon { background: var(--surface-soft); color: var(--text-muted); }
+.home-card-off { flex: none; font-size: .7rem; font-weight: 700; letter-spacing: .06em; color: var(--text-muted); }

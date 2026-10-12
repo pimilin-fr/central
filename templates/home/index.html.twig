@@ -1,0 +1,58 @@
+{% extends 'modern.html.twig' %}
+
+{% block title %}Applications{% endblock %}
+
+{% block body %}
+    {# Les applications autonomes (autre projet sur le Pi) sont des URL absolues, HORS du sous-chemin /central : pas de path(). #}
+    <div class="page-container">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="home-title">Applications</h1>
+                <p class="home-lead">Choisissez l'application à ouvrir.</p>
+            </div>
+        </div>
+
+        <div class="home-grid">
+            <a class="home-card" href="{{ path('app_portefeuille_index') }}">
+                <span class="home-card-icon"><twig:ux:icon name="streamline:bank-solid" /></span>
+                <span class="home-card-copy">
+                    <span class="home-card-name">Central</span>
+                    <span class="home-card-info">Gestion financière</span>
+                </span>
+                <twig:ux:icon name="lucide:arrow-right" class="home-card-go" />
+            </a>
+            <a class="home-card" href="/milecube/">
+                <span class="home-card-icon"><twig:ux:icon name="grommet-icons:cubes" /></span>
+                <span class="home-card-copy">
+                    <span class="home-card-name">milecube</span>
+                    <span class="home-card-info">Application de proto · jeux</span>
+                </span>
+                <twig:ux:icon name="lucide:arrow-right" class="home-card-go" />
+            </a>
+            <div class="home-card is-off" aria-disabled="true">
+                <span class="home-card-icon"><twig:ux:icon name="mdi:home-automation" /></span>
+                <span class="home-card-copy">
+                    <span class="home-card-name">Dominique</span>
+                    <span class="home-card-info">Domotique</span>
+                </span>
+                <span class="home-card-off">OFF</span>
+            </div>
+            <div class="home-card is-off" aria-disabled="true">
+                <span class="home-card-icon"><twig:ux:icon name="mdi:backup-restore" /></span>
+                <span class="home-card-copy">
+                    <span class="home-card-name">Sauvegardes</span>
+                    <span class="home-card-info">Raspberry Pi</span>
+                </span>
+                <span class="home-card-off">OFF</span>
+            </div>
+            <div class="home-card is-off" aria-disabled="true">
+                <span class="home-card-icon"><twig:ux:icon name="mdi:database-outline" /></span>
+                <span class="home-card-copy">
+                    <span class="home-card-name">Base</span>
+                    <span class="home-card-info">phpMyAdmin</span>
+                </span>
+                <span class="home-card-off">OFF</span>
+            </div>
+        </div>
+    </div>
+{% endblock %}

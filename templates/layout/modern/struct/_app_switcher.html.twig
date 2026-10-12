@@ -17,6 +17,14 @@
         </div>
 
         <div class="app-switcher-list">
+            <a href="{{ path('app_home') }}" class="app-switcher-item">
+                <span class="app-switcher-icon"><twig:ux:icon name="lucide:layout-grid" /></span>
+                <span class="app-switcher-copy">
+                    <span class="app-switcher-name">Accueil</span>
+                    <span class="app-switcher-status">Toutes les applications</span>
+                </span>
+            </a>
+
             {# App. Centrale #}
             <a href="{{ path('app_tiers_index') }}" class="app-switcher-item is-active">
                 <span class="app-switcher-icon"><twig:ux:icon name="streamline:bank-solid" /></span>
@@ -25,6 +33,15 @@
                     <span class="app-switcher-status">Gestion financière</span>
                 </span>
                 <span class="app-switcher-active"></span>
+            </a>
+
+            {# milecube : application autonome (autre projet sur le Pi, hors du sous-chemin /central) #}
+            <a href="/milecube/" class="app-switcher-item">
+                <span class="app-switcher-icon"><twig:ux:icon name="grommet-icons:cubes" /></span>
+                <span class="app-switcher-copy">
+                    <span class="app-switcher-name">milecube</span>
+                    <span class="app-switcher-status">Application de proto · jeux</span>
+                </span>
             </a>
 
             {# App. Domotique #}

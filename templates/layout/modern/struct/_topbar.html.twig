@@ -34,11 +34,10 @@
         {% endfor %}
 
         <nav class="topbar-breadcrumb" aria-label="Fil d'Ariane">
-            <span class="topbar-breadcrumb-root">Central</span>
-
+            <a class="topbar-breadcrumb-link" href="{{path('app_home')}}">Central</a>
             {% if section is null %}
-                <span class="topbar-breadcrumb-separator">/</span>
-                <span class="topbar-breadcrumb-current">Tableau de bord</span>
+                {#<span class="topbar-breadcrumb-separator">/</span>
+                <span class="topbar-breadcrumb-current">Tableau de bord</span>#}
             {% elseif breadcrumb_current is defined and breadcrumb_current %}
                 <span class="topbar-breadcrumb-separator">/</span>
                 <a class="topbar-breadcrumb-link" href="{{ path(section.route) }}">{{ section.label }}</a>
