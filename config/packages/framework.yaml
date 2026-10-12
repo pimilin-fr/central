@@ -2,9 +2,11 @@
 framework:
     secret: '%env(APP_SECRET)%'
     default_locale: fr
-    
+
     # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    session:
+        name: CENTRALSESSID
+        cookie_path: /central
 
     #esi: true
     #fragments: true
