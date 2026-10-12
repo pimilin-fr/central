@@ -3,13 +3,42 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/_resume.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/_resume.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/list/_table.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/list/_node.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/_activite.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/depenses/list/_group.html.twig</file>
-            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/categorie/show/_btns.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/type_tiers/index.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/type_tiers/show.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/public/js/app.js</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/public/css/app.css</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/.gitignore</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/.env</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Command/ImportAdresseCommand.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/public/css/entities.css</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/public/js/maps.js</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/PortefeuilleType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/AddDepensesType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/AdresseFormType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/ProjetFormType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/AddAdresseType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/ProjetTypeFormType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/TiersType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Form/TypeTiersType.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Service/DepenseGrouper/DepenseGroup.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Service/DepenseGrouper/DepenseGroupManager.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/src/Service/DepenseGrouper/DepenseGrouper.php</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/public/js/prevision.js</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/depenses/form/_form.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/layout/modern/struct/_sidebar.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/tiers/index.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/projet/index.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/adresse/list/_table.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/prevision/form.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/prevision/index.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/styleguide/index.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/new.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/index.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/show.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/portefeuille/show/_tabs.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/releve/index.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/releve/all.html.twig</file>
+            <file>file:/C:/Users/Pierre/Documents/09_DEV/central/templates/releve/_list.html.twig</file>
         </group>
     </open-files>
 </project-private>
