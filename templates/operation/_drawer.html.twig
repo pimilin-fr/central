@@ -58,7 +58,7 @@
 
                 <label class="op-field op-field-wide">
                     <span class="modern-form-label">Catégorie</span>
-                    <input type="text" name="op[categorie]" class="modern-form-control autocomplete" data-endpoint="/categories/search" autocomplete="off" required>
+                    <input type="text" name="op[categorie]" class="modern-form-control autocomplete" data-endpoint="{{ path('json_categories_search') }}" autocomplete="off" required>
                     <input type="hidden" name="op[categorie_id]">
                 </label>
 
@@ -71,7 +71,7 @@
                 {% else %}
                     <label class="op-field op-field-wide">
                         <span class="modern-form-label">Tiers</span>
-                        <input type="text" name="op[tiers]" class="modern-form-control autocomplete" data-endpoint="/tiers/search" autocomplete="off" required>
+                        <input type="text" name="op[tiers]" class="modern-form-control autocomplete" data-endpoint="{{ path('json_tiers_search') }}" autocomplete="off" required>
                         <input type="hidden" name="op[tiers_id]">
                     </label>
                 {% endif %}
@@ -95,7 +95,7 @@
                 <div class="op-grid">
                     <label class="op-field op-field-wide">
                         <span class="modern-form-label">Projet</span>
-                        <input type="text" name="op[projet]" class="modern-form-control autocomplete" data-endpoint="/projet/search" autocomplete="off">
+                        <input type="text" name="op[projet]" class="modern-form-control autocomplete" data-endpoint="{{ path('json_projet_search') }}" autocomplete="off">
                         <input type="hidden" name="op[projet_id]">
                     </label>
                     <label class="op-field op-field-wide">

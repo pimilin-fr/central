@@ -1,4 +1,21 @@
 const App = {
+    /**
+     * URLs dynamiques : l'application peut être servie sous un sous-chemin (ex. /central).
+     * Le layout publie ce préfixe dans <meta name="app-base"> (app.request.basePath).
+     * App.url('/tiers/search') → '/central/tiers/search' ; sans effet si le préfixe est déjà là.
+     */
+    url(path) {
+        if (typeof path !== 'string' || !path.startsWith('/') || path.startsWith('//')) {
+            return path;
+        }
+        const meta = document.querySelector('meta[name="app-base"]');
+        const base = (meta ? meta.content : '').replace(/\/+$/, '');
+        if (!base || path === base || path.startsWith(base + '/') || path.startsWith(base + '?')) {
+            return path;
+        }
+        return base + path;
+    },
+
 
     config: {
         debug: true,
@@ -304,7 +321,7 @@ const App = {
 
                         try {
                             const response = await fetch(
-                                    `${endpoint}?q=${encodeURIComponent(query)}`
+                                    `${App.url(endpoint)}?q=${encodeURIComponent(query)}`
                                     );
 
                             const data = await response.json();
@@ -601,7 +618,7 @@ const App = {
 
                 try {
 
-                    const response = await fetch(`/tiers/js/adresses/${tiersId}`);
+                    const response = await fetch(App.url(`/tiers/js/adresses/${tiersId}`));
 
                     if (!response.ok) {
                         throw new Error(`Erreur HTTP ${response.status}`);

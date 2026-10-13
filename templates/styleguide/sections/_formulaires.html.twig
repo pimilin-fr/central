@@ -100,7 +100,7 @@
 {% set code %}{% verbatim %}
 <form onsubmit="return false">
     <label class="modern-form-label">Tiers (autocomplétion réelle)</label>
-    <input type="text" name="tiers" class="modern-form-control autocomplete" placeholder="Rechercher un tiers" autocomplete="off" data-endpoint="/tiers/search">
+    <input type="text" name="tiers" class="modern-form-control autocomplete" placeholder="Rechercher un tiers" autocomplete="off" data-endpoint="{{ path('json_tiers_search') }}">
     <input type="hidden" name="tiers_id">
 </form>
 {# Le JS (App.autocomplete) enveloppe le champ dans .ac-wrapper et crée la liste .ac-results ; il a besoin d'un <form> parent et d'un champ caché <nom>_id. #}

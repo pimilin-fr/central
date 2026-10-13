@@ -231,7 +231,7 @@ const CentralPrevision = {
 
             let data;
             try {
-                const response = await fetch(`/prevision/assist/tiers/${encodeURIComponent(item.id)}`, {headers: {Accept: 'application/json'}});
+                const response = await fetch(App.url(`/prevision/assist/tiers/${encodeURIComponent(item.id)}`), {headers: {Accept: 'application/json'}});
                 data = await response.json();
             } catch (err) {
                 this.log('assist indisponible', err);

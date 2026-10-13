@@ -27,12 +27,12 @@
                     <div class="form-field-heading"><span class="form-field-index">01</span><h3>Quoi, avec qui</h3></div>
                     <div class="form-row" style="--cols: 1fr 1fr">
                         <div>{{ form_label(form.libelle, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(form.libelle, { attr: { class: 'modern-form-control' } }) }}{{ form_errors(form.libelle) }}</div>
-                        <div>{{ form_label(form.tiers, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(form.tiers, { attr: { class: 'modern-form-control autocomplete', 'data-endpoint': '/tiers/search', placeholder: 'Rechercher un tiers…' } }) }}{{ form_widget(form.tiers_id) }}{{ form_errors(form.tiers) }}</div>
+                        <div>{{ form_label(form.tiers, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(form.tiers, { attr: { class: 'modern-form-control autocomplete', 'data-endpoint': path('json_tiers_search'), placeholder: 'Rechercher un tiers…' } }) }}{{ form_widget(form.tiers_id) }}{{ form_errors(form.tiers) }}</div>
                     </div>
                     <div class="form-row" style="--cols: 1fr 1fr 1fr">
-                        <div>{{ form_label(form.categorie, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(form.categorie, { attr: { class: 'modern-form-control autocomplete', 'data-endpoint': '/categories/search', placeholder: 'Rechercher une catégorie…' } }) }}{{ form_widget(form.categorie_id) }}{{ form_errors(form.categorie) }}</div>
+                        <div>{{ form_label(form.categorie, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(form.categorie, { attr: { class: 'modern-form-control autocomplete', 'data-endpoint': path('json_categories_search'), placeholder: 'Rechercher une catégorie…' } }) }}{{ form_widget(form.categorie_id) }}{{ form_errors(form.categorie) }}</div>
                         <div>{{ form_label(form.portefeuille, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(form.portefeuille, { attr: { class: 'modern-form-control' } }) }}{{ form_errors(form.portefeuille) }}</div>
-                        <div>{{ form_label(form.projet, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(form.projet, { attr: { class: 'modern-form-control autocomplete', 'data-endpoint': '/projet/search', placeholder: 'Rechercher un projet…' } }) }}{{ form_widget(form.projet_id) }}{{ form_errors(form.projet) }}</div>
+                        <div>{{ form_label(form.projet, null, { label_attr: { class: 'modern-form-label' } }) }}{{ form_widget(form.projet, { attr: { class: 'modern-form-control autocomplete', 'data-endpoint': path('json_projet_search'), placeholder: 'Rechercher un projet…' } }) }}{{ form_widget(form.projet_id) }}{{ form_errors(form.projet) }}</div>
                     </div>
                     <p class="pv-hint" data-pv-assist>Choisissez un tiers : le reste se remplit d'après l'historique de vos opérations.</p>
                 </div>

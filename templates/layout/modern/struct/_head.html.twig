@@ -1,6 +1,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="app-base" content="{{ app.request.basePath }}" />
     <script>
         (() => {
             const themes = {{ themes|map(t => t.id)|json_encode|raw }};
@@ -45,9 +46,9 @@
     <script defer src="{{ asset('js/env.js') ~ '?v=2' }}"></script>
     <script defer src="{{ asset('js/maps.js') ~ '?v=14' }}"></script>
     <script defer src="{{ asset('js/releve.js') ~ '?v=9' }}"></script>
-    <script defer src="{{ asset('js/prevision.js') ~ '?v=9' }}"></script>
+    <script defer src="{{ asset('js/prevision.js') ~ '?v=10' }}"></script>
     <script defer src="{{ asset('js/operation.js') ~ '?v=3' }}"></script>
-    <script defer src="{{ asset('js/app.js') ~ '?v=32' }}"></script>
+    <script defer src="{{ asset('js/app.js') ~ '?v=33' }}"></script>
 
 
     {% block stylesheets %}{% endblock %}
