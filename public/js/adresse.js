@@ -22,8 +22,8 @@ const CentralAdresse = {
 
     config: {
         debug: true,
-        version: 'v2.0.0',
-        nearbyLimit: 6,
+        version: 'v2.1.0',
+        nearbyLimit: 5,
         appName: 'Central-ModuleAdresse'
     },
 
@@ -223,7 +223,7 @@ const CentralAdresse = {
         };
 
         const openStep = (li, ctx, pin) => {
-            const s = {li, level: LEVELS[li], ctx, pin, choice: null, el: null, map: null, items: [], markers: []};
+            const s = {li, level: LEVELS[li], ctx, pin, choice: null, el: null, map: null, items: [], markers: [], shapes: [], bounds: [], all: false, preselect: null, hasMore: false};
             steps.push(s);
             buildDrawer(s);
             box.appendChild(s.el);
@@ -307,7 +307,11 @@ const CentralAdresse = {
             const bSkip = el('button', 'btn btn-ghost btn-sm', 'Passer ce niveau');
             bSkip.type = 'button';
             bSkip.addEventListener('click', () => finish(s, {level: key, mode: 'skip'}));
-            s.actions.append(bCreate, bSkip);
+            s.more = el('button', 'btn btn-ghost btn-sm', 'Voir des zones plus éloignées');
+            s.more.type = 'button';
+            s.more.hidden = true;
+            s.more.addEventListener('click', () => { s.all = true; s.more.hidden = true; s.lead.textContent = 'Recherche élargie…'; loadNearby(s); });
+            s.actions.append(bCreate, bSkip, s.more);
 
             s.create = buildCreate(s);
             s.create.hidden = true;
@@ -322,32 +326,48 @@ const CentralAdresse = {
             try {
                 const data = await getJson(root.dataset.adNearbyUrl, {
                     level: s.level.key, lat: s.ctx.lat, lng: s.ctx.lng,
-                    name: (s.ctx.anc || {})[s.level.key] || '', limit: this.config.nearbyLimit
+                    name: (s.ctx.anc || {})[s.level.key] || '',
+                    limit: s.all ? 12 : this.config.nearbyLimit, all: s.all ? 1 : ''
                 });
                 s.items = data.items || [];
+                s.preselect = data.preselect || null;
+                s.hasMore = !!data.hasMore;
             } catch (error) {
                 this.log('Proches en échec', error);
                 s.items = [];
+                s.preselect = null;
+                s.hasMore = false;
                 s.lead.textContent = 'Liste indisponible : vous pouvez tout de même créer ce niveau ou le passer.';
             }
             renderItems(s);
         };
 
+        const fmtDist = (m) => m < 1000 ? m + ' m' : (m / 1000).toFixed(m < 10000 ? 1 : 0).replace('.', ',') + ' km';
+
         const renderItems = (s) => {
             const lower = s.level.label.toLowerCase();
+            const pre = s.items.find(it => it.id === s.preselect);
             s.list.replaceChildren();
-            s.lead.textContent = s.items.length
-                    ? `${s.items.length} ${lower}${s.items.length > 1 ? 's' : ''} existant${s.items.length > 1 ? 's' : ''} le${s.items.length > 1 ? 's' : ''} plus proche${s.items.length > 1 ? 's' : ''}` + (s.pin ? ' de la nouvelle position (repère rouge).' : '.') + ' Choisissez-en un, ou créez-en un nouveau.'
-                    : `Aucun ${lower} existant à proximité : créez-le (ou passez ce niveau).`;
+            if (s.items.length === 0) {
+                s.lead.textContent = `Aucun ${lower} existant à proximité : créez-le (ou passez ce niveau).`;
+            } else if (pre) {
+                s.lead.textContent = `La position est dans la zone « ${pre.label} » : présélectionné. Confirmez, ou choisissez / créez autre chose.`;
+            } else {
+                s.lead.textContent = `Aucun ${lower} existant ne contient cette position. Les plus proches (distance à la zone, repère rouge = nouvelle position) :`;
+            }
             s.items.forEach((it, i) => {
-                const li = el('li', 'ad-item');
+                const li = el('li', 'ad-item' + (it.id === s.preselect ? ' is-sel' : ''));
                 li.append(el('span', 'ad-rank', String(i + 1)));
                 const nm = el('span', 'ad-name', it.label);
                 if (it.parent) { nm.append(el('small', '', it.parent)); }
                 li.append(nm);
-                if (it.km !== null) { li.append(el('span', 'ad-km', fmtKm(it.km))); }
+                if (it.inside) {
+                    li.append(el('span', 'ad-badge is-in', 'dans la zone'));
+                } else if (it.dist !== null && it.dist !== undefined) {
+                    li.append(el('span', 'ad-km', 'à ' + fmtDist(it.dist) + ' de la zone'));
+                }
                 if (it.exact) { li.append(el('span', 'ad-badge', 'même nom')); }
-                const b = el('button', 'btn btn-neutral btn-xs', 'Choisir');
+                const b = el('button', 'btn btn-xs ' + (it.id === s.preselect ? 'btn-primary' : 'btn-neutral'), it.id === s.preselect ? '✓ Confirmer' : 'Choisir');
                 b.type = 'button';
                 b.addEventListener('click', () => choose(s, it));
                 li.append(b);
@@ -355,6 +375,7 @@ const CentralAdresse = {
                 li.addEventListener('mouseleave', () => hilite(s, i, false));
                 s.list.appendChild(li);
             });
+            s.more.hidden = !s.hasMore || s.all;
             drawMap(s);
         };
 
@@ -363,6 +384,8 @@ const CentralAdresse = {
         const hilite = (s, i, on) => {
             const m = s.markers[i];
             if (m && m.getElement()) { m.getElement().classList.toggle('is-hot', on); }
+            const z = s.shapes[i];
+            if (z && z.setStyle) { z.setStyle({weight: on ? 4 : 2}); }
         };
 
         const drawMap = (s) => {
@@ -374,16 +397,42 @@ const CentralAdresse = {
             s.mapDiv.hidden = false;
             if (s.map) { s.map.remove(); }
             const tiles = (window.CentralMaps && CentralMaps.config.tileLayer) || {url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', options: {maxZoom: 19}};
+            const color = (window.CentralMaps && CentralMaps.themeColor) ? CentralMaps.themeColor('--accent') : '#e67e22';
             s.map = L.map(s.mapDiv, {scrollWheelZoom: false});
             L.tileLayer(tiles.url, tiles.options).addTo(s.map);
+            s.bounds = [];
+            // zones : enveloppe des adresses situées en dessous (+ marge), comme sur la carte de visualisation
+            s.shapes = s.items.map((it) => {
+                const sh = it.shape;
+                if (!sh) { return null; }
+                const style = {color, weight: 2, fillColor: color, fillOpacity: it.inside ? 0.3 : 0.12, dashArray: it.inside ? null : '5 4'};
+                let layer;
+                if (sh.type === 'polygon') {
+                    layer = L.polygon(sh.pts, style).addTo(s.map);
+                    sh.pts.forEach(pt => s.bounds.push(pt));
+                } else {
+                    layer = L.circle(sh.center, Object.assign({radius: sh.r}, style)).addTo(s.map);
+                    s.bounds.push(sh.center);
+                }
+                layer.on('click', () => choose(s, it));
+                return layer;
+            });
             s.markers = s.items.map((it, i) => {
                 if (!hasPoint(it)) { return null; }
-                const m = L.marker([it.lat, it.lng], {icon: L.divIcon({className: 'ad-mk', html: `<span>${i + 1}</span>`, iconSize: [26, 26], iconAnchor: [13, 13]})}).addTo(s.map);
-                m.bindTooltip(it.label + (it.km !== null ? ' · ' + fmtKm(it.km) : ''), {direction: 'top', offset: [0, -12]});
+                s.bounds.push([it.lat, it.lng]);
+                const m = L.marker([it.lat, it.lng], {icon: L.divIcon({className: 'ad-mk' + (it.id === s.preselect ? ' is-sel' : ''), html: `<span>${i + 1}</span>`, iconSize: [26, 26], iconAnchor: [13, 13]})}).addTo(s.map);
+                m.bindTooltip(it.label + (it.inside ? ' · dans la zone' : (it.dist !== null && it.dist !== undefined ? ' · à ' + fmtDist(it.dist) : '')), {direction: 'top', offset: [0, -12]});
                 m.on('click', () => choose(s, it));
                 return m;
             });
             if (hasPoint(s.pin)) {
+                s.bounds.push([s.pin.lat, s.pin.lng]);
+                // trait pointillé jusqu'au point le plus proche de chaque zone voisine (non englobante)
+                s.items.forEach((it) => {
+                    if (!it.inside && it.nearest) {
+                        L.polyline([[s.pin.lat, s.pin.lng], it.nearest], {color: '#c0392b', weight: 1.5, dashArray: '3 5', opacity: .8}).addTo(s.map);
+                    }
+                });
                 L.marker([s.pin.lat, s.pin.lng], {zIndexOffset: 1000, icon: L.divIcon({className: 'ad-pin-wrap', html: '<span class="ad-pin"></span>', iconSize: [30, 30], iconAnchor: [15, 28]})})
                         .addTo(s.map).bindTooltip(s.pin.label, {permanent: true, direction: 'right', offset: [14, -14], className: 'ad-pin-tip'});
             }
@@ -391,10 +440,8 @@ const CentralAdresse = {
         };
 
         const fit = (s) => {
-            if (!s.map) { return; }
-            const pts = s.items.filter(hasPoint).map(i => [i.lat, i.lng]);
-            if (hasPoint(s.pin)) { pts.push([s.pin.lat, s.pin.lng]); }
-            if (pts.length === 1) { s.map.setView(pts[0], 14); } else if (pts.length > 1) { s.map.fitBounds(pts, {padding: [34, 34], maxZoom: 15}); }
+            if (!s.map || !s.bounds) { return; }
+            if (s.bounds.length === 1) { s.map.setView(s.bounds[0], 14); } else if (s.bounds.length > 1) { s.map.fitBounds(s.bounds, {padding: [34, 34], maxZoom: 16}); }
         };
 
         /* création d'un niveau : saisie « comme une adresse » */

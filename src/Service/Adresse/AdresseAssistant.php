@@ -62,38 +62,230 @@ final class AdresseAssistant {
         return $out;
     }
 
+    /** Tolérance de base (m) : au-delà, une zone n'est proposée que sur demande ; elle croît avec la taille de la zone. */
+    private const TOLERANCE = ['quartier' => 800, 'ville' => 5000, 'departement' => 30000, 'region' => 100000, 'pays' => 300000];
+
+    /** Marge ajoutée autour des points d'une zone (m) : même règle que la carte des adresses (maps.js). */
+    private const MARGIN_MANY = 100.0;
+    private const MARGIN_FEW = 150.0;
+
     /**
-     * Adresses existantes d'un niveau, les plus proches d'abord (celles sans position à la fin, seulement si leur nom correspond).
+     * Adresses existantes d'un niveau proches d'une position, vues comme des ZONES.
+     *
+     * Une adresse de niveau supérieur (quartier, ville…) est la zone formée par toutes les adresses situées en dessous
+     * d'elle (enveloppe convexe de leurs points + marge, comme sur la carte de visualisation) :
+     *  - la distance est mesurée jusqu'au point le plus proche de la zone, pas jusqu'au « centre » de l'adresse ;
+     *  - dans la zone → distance 0, « inside », et c'est la zone présélectionnée (la plus petite si plusieurs) ;
+     *  - « trop éloigné » est relatif : la tolérance dépend du niveau et de la taille de la zone (une grande ville
+     *    tolère plus qu'un petit quartier). `$all` lève ce filtre (bouton « voir plus éloignés »).
      *
      * @return array<string,mixed>
      */
-    public function nearby(AdresseLevel $level, ?float $lat, ?float $lng, string $name = '', int $limit = 6): array {
+    public function nearby(AdresseLevel $level, ?float $lat, ?float $lng, string $name = '', int $limit = 5, bool $all = false): array {
         $type = $this->findType($level);
         $norm = AdresseLevel::normalize($name);
+        $hasPos = $lat !== null && $lng !== null;
         $rows = [];
+
         if ($type !== null) {
-            foreach ($this->adresses->findBy(['adresseType' => $type, 'deletedAt' => null]) as $a) {
-                $located = $a->isGeolocalisee();
-                $km = ($lat !== null && $lng !== null && $located) ? $this->km($lat, $lng, $a->getLatitude(), $a->getLongitude()) : null;
-                $exact = $norm !== '' && AdresseLevel::normalize($a->getName()) === $norm;
-                if ($km === null && !$exact && ($lat !== null && $lng !== null)) {
-                    continue; // position inconnue et nom différent : inutile à proposer
+            $children = [];
+            $everything = $this->adresses->findBy(['deletedAt' => null]);
+            foreach ($everything as $a) {
+                $children[$a->getAdresseParent()?->getId() ?? 0][] = $a;
+            }
+
+            foreach ($everything as $a) {
+                if ($a->getAdresseType()->getId() !== $type->getId()) {
+                    continue;
                 }
+                $points = $this->zonePoints($a, $children);
+                $exact = $norm !== '' && AdresseLevel::normalize($a->getName()) === $norm;
                 $parent = $a->getAdresseParent();
-                $rows[] = [
+                $row = [
                     'id' => $a->getId(),
                     'label' => $a->getName(),
                     'parent' => $parent?->getName(),
-                    'lat' => $located ? $a->getLatitude() : null,
-                    'lng' => $located ? $a->getLongitude() : null,
-                    'km' => $km !== null ? round($km, 1) : null,
+                    'lat' => $a->isGeolocalisee() ? $a->getLatitude() : null,
+                    'lng' => $a->isGeolocalisee() ? $a->getLongitude() : null,
+                    'dist' => null,
+                    'inside' => false,
+                    'diameter' => 0,
                     'exact' => $exact,
+                    'shape' => null,
+                    'nearest' => null,
+                    'points' => count($points),
                 ];
+                if ($hasPos && $points !== []) {
+                    $row = $this->measure($row, $points, $lat, $lng);
+                } elseif ($hasPos && !$exact) {
+                    continue; // aucune position connue et nom différent : rien à comparer
+                }
+                $rows[] = $row;
             }
         }
-        usort($rows, static fn($x, $y) => [$x['km'] ?? 1e9, !$x['exact'], $x['label']] <=> [$y['km'] ?? 1e9, !$y['exact'], $y['label']]);
 
-        return ['level' => $level->value, 'label' => $level->label(), 'items' => array_slice($rows, 0, max(1, $limit))];
+        usort($rows, static fn($x, $y) => [!$x['inside'], $x['inside'] ? $x['diameter'] : 0, $x['dist'] ?? 1e12, !$x['exact'], $x['label']]
+                <=> [!$y['inside'], $y['inside'] ? $y['diameter'] : 0, $y['dist'] ?? 1e12, !$y['exact'], $y['label']]);
+
+        $tolBase = self::TOLERANCE[$level->value] ?? 1e12;
+        $relevant = array_values(array_filter($rows, static fn($r) => $r['inside'] || $r['exact'] || $r['dist'] === null
+                || $r['dist'] <= max($tolBase, 0.5 * $r['diameter'])));
+        $pool = $all ? $rows : $relevant;
+        $items = array_slice($pool, 0, max(1, $limit));
+        $preselect = ($items !== [] && $items[0]['inside']) ? $items[0]['id'] : null;
+
+        return [
+            'level' => $level->value,
+            'label' => $level->label(),
+            'items' => $items,
+            'preselect' => $preselect,
+            'hasMore' => count($rows) > count($items),
+        ];
+    }
+
+    /** Points qui forment la zone d'une adresse : la sienne + celles de tous ses descendants géolocalisés. @return list<array{0:float,1:float}> */
+    private function zonePoints(Adresse $root, array $children): array {
+        $points = [];
+        $stack = [$root];
+        $seen = [];
+        while ($stack !== []) {
+            $a = array_pop($stack);
+            if (isset($seen[$a->getId()])) {
+                continue;
+            }
+            $seen[$a->getId()] = true;
+            if ($a->isGeolocalisee()) {
+                $points[] = [(float) $a->getLatitude(), (float) $a->getLongitude()];
+            }
+            foreach ($children[$a->getId()] ?? [] as $c) {
+                $stack[] = $c;
+            }
+        }
+
+        return $points;
+    }
+
+    /**
+     * Distance de la position à la zone (0 dedans), forme de la zone et point le plus proche.
+     * Géométrie en mètres sur une projection plane locale (suffisant à l'échelle d'une région).
+     */
+    private function measure(array $row, array $points, float $lat, float $lng): array {
+        $k = cos(deg2rad($lat)) * 111320.0;
+        $proj = static fn(array $p): array => [($p[1] - $lng) * $k, ($p[0] - $lat) * 110574.0];
+        $unproj = static fn(array $xy): array => [$lat + $xy[1] / 110574.0, $lng + $xy[0] / $k];
+
+        $hull = self::hull(array_map($proj, $points));
+        $n = count($hull);
+        $margin = $n >= 3 ? self::MARGIN_MANY : self::MARGIN_FEW;
+        $me = [0.0, 0.0];
+
+        if ($n >= 3 && self::inPolygon($me, $hull)) {
+            $d = 0.0;
+            $near = $me;
+        } else {
+            [$d, $near] = self::closest($me, $hull);
+            $d = max(0.0, $d - $margin);
+        }
+
+        $diameter = 0.0;
+        foreach ($hull as $a) {
+            foreach ($hull as $b) {
+                $diameter = max($diameter, hypot($a[0] - $b[0], $a[1] - $b[1]));
+            }
+        }
+        $diameter += 2 * $margin;
+
+        if ($n >= 3) { // enveloppe élargie de la marge, pour le dessin
+            $cx = array_sum(array_column($hull, 0)) / $n;
+            $cy = array_sum(array_column($hull, 1)) / $n;
+            $shape = ['type' => 'polygon', 'pts' => array_map(static function (array $v) use ($cx, $cy, $margin, $unproj): array {
+                $len = max(1e-6, hypot($v[0] - $cx, $v[1] - $cy));
+
+                return $unproj([$v[0] + ($v[0] - $cx) / $len * $margin, $v[1] + ($v[1] - $cy) / $len * $margin]);
+            }, $hull)];
+        } else {
+            $c = $n === 2 ? [($hull[0][0] + $hull[1][0]) / 2, ($hull[0][1] + $hull[1][1]) / 2] : $hull[0];
+            $shape = ['type' => 'circle', 'center' => $unproj($c), 'r' => (int) round($margin + ($n === 2 ? hypot($hull[0][0] - $hull[1][0], $hull[0][1] - $hull[1][1]) / 2 : 0))];
+        }
+
+        $row['inside'] = $d <= 0.0;
+        $row['dist'] = (int) round($d);
+        $row['diameter'] = (int) round($diameter);
+        $row['shape'] = $shape;
+        $row['nearest'] = $unproj($near);
+        if ($row['lat'] === null) { // pas de point propre : repère au centre de la zone
+            $center = $unproj([array_sum(array_column($hull, 0)) / $n, array_sum(array_column($hull, 1)) / $n]);
+            $row['lat'] = $center[0];
+            $row['lng'] = $center[1];
+        }
+
+        return $row;
+    }
+
+    /** Enveloppe convexe (monotone chain) de points [x, y]. */
+    private static function hull(array $pts): array {
+        $pts = array_values(array_unique(array_map(static fn($p) => round($p[0], 2) . ',' . round($p[1], 2), $pts)));
+        $pts = array_map(static fn($s) => array_map('floatval', explode(',', $s)), $pts);
+        sort($pts);
+        if (count($pts) <= 2) {
+            return $pts;
+        }
+        $cross = static fn($o, $a, $b) => ($a[0] - $o[0]) * ($b[1] - $o[1]) - ($a[1] - $o[1]) * ($b[0] - $o[0]);
+        $lower = [];
+        foreach ($pts as $p) {
+            while (count($lower) >= 2 && $cross($lower[count($lower) - 2], $lower[count($lower) - 1], $p) <= 0) {
+                array_pop($lower);
+            }
+            $lower[] = $p;
+        }
+        $upper = [];
+        foreach (array_reverse($pts) as $p) {
+            while (count($upper) >= 2 && $cross($upper[count($upper) - 2], $upper[count($upper) - 1], $p) <= 0) {
+                array_pop($upper);
+            }
+            $upper[] = $p;
+        }
+        array_pop($lower);
+        array_pop($upper);
+
+        return array_merge($lower, $upper);
+    }
+
+    private static function inPolygon(array $p, array $poly): bool {
+        $in = false;
+        for ($i = 0, $j = count($poly) - 1; $i < count($poly); $j = $i++) {
+            if ((($poly[$i][1] > $p[1]) !== ($poly[$j][1] > $p[1]))
+                    && ($p[0] < ($poly[$j][0] - $poly[$i][0]) * ($p[1] - $poly[$i][1]) / ($poly[$j][1] - $poly[$i][1]) + $poly[$i][0])) {
+                $in = !$in;
+            }
+        }
+
+        return $in;
+    }
+
+    /** Point le plus proche de p sur une forme (1 point, 1 segment ou le contour d'un polygone). @return array{0:float,1:array} */
+    private static function closest(array $p, array $shape): array {
+        $n = count($shape);
+        if ($n === 1) {
+            return [hypot($p[0] - $shape[0][0], $p[1] - $shape[0][1]), $shape[0]];
+        }
+        $best = [INF, $shape[0]];
+        $edges = $n === 2 ? 1 : $n;
+        for ($i = 0; $i < $edges; $i++) {
+            $a = $shape[$i];
+            $b = $shape[($i + 1) % $n];
+            $dx = $b[0] - $a[0];
+            $dy = $b[1] - $a[1];
+            $len2 = $dx * $dx + $dy * $dy;
+            $t = $len2 > 0 ? max(0.0, min(1.0, (($p[0] - $a[0]) * $dx + ($p[1] - $a[1]) * $dy) / $len2)) : 0.0;
+            $q = [$a[0] + $t * $dx, $a[1] + $t * $dy];
+            $d = hypot($p[0] - $q[0], $p[1] - $q[1]);
+            if ($d < $best[0]) {
+                $best = [$d, $q];
+            }
+        }
+
+        return $best;
     }
 
     /**
@@ -179,14 +371,5 @@ final class AdresseAssistant {
         }
 
         return $type;
-    }
-
-    private function km(float $lat1, float $lng1, float $lat2, float $lng2): float {
-        $r = 6371.0;
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLng = deg2rad($lng2 - $lng1);
-        $h = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
-
-        return 2 * $r * asin(min(1.0, sqrt($h)));
     }
 }

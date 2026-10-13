@@ -699,3 +699,8 @@ label.required::after,
 .ad-create { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--border-strong); border-radius: 8px; }
 .ad-create .modern-form-label { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .ad-drawer { transition: none; } .ad-pin { animation: none; } }
+
+/* zones proposées : présélection + badge « dans la zone » */
+.ad-item.is-sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.ad-badge.is-in { color: var(--accent-strong, var(--accent)); font-weight: 600; }
+.ad-mk.is-sel span { background: var(--accent-strong, var(--accent)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
