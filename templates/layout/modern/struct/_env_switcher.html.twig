@@ -56,6 +56,7 @@
                 <span class="env-option-icon"><twig:ux:icon name="mdi:refresh" class="env-icon-idle" /><twig:ux:icon name="mdi:timer-refresh" class="env-icon-busy" /></span>
                 <span class="env-option-copy">
                     <strong data-env-rebuild-title>{{ building ? 'Reconstruction en cours' : 'Reconstruire la démo' }}</strong>
+                    <span class="env-progress" data-env-progress {{ building ? '' : 'hidden' }}><i data-env-progress-bar style="width: 0%"></i></span>
                     <small data-env-rebuild-hint>
                         {% if building %}
                         {% elseif is_demo %}
@@ -71,5 +72,11 @@
                 </span>
             </button>
         </form>
+
+        {# --- Suivi détaillé : avancement, étapes, erreurs, journal --- #}
+        <a href="{{ path('app_env_demo') }}" class="env-option env-option-log">
+            <span class="env-option-icon"><twig:ux:icon name="lucide:flask-conical" /></span>
+            <span class="env-option-copy"><strong>Suivi de la démo</strong><small>Avancement, journal et erreurs</small></span>
+        </a>
     </div>
 </div>

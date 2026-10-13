@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Demo\DbMode;
+use App\Demo\DemoProgress;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
@@ -22,7 +23,11 @@ final class DbModeExtension extends AbstractExtension {
     public function getFunctions(): array {
         return [
             new TwigFunction('app_db_mode', fn (): string => DbMode::current()),
-            new TwigFunction('app_db_building', fn (): bool => DbMode::isBuilding($this->projectDir)),
+            new TwigFunction('app_db_building', function (): bool {
+                DemoProgress::reconcile($this->projectDir); // lève un verrou resté après un processus mort
+
+                return DbMode::isBuilding($this->projectDir);
+            }),
             new TwigFunction('app_db_last_build', fn (): ?array => DbMode::lastBuild($this->projectDir)),
             new TwigFunction('app_env_token', $this->token(...)),
         ];

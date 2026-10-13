@@ -19,6 +19,14 @@ class DemoBuilder {
 
     private const BATCH_SIZE = 300;
 
+    /** @var (callable(array):void)|null avancement : ['kind'=>start|tick|done, index, steps, label, rowsDone, rowsTotal, curDone, curRows, summary] */
+    private $progress = null;
+    private int $rowsDone = 0;
+    private int $rowsTotal = 0;
+    private float $lastTick = 0.0;
+    /** @var array{index:int, steps:int, label:string, rows:int, done:int} */
+    private array $cur = ['index' => 0, 'steps' => 0, 'label' => '', 'rows' => 0, 'done' => 0];
+
     /** @var list<DemoTransformerInterface> */
     private array $transformers;
 
@@ -52,13 +60,26 @@ class DemoBuilder {
     /**
      * @param (callable(string):void)|null $log appelée avec un message par classe traitée
      */
-    public function build(?callable $log = null): void {
+    public function build(?callable $log = null, ?callable $progress = null): void {
         $this->context->reset();
         $this->faker->reset();
+        $this->progress = $progress;
+        $this->rowsDone = 0;
 
-        foreach ($this->transformers as $transformer) {
+        // nombre de lignes à traiter (pour la barre d'avancement) ; un échec de comptage n'est pas bloquant
+        $counts = [];
+        foreach ($this->transformers as $i => $transformer) {
+            $counts[$i] = $this->countRows($transformer);
+        }
+        $this->rowsTotal = array_sum($counts);
+        $steps = count($this->transformers);
+
+        foreach ($this->transformers as $i => $transformer) {
             $this->em->clear();
             $this->demoEm->clear();
+
+            $this->cur = ['index' => $i + 1, 'steps' => $steps, 'label' => $transformer->getLabel(), 'rows' => $counts[$i], 'done' => 0];
+            $this->emit('start', true);
 
             $transformer->prepare($this->context);
             $class = $transformer->getSourceClass();
@@ -67,9 +88,11 @@ class DemoBuilder {
                 ? $this->processHierarchy($transformer)
                 : $this->processStream($transformer);
 
+            $summary = $this->summary($class);
             if ($log) {
-                $log(sprintf('%s : %s', $transformer->getLabel(), $this->summary($class)));
+                $log(sprintf('%s : %s', $transformer->getLabel(), $summary));
             }
+            $this->emit('done', true, $summary);
         }
 
         $this->em->clear();
@@ -77,6 +100,39 @@ class DemoBuilder {
     }
 
     // ------------------------------------------------------------------
+
+    private function countRows(DemoTransformerInterface $transformer): int {
+        try {
+            $qb = $this->em->createQueryBuilder()->select('COUNT(e.id)')->from($transformer->getSourceClass(), 'e');
+            $transformer->configureQuery($qb);
+
+            return (int) $qb->getQuery()->getSingleScalarResult();
+        } catch (Throwable) {
+            return 0;
+        }
+    }
+
+    private function emit(string $kind, bool $force = false, string $summary = ''): void {
+        if ($this->progress === null) {
+            return;
+        }
+        $now = microtime(true);
+        if (!$force && ($now - $this->lastTick) < 0.4) {
+            return;
+        }
+        $this->lastTick = $now;
+        ($this->progress)([
+            'kind' => $kind,
+            'index' => $this->cur['index'],
+            'steps' => $this->cur['steps'],
+            'label' => $this->cur['label'],
+            'rowsDone' => $this->rowsDone,
+            'rowsTotal' => $this->rowsTotal,
+            'curDone' => $this->cur['done'],
+            'curRows' => $this->cur['rows'],
+            'summary' => $summary,
+        ]);
+    }
 
     /** Flux : lecture ligne à ligne + écriture par lots. */
     private function processStream(DemoTransformerInterface $transformer): void {
@@ -138,6 +194,9 @@ class DemoBuilder {
         $class = $transformer->getSourceClass();
         $id = $transformer->getSourceId($source);
         $strategy = $transformer->strategyOf($source, $this->context);
+        $this->cur['done']++;
+        $this->rowsDone++;
+        $this->emit('tick');
 
         if ($strategy === DemoStrategy::EXCLUDE) {
             $this->context->exclude($class, $id, $transformer->isHierarchical() ? $transformer->getParentId($source) : null);

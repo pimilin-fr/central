@@ -1,0 +1,81 @@
+{#
+    Suivi de la reconstruction de la démo : avancement, étapes, erreur détaillée, diagnostic, journal.
+    Données : /environnement/etat (JSON) et /environnement/journal ; rendu : public/js/env.js (data-env-page).
+#}
+{% extends 'modern.html.twig' %}
+
+{% set breadcrumb_current = 'Suivi de la démo' %}
+{% block title %}Suivi de la démo{% endblock %}
+
+{% block body %}
+    <div class="page-container" data-env-page
+         data-state-url="{{ path('app_env_state') }}"
+         data-log-url="{{ path('app_env_log') }}">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">Suivi de la démo</h1>
+                <p class="page-subtitle">Avancement de la reconstruction (copie + anonymisation de la production), étapes, erreurs et journal.</p>
+            </div>
+            <div class="page-heading-actions">
+                <form method="post" action="{{ path('app_env_unlock') }}" data-env-confirm="Débloquer ?&#10;&#10;À n'utiliser que si la reconstruction est bloquée : elle sera marquée en échec (refusé si un processus tourne encore).">
+                    <input type="hidden" name="_token" value="{{ app_env_token() }}">
+                    <button type="submit" class="btn btn-neutral btn-sm" data-envp-unlock {{ building ? '' : 'hidden' }}>Débloquer</button>
+                </form>
+                <form method="post" action="{{ path('app_env_rebuild') }}" data-env-confirm="Reconstruire la base démo ?&#10;&#10;La production est d'abord sauvegardée puis lue en lecture seule ; la démo actuelle est effacée et recréée.">
+                    <input type="hidden" name="_token" value="{{ app_env_token() }}">
+                    <button type="submit" class="btn btn-primary btn-sm" data-envp-rebuild {{ building or mode == 'demo' ? 'disabled' : '' }} title="{{ mode == 'demo' ? 'Revenez d\'abord sur Central' : '' }}">Reconstruire la démo</button>
+                </form>
+            </div>
+        </div>
+
+        <section class="envp-card" aria-live="polite">
+            <div class="envp-top">
+                <span class="envp-badge" data-envp-badge data-state="idle">…</span>
+                <strong class="envp-phase" data-envp-phase>Chargement de l'état…</strong>
+                <span class="envp-percent" data-envp-percent></span>
+            </div>
+            <div class="envp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-envp-bar-wrap><i data-envp-bar></i></div>
+            <p class="envp-meta" data-envp-meta></p>
+            <p class="envp-warn" data-envp-warn hidden></p>
+        </section>
+
+        <section class="envp-card envp-error" data-envp-error hidden>
+            <h2>Erreur</h2>
+            <p data-envp-error-msg></p>
+            <p class="envp-where" data-envp-error-where></p>
+            <pre data-envp-error-trace></pre>
+        </section>
+
+        <section class="envp-card">
+            <h2>Étapes</h2>
+            <ol class="envp-steps" data-envp-steps><li class="envp-muted">Aucune reconstruction suivie pour l'instant.</li></ol>
+        </section>
+
+        <section class="envp-card">
+            <h2>Diagnostic</h2>
+            <ul class="envp-checks">
+                {% for c in checks %}
+                    <li class="{{ c.ok is same as(true) ? 'is-ok' : (c.ok is same as(false) ? 'is-ko' : 'is-info') }}">
+                        <b>{{ c.ok is same as(true) ? '✓' : (c.ok is same as(false) ? '✗' : '•') }}</b>
+                        <span>{{ c.label }}</span>
+                        <small>{{ c.detail }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="envp-card">
+            <div class="envp-top">
+                <h2>Journal <small>var/demo-build.log</small></h2>
+                <span class="envp-actions">
+                    <button type="button" class="btn btn-ghost btn-sm" data-envp-log-refresh>Actualiser</button>
+                    <form method="post" action="{{ path('app_env_log_clear') }}" data-env-confirm="Vider le journal et réinitialiser le suivi ?">
+                        <input type="hidden" name="_token" value="{{ app_env_token() }}">
+                        <button type="submit" class="btn btn-neutral btn-sm">Vider le journal</button>
+                    </form>
+                </span>
+            </div>
+            <pre class="envp-log" data-envp-log tabindex="0">Chargement…</pre>
+        </section>
+    </div>
+{% endblock %}

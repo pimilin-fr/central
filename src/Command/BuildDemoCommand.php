@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Demo\DemoBuilder;
+use App\Demo\DemoProgress;
 use App\Demo\DemoPurger;
 use App\Demo\DemoSchemaCloner;
 use DateTimeImmutable;
@@ -29,7 +30,8 @@ class BuildDemoCommand extends Command {
         #[Autowire(service: 'doctrine.orm.demo_entity_manager')] private EntityManagerInterface $demoEm,
         private DemoBuilder $builder,
         private DemoPurger $purger,
-        private DemoSchemaCloner $cloner
+        private DemoSchemaCloner $cloner,
+        private DemoProgress $progress
     ) {
         parent::__construct();
     }
@@ -49,6 +51,16 @@ class BuildDemoCommand extends Command {
         $io = new SymfonyStyle($input, $output);
         $dryRun = (bool) $input->getOption('dry-run');
 
+        // Suivi pour l'interface (var/demo-build.progress.json) : avancement, étapes, erreur détaillée.
+        $this->progress->begin();
+        $io->writeln(sprintf('[%s] app:demo:build démarrée (pid %d)', date('H:i:s'), getmypid()));
+        register_shutdown_function(function (): void {
+            if ($this->progress->isRunning()) {
+                $e = error_get_last();
+                $this->progress->finish(false, 'La commande s\'est arrêtée brutalement' . ($e ? ' : ' . $e['message'] . ' (' . basename($e['file']) . ':' . $e['line'] . ')' : '.'));
+            }
+        });
+
         // ---- garde-fous : ne JAMAIS écrire dans la production ---------------------------------
         $source = $this->databaseKey($this->em);
         $target = $this->databaseKey($this->demoEm);
@@ -57,6 +69,7 @@ class BuildDemoCommand extends Command {
                 "La base démo et la base source sont identiques (%s). Refus de continuer : vérifiez DEMO_DATABASE_URL.",
                 $target
             ));
+            $this->progress->finish(false, sprintf('Base démo et source identiques (%s) : refus.', $target));
 
             return Command::FAILURE;
         }
@@ -64,6 +77,7 @@ class BuildDemoCommand extends Command {
         [$sourceDb, $targetDb] = $this->cloner->databases();
         if (!$input->getOption('allow-any-name') && !str_contains(strtolower($targetDb), 'demo')) {
             $io->error(sprintf('Le nom de la base cible (« %s ») ne contient pas « demo » : refus par précaution (sinon --allow-any-name).', $targetDb));
+            $this->progress->finish(false, sprintf('Le nom de la base cible « %s » ne contient pas « demo » : refus.', $targetDb));
 
             return Command::FAILURE;
         }
@@ -71,6 +85,7 @@ class BuildDemoCommand extends Command {
         $fresh = (bool) $input->getOption('fresh');
         if ($fresh && $dryRun) {
             $io->error('--fresh et --dry-run sont incompatibles (--fresh supprime le contenu de la base démo).');
+            $this->progress->finish(false, '--fresh et --dry-run sont incompatibles.');
 
             return Command::FAILURE;
         }
@@ -85,6 +100,7 @@ class BuildDemoCommand extends Command {
                     'La base démo n’a pas le schéma attendu (tables manquantes : ' . implode(', ', $missing) . ').',
                     'Relancez avec --fresh pour recréer la structure depuis la production.',
                 ]);
+                $this->progress->finish(false, 'Schéma démo incomplet (tables manquantes : ' . implode(', ', $missing) . ').');
 
                 return Command::FAILURE;
             }
@@ -110,6 +126,7 @@ class BuildDemoCommand extends Command {
         if (!$dryRun) {
             if (!$input->getOption('yes') && !$io->confirm(sprintf('Tout le contenu de « %s » va être SUPPRIMÉ puis reconstruit. Continuer ?', $targetDb), false)) {
                 $io->warning('Annulé.');
+                $this->progress->finish(false, 'Annulé par l\'utilisateur.');
 
                 return Command::SUCCESS;
             }
@@ -117,14 +134,21 @@ class BuildDemoCommand extends Command {
             try {
                 if ($fresh) {
                     $io->section('Recréation de la structure (copie depuis la production)');
+                    $this->progress->phase('Recréation de la structure (tables, index, vues)', 2);
+                    $this->progress->step('Structure de la base démo', 'running');
                     $done = $this->cloner->recreate();
                     $io->writeln(sprintf(' • %d tables et %d vues recréées dans « %s »', $done['tables'], $done['views'], $targetDb));
+                    $this->progress->step('Structure de la base démo', 'ok', sprintf('%d tables, %d vues', $done['tables'], $done['views']));
                 } else {
                     $io->section('Purge de la base démo');
+                    $this->progress->phase('Purge de la base démo', 2);
+                    $this->progress->step('Purge de la base démo', 'running');
                     $this->purger->purge();
+                    $this->progress->step('Purge de la base démo', 'ok');
                 }
             } catch (Throwable $e) {
                 $io->error('Échec avant la copie des données (la production n’a pas été touchée) : ' . $e->getMessage());
+                $this->progress->finish(false, 'Échec avant la copie des données (la production n\'a pas été touchée).', $e);
 
                 return Command::FAILURE;
             }
@@ -141,6 +165,7 @@ class BuildDemoCommand extends Command {
             $sourceConnection->beginTransaction();
         } catch (Throwable $e) {
             $io->error('Impossible de passer la production en lecture seule, abandon (' . $e->getMessage() . ')');
+            $this->progress->finish(false, 'Impossible de passer la production en lecture seule.', $e);
 
             return Command::FAILURE;
         }
@@ -148,7 +173,24 @@ class BuildDemoCommand extends Command {
         $connection->beginTransaction();
         try {
             $io->section('Transformation');
-            $this->builder->build(static fn (string $line) => $io->writeln(' • ' . $line));
+            $this->progress->phase('Copie et anonymisation des données', 5);
+            $this->builder->build(static fn (string $line) => $io->writeln(' • ' . $line), function (array $i): void {
+                // 5 % réservés à la structure, 95 % à la copie : au prorata des lignes (sinon des étapes)
+                $fraction = $i['rowsTotal'] > 0
+                    ? $i['rowsDone'] / $i['rowsTotal']
+                    : (($i['index'] - 1) + ($i['kind'] === 'done' ? 1 : 0)) / max(1, $i['steps']);
+                $label = sprintf('%s (%d/%d)', $i['label'], $i['index'], $i['steps']);
+                if ($i['kind'] === 'done') {
+                    $this->progress->step($i['label'], 'ok', $i['summary']);
+                    $this->progress->tick($label . ' — terminé', 5 + 90 * $fraction);
+                } elseif ($i['kind'] === 'start') {
+                    $this->progress->step($i['label'], 'running', $i['curRows'] > 0 ? $i['curRows'] . ' ligne(s) à traiter' : '');
+                    $this->progress->tick($label, 5 + 90 * $fraction);
+                } else {
+                    $this->progress->tick($label, 5 + 90 * $fraction, sprintf('%d / %d ligne(s)', $i['curDone'], $i['curRows']));
+                }
+            });
+            $this->progress->phase($dryRun ? 'Simulation : annulation de la transaction' : 'Validation de la transaction (commit)', 97);
 
             if ($dryRun) {
                 $connection->rollBack();
@@ -160,6 +202,8 @@ class BuildDemoCommand extends Command {
                 $connection->rollBack();
             }
             $io->error('Échec, la production n’a pas été modifiée, la base démo est à refaire : ' . $e->getMessage());
+            $io->writeln('<comment>' . $e::class . ' — ' . basename($e->getFile()) . ':' . $e->getLine() . '</comment>');
+            $this->progress->finish(false, 'Échec pendant la copie : la production n\'a pas été modifiée, la base démo est à refaire.', $e);
 
             return Command::FAILURE;
         } finally {
@@ -169,6 +213,7 @@ class BuildDemoCommand extends Command {
         }
 
         $this->report($io);
+        $this->progress->finish(true, $dryRun ? 'Simulation terminée : aucune donnée conservée.' : 'Base démo reconstruite.');
         $io->success($dryRun ? 'Simulation terminée : aucune donnée n’a été conservée.' : 'Base démo reconstruite.');
 
         return Command::SUCCESS;
