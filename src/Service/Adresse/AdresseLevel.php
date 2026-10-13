@@ -19,9 +19,9 @@ enum AdresseLevel: string {
     case Zone = 'zone';
     case Planete = 'planete';
 
-    /** Niveaux que l'assistant sait proposer / créer (au-dessus de la rue, jusqu'au pays). */
+    /** Niveaux parents proposés / créés par l'assistant, du plus proche de la rue au plus haut. */
     public static function chain(): array {
-        return [self::Quartier, self::Ville, self::Departement, self::Region, self::Pays];
+        return [self::Quartier, self::Ville, self::Departement, self::Region, self::Pays, self::Zone, self::Planete];
     }
 
     /** Nom d'AdresseType créé si le niveau n'existe pas encore en base. */

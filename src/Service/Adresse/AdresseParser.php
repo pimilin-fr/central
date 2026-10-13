@@ -56,13 +56,44 @@ final class AdresseParser {
                 'cedex' => '',
                 'pays' => $pays,
             ],
-            'ancestors' => [
-                'quartier' => $quartier,
-                'ville' => $ville !== '' ? $ville : null,
-                'departement' => $this->first($a, ['county', 'state_district']),
-                'region' => $this->first($a, ['state', 'region']),
-                'pays' => $pays !== '' ? $pays : null,
-            ],
+            'ancestors' => $this->ancestors($a, $ville, $quartier),
+        ];
+    }
+
+    /**
+     * Résultat Nominatim pour un lieu de niveau supérieur (quartier, ville, département…) saisi « comme une adresse ».
+     *
+     * @return array<string,mixed>
+     */
+    public function place(array $r): array {
+        $a = is_array($r['address'] ?? null) ? $r['address'] : [];
+        $display = (string) ($r['display_name'] ?? '');
+        $name = trim((string) ($r['name'] ?? '')) ?: trim(explode(',', $display)[0]);
+        $ville = $this->first($a, ['city', 'town', 'village', 'municipality', 'hamlet']) ?? '';
+        $pays = (string) ($a['country'] ?? '');
+
+        return [
+            'label' => $display !== '' ? $display : $name,
+            'name' => $name,
+            'adresse' => $display !== '' ? $display : $name,
+            'lat' => isset($r['lat']) ? (float) $r['lat'] : null,
+            'lng' => isset($r['lon']) ? (float) $r['lon'] : null,
+            'cc' => strtolower((string) ($a['country_code'] ?? '')),
+            'fields' => ['ville' => $ville, 'pays' => $pays],
+            'ancestors' => $this->ancestors($a, $ville, $this->first($a, ['suburb', 'neighbourhood', 'quarter', 'city_district', 'borough'])),
+        ];
+    }
+
+    /** @return array<string,?string> */
+    private function ancestors(array $a, string $ville, ?string $quartier): array {
+        $pays = (string) ($a['country'] ?? '');
+
+        return [
+            'quartier' => $quartier,
+            'ville' => $ville !== '' ? $ville : null,
+            'departement' => $this->first($a, ['county', 'state_district']),
+            'region' => $this->first($a, ['state', 'region']),
+            'pays' => $pays !== '' ? $pays : null,
         ];
     }
 

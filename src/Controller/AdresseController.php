@@ -7,6 +7,7 @@ use App\Form\AdresseFormType;
 use App\Repository\AdresseRepository;
 use App\Service\Adresse\AdresseMapBuilder;
 use App\Service\Adresse\AdresseAssistant;
+use App\Service\Adresse\AdresseLevel;
 use App\Service\Geocoder\Geocoder;
 use App\Service\Geocoder\GeocoderException;
 use DateTimeImmutable;
@@ -104,8 +105,8 @@ final class AdresseController extends AbstractController {
             }
 
             // Rattachement assisté : crée les niveaux manquants (quartier, ville…) puis relie la rue
-            $chain = $request->request->all('chain');
-            if ($chain !== []) {
+            $chain = json_decode((string) $request->request->get('chain_json', ''), true);
+            if (is_array($chain) && $chain !== []) {
                 $created = $assistant->applyChain($adresse, $chain, $adresse->getLatitude(), $adresse->getLongitude());
                 if ($created > 0) {
                     $this->addFlash('success', $created . ' adresse(s) parente(s) créée(s).');
@@ -142,7 +143,8 @@ final class AdresseController extends AbstractController {
         try {
             $candidates = $assistant->locate(
                     trim((string) $request->query->get('q', '')),
-                    self::parseCoords((string) $request->query->get('coords', ''))
+                    self::parseCoords((string) $request->query->get('coords', '')),
+                    AdresseLevel::tryFrom((string) $request->query->get('level', 'rue')) ?? AdresseLevel::Rue
             );
         } catch (GeocoderException $e) {
             return $this->json(['ok' => false, 'error' => $e->getMessage()]);
@@ -151,18 +153,18 @@ final class AdresseController extends AbstractController {
         return $this->json(['ok' => true, 'candidates' => $candidates]);
     }
 
-    /** Étape 2 : niveaux parents (adresses existantes proches + création proposée). */
-    #[Route('/assist/parents', name: 'json_adresse_assist_parents', methods: ['GET'])]
-    public function assistParents(Request $request, AdresseAssistant $assistant): JsonResponse {
+    /** Étape suivante : les N adresses existantes d'un niveau les plus proches d'une position (carte + liste). */
+    #[Route('/assist/nearby', name: 'json_adresse_assist_nearby', methods: ['GET'])]
+    public function assistNearby(Request $request, AdresseAssistant $assistant): JsonResponse {
         $q = $request->query;
+        $level = AdresseLevel::tryFrom((string) $q->get('level', ''));
+        if ($level === null || $level === AdresseLevel::Rue) {
+            return $this->json(['ok' => false, 'error' => 'Niveau inconnu.']);
+        }
         $lat = is_numeric($q->get('lat')) ? (float) $q->get('lat') : null;
         $lng = is_numeric($q->get('lng')) ? (float) $q->get('lng') : null;
-        $anc = [];
-        foreach (['quartier', 'ville', 'departement', 'region', 'pays'] as $k) {
-            $anc[$k] = (string) $q->get($k, '');
-        }
 
-        return $this->json(['ok' => true, 'levels' => $assistant->levels($anc, $lat, $lng)]);
+        return $this->json(['ok' => true] + $assistant->nearby($level, $lat, $lng, (string) $q->get('name', ''), min(12, max(1, (int) $q->get('limit', 6)))));
     }
 
     /** « 48.8566, 2.3522 » → ['lat' => 48.8566, 'lng' => 2.3522 ], sinon null. */

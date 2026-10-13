@@ -14,7 +14,7 @@
 
 <div class="form-layout is-single" data-ad-assist
      data-ad-locate-url="{{ path('json_adresse_assist_locate') }}"
-     data-ad-parents-url="{{ path('json_adresse_assist_parents') }}"
+     data-ad-nearby-url="{{ path('json_adresse_assist_nearby') }}"
      data-ad-edit="{{ isEdit ? '1' : '0' }}">
 
     <div class="form-timeline">
@@ -128,18 +128,19 @@
             </div>
 
             <p class="form-hint" data-ad-chain-hint>
-                {% if adresse.adresseParent %}Actuellement rattachée à <strong>{{ adresse.adresseParent.name }}</strong>.{% else %}Les parents proches (quartier, puis ville, département, région, pays) seront proposés après la recherche de l'adresse.{% endif %}
+                {% if adresse.adresseParent %}Actuellement rattachée à <strong>{{ adresse.adresseParent.name }}</strong>. Vous pouvez en choisir un autre ci-dessous.{% else %}Après la recherche de l'adresse, les quartiers les plus proches sont proposés sur une carte ; on choisit ou on en crée un, puis on remonte niveau par niveau (ville, département, région, pays…).{% endif %}
             </p>
-            <div class="ad-chain" data-ad-chain></div>
+            <div class="ad-drawers" data-ad-drawers></div>
+            <input type="hidden" name="chain_json" value="" data-ad-chain-json>
             <div class="ad-actions">
                 {% include 'layout/modern/components/_btns.html.twig' with {
                     removeContainer: true,
-                    btns: [{ type: 'button', label: 'Proposer un rattachement', icon: 'gravity-ui:geo-pin', color: 'neutral', size: 'sm', attrs: { 'data-ad-parents': true } }]
+                    btns: [{ type: 'button', label: adresse.adresseParent ? 'Changer le rattachement' : 'Proposer un rattachement', icon: 'gravity-ui:geo-pin', color: 'neutral', size: 'sm', attrs: { 'data-ad-parents': true } }]
                 } %}
             </div>
 
             <details class="form-more" {{ form.adresseParent.vars.value ? 'open' : '' }}>
-                <summary>Choisir soi-même le parent (remplacé par le choix ci-dessus s'il est utilisé)</summary>
+                <summary>Choisir soi-même le parent dans la liste (remplacé par le choix ci-dessus s'il est utilisé)</summary>
                 <div class="form-row" style="--cols: 1fr">
                     <div>
                         {{ form_label(form.adresseParent, null, { label_attr: { class: 'modern-form-label' } }) }}
