@@ -1,6 +1,6 @@
 {#
-    Formulaire adresse — frise verticale, sans aperçu.
-    Localisation sur 3 lignes : préfixe/num/bis/type · voie · CP/ville/cedex/pays.
+    Formulaire adresse — saisie assistée (public/js/adresse.js) :
+      01 adresse complète (+ position optionnelle) → recherche → 02 champs détaillés remplis → 03 rattachement aux parents proches / création assistée.
 #}
 {% set isEdit = adresse.id is not null %}
 {% set formAction = isEdit
@@ -12,56 +12,88 @@
     attr: { class: 'modern-form' }
 }) }}
 
-<div class="form-layout is-single">
+<div class="form-layout is-single" data-ad-assist
+     data-ad-locate-url="{{ path('json_adresse_assist_locate') }}"
+     data-ad-nearby-url="{{ path('json_adresse_assist_nearby') }}"
+     data-ad-edit="{{ isEdit ? '1' : '0' }}">
 
     <div class="form-timeline">
 
-        {# 01 — Identité #}
+        {# 01 — Adresse complète (point de départ de la saisie) #}
         <div class="form-field-card card-inset">
             <div class="form-field-heading">
                 <span class="form-field-index">01</span>
-                <h3>Identité</h3>
+                <h3>Adresse complète</h3>
+            </div>
+
+            <div>
+                <div class="form-label-line">
+                    {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
+                </div>
+                {{ form_widget(form.adresse, { attr: { class: 'modern-form-control', rows: 2, 'data-ad-field': 'adresse', placeholder: 'Ex. 10 rue de la Paix, 75002 Paris, France' } }) }}
+                {{ form_errors(form.adresse) }}
+                <p class="form-hint">Saisissez l'adresse en une fois : les champs ci-dessous et le rattachement (quartier, ville…) sont proposés automatiquement.</p>
+            </div>
+
+            <div class="ad-actions">
+                {% include 'layout/modern/components/_btns.html.twig' with {
+                    removeContainer: true,
+                    btns: [{ type: 'button', label: 'Rechercher cette adresse', icon: 'gravity-ui:geo-pin', color: 'primary', size: 'sm', attrs: { 'data-ad-search': true } }]
+                } %}
+                <span class="ad-status" data-ad-status aria-live="polite"></span>
+            </div>
+
+            <details class="form-more" {{ form.adresseForcee.vars.value ? 'open' : '' }}>
+                <summary>Position connue (optionnel)</summary>
+                <div class="coords-field" data-coords-state>
+                    {{ form_label(form.adresseForcee, 'Coordonnées (latitude, longitude)', { label_attr: { class: 'modern-form-label' } }) }}
+                    {{ form_widget(form.adresseForcee, { attr: {
+                        class: 'modern-form-control',
+                        'data-coords': '',
+                        'data-ad-field': 'forcee',
+                        placeholder: '48.8566, 2.3522',
+                        autocomplete: 'off'
+                    } }) }}
+                    <p class="form-hint" data-coords-hint>Laisser vide pour une géolocalisation automatique. Avec des coordonnées, l'adresse est retrouvée à partir de la position.</p>
+                    {{ form_errors(form.adresseForcee) }}
+                </div>
+            </details>
+
+            <div class="ad-cands" data-ad-results hidden></div>
+
+            {{ form_widget(form.latitude, { type: 'hidden', attr: { 'data-ad-field': 'latitude' } }) }}
+            {{ form_widget(form.longitude, { type: 'hidden', attr: { 'data-ad-field': 'longitude' } }) }}
+            <input type="hidden" name="geo_from_assist" value="" data-ad-geoflag>
+        </div>
+
+        {# 02 — Détail (rempli par l'assistant, toujours modifiable) #}
+        <div class="form-field-card card-inset">
+            <div class="form-field-heading">
+                <span class="form-field-index">02</span>
+                <h3>Détail de l'adresse</h3>
             </div>
 
             <div class="form-row" style="--cols: minmax(160px, 1fr) minmax(0, 2fr)">
                 <div>
                     {{ form_label(form.adresseType, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.adresseType, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_widget(form.adresseType, { attr: { class: 'modern-form-control', 'data-ad-field': 'type' } }) }}
                     {{ form_errors(form.adresseType) }}
                 </div>
                 <div>
                     {{ form_label(form.name, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.name, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_widget(form.name, { attr: { class: 'modern-form-control', 'data-ad-field': 'name' } }) }}
                     {{ form_errors(form.name) }}
                 </div>
             </div>
 
-            <details class="form-more" {{ form.adresseParent.vars.value ? 'open' : '' }}>
-                <summary>Rattacher à une adresse parente</summary>
-                <div class="form-row" style="--cols: 1fr">
-                    <div>
-                        {{ form_label(form.adresseParent, null, { label_attr: { class: 'modern-form-label' } }) }}
-                        {{ form_widget(form.adresseParent, { attr: { class: 'modern-form-control' } }) }}
-                        {{ form_errors(form.adresseParent) }}
-                    </div>
-                </div>
-            </details>
-        </div>
-
-        {# 02 — Localisation #}
-        <div class="form-field-card card-inset">
-            <div class="form-field-heading">
-                <span class="form-field-index">02</span>
-                <h3>Localisation</h3>
-            </div>
-
             {# Ligne 1 : préfixe · numéro · bis/ter · type de voie #}
             <div class="form-row is-start" style="--cols: 110px 90px 100px 160px">
-                {% for field in [form.prefix, form.num, form.bisTer, form.typeVoie] %}
+                {% for field, key in { prefix: 'prefix', num: 'num', bisTer: 'bisTer', typeVoie: 'typeVoie' } %}
+                    {% set f = form[field] %}
                     <div>
-                        {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
-                        {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
-                        {{ form_errors(field) }}
+                        {{ form_label(f, null, { label_attr: { class: 'modern-form-label' } }) }}
+                        {{ form_widget(f, { attr: { class: 'modern-form-control', 'data-ad-field': key } }) }}
+                        {{ form_errors(f) }}
                     </div>
                 {% endfor %}
             </div>
@@ -70,53 +102,51 @@
             <div class="form-row" style="--cols: 1fr">
                 <div>
                     {{ form_label(form.nomVoie, null, { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.nomVoie, { attr: { class: 'modern-form-control' } }) }}
+                    {{ form_widget(form.nomVoie, { attr: { class: 'modern-form-control', 'data-ad-field': 'nomVoie' } }) }}
                     {{ form_errors(form.nomVoie) }}
                 </div>
             </div>
 
             {# Ligne 3 : code postal · ville · cedex · pays #}
             <div class="form-row" style="--cols: 110px minmax(0, 2fr) 110px minmax(0, 1.4fr)">
-                {% for field in [form.codePostal, form.ville, form.cedex, form.pays] %}
+                {% for field, key in { codePostal: 'codePostal', ville: 'ville', cedex: 'cedex', pays: 'pays' } %}
+                    {% set f = form[field] %}
                     <div>
-                        {{ form_label(field, null, { label_attr: { class: 'modern-form-label' } }) }}
-                        {{ form_widget(field, { attr: { class: 'modern-form-control' } }) }}
-                        {{ form_errors(field) }}
+                        {{ form_label(f, null, { label_attr: { class: 'modern-form-label' } }) }}
+                        {{ form_widget(f, { attr: { class: 'modern-form-control', 'data-ad-field': key } }) }}
+                        {{ form_errors(f) }}
                     </div>
                 {% endfor %}
             </div>
         </div>
 
-        {# 03 — Adresse complète & position #}
+        {# 03 — Rattachement : parents proches (quartier, ville…) ou création assistée #}
         <div class="form-field-card card-inset">
             <div class="form-field-heading">
                 <span class="form-field-index">03</span>
-                <h3>Adresse complète &amp; position</h3>
+                <h3>Rattachement</h3>
             </div>
 
-            <div>
-                <div class="form-label-line">
-                    {{ form_label(form.adresse, null, { label_attr: { class: 'modern-form-label' } }) }}
-                </div>
-                {{ form_widget(form.adresse, { attr: { class: 'modern-form-control', rows: 2 } }) }}
-                {{ form_errors(form.adresse) }}
-            </div>
-
-            <details class="form-more form-more-btn" {{ form.adresseForcee.vars.value ? 'open' : '' }}>
+            <p class="form-hint" data-ad-chain-hint>
+                {% if adresse.adresseParent %}Actuellement rattachée à <strong>{{ adresse.adresseParent.name }}</strong>. Vous pouvez en choisir un autre ci-dessous.{% else %}Après la recherche de l'adresse, les quartiers les plus proches sont proposés sur une carte ; on choisit ou on en crée un, puis on remonte niveau par niveau (ville, département, région, pays…).{% endif %}
+            </p>
+            <div class="ad-drawers" data-ad-drawers></div>
+            <input type="hidden" name="chain_json" value="" data-ad-chain-json>
+            <div class="ad-actions">
                 {% include 'layout/modern/components/_btns.html.twig' with {
                     removeContainer: true,
-                    btns: [{ type: 'summary', label: 'Géolocaliser', title: 'Forcer la géolocalisation : saisir soi-même les coordonnées', icon: 'gravity-ui:geo-pin', color: 'neutral', size: 'sm' }]
+                    btns: [{ type: 'button', label: adresse.adresseParent ? 'Changer le rattachement' : 'Proposer un rattachement', icon: 'gravity-ui:geo-pin', color: 'neutral', size: 'sm', attrs: { 'data-ad-parents': true } }]
                 } %}
-                <div class="coords-field" data-coords-state>
-                    {{ form_label(form.adresseForcee, 'Coordonnées (latitude, longitude)', { label_attr: { class: 'modern-form-label' } }) }}
-                    {{ form_widget(form.adresseForcee, { attr: {
-                        class: 'modern-form-control',
-                        'data-coords': '',
-                        placeholder: '48.8566, 2.3522',
-                        autocomplete: 'off'
-                    } }) }}
-                    <p class="form-hint" data-coords-hint>Laisser vide pour une géolocalisation automatique.</p>
-                    {{ form_errors(form.adresseForcee) }}
+            </div>
+
+            <details class="form-more" {{ form.adresseParent.vars.value ? 'open' : '' }}>
+                <summary>Choisir soi-même le parent dans la liste (remplacé par le choix ci-dessus s'il est utilisé)</summary>
+                <div class="form-row" style="--cols: 1fr">
+                    <div>
+                        {{ form_label(form.adresseParent, null, { label_attr: { class: 'modern-form-label' } }) }}
+                        {{ form_widget(form.adresseParent, { attr: { class: 'modern-form-control' } }) }}
+                        {{ form_errors(form.adresseParent) }}
+                    </div>
                 </div>
             </details>
         </div>
