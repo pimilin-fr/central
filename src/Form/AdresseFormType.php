@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -85,6 +86,10 @@ class AdresseFormType extends AbstractType {
                                 message: 'Format attendu : latitude, longitude (ex. 48.8566, 2.3522).',
                         )],
                 ])
+                // Position issue de l'assistant (renseignée par JS ; laisser vide = géocodage automatique)
+                // (NumberType html5 : point décimal quelle que soit la locale ; rendu en champ caché dans le gabarit)
+                ->add('latitude', NumberType::class, ['required' => false, 'html5' => true, 'scale' => 8])
+                ->add('longitude', NumberType::class, ['required' => false, 'html5' => true, 'scale' => 8])
                 ->add('prefix', TextType::class, [
                     'label' => 'Préfix',
                     'required' => false,

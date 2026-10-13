@@ -26,7 +26,6 @@ class Geocoder {
             new AdresseForceeGeoQueryBuilder($adresse),
             new StructuredGeoQueryBuilder($adresse),
             new AdresseGeoQueryBuilder($adresse),
-            new AdresseGeoQueryBuilder($adresse),
         ];
     }
 
@@ -84,9 +83,6 @@ class Geocoder {
                             2
                     );
         } catch (GeocoderException $e) {
-            echo '<pre>';
-            var_dump($errors);
-            die;
             throw $e;
         } catch (TransportExceptionInterface $e) {
 
@@ -103,6 +99,54 @@ class Geocoder {
                             $e
                     );
         }
+    }
+
+    /**
+     * Recherche libre détaillée (addressdetails) : liste de résultats Nominatim bruts.
+     * Appelée sur action explicite de l'utilisateur (la politique de Nominatim interdit l'autocomplétion à la frappe).
+     *
+     * @return list<array<string,mixed>>
+     */
+    public function searchDetailed(string $q, int $limit = 5): array {
+        return $this->call('search', ['q' => $q, 'limit' => $limit]);
+    }
+
+    /** Géocodage inverse (coordonnées → adresse détaillée), ou null. */
+    public function reverseDetailed(float $lat, float $lng): ?array {
+        $data = $this->call('reverse', ['lat' => $lat, 'lon' => $lng, 'zoom' => 18]);
+
+        return $data[0] ?? null;
+    }
+
+    /** Position approximative d'un lieu (quartier, ville…) ; null si introuvable ou en cas d'erreur réseau. */
+    public function lookupPoint(string $q): ?array {
+        try {
+            $data = $this->call('search', ['q' => $q, 'limit' => 1]);
+        } catch (GeocoderException) {
+            return null;
+        }
+
+        return isset($data[0]['lat'], $data[0]['lon']) ? ['lat' => (float) $data[0]['lat'], 'lng' => (float) $data[0]['lon']] : null;
+    }
+
+    private function call(string $endpoint, array $query): array {
+        try {
+            $response = $this->httpClient->request('GET', 'https://nominatim.openstreetmap.org/' . $endpoint, [
+                'query' => $query + ['format' => 'jsonv2', 'addressdetails' => 1],
+                'headers' => ['User-Agent' => 'localapp-central/1.0', 'Accept-Language' => 'fr'],
+                'timeout' => 15,
+            ]);
+            $data = $this->retrieveData($response);
+        } catch (TransportExceptionInterface $e) {
+            throw new GeocoderException('Réseau indisponible : ' . $e->getMessage(), 10, $e);
+        }
+
+        // « reverse » renvoie un objet unique (ou {error}) ; « search » une liste
+        if (isset($data['error'])) {
+            return [];
+        }
+
+        return array_is_list($data) ? $data : [$data];
     }
 
     private function retrieveData($response): array {

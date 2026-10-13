@@ -630,3 +630,24 @@ label.required::after,
 .form-row.is-start {
     justify-content: start;
 }
+
+/* ---------- Saisie assistée d'une adresse (public/js/adresse.js) ---------- */
+.ad-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+.ad-status { font-size: 11px; color: var(--text-muted); }
+.ad-status[data-kind="ok"] { color: var(--success); }
+.ad-status[data-kind="warn"] { color: var(--text-soft); }
+.ad-status[data-kind="error"] { color: var(--danger); }
+.ad-cands { display: grid; gap: 6px; margin-top: 10px; }
+.ad-cands[hidden] { display: none; }
+.ad-cand {
+    display: grid; gap: 2px; text-align: left; padding: 8px 10px; cursor: pointer;
+    color: var(--text); background: var(--surface-soft); border: 1px solid var(--border); border-radius: 8px;
+}
+.ad-cand small { color: var(--text-muted); font-size: 10px; }
+.ad-cand:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+.ad-cand.is-picked { border-color: var(--accent); background: var(--accent-soft); }
+.ad-chain { display: grid; gap: 10px; }
+.ad-level { display: grid; grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1fr); gap: 8px; align-items: center; }
+.ad-level[hidden], .ad-level input[hidden] { display: none; }
+.ad-level .modern-form-label { margin: 0; }
+@media (max-width: 720px) { .ad-level { grid-template-columns: 1fr; } }

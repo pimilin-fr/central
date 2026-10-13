@@ -6,7 +6,9 @@ use App\Entity\Adresse;
 use App\Form\AdresseFormType;
 use App\Repository\AdresseRepository;
 use App\Service\Adresse\AdresseMapBuilder;
+use App\Service\Adresse\AdresseAssistant;
 use App\Service\Geocoder\Geocoder;
+use App\Service\Geocoder\GeocoderException;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +47,7 @@ final class AdresseController extends AbstractController {
     }
 
     #[Route('/new', name: 'app_adresse_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder): Response {
+    public function new(Request $request, EntityManagerInterface $entityManager, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder, AdresseAssistant $assistant): Response {
         $adresse = new Adresse();
 
         return $this->handleForm(
@@ -54,28 +56,30 @@ final class AdresseController extends AbstractController {
                         $entityManager,
                         $geocoder,
                         $adresseMapBuilder,
+                        $assistant,
                         'Adresse ajoutée avec succès'
                 );
     }
 
     #[Route('/edit/{id}', name: 'app_adresse_edit', methods: ['GET', 'POST'])]
-    public function edit(Adresse $adresse, Request $request, EntityManagerInterface $em, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder): Response {
-        return $this->handleForm($request, $adresse, $em, $geocoder, $adresseMapBuilder, 'Adresse modifiée avec succès');
+    public function edit(Adresse $adresse, Request $request, EntityManagerInterface $em, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder, AdresseAssistant $assistant): Response {
+        return $this->handleForm($request, $adresse, $em, $geocoder, $adresseMapBuilder, $assistant, 'Adresse modifiée avec succès');
     }
 
     #[Route('/show/{id}', name: 'app_adresse_show', methods: ['GET', 'POST'])]
-    public function show(Adresse $adresse, Request $request, EntityManagerInterface $entityManager, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder): Response {
+    public function show(Adresse $adresse, Request $request, EntityManagerInterface $entityManager, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder, AdresseAssistant $assistant): Response {
         return $this->handleForm(
                         $request,
                         $adresse,
                         $entityManager,
                         $geocoder,
                         $adresseMapBuilder,
+                        $assistant,
                         'Adresse modifiée avec succès'
                 );
     }
 
-    private function handleForm(Request $request, Adresse $adresse, EntityManagerInterface $entityManager, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder, string $successMessage): Response {
+    private function handleForm(Request $request, Adresse $adresse, EntityManagerInterface $entityManager, Geocoder $geocoder, AdresseMapBuilder $adresseMapBuilder, AdresseAssistant $assistant, string $successMessage): Response {
         $form = $this->createForm(
                 AdresseFormType::class,
                 $adresse
@@ -84,11 +88,28 @@ final class AdresseController extends AbstractController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $coords = $geocoder->geocode($adresse);
+            // Position : coordonnées saisies > position issue de l'assistant > géocodage automatique
+            $forced = self::parseCoords((string) $adresse->getAdresseForcee());
+            if ($forced !== null) {
+                $adresse->setLatitude($forced['lat']);
+                $adresse->setLongitude($forced['lng']);
+            } elseif (!($request->request->get('geo_from_assist') && $adresse->isGeolocalisee())) {
+                try {
+                    $coords = $geocoder->geocode($adresse);
+                    $adresse->setLatitude($coords['lat']);
+                    $adresse->setLongitude($coords['lng']);
+                } catch (GeocoderException $e) {
+                    $this->addFlash('warning', 'Adresse enregistrée sans géolocalisation (' . $e->getMessage() . ').');
+                }
+            }
 
-            if ($coords !== null) {
-                $adresse->setLatitude($coords['lat']);
-                $adresse->setLongitude($coords['lng']);
+            // Rattachement assisté : crée les niveaux manquants (quartier, ville…) puis relie la rue
+            $chain = $request->request->all('chain');
+            if ($chain !== []) {
+                $created = $assistant->applyChain($adresse, $chain, $adresse->getLatitude(), $adresse->getLongitude());
+                if ($created > 0) {
+                    $this->addFlash('success', $created . ' adresse(s) parente(s) créée(s).');
+                }
             }
 
             $entityManager->persist($adresse);
@@ -113,6 +134,46 @@ final class AdresseController extends AbstractController {
                             'adresseMap' => $adresseMap,
                         ]
                 );
+    }
+
+    /** Étape 1 de la saisie assistée : adresse complète (ou coordonnées) → candidats décomposés. */
+    #[Route('/assist/locate', name: 'json_adresse_assist_locate', methods: ['GET'])]
+    public function assistLocate(Request $request, AdresseAssistant $assistant): JsonResponse {
+        try {
+            $candidates = $assistant->locate(
+                    trim((string) $request->query->get('q', '')),
+                    self::parseCoords((string) $request->query->get('coords', ''))
+            );
+        } catch (GeocoderException $e) {
+            return $this->json(['ok' => false, 'error' => $e->getMessage()]);
+        }
+
+        return $this->json(['ok' => true, 'candidates' => $candidates]);
+    }
+
+    /** Étape 2 : niveaux parents (adresses existantes proches + création proposée). */
+    #[Route('/assist/parents', name: 'json_adresse_assist_parents', methods: ['GET'])]
+    public function assistParents(Request $request, AdresseAssistant $assistant): JsonResponse {
+        $q = $request->query;
+        $lat = is_numeric($q->get('lat')) ? (float) $q->get('lat') : null;
+        $lng = is_numeric($q->get('lng')) ? (float) $q->get('lng') : null;
+        $anc = [];
+        foreach (['quartier', 'ville', 'departement', 'region', 'pays'] as $k) {
+            $anc[$k] = (string) $q->get($k, '');
+        }
+
+        return $this->json(['ok' => true, 'levels' => $assistant->levels($anc, $lat, $lng)]);
+    }
+
+    /** « 48.8566, 2.3522 » → ['lat' => 48.8566, 'lng' => 2.3522 ], sinon null. */
+    private static function parseCoords(string $raw): ?array {
+        if (!preg_match('/^\s*(-?\d{1,2}(?:[.,]\d+)?)\s*[;,\s]\s*(-?\d{1,3}(?:[.,]\d+)?)\s*$/', $raw, $m)) {
+            return null;
+        }
+        $lat = (float) str_replace(',', '.', $m[1]);
+        $lng = (float) str_replace(',', '.', $m[2]);
+
+        return (abs($lat) <= 90 && abs($lng) <= 180) ? ['lat' => $lat, 'lng' => $lng] : null;
     }
 
     #[Route('/delete/{id}', name: 'app_adresse_delete', methods: ['GET'])]
