@@ -1,7 +1,0 @@
-# --- Sauvegardes : chaque tâche passe par bin/jobs (enregistre statut, durée, taille, erreurs) ---
-0 3 * * *   /usr/bin/php /var/www/central/bin/jobs run sql-daily      >> /var/log/backup/jobs.log 2>&1
-30 3 * * *  /usr/bin/php /var/www/central/bin/jobs run symfony-daily  >> /var/log/backup/jobs.log 2>&1
-0 4 * * 0   /usr/bin/php /var/www/central/bin/jobs run mariadb-weekly >> /var/log/backup/jobs.log 2>&1
-0 5 * * 1   /usr/bin/php /var/www/central/bin/jobs run clean-weekly   >> /var/log/backup/jobs.log 2>&1
-# Relances demandées depuis l'écran Sauvegardes (chaque minute, sans effet s'il n'y a rien à faire)
-* * * * *   /usr/bin/php /var/www/central/bin/jobs dispatch
