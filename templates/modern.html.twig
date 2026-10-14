@@ -22,7 +22,11 @@
     <body class="min-h-full">
         {% include 'layout/modern/struct/_db_mode_banner.html.twig' %}
         <div id="app-shell" class="app-shell">
-            {% include 'layout/modern/struct/_sidebar.html.twig' %}
+            {% if app.request.attributes.get('_route') starts with 'app_jobs_' %}
+                {% include 'layout/modern/struct/_sidebar_sauvegardes.html.twig' %}
+            {% else %}
+                {% include 'layout/modern/struct/_sidebar.html.twig' %}
+            {% endif %}
 
             <div class="app-main">
                 {% include 'layout/modern/struct/_topbar.html.twig' %}

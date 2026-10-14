@@ -1,0 +1,48 @@
+{
+    "storage": "/mnt/backup_hdd",
+    "diskWarnFreePct": 10,
+    "jobs": [
+        {
+            "id": "sql-daily",
+            "label": "Base Central — dump quotidien",
+            "description": "mysqldump de la base de production (rotation gérée par le nettoyage hebdomadaire).",
+            "command": "/usr/local/bin/backup-sql.sh",
+            "schedule": "Tous les jours à 03:00",
+            "everyHours": 24,
+            "graceHours": 3,
+            "artifact": { "dir": "/mnt/backup_hdd/mariadb/daily_sql", "glob": "central_*.sql", "minBytes": 1000 },
+            "sizeDropWarnPct": 30
+        },
+        {
+            "id": "symfony-daily",
+            "label": "Application Central — archive quotidienne",
+            "description": "Archive des fichiers de l'application (code, uploads).",
+            "command": "/usr/local/bin/backup-symfony.sh",
+            "schedule": "Tous les jours à 03:30",
+            "everyHours": 24,
+            "graceHours": 3,
+            "artifact": { "dir": "/mnt/backup_hdd/symfony/daily", "glob": "*", "minBytes": 100000 },
+            "sizeDropWarnPct": 30
+        },
+        {
+            "id": "mariadb-weekly",
+            "label": "MariaDB — sauvegarde complète hebdomadaire",
+            "description": "Sauvegarde de toutes les bases du serveur.",
+            "command": "/usr/local/bin/backup-mariadb.sh",
+            "schedule": "Dimanche à 04:00",
+            "everyHours": 168,
+            "graceHours": 12,
+            "artifact": { "dir": "/mnt/backup_hdd/mariadb/weekly_full", "glob": "*", "minBytes": 1000 },
+            "sizeDropWarnPct": 30
+        },
+        {
+            "id": "clean-weekly",
+            "label": "Nettoyage des anciennes sauvegardes",
+            "description": "Supprime les sauvegardes au-delà de la durée de conservation.",
+            "command": "/usr/local/bin/backup-clean.sh",
+            "schedule": "Lundi à 05:00",
+            "everyHours": 168,
+            "graceHours": 12
+        }
+    ]
+}

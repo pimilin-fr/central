@@ -1,0 +1,80 @@
+/* Section Sauvegardes + indicateur global (barre du haut) — tokens de thème uniquement. */
+
+/* Pastille de l'indicateur global */
+.jobs-pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text-soft);
+    font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap;
+}
+.jobs-pill:hover { background: var(--surface-hover); color: var(--text); }
+.jobs-pill-dot, .jobs-dot, .jobs-hero-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); flex: 0 0 auto; }
+.jobs-dot { margin-left: auto; }
+.jobs-pill.is-ok .jobs-pill-dot, .jobs-dot.is-ok, .jobs-hero.is-ok .jobs-hero-dot { background: var(--success); }
+.jobs-pill.is-warning .jobs-pill-dot, .jobs-dot.is-warning, .jobs-hero.is-warning .jobs-hero-dot { background: var(--warning); }
+.jobs-pill.is-danger .jobs-pill-dot, .jobs-dot.is-danger, .jobs-hero.is-danger .jobs-hero-dot { background: var(--danger); }
+.jobs-pill.is-warning { border-color: var(--warning); background: var(--warning-soft); color: var(--warning-strong); }
+.jobs-pill.is-danger { border-color: var(--danger); background: var(--danger-soft); color: var(--danger-strong); }
+.jobs-pill.is-danger .jobs-pill-dot { animation: jobs-pulse 1.6s ease-in-out infinite; }
+@keyframes jobs-pulse { 50% { opacity: .35; } }
+@media (max-width: 900px) { .jobs-pill-text { display: none; } .jobs-pill { padding: 8px; } }
+
+/* Bandeau de synthèse */
+.jobs-hero { display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.jobs-hero-dot { width: 14px; height: 14px; }
+.jobs-hero-copy { display: flex; flex-direction: column; gap: 2px; }
+.jobs-hero-copy small, .jobs-muted { color: var(--text-muted); font-size: 12px; }
+.jobs-hero.is-warning { border-color: var(--warning); background: var(--warning-soft); }
+.jobs-hero.is-danger { border-color: var(--danger); background: var(--danger-soft); }
+.jobs-hero.is-ok { border-color: var(--success); background: var(--success-soft); }
+
+/* Badges de statut */
+.jobs-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; background: var(--surface-soft); color: var(--text-soft); border: 1px solid var(--border); vertical-align: middle; }
+.jobs-badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); }
+.jobs-badge.is-ok { color: var(--success-strong); background: var(--success-soft); border-color: var(--success); }
+.jobs-badge.is-ok i { background: var(--success); }
+.jobs-badge.is-running { color: var(--info-strong); background: var(--info-soft); border-color: var(--info); }
+.jobs-badge.is-running i { background: var(--info); animation: jobs-pulse 1.2s ease-in-out infinite; }
+.jobs-badge.is-warning, .jobs-badge.is-late { color: var(--warning-strong); background: var(--warning-soft); border-color: var(--warning); }
+.jobs-badge.is-warning i, .jobs-badge.is-late i { background: var(--warning); }
+.jobs-badge.is-failed { color: var(--danger-strong); background: var(--danger-soft); border-color: var(--danger); }
+.jobs-badge.is-failed i { background: var(--danger); }
+
+/* Cartes */
+.jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-top: 16px; }
+.jobs-card, .jobs-disk, .jobs-error { margin-bottom: 0; }
+.page-container.jobs-page .envp-card { margin-bottom: 16px; }
+.jobs-grid .envp-card { margin-bottom: 0; }
+.jobs-card-head, .jobs-disk-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.jobs-card-head h2 a { color: inherit; text-decoration: none; }
+.jobs-card-head h2 a:hover { color: var(--accent); }
+.jobs-card.is-failed, .jobs-error { border-color: var(--danger); }
+.jobs-card.is-late, .jobs-card.is-warning { border-color: var(--warning); }
+.jobs-reason { margin: 8px 0; color: var(--text-soft); font-size: 13px; }
+.jobs-card.is-failed .jobs-reason, .jobs-error .jobs-reason { color: var(--danger-strong); font-weight: 700; }
+.jobs-facts { display: grid; gap: 6px; margin: 10px 0; }
+.jobs-facts > div { display: grid; grid-template-columns: 150px 1fr; gap: 8px; font-size: 13px; }
+.jobs-facts dt { color: var(--text-muted); }
+.jobs-facts dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.jobs-actions { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+.jobs-actions form { margin: 0; }
+.jobs-delta { margin-left: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.jobs-delta.is-down { color: var(--danger-strong); }
+
+/* Disque */
+.jobs-bar { height: 8px; border-radius: 999px; background: var(--surface-soft); border: 1px solid var(--border); overflow: hidden; margin: 8px 0; }
+.jobs-bar span { display: block; height: 100%; background: var(--accent); }
+.jobs-disk.is-failed { border-color: var(--danger); }
+.jobs-disk.is-warning { border-color: var(--warning); }
+
+/* Détail */
+.jobs-log { margin: 8px 0 0; padding: 12px; max-height: 340px; overflow: auto; border-radius: 10px; background: var(--surface-soft); border: 1px solid var(--border); color: var(--text); font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.jobs-spark { width: 100%; height: 120px; display: block; }
+.jobs-spark-line { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.jobs-spark-area { fill: var(--accent-soft); stroke: none; }
+.jobs-table-wrap { overflow-x: auto; }
+.jobs-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.jobs-table th { text-align: left; color: var(--text-muted); font-weight: 700; font-size: 11px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.jobs-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.jobs-table tr.is-failed td { background: var(--danger-soft); }
+.jobs-msg { color: var(--danger-strong); max-width: 420px; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .jobs-facts > div { grid-template-columns: 1fr; gap: 0; } .jobs-grid { grid-template-columns: 1fr; } }

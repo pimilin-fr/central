@@ -1,0 +1,72 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Suivi des tâches planifiées de Central (sauvegardes…). Aucune dépendance Symfony : lancé par cron (utilisateur pi).
+ *
+ *   php bin/jobs run <id> [--manual]   exécute la tâche et enregistre le résultat
+ *   php bin/jobs dispatch              traite les relances demandées depuis le web (à planifier chaque minute)
+ *   php bin/jobs status                affiche l'état de toutes les tâches
+ *   php bin/jobs list                  liste les identifiants
+ */
+
+declare(strict_types=1);
+
+$root = dirname(__DIR__);
+require_once $root . '/src/Service/Job/JobStore.php';
+require_once $root . '/src/Service/Job/JobRunner.php';
+
+use App\Service\Job\JobRunner;
+use App\Service\Job\JobStore;
+
+$store = new JobStore($root, getenv('JOBS_CONFIG') ?: null, getenv('JOBS_VAR') ?: null);
+$runner = new JobRunner($store);
+$cmd = $argv[1] ?? 'status';
+
+switch ($cmd) {
+    case 'run':
+        $id = $argv[2] ?? '';
+        if ($store->job($id) === null) {
+            fwrite(STDERR, "Tâche inconnue : $id\n");
+            exit(2);
+        }
+        $trigger = in_array('--manual', $argv, true) ? 'manual' : 'cron';
+        $res = $runner->run($id, $trigger);
+        if ($res === null) {
+            fwrite(STDERR, "Tâche $id déjà en cours.\n");
+            exit(3);
+        }
+        echo date('c') . " $id : {$res['status']} — {$res['message']}\n";
+        exit($res['status'] === JobStore::FAILED ? 1 : 0);
+
+    case 'dispatch':
+        foreach ($store->takeRequests() as $id) {
+            $php = PHP_BINARY ?: 'php';
+            $line = sprintf('nohup %s %s run %s --manual >/dev/null 2>&1 &', escapeshellarg($php), escapeshellarg(__FILE__), escapeshellarg($id));
+            exec($line);
+            echo date('c') . " relance demandée : $id\n";
+        }
+        exit(0);
+
+    case 'list':
+        foreach (array_keys($store->jobs()) as $id) {
+            echo $id . "\n";
+        }
+        exit(0);
+
+    case 'status':
+        foreach ($store->evaluateAll() as $e) {
+            $s = $e['state'];
+            printf("%-16s %-8s %s | %s\n", $e['id'], $e['status'], $s && isset($s['endedAt']) ? date('Y-m-d H:i', (int) $s['endedAt']) : '-', $e['reason']);
+        }
+        $d = $store->disk();
+        if ($d) {
+            printf("%-16s %-8s libre %.0f %% | %s\n", 'disque', $d['status'], $d['freePct'], $d['reason']);
+        }
+        $sum = $store->summary();
+        echo 'Global : ' . $sum['level'] . ' — ' . $sum['label'] . "\n";
+        exit(0);
+
+    default:
+        fwrite(STDERR, "Commande inconnue : $cmd (run|dispatch|status|list)\n");
+        exit(2);
+}

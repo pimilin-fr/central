@@ -1,11 +1,13 @@
+{% set ctx = app.request.attributes.get('_route') starts with 'app_jobs_' ? 'sauvegardes' : 'central' %}
+{% set jsum = app_jobs_summary() %}
 <div class="app-switcher" data-app-switcher>
     <button type="button" class="app-switcher-trigger" data-app-switcher-toggle aria-expanded="false" aria-haspopup="true" aria-label="Changer d'application">
         <span class="app-logo" aria-hidden="true">
-            <twig:ux:icon name="streamline:bank-solid" />
+            {% if ctx == 'sauvegardes' %}<twig:ux:icon name="mdi:backup-restore" />{% else %}<twig:ux:icon name="streamline:bank-solid" />{% endif %}
         </span>
         <span class="app-switcher-trigger-copy">
             <span class="app-switcher-kicker">Application</span>
-            <span class="app-switcher-title">Central</span>
+            <span class="app-switcher-title">{{ ctx == 'sauvegardes' ? 'Sauvegardes' : 'Central' }}</span>
         </span>
         <twig:ux:icon name="lucide:chevrons-up-down" class="app-switcher-chevron" />
     </button>
@@ -26,13 +28,13 @@
             </a>
 
             {# App. Centrale #}
-            <a href="{{ path('app_tiers_index') }}" class="app-switcher-item is-active">
+            <a href="{{ path('app_tiers_index') }}" class="app-switcher-item{{ ctx == 'central' ? ' is-active' : '' }}">
                 <span class="app-switcher-icon"><twig:ux:icon name="streamline:bank-solid" /></span>
                 <span class="app-switcher-copy">
                     <span class="app-switcher-name">Central</span>
                     <span class="app-switcher-status">Gestion financière</span>
                 </span>
-                <span class="app-switcher-active"></span>
+                {% if ctx == 'central' %}<span class="app-switcher-active"></span>{% endif %}
             </a>
 
             {# milecube : application autonome (autre projet sur le Pi, hors du sous-chemin /central) #}
@@ -54,15 +56,16 @@
                 <span class="app-switcher-off">OFF</span>
             </button>
 
-            {# Sauvegardes #}
-            <button type="button" class="app-switcher-item" disabled>
+            {# Sauvegardes : suivi des tâches planifiées du Pi (indicateur = pire statut) #}
+            <a href="{{ path('app_jobs_index') }}" class="app-switcher-item{{ ctx == 'sauvegardes' ? ' is-active' : '' }}">
                 <span class="app-switcher-icon"><twig:ux:icon name="mdi:backup-restore" /></span>
                 <span class="app-switcher-copy">
                     <span class="app-switcher-name">Sauvegardes</span>
-                    <span class="app-switcher-status">Raspberry Pi</span>
+                    <span class="app-switcher-status">{{ jsum.label }}</span>
                 </span>
-                <span class="app-switcher-off">OFF</span>
-            </button>
+                {% if jsum.level != 'none' %}<span class="jobs-dot is-{{ jsum.level }}" aria-hidden="true"></span>{% endif %}
+                {% if ctx == 'sauvegardes' %}<span class="app-switcher-active"></span>{% endif %}
+            </a>
 
             {# Base #}
             <button type="button" class="app-switcher-item" disabled>

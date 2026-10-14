@@ -1,0 +1,46 @@
+{# Menu latéral de l'application « Sauvegardes » (identité propre, distincte de Central). #}
+{% set route = app.request.attributes.get('_route') %}
+{% set jsum = app_jobs_summary() %}
+
+<aside id="sidebar" class="central-sidebar" data-sidebar>
+    <div class="sidebar-header">
+        <div class="sidebar-context">
+            <span class="sidebar-context-indicator"></span>
+            <span class="sidebar-context-copy">
+                <span class="sidebar-context-label">Application</span>
+                <span class="sidebar-context-name">Sauvegardes</span>
+            </span>
+        </div>
+
+        <button type="button" class="sidebar-collapse-button" data-sidebar-toggle aria-label="Réduire ou agrandir le menu" title="Réduire ou agrandir le menu">
+            <twig:ux:icon name="mynaui:panel-left-close-solid" class="sidebar-icon-open" />
+            <twig:ux:icon name="mynaui:panel-left-open-solid" class="sidebar-icon-compact" />
+        </button>
+    </div>
+
+    <div class="sidebar-separator"></div>
+
+    <nav class="sidebar-nav" aria-label="Navigation Sauvegardes">
+        <div class="sidebar-section-label">Suivi</div>
+
+        <a href="{{ path('app_jobs_index') }}" class="sidebar-link {{ route starts with 'app_jobs_' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="lucide:list" /></span>
+            <span class="sidebar-link-copy">Tâches planifiées</span>
+        </a>
+
+        <div class="sidebar-section-label">Applications</div>
+
+        <a href="{{ path('app_tiers_index') }}" class="sidebar-link">
+            <span class="sidebar-link-icon"><twig:ux:icon name="streamline:bank-solid" /></span>
+            <span class="sidebar-link-copy">Retour à Central</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom-card">
+        <twig:ux:icon name="mdi:backup-restore" />
+        <span class="sidebar-bottom-copy">
+            <span class="sidebar-bottom-title">Sauvegardes</span>
+            <span class="sidebar-bottom-text">{{ jsum.label }}</span>
+        </span>
+    </div>
+</aside>

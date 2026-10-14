@@ -37,14 +37,14 @@
                 </span>
                 <span class="home-card-off">OFF</span>
             </div>
-            <div class="home-card is-off" aria-disabled="true">
+            <a href="{{ path('app_jobs_index') }}" class="home-card">
                 <span class="home-card-icon"><twig:ux:icon name="mdi:backup-restore" /></span>
                 <span class="home-card-copy">
                     <span class="home-card-name">Sauvegardes</span>
-                    <span class="home-card-info">Raspberry Pi</span>
+                    <span class="home-card-info">{{ app_jobs_summary().label }}</span>
                 </span>
-                <span class="home-card-off">OFF</span>
-            </div>
+                {% if app_jobs_summary().level != 'none' %}<span class="jobs-dot is-{{ app_jobs_summary().level }}" aria-hidden="true"></span>{% endif %}
+            </a>
             <div class="home-card is-off" aria-disabled="true">
                 <span class="home-card-icon"><twig:ux:icon name="mdi:database-outline" /></span>
                 <span class="home-card-copy">

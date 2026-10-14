@@ -1,0 +1,89 @@
+{% extends 'modern.html.twig' %}
+
+{% block title %}Sauvegardes{% endblock %}
+
+{% block body %}
+    <div class="page-container jobs-page" data-jobs-page data-jobs-state-url="{{ path('app_jobs_state') }}"
+         data-jobs-busy="{{ items|filter(i => i.status == 'running' or i.pending)|length > 0 ? '1' : '0' }}">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">Sauvegardes</h1>
+                <p class="page-subtitle">Dernières exécutions des tâches planifiées du Raspberry Pi.</p>
+            </div>
+        </div>
+
+        <section class="jobs-hero is-{{ summary.level }}">
+            <span class="jobs-hero-dot" aria-hidden="true"></span>
+            <div class="jobs-hero-copy">
+                <strong>{{ summary.label }}</strong>
+                <small>
+                    {% if summary.level == 'ok' %}Toutes les tâches suivies se sont bien terminées dans les délais.
+                    {% elseif summary.level == 'none' %}Aucune tâche n'est déclarée dans config/jobs.json.
+                    {% else %}Voir le détail ci-dessous : les tâches en défaut sont en premier.{% endif %}
+                </small>
+            </div>
+        </section>
+
+        {% if disk %}
+            <section class="envp-card jobs-disk is-{{ disk.status }}">
+                <div class="jobs-disk-head">
+                    <h2>Disque de sauvegarde</h2>
+                    {% include 'sauvegarde/_badge.html.twig' with { status: disk.status == 'failed' ? 'failed' : (disk.status == 'warning' ? 'warning' : 'ok') } %}
+                </div>
+                <p class="jobs-muted">{{ disk.reason }}</p>
+                <div class="jobs-bar" role="img" aria-label="Espace utilisé"><span style="width: {{ disk.total > 0 ? (100 - disk.freePct)|round(1) : 0 }}%"></span></div>
+                <p class="jobs-muted"><code>{{ disk.path }}</code> · {{ disk.free|job_size }} libres sur {{ disk.total|job_size }}</p>
+            </section>
+        {% endif %}
+
+        {% set sorted = items|sort((a, b) => b.severity <=> a.severity) %}
+        <div class="jobs-grid">
+            {% for it in sorted %}
+                {% set st = it.state %}
+                <article class="envp-card jobs-card is-{{ it.status }}" data-job="{{ it.id }}">
+                    <div class="jobs-card-head">
+                        <div>
+                            <h2><a href="{{ path('app_jobs_show', {id: it.id}) }}">{{ it.job.label }}</a></h2>
+                            <small class="jobs-muted">{{ it.job.schedule ?? '' }}</small>
+                        </div>
+                        {% include 'sauvegarde/_badge.html.twig' with { status: it.status } %}
+                    </div>
+
+                    <p class="jobs-reason">{{ it.reason }}{% if it.pending and it.status != 'running' %} <em>(relance demandée)</em>{% endif %}</p>
+
+                    <dl class="jobs-facts">
+                        <div><dt>Dernière exécution</dt><dd>{{ st.startedAt is defined ? (st.startedAt|job_dt) ~ ' · ' ~ (st.startedAt|job_ago) : '—' }}</dd></div>
+                        <div><dt>Durée</dt><dd>{{ st.duration is defined ? st.duration|job_duration : '—' }}</dd></div>
+                        <div><dt>Fichier</dt><dd>
+                            {% if st.artifact is defined and st.artifact %}
+                                {{ st.artifact.size|job_size }}
+                                {% if it.sizeDeltaPct is not null %}<span class="jobs-delta {{ it.sizeDeltaPct <= -20 ? 'is-down' : '' }}">{{ it.sizeDeltaPct >= 0 ? '+' : '' }}{{ it.sizeDeltaPct|round(1)|replace({'.': ','}) }} %</span>{% endif %}
+                            {% else %}—{% endif %}
+                        </dd></div>
+                        {% if it.lastOk and it.status in ['failed', 'late'] %}
+                            <div><dt>Dernière réussite</dt><dd>{{ it.lastOk.endedAt|job_dt }} · {{ it.lastOk.endedAt|job_ago }}</dd></div>
+                        {% endif %}
+                    </dl>
+
+                    <div class="jobs-actions">
+                        {% include 'layout/modern/components/_btns.html.twig' with {
+                            removeContainer: true,
+                            btns: [{ label: 'Détails', path: path('app_jobs_show', {id: it.id}), icon: 'lucide:list', color: 'neutral', size: 'sm' }]
+                        } %}
+                        <form method="post" action="{{ path('app_jobs_run', {id: it.id}) }}" data-jobs-confirm="Relancer « {{ it.job.label }} » maintenant ?">
+                            <input type="hidden" name="_token" value="{{ csrf_token('jobs_run') }}">
+                            {% include 'layout/modern/components/_btns.html.twig' with {
+                                removeContainer: true,
+                                btns: [{ label: 'Relancer', type: 'submit', icon: 'mdi:refresh', color: 'primary', size: 'sm', attrs: (it.status == 'running' or it.pending) ? { disabled: true } : {} }]
+                            } %}
+                        </form>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/jobs.js') ~ '?v=1' }}" defer></script>
+{% endblock %}

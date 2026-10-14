@@ -1,0 +1,105 @@
+{% extends 'modern.html.twig' %}
+
+{% set breadcrumb_current = item.job.label %}
+{% block title %}{{ item.job.label }}{% endblock %}
+
+{% block body %}
+    {% set st = item.state %}
+    {% set spark = history|job_spark %}
+    <div class="page-container jobs-page" data-jobs-page data-jobs-state-url="{{ path('app_jobs_state') }}"
+         data-jobs-busy="{{ item.status == 'running' or item.pending ? '1' : '0' }}">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <h1 class="page-title">{{ item.job.label }} {% include 'sauvegarde/_badge.html.twig' with { status: item.status } %}</h1>
+                <p class="page-subtitle">{{ item.job.description ?? '' }}</p>
+            </div>
+            <div class="page-heading-actions">
+                <form method="post" action="{{ path('app_jobs_run', {id: item.id}) }}" data-jobs-confirm="Relancer cette tâche maintenant ?">
+                    <input type="hidden" name="_token" value="{{ csrf_token('jobs_run') }}">
+                    <input type="hidden" name="back" value="show">
+                    {% include 'layout/modern/components/_btns.html.twig' with {
+                        removeContainer: true,
+                        btns: [{ label: 'Relancer', type: 'submit', icon: 'mdi:refresh', color: 'primary', attrs: (item.status == 'running' or item.pending) ? { disabled: true } : {} }]
+                    } %}
+                </form>
+                {% include 'layout/modern/components/_btns.html.twig' with {
+                    removeContainer: true,
+                    btns: [{ label: 'Retour', path: path('app_jobs_index'), icon: 'mdi:arrow-left', color: 'neutral' }]
+                } %}
+            </div>
+        </div>
+
+        <section class="envp-card jobs-card is-{{ item.status }}">
+            <h2>État</h2>
+            <p class="jobs-reason">{{ item.reason }}</p>
+            <dl class="jobs-facts">
+                <div><dt>Planification</dt><dd>{{ item.job.schedule ?? '—' }}</dd></div>
+                <div><dt>Commande</dt><dd><code>{{ item.job.command }}</code></dd></div>
+                <div><dt>Dernier début</dt><dd>{{ st.startedAt is defined ? (st.startedAt|job_dt) ~ ' · ' ~ (st.startedAt|job_ago) : '—' }}</dd></div>
+                <div><dt>Durée</dt><dd>{{ st.duration is defined ? st.duration|job_duration : '—' }}</dd></div>
+                <div><dt>Déclenchement</dt><dd>{{ st.trigger is defined ? (st.trigger == 'manual' ? 'Manuel (relance)' : 'Planifié (cron)') : '—' }}</dd></div>
+                <div><dt>Fichier produit</dt><dd>{% if st.artifact is defined and st.artifact %}<code>{{ st.artifact.name }}</code> · {{ st.artifact.size|job_size }}{% else %}—{% endif %}</dd></div>
+            </dl>
+        </section>
+
+        {% if st.status is defined and st.status == 'failed' %}
+            <section class="envp-card jobs-error">
+                <h2>Erreur</h2>
+                <p class="jobs-reason">{{ st.message }}</p>
+                {% if log %}<pre class="jobs-log">{{ log }}</pre>{% endif %}
+            </section>
+        {% elseif log %}
+            <section class="envp-card">
+                <h2>Sortie de la dernière exécution</h2>
+                <pre class="jobs-log">{{ log }}</pre>
+            </section>
+        {% endif %}
+
+        {% if item.job.artifact is defined %}
+            <section class="envp-card">
+                <h2>Évolution de la taille</h2>
+                {% if spark %}
+                    <svg class="jobs-spark" viewBox="0 0 {{ spark.w }} {{ spark.h }}" preserveAspectRatio="none" role="img" aria-label="Évolution de la taille des sauvegardes">
+                        <polygon points="{{ spark.area }}" class="jobs-spark-area"/>
+                        <polyline points="{{ spark.points }}" class="jobs-spark-line"/>
+                    </svg>
+                    <p class="jobs-muted">{{ spark.n }} sauvegardes · min {{ spark.min|job_size }} · max {{ spark.max|job_size }}</p>
+                {% else %}
+                    <p class="jobs-muted">La courbe apparaîtra dès deux exécutions réussies.</p>
+                {% endif %}
+            </section>
+        {% endif %}
+
+        <section class="envp-card">
+            <h2>Historique ({{ history|length }})</h2>
+            {% if history %}
+                <div class="jobs-table-wrap">
+                    <table class="jobs-table">
+                        <thead><tr><th>Début</th><th>Statut</th><th>Durée</th><th>Taille</th><th>Variation</th><th>Message</th></tr></thead>
+                        <tbody>
+                        {% for row in history %}
+                            {% set prev = history[loop.index] ?? null %}
+                            {% set size = row.artifact.size ?? null %}
+                            {% set psize = prev ? (prev.artifact.size ?? null) : null %}
+                            <tr class="is-{{ row.status }}">
+                                <td>{{ row.startedAt|job_dt }}</td>
+                                <td>{% include 'sauvegarde/_badge.html.twig' with { status: row.status } %}</td>
+                                <td>{{ row.duration is defined ? row.duration|job_duration : '—' }}</td>
+                                <td>{{ size is not null ? size|job_size : '—' }}</td>
+                                <td>{% if size and psize %}{% set d = (size - psize) / psize * 100 %}<span class="jobs-delta {{ d <= -20 ? 'is-down' : '' }}">{{ d >= 0 ? '+' : '' }}{{ d|round(1)|replace({'.': ','}) }} %</span>{% else %}—{% endif %}</td>
+                                <td class="jobs-msg">{{ row.status == 'ok' ? '' : row.message }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="jobs-muted">Aucune exécution enregistrée pour l'instant.</p>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/jobs.js') ~ '?v=1' }}" defer></script>
+{% endblock %}
