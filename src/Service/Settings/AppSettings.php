@@ -13,12 +13,12 @@ final class AppSettings {
 
     /** @var array<string,array<string,mixed>> */
     public const DEFINITIONS = [
-        'adresse.tolerance.quartier' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Quartier : distance max proposée', 'unit' => 'km', 'default' => 1, 'min' => 0, 'max' => 20000, 'float' => true,
+        'adresse.tolerance.quartier' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Quartier : distance max proposée', 'unit' => 'km', 'default' => 2, 'min' => 0, 'max' => 20000, 'float' => true,
             'help' => 'Au-delà de cette distance à la zone, un quartier n\'est proposé que via « Voir des zones plus éloignées ».'],
-        'adresse.tolerance.ville' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Ville : distance max proposée', 'unit' => 'km', 'default' => 8, 'min' => 0, 'max' => 20000, 'float' => true, 'help' => ''],
+        'adresse.tolerance.ville' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Ville : distance max proposée', 'unit' => 'km', 'default' => 10, 'min' => 0, 'max' => 20000, 'float' => true, 'help' => ''],
         'adresse.tolerance.agglomeration' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Agglomération : distance max proposée', 'unit' => 'km', 'default' => 15, 'min' => 0, 'max' => 20000, 'float' => true, 'help' => ''],
-        'adresse.tolerance.departement' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Département : distance max proposée', 'unit' => 'km', 'default' => 30, 'min' => 0, 'max' => 20000, 'float' => true, 'help' => ''],
-        'adresse.tolerance.region' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Région : distance max proposée', 'unit' => 'km', 'default' => 100, 'min' => 0, 'max' => 20000, 'float' => true, 'help' => ''],
+        'adresse.tolerance.departement' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Département : distance max proposée', 'unit' => 'km', 'default' => 40, 'min' => 0, 'max' => 20000, 'float' => true, 'help' => ''],
+        'adresse.tolerance.region' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Région : distance max proposée', 'unit' => 'km', 'default' => 120, 'min' => 0, 'max' => 20000, 'float' => true, 'help' => ''],
         'adresse.tolerance.pays' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Pays : distance max proposée', 'unit' => 'km', 'default' => 500, 'min' => 0, 'max' => 20000, 'float' => true, 'help' => ''],
         'adresse.tolerance.ratio' => ['group' => 'Proposition de rattachement (adresses)', 'label' => 'Tolérance liée à la taille de la zone', 'unit' => '% du diamètre', 'default' => 50, 'min' => 0, 'max' => 1000,
             'help' => 'La distance max est le plus grand de : la valeur du niveau ci-dessus, ou ce pourcentage du diamètre de la zone (une grande zone tolère plus).'],

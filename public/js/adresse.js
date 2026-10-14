@@ -23,7 +23,7 @@ const CentralAdresse = {
 
     config: {
         debug: true,
-        version: 'v2.5.0',
+        version: 'v2.10.0',
         nearbyLimit: 5,
         appName: 'Central-ModuleAdresse'
     },
@@ -364,28 +364,61 @@ const CentralAdresse = {
 
         const renderItems = (s) => {
             const lower = s.level.label.toLowerCase();
-            const pre = s.items.find(it => it.id === s.preselect);
+            // valeur trouvée dans l'adresse d'origine pour ce niveau
+            const known = ((s.ctx.anc || {})[s.level.key] || '').trim();
+            const twin = known !== '' ? s.items.find(it => it.exact && it.near) : null;
+            // l'élément qui porte le nom de l'adresse passe en premier et devient la proposition principale
+            if (twin) {
+                s.items = [twin, ...s.items.filter(it => it !== twin)];
+                s.preselect = twin.id;
+            }
+            const primary = s.items.find(it => it.id === s.preselect) || null; // existant retenu : même nom, ou position dans sa zone
+            const virtualNew = known !== '' && !primary && !s.items.some(it => it.exact);
+            if (virtualNew) { s.preselect = null; }
             s.list.replaceChildren();
-            if (s.items.length === 0) {
+            if (virtualNew) {
+                s.lead.textContent = `« ${known} » (trouvé dans l'adresse) n'existe pas encore : créez-le, ou choisissez un ${lower} existant.`;
+            } else if (twin) {
+                s.lead.textContent = `« ${twin.label} » existe déjà (même nom que dans l'adresse) : confirmez-le, ou choisissez / créez autre chose.`;
+            } else if (primary) {
+                s.lead.textContent = `La position est dans la zone « ${primary.label} » : présélectionné` + (known !== '' ? ` (le nom de l'adresse, « ${known} », est différent)` : '') + '. Confirmez, ou choisissez / créez autre chose.';
+            } else if (s.items.length === 0) {
                 s.lead.textContent = `Aucun ${lower} existant à proximité : créez-le (ou passez ce niveau).`;
-            } else if (pre) {
-                s.lead.textContent = `La position est dans la zone « ${pre.label} » : présélectionné. Confirmez, ou choisissez / créez autre chose.`;
             } else {
                 s.lead.textContent = `Aucun ${lower} existant ne contient cette position. Les plus proches (distance à la zone, repère rouge = nouvelle position) :`;
             }
+            // nom absent des existants : il figure en tête de liste comme un existant « fictif » (même présentation, bouton intégré) ;
+            // aucun nom dans l'adresse et aucun existant retenu : une ligne discrète le dit
+            if (virtualNew || (known === '' && !primary)) {
+                const v = el('li', 'ad-item is-virtual' + (known === '' ? ' is-empty' : ' is-sel'));
+                v.append(el('span', 'ad-rank', known === '' ? '–' : '＋'));
+                const vn = el('span', 'ad-name', known === '' ? 'Aucun ' + lower + ' dans l\'adresse' : known);
+                vn.append(el('small', '', known === '' ? 'rien à reprendre : saisie manuelle' : 'nom trouvé dans l\'adresse'));
+                v.append(vn, el('span', 'ad-badge is-new', known === '' ? 'Aucune valeur' : 'À créer'));
+                const vb = el('button', 'btn btn-xs ' + (known === '' ? 'btn-neutral' : 'btn-primary'), known === '' ? 'Saisir…' : '✓ Créer');
+                vb.type = 'button';
+                vb.addEventListener('click', () => openCreate(s));
+                v.append(vb);
+                s.list.appendChild(v);
+            }
             s.items.forEach((it, i) => {
-                const li = el('li', 'ad-item' + (it.id === s.preselect ? ' is-sel' : ''));
+                const isPrimary = primary !== null && it === primary;
+                const li = el('li', 'ad-item' + (isPrimary ? ' is-sel is-exists' : ''));
                 li.append(el('span', 'ad-rank', String(i + 1)));
                 const nm = el('span', 'ad-name', it.label);
                 if (it.parent) { nm.append(el('small', '', it.parent)); }
+                if (isPrimary && !it.exact) {
+                    nm.append(el('small', 'ad-note', known !== '' ? 'nom dans l\'adresse : « ' + known + ' » (différent)' : 'aucun nom dans l\'adresse'));
+                }
                 li.append(nm);
+                if (isPrimary) { li.append(el('span', 'ad-badge is-ok', 'Déjà existant')); }
                 if (it.inside) {
                     li.append(el('span', 'ad-badge is-in', 'dans la zone'));
                 } else if (it.dist !== null && it.dist !== undefined) {
                     li.append(el('span', 'ad-km', 'à ' + fmtDist(it.dist) + ' de la zone'));
                 }
-                if (it.exact) { li.append(el('span', 'ad-badge', 'même nom')); }
-                const b = el('button', 'btn btn-xs ' + (it.id === s.preselect ? 'btn-primary' : 'btn-neutral'), it.id === s.preselect ? '✓ Confirmer' : 'Choisir');
+                if (it.exact) { li.append(el('span', 'ad-badge' + (isPrimary ? ' is-ok' : ''), 'même nom')); }
+                const b = el('button', 'btn btn-xs ' + (isPrimary ? 'btn-primary' : 'btn-neutral'), isPrimary ? '✓ Confirmer' : 'Choisir');
                 b.type = 'button';
                 b.addEventListener('click', () => choose(s, it));
                 li.append(b);
@@ -534,14 +567,28 @@ const CentralAdresse = {
                     ok.disabled = true;
                     try {
                         const data = await getJson(root.dataset.adNearbyUrl, {level: s.level.key, lat, lng, name, limit: 12, all: 1, exclude: root.dataset.adId || ''});
-                        const twin = (data.items || []).find(it => it.near && it.exact);
-                        if (twin) {
+                        const same = (data.items || []).filter(it => it.exact);
+                        const twin = same.find(it => it.near);
+                        const far = same.find(it => !it.near);
+                        this.log('Contrôle de doublon', {name, items: (data.items || []).map(it => ({label: it.label, exact: it.exact, near: it.near, inside: it.inside, dist: it.dist}))});
+                        if (twin || (far && s.ackName !== norm(name))) {
+                            const found = twin || far;
                             s.cPos.replaceChildren();
-                            s.cPos.append('« ' + twin.label + ' » existe déjà ici' + (twin.parent ? ' (' + twin.parent + ')' : '') + ' : utilisez-le plutôt que de créer un doublon. ');
+                            if (twin) {
+                                s.cPos.append('« ' + found.label + ' » existe déjà ici' + (found.parent ? ' (' + found.parent + ')' : '') + ' : utilisez-le plutôt que de créer un doublon. ');
+                            } else {
+                                s.cPos.append('Un « ' + found.label + ' » existe aussi' + (found.parent ? ' (' + found.parent + ')' : '') + (found.dist !== null && found.dist !== undefined ? ', à ' + fmtDist(found.dist) + ' de cette zone' : '') + '. Est-ce le même ? ');
+                            }
                             const use = el('button', 'btn btn-primary btn-xs', 'Choisir l\'existant');
                             use.type = 'button';
-                            use.addEventListener('click', () => { s.create.hidden = true; s.actions.hidden = false; choose(s, twin); });
+                            use.addEventListener('click', () => { s.create.hidden = true; s.actions.hidden = false; choose(s, found); });
                             s.cPos.append(use);
+                            if (!twin) {
+                                const force = el('button', 'btn btn-neutral btn-xs', 'Non, créer quand même');
+                                force.type = 'button';
+                                force.addEventListener('click', () => { s.ackName = norm(name); ok.click(); });
+                                s.cPos.append(' ', force);
+                            }
                             return;
                         }
                     } catch (error) {
@@ -553,7 +600,7 @@ const CentralAdresse = {
 
                 finish(s, {
                     level: s.level.key, mode: 'new', name,
-                    adresse: (d.adresse && norm(d.name) === norm(name)) ? d.adresse : name,
+                    adresse: (d.adresse && norm(s.draftName || d.name) === norm(name)) ? d.adresse : name,
                     lat, lng,
                     ville: (d.fields && d.fields.ville) || anc.ville || '',
                     pays: (d.fields && d.fields.pays) || anc.pays || '',
@@ -567,11 +614,16 @@ const CentralAdresse = {
 
         const setDraft = (s, c) => {
             s.draft = c;
-            s.cName.value = c.name || '';
+            // Nom : celui du niveau issu de l'adresse d'origine (ex. le quartier donné pour la rue) tant que la recherche est celle
+            // proposée automatiquement ; le lieu trouvé ne sert alors qu'à la position (son nom peut être celui d'un point voisin).
+            const known = (s.ctx.anc || {})[s.level.key];
+            const auto = known && s.cAddr && s.cAddr.value.trim() === hintFor(s);
+            s.draftName = auto ? known : (c.name || '');
+            s.cName.value = s.draftName;
             s.cPos.textContent = hasPoint(c) ? `Position : ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}` : '';
             // la nouvelle position apparaît sur la carte du tiroir (repère distinct)
             if (hasPoint(c)) {
-                s.pin = {lat: c.lat, lng: c.lng, label: c.name + ' (nouveau)'};
+                s.pin = {lat: c.lat, lng: c.lng, label: s.draftName + ' (nouveau)'};
                 s.ctx = Object.assign({}, s.ctx, {lat: s.ctx.lat, lng: s.ctx.lng});
                 drawMap(s);
             }
@@ -580,6 +632,9 @@ const CentralAdresse = {
         const openCreate = (s) => {
             s.actions.hidden = true;
             s.create.hidden = false;
+            // nom connu dès l'adresse d'origine : proposé tout de suite (même si la recherche ne donne rien)
+            const known = (s.ctx.anc || {})[s.level.key];
+            if (known && !s.cName.value) { s.cName.value = known; s.draftName = known; }
             if (s.level.locate && s.cAddr.value === '') {
                 s.cAddr.value = hintFor(s);
                 if (s.cAddr.value) { s.runCreateSearch(); } else { s.cAddr.focus(); }

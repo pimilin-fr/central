@@ -33,10 +33,8 @@
                 <twig:ux:icon name="streamline-flex:street-road-solid" />
             {% elseif 'quartier' in adresseType  %}
                 <twig:ux:icon name="simple-icons:git" />
-            {% elseif 'ville' in adresseType %}
+            {% elseif 'ville' in adresseType or 'agglo' in adresseType or 'métropole' in adresseType %}
                 <twig:ux:icon name="streamline:city-hall-remix" />
-            {% elseif 'agglo' in adresseType or 'métropole' in adresseType %}
-                <twig:ux:icon name="griddy-icons:city-filled" />
             {% elseif 'département' in adresseType %}
                 <twig:ux:icon name="mdi:house-group" />
             {% elseif 'région' in adresseType %}
@@ -60,10 +58,6 @@
             <div class="entity-head">
                 <h2 class="entity-title" title="{{ adresse.name }}">{{ adresse.name }}</h2>
                 <span class="entity-sub">{{ adresse.adresseType.name }}</span>
-                {# TEMPORAIRE (refonte des adresses) : repère les adresses non rattachées — à retirer ensuite #}
-                {% if adresse.adresseParent is null and 'planète' not in adresseType %}
-                    <span class="entity-sub" title="Cette adresse n'a pas de parent" style="color: var(--warning, #d98e04); font-weight: 700;">⚠ Sans parent</span>
-                {% endif %}
             </div>
 
             <div class="sep sep-inset">

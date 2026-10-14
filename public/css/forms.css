@@ -704,3 +704,12 @@ label.required::after,
 .ad-item.is-sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .ad-badge.is-in { color: var(--accent-strong, var(--accent)); font-weight: 600; }
 .ad-mk.is-sel span { background: var(--accent-strong, var(--accent)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+
+/* élément « à créer » présenté comme un existant dans la liste des propositions */
+.ad-item.is-virtual { border-style: dashed; border-color: var(--accent, #e67e22); background: color-mix(in srgb, var(--accent, #e67e22) 8%, transparent); }
+.ad-item.is-virtual.is-empty { border-color: var(--border-strong); background: transparent; color: var(--text-muted); }
+.ad-badge.is-new { color: var(--accent-strong, var(--accent, #e67e22)); }
+.ad-item.is-virtual.is-empty .ad-badge.is-new { color: var(--text-muted); }
+.ad-item.is-exists { border-color: var(--success, #2e9e5b); background: color-mix(in srgb, var(--success, #2e9e5b) 10%, transparent); }
+.ad-badge.is-ok { color: var(--success, #2e9e5b); font-weight: 800; }
+.ad-note { color: var(--text-muted); }
