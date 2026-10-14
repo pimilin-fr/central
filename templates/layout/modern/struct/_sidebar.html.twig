@@ -69,6 +69,12 @@
             <span class="sidebar-link-copy">Dépenses</span>
         </a>#}
 
+        <a href="{{ path('app_settings') }}"
+           class="sidebar-link {{ route starts with 'app_settings' ? 'is-active' : '' }}">
+            <span class="sidebar-link-icon"><twig:ux:icon name="lucide:settings" /></span>
+            <span class="sidebar-link-copy">Paramètres</span>
+        </a>
+
         {% if app.debug %}
         <a href="{{ path('app_styleguide') }}"
            class="sidebar-link {{ route starts with 'app_styleguide' ? 'is-active' : '' }}">

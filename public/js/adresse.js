@@ -11,18 +11,18 @@
  */
 const CentralAdresse = {
     LEVELS: [
-        {key: 'quartier', label: 'Quartier', locate: true},
-        {key: 'ville', label: 'Ville', locate: true},
-        {key: 'departement', label: 'Département', locate: true},
-        {key: 'region', label: 'Région', locate: true},
-        {key: 'pays', label: 'Pays', locate: true},
-        {key: 'zone', label: 'Zone géographique', locate: false},
-        {key: 'planete', label: 'Planète', locate: false}
+        {key: 'quartier', label: 'Quartier', locate: true, aliases: ['quartier', 'secteur']},
+        {key: 'ville', label: 'Ville', locate: true, aliases: ['ville', 'commune']},
+        {key: 'departement', label: 'Département', locate: true, aliases: ['departement', 'dept']},
+        {key: 'region', label: 'Région', locate: true, aliases: ['region']},
+        {key: 'pays', label: 'Pays', locate: true, aliases: ['pays', 'country']},
+        {key: 'zone', label: 'Zone géographique', locate: false, aliases: ['zone geographique', 'zone']},
+        {key: 'planete', label: 'Planète', locate: false, aliases: ['planete', 'terre']}
     ],
 
     config: {
         debug: true,
-        version: 'v2.1.0',
+        version: 'v2.3.0',
         nearbyLimit: 5,
         appName: 'Central-ModuleAdresse'
     },
@@ -213,13 +213,29 @@ const CentralAdresse = {
             if (s.el) { s.el.remove(); }
         };
 
-        /** (Re)démarre la chaîne depuis la rue : ctx = position + noms des niveaux parents connus. */
+        /**
+         * Indice du premier niveau parent à proposer : celui juste au-dessus du type de l'adresse en cours
+         * (rue → quartier ; quartier → ville…). Type inconnu (nom personnalisé) : on part du quartier.
+         */
+        const firstParentIndex = () => {
+            const opt = f.type && f.type.selectedOptions ? f.type.selectedOptions[0] : null;
+            const n = opt ? norm(opt.textContent) : '';
+            const own = LEVELS.findIndex(l => l.aliases.includes(n));
+            return own + 1; // rue ou inconnu : own = -1 → 0
+        };
+
+        /** (Re)démarre la chaîne au niveau parent de l'adresse en cours : ctx = position + noms des niveaux parents connus. */
         const startChain = (ctx, pinLabel) => {
             clearChain();
-            if (chainHint) {
-                chainHint.textContent = 'Choisissez le quartier sur la carte (ou créez-le) : la chaîne remonte ensuite niveau par niveau.';
+            const first = firstParentIndex();
+            if (first >= LEVELS.length) {
+                if (chainHint) { chainHint.textContent = 'Ce niveau est le plus haut de la hiérarchie : il n\'a pas de rattachement.'; }
+                return;
             }
-            openStep(0, ctx, hasPoint(ctx) ? {lat: ctx.lat, lng: ctx.lng, label: pinLabel} : null);
+            if (chainHint) {
+                chainHint.textContent = 'Choisissez le niveau « ' + LEVELS[first].label.toLowerCase() + ' » sur la carte (ou créez-le) : la chaîne remonte ensuite niveau par niveau.';
+            }
+            openStep(first, ctx, hasPoint(ctx) ? {lat: ctx.lat, lng: ctx.lng, label: pinLabel} : null);
         };
 
         const openStep = (li, ctx, pin) => {
@@ -327,7 +343,8 @@ const CentralAdresse = {
                 const data = await getJson(root.dataset.adNearbyUrl, {
                     level: s.level.key, lat: s.ctx.lat, lng: s.ctx.lng,
                     name: (s.ctx.anc || {})[s.level.key] || '',
-                    limit: s.all ? 12 : this.config.nearbyLimit, all: s.all ? 1 : ''
+                    exclude: root.dataset.adId || '',
+                    all: s.all ? 1 : ''
                 });
                 s.items = data.items || [];
                 s.preselect = data.preselect || null;
@@ -581,6 +598,11 @@ const CentralAdresse = {
                 geoFlag.value = '';
             }
         });
+
+        // changer le type de l'adresse change le niveau parent attendu : on repart de zéro
+        if (f.type) {
+            f.type.addEventListener('change', () => { if (steps.length) { clearChain(); if (chainHint) { chainHint.textContent = 'Le type a changé : relancez la proposition de rattachement.'; } } });
+        }
 
         // proposition de rattachement à la demande (modification d'une adresse existante, ou champs saisis à la main)
         root.querySelector('[data-ad-parents]').addEventListener('click', () => {

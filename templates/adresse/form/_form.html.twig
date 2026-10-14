@@ -15,7 +15,8 @@
 <div class="form-layout is-single" data-ad-assist
      data-ad-locate-url="{{ path('json_adresse_assist_locate') }}"
      data-ad-nearby-url="{{ path('json_adresse_assist_nearby') }}"
-     data-ad-edit="{{ isEdit ? '1' : '0' }}">
+     data-ad-edit="{{ isEdit ? '1' : '0' }}"
+     data-ad-id="{{ isEdit ? adresse.id : '' }}">
 
     <div class="form-timeline">
 

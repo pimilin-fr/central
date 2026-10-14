@@ -118,6 +118,7 @@ class AdresseFormType extends AbstractType {
                 ])
                 ->add('ville', TextType::class, [
                     'label' => 'Ville',
+                    'required' => false,
                 ])
                 ->add('cedex', TextType::class, [
                     'label' => 'Cedex',

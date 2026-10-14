@@ -56,7 +56,7 @@ class Adresse implements DemoEntityInterface {
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $codePostal = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $ville = null;
 
     #[ORM\Column(length: 10, nullable: true)]

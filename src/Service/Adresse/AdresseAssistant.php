@@ -6,6 +6,7 @@ use App\Entity\Adresse;
 use App\Entity\AdresseType;
 use App\Repository\AdresseRepository;
 use App\Service\Geocoder\Geocoder;
+use App\Service\Settings\AppSettings;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -24,6 +25,7 @@ final class AdresseAssistant {
             private readonly AdresseParser $parser,
             private readonly AdresseRepository $adresses,
             private readonly EntityManagerInterface $em,
+            private readonly AppSettings $settings,
     ) {
     }
 
@@ -62,12 +64,7 @@ final class AdresseAssistant {
         return $out;
     }
 
-    /** Tolérance de base (m) : au-delà, une zone n'est proposée que sur demande ; elle croît avec la taille de la zone. */
-    private const TOLERANCE = ['quartier' => 800, 'ville' => 5000, 'departement' => 30000, 'region' => 100000, 'pays' => 300000];
-
     /** Marge ajoutée autour des points d'une zone (m) : même règle que la carte des adresses (maps.js). */
-    private const MARGIN_MANY = 100.0;
-    private const MARGIN_FEW = 150.0;
 
     /**
      * Adresses existantes d'un niveau proches d'une position, vues comme des ZONES.
@@ -81,7 +78,8 @@ final class AdresseAssistant {
      *
      * @return array<string,mixed>
      */
-    public function nearby(AdresseLevel $level, ?float $lat, ?float $lng, string $name = '', int $limit = 5, bool $all = false): array {
+    public function nearby(AdresseLevel $level, ?float $lat, ?float $lng, string $name = '', ?int $limit = null, bool $all = false, ?int $excludeId = null): array {
+        $limit ??= $this->settings->get($all ? 'adresse.limit_all' : 'adresse.limit');
         $type = $this->findType($level);
         $norm = AdresseLevel::normalize($name);
         $hasPos = $lat !== null && $lng !== null;
@@ -93,9 +91,28 @@ final class AdresseAssistant {
             foreach ($everything as $a) {
                 $children[$a->getAdresseParent()?->getId() ?? 0][] = $a;
             }
+            // adresse en cours de modification : elle et tout ce qui est en dessous ne peuvent ni être son parent
+            // (cycle) ni servir à dessiner la zone d'un candidat (sa position est peut-être justement à corriger)
+            $excluded = [];
+            if ($excludeId !== null) {
+                $stack = [$excludeId];
+                while ($stack !== []) {
+                    $id = array_pop($stack);
+                    if (isset($excluded[$id])) {
+                        continue;
+                    }
+                    $excluded[$id] = true;
+                    foreach ($children[$id] ?? [] as $c) {
+                        $stack[] = $c->getId();
+                    }
+                }
+                foreach ($children as $pid => $list) {
+                    $children[$pid] = array_values(array_filter($list, static fn($c) => !isset($excluded[$c->getId()])));
+                }
+            }
 
             foreach ($everything as $a) {
-                if ($a->getAdresseType()->getId() !== $type->getId()) {
+                if ($a->getAdresseType()->getId() !== $type->getId() || isset($excluded[$a->getId()])) {
                     continue;
                 }
                 $points = $this->zonePoints($a, $children);
@@ -127,9 +144,10 @@ final class AdresseAssistant {
         usort($rows, static fn($x, $y) => [!$x['inside'], $x['inside'] ? $x['diameter'] : 0, $x['dist'] ?? 1e12, !$x['exact'], $x['label']]
                 <=> [!$y['inside'], $y['inside'] ? $y['diameter'] : 0, $y['dist'] ?? 1e12, !$y['exact'], $y['label']]);
 
-        $tolBase = self::TOLERANCE[$level->value] ?? 1e12;
+        $tolBase = in_array($level->value, ['quartier', 'ville', 'departement', 'region', 'pays'], true) ? 1000.0 * $this->settings->get('adresse.tolerance.' . $level->value) : 1e12; // réglé en km
+        $ratio = $this->settings->get('adresse.tolerance.ratio') / 100;
         $relevant = array_values(array_filter($rows, static fn($r) => $r['inside'] || $r['exact'] || $r['dist'] === null
-                || $r['dist'] <= max($tolBase, 0.5 * $r['diameter'])));
+                || $r['dist'] <= max($tolBase, $ratio * $r['diameter'])));
         $pool = $all ? $rows : $relevant;
         $items = array_slice($pool, 0, max(1, $limit));
         $preselect = ($items !== [] && $items[0]['inside']) ? $items[0]['id'] : null;
@@ -176,7 +194,7 @@ final class AdresseAssistant {
 
         $hull = self::hull(array_map($proj, $points));
         $n = count($hull);
-        $margin = $n >= 3 ? self::MARGIN_MANY : self::MARGIN_FEW;
+        $margin = (float) $this->settings->get($n >= 3 ? 'adresse.margin.many' : 'adresse.margin.few');
         $me = [0.0, 0.0];
 
         if ($n >= 3 && self::inPolygon($me, $hull)) {
@@ -306,7 +324,7 @@ final class AdresseAssistant {
             $level = AdresseLevel::from($step['level']);
             if (($step['mode'] ?? '') === 'existing') {
                 $existing = $this->adresses->find((int) ($step['id'] ?? 0));
-                if ($existing instanceof Adresse && !$existing->isDeleted()) {
+                if ($existing instanceof Adresse && !$existing->isDeleted() && !$this->isSelfOrDescendant($existing, $street)) {
                     $picked[] = ['level' => $level, 'entity' => $existing];
                     break;
                 }
@@ -352,6 +370,20 @@ final class AdresseAssistant {
     }
 
     /* ------------------------------------------------------------------ */
+
+    /** Vrai si $candidate est $street ou l'un de ses descendants (un parent ne peut pas être sous l'adresse elle-même). */
+    private function isSelfOrDescendant(Adresse $candidate, Adresse $street): bool {
+        if ($street->getId() === null) {
+            return false;
+        }
+        for ($n = 0, $cur = $candidate; $cur !== null && $n < 50; $n++, $cur = $cur->getAdresseParent()) {
+            if ($cur->getId() === $street->getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private function findType(AdresseLevel $level): ?AdresseType {
         foreach ($this->em->getRepository(AdresseType::class)->findAll() as $t) {

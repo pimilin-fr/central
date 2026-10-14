@@ -164,7 +164,7 @@ final class AdresseController extends AbstractController {
         $lat = is_numeric($q->get('lat')) ? (float) $q->get('lat') : null;
         $lng = is_numeric($q->get('lng')) ? (float) $q->get('lng') : null;
 
-        return $this->json(['ok' => true] + $assistant->nearby($level, $lat, $lng, (string) $q->get('name', ''), min(12, max(1, (int) $q->get('limit', 5))), $q->getBoolean('all')));
+        return $this->json(['ok' => true] + $assistant->nearby($level, $lat, $lng, (string) $q->get('name', ''), null, $q->getBoolean('all'), $q->getInt('exclude') ?: null));
     }
 
     /** « 48.8566, 2.3522 » → ['lat' => 48.8566, 'lng' => 2.3522 ], sinon null. */
