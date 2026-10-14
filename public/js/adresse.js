@@ -13,16 +13,17 @@ const CentralAdresse = {
     LEVELS: [
         {key: 'quartier', label: 'Quartier', locate: true, aliases: ['quartier', 'secteur']},
         {key: 'ville', label: 'Ville', locate: true, aliases: ['ville', 'commune']},
+        {key: 'agglomeration', label: 'Agglomération', locate: true, aliases: ['agglomeration', 'agglo', 'metropole', 'communaute d\'agglomeration', 'communaute urbaine']},
         {key: 'departement', label: 'Département', locate: true, aliases: ['departement', 'dept']},
         {key: 'region', label: 'Région', locate: true, aliases: ['region']},
         {key: 'pays', label: 'Pays', locate: true, aliases: ['pays', 'country']},
-        {key: 'zone', label: 'Zone géographique', locate: false, aliases: ['zone geographique', 'zone']},
+        {key: 'zone', label: 'Zone géographique', locate: false, aliases: ['zone geographique', 'zone geo', 'zone']},
         {key: 'planete', label: 'Planète', locate: false, aliases: ['planete', 'terre']}
     ],
 
     config: {
         debug: true,
-        version: 'v2.3.0',
+        version: 'v2.5.0',
         nearbyLimit: 5,
         appName: 'Central-ModuleAdresse'
     },
@@ -317,7 +318,7 @@ const CentralAdresse = {
             s.mapDiv = el('div', 'ad-map');
             s.list = el('ol', 'ad-list');
             s.actions = el('div', 'ad-actions');
-            const bCreate = el('button', 'btn btn-primary btn-sm', '➕ Créer ' + (key === 'quartier' || key === 'departement' || key === 'pays' ? 'un nouveau ' : (key === 'planete' ? 'une nouvelle ' : 'une nouvelle ')) + lower);
+            const bCreate = el('button', 'btn btn-primary btn-sm', '➕ Créer ' + (key === 'quartier' || key === 'departement' || key === 'pays' ? 'un nouveau ' : 'une nouvelle ') + lower);
             bCreate.type = 'button';
             bCreate.addEventListener('click', () => openCreate(s));
             const bSkip = el('button', 'btn btn-ghost btn-sm', 'Passer ce niveau');
@@ -465,7 +466,7 @@ const CentralAdresse = {
 
         const hintFor = (s) => {
             const anc = s.ctx.anc || {};
-            const keys = ['quartier', 'ville', 'departement', 'region', 'pays'];
+            const keys = ['quartier', 'ville', 'agglomeration', 'departement', 'region', 'pays'];
             const name = anc[s.level.key];
             if (!name) { return ''; }
             const above = keys.slice(keys.indexOf(s.level.key) + 1).map(k => anc[k]).find(Boolean);
@@ -482,7 +483,7 @@ const CentralAdresse = {
                 const lab = el('label', 'modern-form-label', 'Adresse du ' + lower + ' (comme une adresse)');
                 s.cAddr = el('input', 'modern-form-control');
                 s.cAddr.type = 'text';
-                s.cAddr.placeholder = 'Ex. ' + (s.level.key === 'pays' ? 'France' : 'Nom, ville, pays');
+                s.cAddr.placeholder = 'Ex. ' + (s.level.key === 'pays' ? 'France' : (s.level.key === 'agglomeration' ? 'Métropole du Grand Nancy, France' : 'Nom, ville, pays'));
                 s.cAddr.autocomplete = 'off';
                 const row = el('div', 'ad-actions');
                 const bs = el('button', 'btn btn-primary btn-sm', 'Rechercher');
@@ -520,16 +521,40 @@ const CentralAdresse = {
             const cancel = el('button', 'btn btn-ghost btn-sm', 'Annuler');
             cancel.type = 'button';
             row2.append(ok, cancel);
-            ok.addEventListener('click', () => {
+            ok.addEventListener('click', async () => {
                 const name = s.cName.value.trim();
                 if (!name) { s.cName.focus(); s.cPos.textContent = 'Le nom est obligatoire.'; return; }
                 const d = s.draft || {};
                 const anc = s.ctx.anc || {};
+                const lat = hasPoint(d) ? d.lat : (hasPoint(s.ctx) ? s.ctx.lat : null);
+                const lng = hasPoint(d) ? d.lng : (hasPoint(s.ctx) ? s.ctx.lng : null);
+
+                // doublon : même nom, même niveau, au même endroit → on propose l'existant (un même nom plus loin reste permis)
+                if (lat !== null && lng !== null) {
+                    ok.disabled = true;
+                    try {
+                        const data = await getJson(root.dataset.adNearbyUrl, {level: s.level.key, lat, lng, name, limit: 12, all: 1, exclude: root.dataset.adId || ''});
+                        const twin = (data.items || []).find(it => it.near && it.exact);
+                        if (twin) {
+                            s.cPos.replaceChildren();
+                            s.cPos.append('« ' + twin.label + ' » existe déjà ici' + (twin.parent ? ' (' + twin.parent + ')' : '') + ' : utilisez-le plutôt que de créer un doublon. ');
+                            const use = el('button', 'btn btn-primary btn-xs', 'Choisir l\'existant');
+                            use.type = 'button';
+                            use.addEventListener('click', () => { s.create.hidden = true; s.actions.hidden = false; choose(s, twin); });
+                            s.cPos.append(use);
+                            return;
+                        }
+                    } catch (error) {
+                        this.log('Contrôle de doublon indisponible (le serveur évitera le doublon)', error);
+                    } finally {
+                        ok.disabled = false;
+                    }
+                }
+
                 finish(s, {
                     level: s.level.key, mode: 'new', name,
                     adresse: (d.adresse && norm(d.name) === norm(name)) ? d.adresse : name,
-                    lat: hasPoint(d) ? d.lat : (hasPoint(s.ctx) ? s.ctx.lat : null),
-                    lng: hasPoint(d) ? d.lng : (hasPoint(s.ctx) ? s.ctx.lng : null),
+                    lat, lng,
                     ville: (d.fields && d.fields.ville) || anc.ville || '',
                     pays: (d.fields && d.fields.pays) || anc.pays || '',
                     anc: d.ancestors || null

@@ -19,6 +19,11 @@
                         <span class="toolbar-dot"></span>
                         <span><strong id="adresses-visible-count">{{ adresses|length }}</strong> adresses</span>
                     </div>
+                    {# TEMPORAIRE (refonte des adresses) : nombre d'adresses sans parent — à retirer ensuite #}
+                    {% set orphelines = adresses|filter(a => a.adresseParent is null and 'planète' not in a.adresseType.name|lower) %}
+                    <div class="toolbar-info" title="Adresses sans parent, y compris supprimées (hors Planète)">
+                        <span style="color: var(--warning, #d98e04);">⚠ <strong>{{ orphelines|length }}</strong> sans parent</span>
+                    </div>
                 </div>
             </div>
 

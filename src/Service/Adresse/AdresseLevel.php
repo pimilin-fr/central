@@ -3,7 +3,7 @@
 namespace App\Service\Adresse;
 
 /**
- * Hiérarchie des adresses : Rue < Quartier < Ville < Département < Région < Pays < Zone géographique < Planète.
+ * Hiérarchie des adresses : Rue < Quartier < Ville < Agglomération (optionnelle) < Département < Région < Pays < Zone géographique < Planète.
  *
  * Les niveaux sont reliés aux AdresseType EXISTANTS par leur nom (insensible à la casse et aux accents,
  * avec quelques synonymes) : aucune colonne n'est ajoutée en base.
@@ -13,6 +13,7 @@ enum AdresseLevel: string {
     case Rue = 'rue';
     case Quartier = 'quartier';
     case Ville = 'ville';
+    case Agglomeration = 'agglomeration';
     case Departement = 'departement';
     case Region = 'region';
     case Pays = 'pays';
@@ -21,7 +22,7 @@ enum AdresseLevel: string {
 
     /** Niveaux parents proposés / créés par l'assistant, du plus proche de la rue au plus haut. */
     public static function chain(): array {
-        return [self::Quartier, self::Ville, self::Departement, self::Region, self::Pays, self::Zone, self::Planete];
+        return [self::Quartier, self::Ville, self::Agglomeration, self::Departement, self::Region, self::Pays, self::Zone, self::Planete];
     }
 
     /** Nom d'AdresseType créé si le niveau n'existe pas encore en base. */
@@ -30,6 +31,7 @@ enum AdresseLevel: string {
             self::Rue => 'Rue',
             self::Quartier => 'Quartier',
             self::Ville => 'Ville',
+            self::Agglomeration => 'Agglomération',
             self::Departement => 'Département',
             self::Region => 'Région',
             self::Pays => 'Pays',
@@ -44,12 +46,25 @@ enum AdresseLevel: string {
             self::Rue => ['rue', 'voie'],
             self::Quartier => ['quartier', 'secteur'],
             self::Ville => ['ville', 'commune'],
+            self::Agglomeration => ['agglomeration', 'agglo', 'metropole', 'communaute d\'agglomeration', 'communaute urbaine'],
             self::Departement => ['departement', 'dept'],
             self::Region => ['region'],
             self::Pays => ['pays', 'country'],
-            self::Zone => ['zone geographique', 'zone'],
+            self::Zone => ['zone geographique', 'zone geo', 'zone'],
             self::Planete => ['planete', 'terre'],
         };
+    }
+
+    /** Rang dans la hiérarchie (Rue = 0 … Planète = 8). Type inconnu (nom personnalisé) : après tous les autres. */
+    public static function rankOfTypeName(?string $name): int {
+        $level = self::fromTypeName($name);
+
+        return $level === null ? 99 : array_search($level, self::cases(), true);
+    }
+
+    /** Niveaux « grossiers » : leur propre point (centre fourni par OpenStreetMap) ne sert pas à dessiner leur zone. */
+    public function isCoarse(): bool {
+        return in_array($this, [self::Departement, self::Region, self::Pays, self::Zone, self::Planete], true);
     }
 
     /** Rayon (km) dans lequel une adresse existante de ce niveau est proposée par proximité. */

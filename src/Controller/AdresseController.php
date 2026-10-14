@@ -24,6 +24,12 @@ final class AdresseController extends AbstractController {
     #[Route(name: 'app_adresse_index', methods: ['GET'])]
     public function index(AdresseRepository $adresseRepository): Response {
         $adresses = $adresseRepository->findAllOrdered();
+        // onglets par type dans l'ordre de la hiérarchie (Rue, Quartier, Ville… Planète) ; tri stable : l'ordre par nom est conservé
+        usort($adresses, static fn(Adresse $x, Adresse $y) => [
+            AdresseLevel::rankOfTypeName($x->getAdresseType()->getName()), $x->getAdresseType()->getName() ?? '',
+        ] <=> [
+            AdresseLevel::rankOfTypeName($y->getAdresseType()->getName()), $y->getAdresseType()->getName() ?? '',
+        ]);
 
         $adressesParType = [];
 
@@ -110,6 +116,9 @@ final class AdresseController extends AbstractController {
                 $created = $assistant->applyChain($adresse, $chain, $adresse->getLatitude(), $adresse->getLongitude());
                 if ($created > 0) {
                     $this->addFlash('success', $created . ' adresse(s) parente(s) créée(s).');
+                }
+                if ($assistant->reused !== []) {
+                    $this->addFlash('info', 'Déjà existant(s), réutilisé(s) sans doublon : ' . implode(', ', $assistant->reused) . '.');
                 }
             }
 

@@ -50,7 +50,7 @@ class Adresse implements DemoEntityInterface {
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $typeVoie = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $nomVoie = null;
 
     #[ORM\Column(length: 10, nullable: true)]

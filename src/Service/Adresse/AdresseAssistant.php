@@ -134,8 +134,8 @@ final class AdresseAssistant {
                 ];
                 if ($hasPos && $points !== []) {
                     $row = $this->measure($row, $points, $lat, $lng);
-                } elseif ($hasPos && !$exact) {
-                    continue; // aucune position connue et nom différent : rien à comparer
+                } elseif ($hasPos && !$exact && !in_array($level, [AdresseLevel::Zone, AdresseLevel::Planete], true)) {
+                    continue; // aucune position connue et nom différent : rien à comparer (zone/planète : toujours proposées, pas de géométrie)
                 }
                 $rows[] = $row;
             }
@@ -144,10 +144,13 @@ final class AdresseAssistant {
         usort($rows, static fn($x, $y) => [!$x['inside'], $x['inside'] ? $x['diameter'] : 0, $x['dist'] ?? 1e12, !$x['exact'], $x['label']]
                 <=> [!$y['inside'], $y['inside'] ? $y['diameter'] : 0, $y['dist'] ?? 1e12, !$y['exact'], $y['label']]);
 
-        $tolBase = in_array($level->value, ['quartier', 'ville', 'departement', 'region', 'pays'], true) ? 1000.0 * $this->settings->get('adresse.tolerance.' . $level->value) : 1e12; // réglé en km
+        $tolBase = in_array($level->value, ['quartier', 'ville', 'agglomeration', 'departement', 'region', 'pays'], true) ? 1000.0 * $this->settings->get('adresse.tolerance.' . $level->value) : 1e12; // réglé en km
         $ratio = $this->settings->get('adresse.tolerance.ratio') / 100;
-        $relevant = array_values(array_filter($rows, static fn($r) => $r['inside'] || $r['exact'] || $r['dist'] === null
-                || $r['dist'] <= max($tolBase, $ratio * $r['diameter'])));
+        // « near » : dans la zone, ou assez proche pour être considérée comme le même endroit (même règle que la pertinence)
+        foreach ($rows as $i => $r) {
+            $rows[$i]['near'] = $r['inside'] || $r['dist'] === null || $r['dist'] <= max($tolBase, $ratio * $r['diameter']);
+        }
+        $relevant = array_values(array_filter($rows, static fn($r) => $r['near'] || $r['exact']));
         $pool = $all ? $rows : $relevant;
         $items = array_slice($pool, 0, max(1, $limit));
         $preselect = ($items !== [] && $items[0]['inside']) ? $items[0]['id'] : null;
@@ -161,7 +164,13 @@ final class AdresseAssistant {
         ];
     }
 
-    /** Points qui forment la zone d'une adresse : la sienne + celles de tous ses descendants géolocalisés. @return list<array{0:float,1:float}> */
+    /**
+     * Points qui forment la zone d'une adresse : ceux des adresses situées en dessous d'elle (et le sien, sauf pour les
+     * niveaux grossiers : le « centre » d'un département, d'une région ou d'un pays fourni par OpenStreetMap n'est pas
+     * une adresse réelle et étirerait la zone). Sans aucun point en dessous, on retombe sur son propre point.
+     *
+     * @return list<array{0:float,1:float}>
+     */
     private function zonePoints(Adresse $root, array $children): array {
         $points = [];
         $stack = [$root];
@@ -172,12 +181,16 @@ final class AdresseAssistant {
                 continue;
             }
             $seen[$a->getId()] = true;
-            if ($a->isGeolocalisee()) {
+            $level = AdresseLevel::fromTypeName($a->getAdresseType()->getName());
+            if ($a->isGeolocalisee() && !($level?->isCoarse() ?? false)) {
                 $points[] = [(float) $a->getLatitude(), (float) $a->getLongitude()];
             }
             foreach ($children[$a->getId()] ?? [] as $c) {
                 $stack[] = $c;
             }
+        }
+        if ($points === [] && $root->isGeolocalisee()) {
+            $points[] = [(float) $root->getLatitude(), (float) $root->getLongitude()];
         }
 
         return $points;
@@ -312,7 +325,11 @@ final class AdresseAssistant {
      * Un niveau « existant » termine la chaîne (ses propres parents sont déjà en base).
      * Retourne le nombre d'adresses créées.
      */
+    /** Noms de niveaux déjà existants réutilisés au lieu d'être recréés (doublon évité) lors du dernier applyChain. @var list<string> */
+    public array $reused = [];
+
     public function applyChain(Adresse $street, array $steps, ?float $lat, ?float $lng): int {
+        $this->reused = [];
         $valid = array_map(static fn(AdresseLevel $l) => $l->value, AdresseLevel::chain());
         $picked = [];
         $seen = [];
@@ -350,6 +367,14 @@ final class AdresseAssistant {
             $ville = trim((string) ($s['ville'] ?? ''));
             $pays = trim((string) ($s['pays'] ?? '')) ?: (string) $street->getPays();
 
+            // même nom, même niveau, même parent : on réutilise l'existant (deux villes différentes peuvent, elles, avoir un quartier de même nom)
+            $twin = $this->findTwin($level, $name, $parent);
+            if ($twin !== null) {
+                $parent = $twin;
+                $this->reused[] = $name;
+                continue;
+            }
+
             $a = new Adresse();
             $a->setName($name)
                     ->setAdresseType($this->typeFor($level))
@@ -370,6 +395,22 @@ final class AdresseAssistant {
     }
 
     /* ------------------------------------------------------------------ */
+
+    /** Adresse active du même niveau, de même nom (insensible casse/accents) et de même parent, s'il y en a une. */
+    private function findTwin(AdresseLevel $level, string $name, ?Adresse $parent): ?Adresse {
+        $type = $this->findType($level);
+        if ($type === null || ($parent !== null && $parent->getId() === null)) {
+            return null; // type encore inexistant, ou parent tout juste créé (pas encore en base) : aucun jumeau possible
+        }
+        $norm = AdresseLevel::normalize($name);
+        foreach ($this->adresses->findBy(['adresseType' => $type, 'adresseParent' => $parent, 'deletedAt' => null]) as $a) {
+            if (AdresseLevel::normalize($a->getName()) === $norm) {
+                return $a;
+            }
+        }
+
+        return null;
+    }
 
     /** Vrai si $candidate est $street ou l'un de ses descendants (un parent ne peut pas être sous l'adresse elle-même). */
     private function isSelfOrDescendant(Adresse $candidate, Adresse $street): bool {

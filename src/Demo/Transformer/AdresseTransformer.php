@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class AdresseTransformer extends AbstractDemoTransformer {
 
     /** Types d'adresse « grossiers » : jamais anonymisés (une ville n'identifie personne). */
-    private const COARSE_TYPES = ['ville', 'quartier', 'département', 'region', 'région', 'pays', 'zone', 'planète'];
+    private const COARSE_TYPES = ['ville', 'quartier', 'agglomération', 'agglomeration', 'département', 'region', 'région', 'pays', 'zone', 'planète'];
 
     /** Amplitude max du décalage GPS, en degrés (0.006° ≈ 600 m). */
     private const GPS_JITTER = 0.006;
