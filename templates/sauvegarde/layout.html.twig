@@ -1,0 +1,72 @@
+{#
+    Mise en page de l'application « Sauvegardes » — AUTONOME : elle n'étend pas modern.html.twig.
+    Ni thèmes, ni menu latéral, ni profil/environnement Central, ni Leaflet, ni scripts Central.
+    Seuls chargés : ui-kit.css (boutons du composant _btns), ops.css (tout le reste) et jobs.js (relance + rafraîchissement).
+    Blocs : title, body. Variable optionnelle : crumb (libellé de la page courante).
+#}
+{% set summary = app_jobs_summary() %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="color-scheme" content="dark"/>
+    <title>Sauvegardes - {% block title %}Tâches{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><rect width=%22128%22 height=%22128%22 rx=%2214%22 fill=%22%230a0e13%22/><text x=%2216%22 y=%2292%22 font-size=%2272%22 font-family=%22monospace%22 font-weight=%22bold%22 fill=%22%2335e08c%22>&gt;_</text></svg>"/>
+    <link rel="stylesheet" href="{{ asset('css/ui-kit.css') ~ '?v=6' }}"/>
+    <link rel="stylesheet" href="{{ asset('css/ops.css') ~ '?v=3' }}"/>
+</head>
+<body class="ops">
+    <header class="ops-bar">
+        <a class="ops-brand" href="{{ path('app_jobs_index') }}">
+            <twig:ux:icon name="mdi:backup-restore" />
+            <span>SAUVEGARDES</span><small>pi@central</small>
+        </a>
+        <nav class="ops-nav" aria-label="Navigation">
+            <a href="{{ path('app_jobs_index') }}" class="{{ crumb is defined ? '' : 'is-active' }}">Tâches</a>
+            {% if crumb is defined %}<span class="ops-sep">/</span><span class="ops-crumb">{{ crumb }}</span>{% endif %}
+        </nav>
+        <div class="ops-bar-right">
+            <span class="ops-led is-{{ summary.level }}" title="{{ summary.label }}"><i></i>{{ summary.label }}</span>
+            <div class="ops-apps" data-ops-apps>
+                <button type="button" class="ops-apps-btn" data-ops-apps-toggle aria-expanded="false" aria-haspopup="true" title="Changer d'application">
+                    <twig:ux:icon name="lucide:layout-grid" /><span>APPS</span><twig:ux:icon name="lucide:chevron-down" class="ops-apps-chevron" />
+                </button>
+                <div class="ops-apps-menu" role="menu" aria-hidden="true">
+                    <div class="ops-apps-title">// applications</div>
+                    <a class="ops-app" href="{{ path('app_home') }}" role="menuitem">
+                        <twig:ux:icon name="lucide:layout-grid" /><span><b>Accueil</b><small>toutes les applications</small></span>
+                    </a>
+                    <a class="ops-app" href="{{ path('app_tiers_index') }}" role="menuitem">
+                        <twig:ux:icon name="streamline:bank-solid" /><span><b>Central</b><small>gestion financière</small></span>
+                    </a>
+                    <a class="ops-app" href="/milecube/" role="menuitem">
+                        <twig:ux:icon name="grommet-icons:cubes" /><span><b>milecube</b><small>proto · jeux</small></span>
+                    </a>
+                    <a class="ops-app is-active" href="{{ path('app_jobs_index') }}" role="menuitem" aria-current="page">
+                        <twig:ux:icon name="mdi:backup-restore" /><span><b>Sauvegardes</b><small>{{ summary.label }}</small></span><i class="ops-app-on" aria-hidden="true"></i>
+                    </a>
+                    <span class="ops-app is-off" aria-disabled="true">
+                        <twig:ux:icon name="mdi:home-automation" /><span><b>Dominique</b><small>domotique</small></span><em>OFF</em>
+                    </span>
+                    <span class="ops-app is-off" aria-disabled="true">
+                        <twig:ux:icon name="mdi:database-outline" /><span><b>Base</b><small>phpMyAdmin</small></span><em>OFF</em>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="ops-main">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="ops-flash is-{{ type in ['error', 'danger'] ? 'error' : (type == 'success' ? 'success' : 'warning') }}" role="status">&gt; {{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        {% block body %}{% endblock %}
+    </main>
+
+    <script src="{{ asset('js/jobs.js') ~ '?v=2' }}" defer></script>
+</body>
+</html>

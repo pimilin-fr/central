@@ -1,5 +1,31 @@
 /* Sauvegardes : confirmation de relance + rafraîchissement automatique tant qu'une tâche tourne ou qu'une relance est en attente. */
 document.addEventListener('DOMContentLoaded', () => {
+    // Sélecteur d'applications
+    const apps = document.querySelector('[data-ops-apps]');
+    if (apps) {
+        const toggle = apps.querySelector('[data-ops-apps-toggle]');
+        const menu = apps.querySelector('.ops-apps-menu');
+        const setOpen = (open) => {
+            apps.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+        };
+        toggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+            setOpen(!apps.classList.contains('is-open'));
+        });
+        document.addEventListener('click', (event) => {
+            if (!apps.contains(event.target)) {
+                setOpen(false);
+            }
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                setOpen(false);
+            }
+        });
+    }
+
     document.querySelectorAll('form[data-jobs-confirm]').forEach((form) => {
         form.addEventListener('submit', (event) => {
             if (!window.confirm(form.dataset.jobsConfirm)) {

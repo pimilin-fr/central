@@ -25,8 +25,15 @@ final class JobsController extends AbstractController {
 
     #[Route('', name: 'app_jobs_index', methods: ['GET'])]
     public function index(): Response {
+        $items = $this->store->evaluateAll();
+        $histories = [];
+        foreach ($items as $it) {
+            $histories[$it['id']] = $this->store->history($it['id'], 30);
+        }
+
         return $this->render('sauvegarde/index.html.twig', [
-            'items' => $this->store->evaluateAll(),
+            'items' => $items,
+            'histories' => $histories,
             'disk' => $this->store->disk(),
             'summary' => $this->store->summary(),
         ]);

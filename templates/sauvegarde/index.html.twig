@@ -1,89 +1,96 @@
-{% extends 'modern.html.twig' %}
+{% extends 'sauvegarde/layout.html.twig' %}
 
 {% block title %}Sauvegardes{% endblock %}
 
 {% block body %}
-    <div class="page-container jobs-page" data-jobs-page data-jobs-state-url="{{ path('app_jobs_state') }}"
-         data-jobs-busy="{{ items|filter(i => i.status == 'running' or i.pending)|length > 0 ? '1' : '0' }}">
-        <div class="page-heading">
-            <div class="page-heading-copy">
-                <h1 class="page-title">Sauvegardes</h1>
-                <p class="page-subtitle">Dernières exécutions des tâches planifiées du Raspberry Pi.</p>
-            </div>
-        </div>
+    {% set cnt = {ok: 0, bad: 0, run: 0, never: 0} %}
+    {% for it in items %}
+        {% if it.status == 'running' %}{% set cnt = cnt|merge({run: cnt.run + 1}) %}
+        {% elseif it.status == 'never' %}{% set cnt = cnt|merge({never: cnt.never + 1}) %}
+        {% elseif it.severity >= 2 %}{% set cnt = cnt|merge({bad: cnt.bad + 1}) %}
+        {% else %}{% set cnt = cnt|merge({ok: cnt.ok + 1}) %}{% endif %}
+    {% endfor %}
 
-        <section class="jobs-hero is-{{ summary.level }}">
-            <span class="jobs-hero-dot" aria-hidden="true"></span>
-            <div class="jobs-hero-copy">
-                <strong>{{ summary.label }}</strong>
-                <small>
-                    {% if summary.level == 'ok' %}Toutes les tâches suivies se sont bien terminées dans les délais.
-                    {% elseif summary.level == 'none' %}Aucune tâche n'est déclarée dans config/jobs.json.
-                    {% else %}Voir le détail ci-dessous : les tâches en défaut sont en premier.{% endif %}
-                </small>
+    <div class="ops-page" data-jobs-page data-jobs-state-url="{{ path('app_jobs_state') }}"
+         data-jobs-busy="{{ cnt.run > 0 or items|filter(i => i.pending)|length > 0 ? '1' : '0' }}">
+
+        <header class="ops-head">
+            <div>
+                <div class="ops-prompt">pi@central:~$ <span>jobs --status</span></div>
+                <h1 class="ops-title">SAUVEGARDES<small> · tâches planifiées</small></h1>
             </div>
+            <div class="ops-clock">{{ 'now'|date('d/m/Y H:i') }}</div>
+        </header>
+
+        <section class="ops-kpis">
+            <div class="ops-kpi is-{{ summary.level }}"><b>{{ summary.level == 'ok' ? 'NOMINAL' : (summary.level == 'none' ? 'N/A' : (summary.level == 'warning' ? 'ATTENTION' : 'DÉFAUT')) }}</b><span>état global</span></div>
+            <div class="ops-kpi"><b>{{ items|length }}</b><span>tâches</span></div>
+            <div class="ops-kpi is-ok"><b>{{ cnt.ok }}</b><span>ok</span></div>
+            <div class="ops-kpi {{ cnt.bad > 0 ? 'is-danger' : '' }}"><b>{{ cnt.bad }}</b><span>en défaut</span></div>
+            <div class="ops-kpi {{ cnt.run > 0 ? 'is-running' : '' }}"><b>{{ cnt.run }}</b><span>en cours</span></div>
+            <div class="ops-kpi"><b>{{ cnt.never }}</b><span>jamais lancées</span></div>
+            {% if disk %}
+                <div class="ops-kpi is-{{ disk.status == 'failed' ? 'danger' : (disk.status == 'warning' ? 'warning' : 'ok') }}">
+                    <b>{{ disk.freePct|round }} %</b><span>disque libre · {{ disk.free|job_size }}</span>
+                </div>
+            {% endif %}
         </section>
 
-        {% if disk %}
-            <section class="envp-card jobs-disk is-{{ disk.status }}">
-                <div class="jobs-disk-head">
-                    <h2>Disque de sauvegarde</h2>
-                    {% include 'sauvegarde/_badge.html.twig' with { status: disk.status == 'failed' ? 'failed' : (disk.status == 'warning' ? 'warning' : 'ok') } %}
-                </div>
-                <p class="jobs-muted">{{ disk.reason }}</p>
-                <div class="jobs-bar" role="img" aria-label="Espace utilisé"><span style="width: {{ disk.total > 0 ? (100 - disk.freePct)|round(1) : 0 }}%"></span></div>
-                <p class="jobs-muted"><code>{{ disk.path }}</code> · {{ disk.free|job_size }} libres sur {{ disk.total|job_size }}</p>
-            </section>
+        {% if disk and disk.status != 'ok' %}
+            <div class="ops-alert is-{{ disk.status == 'failed' ? 'danger' : 'warning' }}">DISK&nbsp;&gt; {{ disk.reason }}</div>
         {% endif %}
 
-        {% set sorted = items|sort((a, b) => b.severity <=> a.severity) %}
-        <div class="jobs-grid">
-            {% for it in sorted %}
-                {% set st = it.state %}
-                <article class="envp-card jobs-card is-{{ it.status }}" data-job="{{ it.id }}">
-                    <div class="jobs-card-head">
-                        <div>
-                            <h2><a href="{{ path('app_jobs_show', {id: it.id}) }}">{{ it.job.label }}</a></h2>
-                            <small class="jobs-muted">{{ it.job.schedule ?? '' }}</small>
-                        </div>
-                        {% include 'sauvegarde/_badge.html.twig' with { status: it.status } %}
-                    </div>
-
-                    <p class="jobs-reason">{{ it.reason }}{% if it.pending and it.status != 'running' %} <em>(relance demandée)</em>{% endif %}</p>
-
-                    <dl class="jobs-facts">
-                        <div><dt>Dernière exécution</dt><dd>{{ st.startedAt is defined ? (st.startedAt|job_dt) ~ ' · ' ~ (st.startedAt|job_ago) : '—' }}</dd></div>
-                        <div><dt>Durée</dt><dd>{{ st.duration is defined ? st.duration|job_duration : '—' }}</dd></div>
-                        <div><dt>Fichier</dt><dd>
-                            {% if st.artifact is defined and st.artifact %}
-                                {{ st.artifact.size|job_size }}
-                                {% if it.sizeDeltaPct is not null %}<span class="jobs-delta {{ it.sizeDeltaPct <= -20 ? 'is-down' : '' }}">{{ it.sizeDeltaPct >= 0 ? '+' : '' }}{{ it.sizeDeltaPct|round(1)|replace({'.': ','}) }} %</span>{% endif %}
-                            {% else %}—{% endif %}
-                        </dd></div>
-                        {% if it.lastOk and it.status in ['failed', 'late'] %}
-                            <div><dt>Dernière réussite</dt><dd>{{ it.lastOk.endedAt|job_dt }} · {{ it.lastOk.endedAt|job_ago }}</dd></div>
-                        {% endif %}
-                    </dl>
-
-                    <div class="jobs-actions">
-                        {% include 'layout/modern/components/_btns.html.twig' with {
-                            removeContainer: true,
-                            btns: [{ label: 'Détails', path: path('app_jobs_show', {id: it.id}), icon: 'lucide:list', color: 'neutral', size: 'sm' }]
-                        } %}
-                        <form method="post" action="{{ path('app_jobs_run', {id: it.id}) }}" data-jobs-confirm="Relancer « {{ it.job.label }} » maintenant ?">
-                            <input type="hidden" name="_token" value="{{ csrf_token('jobs_run') }}">
-                            {% include 'layout/modern/components/_btns.html.twig' with {
-                                removeContainer: true,
-                                btns: [{ label: 'Relancer', type: 'submit', icon: 'mdi:refresh', color: 'primary', size: 'sm', attrs: (it.status == 'running' or it.pending) ? { disabled: true } : {} }]
-                            } %}
-                        </form>
-                    </div>
-                </article>
-            {% endfor %}
+        <div class="ops-section">// JOBS</div>
+        <div class="ops-table-wrap">
+            <table class="ops-table">
+                <thead>
+                <tr>
+                    <th>STATUT</th><th>TÂCHE</th><th>PLANIF.</th><th>DERNIER RUN</th><th>DURÉE</th><th>FICHIER</th><th>Δ</th><th>TAILLE (30 runs)</th><th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for it in items|sort((a, b) => b.severity <=> a.severity) %}
+                    {% set st = it.state %}
+                    {% set spark = histories[it.id]|job_spark(120, 28) %}
+                    <tr class="is-{{ it.status }}" data-job="{{ it.id }}">
+                        <td>{% include 'sauvegarde/_badge.html.twig' with { status: it.status } %}</td>
+                        <td class="ops-name">
+                            <a href="{{ path('app_jobs_show', {id: it.id}) }}">{{ it.id }}</a>
+                            <small>{{ it.job.label }}</small>
+                            {% if it.status not in ['ok', 'never'] %}<em class="ops-reason">{{ it.reason }}</em>{% endif %}
+                        </td>
+                        <td>{{ it.job.schedule ?? '—' }}</td>
+                        <td>{% if st.startedAt is defined %}{{ st.startedAt|job_dt }}<small>{{ st.startedAt|job_ago }}</small>{% else %}—{% endif %}</td>
+                        <td>{{ st.duration is defined ? st.duration|job_duration : '—' }}</td>
+                        <td>{% if st.artifact is defined and st.artifact %}{{ st.artifact.size|job_size }}<small>{{ st.artifact.name }}</small>{% else %}—{% endif %}</td>
+                        <td>{% if it.sizeDeltaPct is not null %}<span class="ops-delta {{ it.sizeDeltaPct <= -20 ? 'is-down' : '' }}">{{ it.sizeDeltaPct >= 0 ? '+' : '' }}{{ it.sizeDeltaPct|round(1)|replace({'.': ','}) }} %</span>{% else %}—{% endif %}</td>
+                        <td>
+                            {% if spark %}
+                                <svg class="ops-spark" viewBox="0 0 {{ spark.w }} {{ spark.h }}" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ spark.points }}"/></svg>
+                            {% else %}<small>—</small>{% endif %}
+                        </td>
+                        <td class="ops-actions">
+                            <form method="post" action="{{ path('app_jobs_run', {id: it.id}) }}" data-jobs-confirm="Relancer « {{ it.job.label }} » maintenant ?">
+                                <input type="hidden" name="_token" value="{{ csrf_token('jobs_run') }}">
+                                {% include 'layout/modern/components/_btns.html.twig' with {
+                                    removeContainer: true,
+                                    btns: [{ label: 'Relancer', type: 'submit', icon: 'mdi:refresh', color: 'neutral', size: 'xs', iconOnly: true, attrs: (it.status == 'running' or it.pending) ? { disabled: true } : {} }]
+                                } %}
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </div>
-{% endblock %}
 
-{% block javascripts %}
-    <script src="{{ asset('js/jobs.js') ~ '?v=1' }}" defer></script>
+        {% if disk %}
+            <div class="ops-section">// STOCKAGE</div>
+            <div class="ops-disk is-{{ disk.status }}">
+                <div class="ops-disk-line"><code>{{ disk.path }}</code> <span>{{ disk.mounted ? 'monté' : 'NON MONTÉ' }}</span></div>
+                <div class="ops-gauge" role="img" aria-label="Espace utilisé"><span style="width: {{ disk.total > 0 ? (100 - disk.freePct)|round(1) : 0 }}%"></span></div>
+                <div class="ops-disk-line"><span>{{ (disk.total - disk.free)|job_size }} utilisés</span><span>{{ disk.free|job_size }} libres / {{ disk.total|job_size }}</span></div>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
